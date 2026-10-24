@@ -36,8 +36,17 @@ class Guest:
             vars=out/'vars.fd';shutil.copyfile(args.firmware.parent/'AAVMF_VARS.fd',vars)
             cmd+=['-drive',f'if=pflash,format=raw,readonly=on,file={args.firmware}',
                   '-drive',f'if=pflash,format=raw,file={vars}','-device','ramfb','-net','none',
-                  '-device','qemu-xhci,id=xhci','-device','usb-kbd,bus=xhci.0,id=kbd',
-                  '-device',('usb-tablet' if args.tablet else 'usb-mouse')+',bus=xhci.0,id=mouse']
+                  '-device','qemu-xhci,id=xhci']
+            self.usb_bus='xhci.0';self.mouse_port=None
+            path='1'
+            for depth in range(args.hub_depth):
+                cmd+=['-device',f'usb-hub,id=hub{depth},bus=xhci.0,port={path}']
+                if depth+1<args.hub_depth:path+='.1'
+            keyboard_port=',port='+path+'.1' if args.hub_depth else ''
+            if args.hub_depth:self.mouse_port=path+'.2'
+            mouse_port=',port='+self.mouse_port if self.mouse_port else ''
+            cmd+=['-device','usb-kbd,bus=xhci.0,id=kbd'+keyboard_port,
+                  '-device',('usb-tablet' if args.tablet else 'usb-mouse')+',bus=xhci.0,id=mouse'+mouse_port]
             if args.mode=='uefi': cmd+=['-device','virtio-scsi-device,id=scsi',
                   '-drive',f'if=none,file={iso},format=raw,media=cdrom,id=cd','-device','scsi-cd,drive=cd']
             else: cmd+=['-drive',f'if=none,file={disk},format=raw,id=disk','-device','virtio-blk-device,drive=disk']
@@ -102,6 +111,7 @@ def main():
     ap.add_argument('--disk',type=pathlib.Path,default=ROOT/'build/qemu-smoke-disk.img')
     ap.add_argument('--out',type=pathlib.Path,required=True)
     ap.add_argument('--qemu-data',type=pathlib.Path)
+    ap.add_argument('--hub-depth',type=int,choices=range(0,5),default=0)
     ap.add_argument('--tablet',action='store_true')
     ap.add_argument('--memory',default='512M')
     ap.add_argument('--uefi-kernel',type=pathlib.Path,default=ROOT/'build/uefi-kernel/chos.elf')
@@ -124,7 +134,7 @@ def main():
         time.sleep(.1)
         result['desktop_ready_seconds']=round(time.monotonic()-g.started,3)
         if args.mode!='direct':
-            assert 'HID devices=2' in g.text(),g.text()
+            wait(lambda:g.symbol('online')==2,10,'USB HID enumeration through root/hub topology')
             assert 'IRQ delivery enabled after initial desktop frame' in g.text()
             if args.timer_fault: assert 'Timer IRQ delivery did not progress' in g.text()
             else: assert 'Timer IRQ delivery verified' in g.text()
@@ -217,10 +227,29 @@ def main():
             for i in range(20):
                 g.qmp('device_del',id=current);time.sleep(.12)
                 current='mouse'+str(i)
-                g.qmp('device_add',driver='usb-tablet' if args.tablet else 'usb-mouse',bus='xhci.0',id=current);time.sleep(.25)
+                g.qmp('device_add',driver='usb-tablet' if args.tablet else 'usb-mouse',bus=g.usb_bus,id=current,**({'port':g.mouse_port} if g.mouse_port else {}));time.sleep(.25)
             before=g.screen('reconnect-before');motion(100,0)
             wait(lambda:g.screen('reconnect-after')!=before,2,'hot-reconnected mouse after 20 cycles')
             result['checks']+=['20 USB hot-unplug/reconnect cycles with ring wraps']
+            if args.hub_depth:
+                g.qmp('input-send-event',events=[{'type':'key','data':{'down':True,'key':{'type':'qcode','data':'shift'}}}])
+                wait(lambda:g.symbol('shift_down')==1,2,'held USB modifier before hub unplug')
+                button(True)
+                g.qmp('device_del',id='hub0')
+                wait(lambda:g.symbol('online')==0,3,'whole hub subtree teardown')
+                wait(lambda:g.symbol('shift_down')==0 and g.symbol('left_button_down')==0,2,'release held inputs on subtree removal')
+                path='1'
+                for depth in range(args.hub_depth):
+                    g.qmp('device_add',driver='usb-hub',id='rehub'+str(depth),bus='xhci.0',port=path)
+                    if depth+1<args.hub_depth:path+='.1'
+                g.qmp('device_add',driver='usb-kbd',bus='xhci.0',port=path+'.1',id='rekbd')
+                g.qmp('device_add',driver='usb-tablet' if args.tablet else 'usb-mouse',bus='xhci.0',port=path+'.2',id='remouse')
+                wait(lambda:g.symbol('online')==2,5,'whole hub subtree re-enumeration')
+                g.qmp('input-send-event',events=[{'type':'key','data':{'down':False,'key':{'type':'qcode','data':'shift'}}}])
+                before=g.screen('rehub-before');motion(-80,30)
+                wait(lambda:g.screen('rehub-after')!=before,2,'input after whole hub reconnect')
+                result['checks']+=['whole hub subtree unplug/reconnect and held-key/button release']
+
         ticks=g.cpu_ticks();start=time.monotonic();time.sleep(2)
         result['idle_cpu_percent']=round(100*(g.cpu_ticks()-ticks)/os.sysconf('SC_CLK_TCK')/(time.monotonic()-start),2)
         result['checks']+=['2-second idle observation']

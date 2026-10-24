@@ -63,6 +63,7 @@ static const char test_file_contents[] =
     "row 19: viewer scrolling works.\n"
     "row 20: viewer scrolling works.\n";
 
+const char *uefi_console_boot_log(void) {return "PCI test inventory\n";}
 int timer_is_ready(void) { return mock_timer_ready; }
 uint64_t timer_ticks(void) { return mock_ticks; }
 uint64_t timer_counter(void) { return mock_ticks; }

@@ -62,6 +62,16 @@ int main(void) {
     config[27]=0;assert(!chos_usb_parse_config(config,sizeof(config),out,&count));config[27]=7;
     config[14]=9;assert(!chos_usb_parse_config(config,sizeof(config),out,&count));config[14]=3;
     config[32]=0xff;assert(!chos_usb_parse_config(config,sizeof(config),out,&count));
+    uint8_t hub_config[]={9,2,25,0,1,1,0,0x80,50,9,4,0,0,1,9,0,0,0,7,5,0x81,3,2,0,12};
+    chos_usb_hid_interface_t hub;
+    assert(chos_usb_parse_hub_config(hub_config,sizeof(hub_config),&hub));
+    assert(hub.endpoint==0x81 && hub.packet_bytes==2);
+    for(size_t n=0;n<sizeof(hub_config);++n)assert(!chos_usb_parse_hub_config(hub_config,n,&hub));
+    hub_config[18]=0;assert(!chos_usb_parse_hub_config(hub_config,sizeof(hub_config),&hub));hub_config[18]=7;
+    hub_config[22]=0;assert(!chos_usb_parse_hub_config(hub_config,sizeof(hub_config),&hub));
+    uint8_t ss_config[]={9,2,40,0,1,1,0,0x80,50,9,4,0,0,1,3,1,1,0,9,0x21,0x11,1,0,1,0x22,45,0,7,5,0x81,3,8,0,10,6,0x30,0,0,8,0};
+    assert(chos_usb_parse_config(ss_config,sizeof(ss_config),out,&count));
+    ss_config[36]=1;assert(!chos_usb_parse_config(ss_config,sizeof(ss_config),out,&count));
     chos_xhci_ring_t r;chos_xhci_ring_init(&r);
     for(unsigned wrap=0;wrap<5;++wrap) {
         unsigned cycle=r.cycle;

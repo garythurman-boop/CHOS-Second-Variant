@@ -22,6 +22,7 @@
 #include "chos/nvme.h"
 #include "chos/entropy.h"
 #include "chos/xhci.h"
+#include "chos/build_stamp.h"
 #include "../platform/uefi_console.h"
 
 static fdt_info_t boot_device_tree;
@@ -128,7 +129,7 @@ static void print_banner(void) {
     uart_puts("| |   | |_| | | | \\___ \\\n");
     uart_puts("| |___|  _  | |_| |___) |\n");
     uart_puts(" \\____|_| |_|\\___/|____/\n");
-    uart_puts("CHOS ARM64 kernel 0.30.0\n");
+    uart_puts("CHOS ARM64 kernel 0.30.0\n[BUILD] " CHOS_BUILD_REVISION "\n");
 }
 
 static __attribute__((noreturn)) void kernel_halt_safely(void) {
@@ -184,6 +185,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             uefi_console_enable_serial();
         }
         if (console_ready) {
+            uefi_console_write("[BUILD] " CHOS_BUILD_REVISION "\n");
             uefi_console_write("\nACPI parser: "); uefi_console_write(chos_acpi_error_string(acpi_result)); uefi_console_write("\n");
             if (acpi_result == CHOS_ACPI_OK) {
                 uefi_console_write("GIC distributor base: "); uefi_console_write_hex(acpi_info.gic_distributor_base); uefi_console_write("\n");
@@ -373,9 +375,10 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         for (uint32_t i=0; i<pci_summary.devices_stored && acpi_result==CHOS_ACPI_OK; ++i) {
             const chos_pci_device_t *d=&pci_devices[i];
             if(d->class_code!=12 || d->subclass!=3 || d->programming_interface!=0x30) continue;
+            if(console_ready)chos_xhci_set_logger(uefi_console_write);
             int ok=chos_xhci_init(boot_info,&acpi_info,d);
             if(console_ready) {
-                uefi_console_write(ok?"[OK] Native xHCI: ":"[WARN] Native xHCI: ");
+                uefi_console_write(ok?"[OK] xHCI controller running: ":"[WARN] xHCI controller unavailable: ");
                 uefi_console_write(chos_xhci_error()); uefi_console_write("; HID devices=");
                 uefi_console_write_u64(chos_xhci_device_count()); uefi_console_write("\n");
             }
@@ -413,6 +416,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
                 uefi_console_write("[OK] Timer IRQ delivery verified before low-power idle.\n");
             }
         }
+        uefi_console_set_graphics_logging(0);
         for (;;) {
             chos_xhci_poll();
             if (input_ready) chos_input_poll();

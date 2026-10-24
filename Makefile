@@ -9,7 +9,7 @@ BUILD := build
 CFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -ffreestanding -fno-builtin \
           -fno-stack-protector -fno-pic -mgeneral-regs-only -mstrict-align \
           -Wall -Wextra -Werror \
-          -O2 -g -std=c11 -Iinclude -MMD -MP
+          -O2 -g -std=c11 -I$(BUILD)/include -Iinclude -MMD -MP
 ASFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -g
 LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 
@@ -1018,3 +1018,11 @@ test-gicv3-sanitize: $(SAN_DIR)/test-gicv3
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-gicv3
 test: test-gicv3
 test-sanitize: test-gicv3-sanitize
+
+# Embed the source revision in diagnostics; no wall-clock timestamp in artifacts.
+BUILD_STAMP := $(BUILD)/include/chos/build_stamp.h
+.PHONY: force-build-stamp
+force-build-stamp:
+$(BUILD_STAMP): force-build-stamp tools/build_stamp.py
+	python3 tools/build_stamp.py $@
+$(BUILD)/kernel/core/kernel.o $(UEFI_KERNEL_BUILD)/kernel/core/kernel.o: $(BUILD_STAMP)

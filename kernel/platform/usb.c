@@ -34,6 +34,8 @@ int chos_usb_parse_config(const uint8_t *d, size_t n,
                 !packet || packet > CHOS_USB_REPORT_BYTES || !d[i+6] || found == CHOS_USB_MAX_HID) return 0;
             for (size_t j=0; j<found; ++j) if (out[j].endpoint == d[i+2]) return 0;
             out[found++] = (chos_usb_hid_interface_t){iface,d[i+2],d[i+6],boot_protocol,packet,report};
+        } else if(d[i+1]==0x30 && hid) {
+            if(len<6 || !found || d[i+2] || d[i+3] || le16(d+i+4)>out[found-1].packet_bytes)return 0;
         }
     }
     *count = found; return found != 0;
@@ -125,4 +127,30 @@ int chos_usb_decode_report(const chos_hid_report_layout_t *l, chos_usb_input_sta
     if (x || y) chos_input_relative(x,y);
     if (wheel) chos_input_scroll(wheel);
     return 1;
+}
+
+int chos_usb_parse_hub_config(const uint8_t *d,size_t n,chos_usb_hid_interface_t *out) {
+    size_t pos,end;
+    int hub=0,found=0;
+    if(!d || !out || n<9 || d[0]!=9 || d[1]!=2 || !d[5])return 0;
+    end=le16(d+2);if(end!=n)return 0;
+    for(pos=9;pos<end;pos+=d[pos]) {
+        if(end-pos<2 || d[pos]<2 || d[pos]>end-pos)return 0;
+        if(d[pos+1]==4) {
+            if(d[pos]<9)return 0;
+            hub=d[pos+3]==0 && d[pos+5]==9;
+            if(hub)out->interface=d[pos+2];
+        } else if(d[pos+1]==5 && hub) {
+            if(d[pos]<7)return 0;
+            if((d[pos+2]&0x80) && (d[pos+3]&3)==3) {
+                unsigned bytes=le16(d+pos+4);
+                if(found || !(d[pos+2]&15) || (d[pos+2]&0x70) || !bytes || bytes>CHOS_USB_REPORT_BYTES || !d[pos+6])return 0;
+                out->endpoint=d[pos+2];out->interval=d[pos+6];out->packet_bytes=(uint16_t)bytes;
+                out->boot_protocol=0;out->report_bytes=0;found=1;
+            }
+        } else if(d[pos+1]==0x30 && hub) {
+            if(d[pos]<6 || !found || d[pos+2] || d[pos+3] || le16(d+pos+4)>out->packet_bytes)return 0;
+        }
+    }
+    return found;
 }

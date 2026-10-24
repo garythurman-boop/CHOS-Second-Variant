@@ -54,3 +54,39 @@ the scene during presentation. This is a concrete in-environment defect, not a h
 blocker. `direct-generation/result.json` and `tablet-generation/result.json` pass with
 actual foreground-window ID/geometry checks. Full updated host and sanitizer suites
 also pass (`iteration1-final-host.log`, `iteration1-final-sanitize.log`).
+
+## Iteration 2: USB hub topology and retained diagnostics
+
+The xHCI path now supports bounded root/hub topology, class hub descriptors,
+configuration, per-port power/status/change acknowledgement, asynchronous debounce
+and reset, route strings, HS single-TT child addressing and recursive child-first
+teardown. Standard SS hub depth/context handling is implemented but has no live SS
+hub evidence here. The QEMU hub model exercises full-speed hub topology; that does
+not establish physical HS/SS hub compatibility.
+
+Limits are 16 owned slots, up to 255 advertised root ports (validated within the BAR),
+32 ports/hub and five route nibbles of depth. Interrupt payloads up to 1024 bytes are
+bounded by port speed. Unsupported SS burst/stream companion capabilities are rejected.
+Ring segments, input/output contexts and data buffers use alignment that prevents
+crossing 64 KiB DMA boundaries. Invalid ring states are rejected before doorbells.
+Control-transfer timeouts cancel the owning slot when the command queue still works;
+a command queue timeout quarantines the controller. Failed port reset/overcurrent
+states do not trigger endless reinitialization.
+
+Live evidence:
+
+* `hub-live-2`, `hub-relative-1`: one hub, absolute/relative pointer variants and 20
+  downstream mouse/tablet reconnects PASS.
+* `hub-nested-1`: two hubs plus keyboard/tablet PASS.
+* `hub-subtree-1` and `hub-aligned-live`: nested hubs, 20 downstream reconnects,
+  whole-subtree unplug/reconnect and held Shift/button release PASS.
+* `hub-fault-test.log`: host and sanitizer coverage includes descriptor truncation,
+  stuck downstream reset, overcurrent, recursive teardown and lost control TD cleanup.
+
+A controller starting with no attached HID is now labelled as controller status,
+not successful keyboard/mouse support. Retained USB logs identify root, route, slot,
+VID/PID and attachment/failure. After startup these messages no longer draw over the
+desktop. In the fallback kernel Console, `bootlog` shows retained initialization/USB
+messages and `pci` filters the PCI inventory. This gives Fusion a diagnostic path even
+when no supported serial UART exists. Boot logs include the source revision and dirty
+state; generated artifacts continue to carry SHA-256 hashes in the delivery manifest.

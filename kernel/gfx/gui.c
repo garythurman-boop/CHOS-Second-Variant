@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/gui.h"
+#include "../platform/uefi_console.h"
 #include "chos/taskbar_text.h"
 #include "chos/syscall.h"
 #include "chos/virtio_gpu.h"
@@ -2172,7 +2173,20 @@ static void terminal_execute(char *input) {
     argument = split;
     while (*argument == ' ' || *argument == '\t') ++argument;
     if (gui_strings_equal(command, "help")) {
-        terminal_puts("Commands:\n  help       Show this help\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+        terminal_puts("Commands:\n  help       Show this help\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+    } else if (gui_strings_equal(command,"bootlog") || gui_strings_equal(command,"pci")) {
+        const char *log=uefi_console_boot_log();
+        if(!log[0])terminal_puts("No retained UEFI log; direct boot uses the serial console.\n");
+        int only_pci=gui_strings_equal(command,"pci");
+        while(*log) {
+            const char *line=log;
+            while(*log && *log!='\n')++log;
+            if(!only_pci || (line[0]=='P' && line[1]=='C' && line[2]=='I' && line[3]==' ')) {
+                while(line<log)terminal_putc(*line++);
+                terminal_putc('\n');
+            }
+            if(*log)++log;
+        }
     } else if (gui_strings_equal(command, "clear") || gui_strings_equal(command, "cls")) {
         terminal_clear_lines();
     } else if (gui_strings_equal(command, "pwd")) {

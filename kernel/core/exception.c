@@ -120,6 +120,7 @@ CHOS_NORETURN void exception_panic(uint64_t esr, uint64_t elr,
     uart_console_emergency_reset();
     /* Generic UEFI hardware may have no supported serial UART. Preserve a
      * visible terminal diagnostic instead of leaving a frozen-looking splash. */
+    uefi_console_set_graphics_logging(1);
     uefi_console_write("\n[FATAL] Kernel exception; halted. ESR=");
     uefi_console_write_hex(esr);uefi_console_write(" ELR=");
     uefi_console_write_hex(elr);uefi_console_write(" FAR=");

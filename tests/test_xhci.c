@@ -40,7 +40,40 @@ static void fixture(void) {
     memset(regs,0,sizeof(regs)); regs[0]=0x01000020;regs[1]=(2u<<24)|8u;
     regs[4]=1;regs[5]=0x1000;regs[6]=0x2000;regs[0x28/4]=1;
     mmio=0;running=poisoned=0;mock_event_tail=0;mock_time=0;
-    reset_stuck=no_response=bad_completion=0;
+    reset_stuck=no_response=bad_completion=0;test_control=0;
+}
+static unsigned port_status,port_changes,cleared,reset_requests;
+static int class_request(usb_device_t *d,uint8_t type,uint8_t request,uint16_t value,uint16_t index,uint16_t length) {
+    (void)index;(void)length;
+    if(type==0xa3 && request==0) {
+        d->data[0]=(uint8_t)port_status;d->data[1]=(uint8_t)(port_status>>8);
+        d->data[2]=(uint8_t)port_changes;d->data[3]=(uint8_t)(port_changes>>8);return 1;
+    }
+    if(type==0x23 && request==1 && value>=16) {cleared|=1u<<(value-16);port_changes&=~(1u<<(value-16));return 1;}
+    if(type==0x23 && request==3 && value==4) {++reset_requests;port_status|=16;return 1;}
+    if(type==0x23 && request==1 && value==8) return 1;
+    return 0;
+}
+static void hub_fault_tests(void) {
+    fixture();assert(chos_xhci_init(&boot,&acpi,&pci));
+    usb_device_t *h=&devices[0];h->active=1;h->hub=1;h->slot=1;h->hub_ports=1;h->hub_changes=1;
+    test_control=class_request;port_status=1;port_changes=1;cleared=reset_requests=0;
+    poll_hubs();assert(h->port_phase[0]==1 && cleared==1);
+    mock_time+=30;poll_hubs();assert(reset_requests==1 && h->port_phase[0]==2);
+    mock_time+=600;poll_hubs();assert(h->port_phase[0]==3 && running); /* bounded stuck reset */
+    /* Disconnecting a hub releases all descendants before disabling the parent. */
+    usb_device_t *child=&devices[1];child->active=1;child->slot=2;child->parent=1;online=1;
+    assert(remove_device(h));assert(!child->slot && !h->slot && !online && running);
+    fixture();assert(chos_xhci_init(&boot,&acpi,&pci));
+    h=&devices[0];h->active=1;h->hub=1;h->slot=1;h->hub_ports=1;h->hub_changes=1;
+    child=&devices[1];child->active=1;child->slot=2;child->parent=1;child->parent_port=1;online=1;
+    port_status=9;port_changes=0;test_control=class_request;poll_hubs();
+    assert(!child->slot && !online && h->port_phase[0]==3 && running); /* overcurrent */
+    /* Lost control TD cancels its slot; unrelated controllers/ports stay alive. */
+    fixture();assert(chos_xhci_init(&boot,&acpi,&pci));
+    h=&devices[0];h->slot=1;h->active=1;chos_xhci_ring_init(&h->control);no_response=1;
+    assert(!control(h,0x80,6,0x100,0,18));assert(running && !poisoned);
+    no_response=0;assert(remove_device(h));assert(running && !h->slot);
 }
 int main(void) {
     fixture();assert(chos_xhci_init(&boot,&acpi,&pci));assert(!online);
@@ -60,5 +93,8 @@ int main(void) {
     events[mock_event_tail++]=(chos_xhci_trb_t){0x1230,6u<<24,TRB(32)|(1u<<24)|(3u<<16)|1};
     chos_xhci_poll();assert(!d->slot && !online && running);
     regs[0x24/4]=4;chos_xhci_poll();assert(!running && poisoned);
+    fixture();assert(chos_xhci_init(&boot,&acpi,&pci));commands.enqueue=CHOS_XHCI_RING_TRBS;
+    assert(!command(23,0,0,0) && poisoned && !running);
+    hub_fault_tests();
     puts("xHCI mock: absent ports, idempotence, malformed capabilities, reset timeout, lost/error completion, fatal status and quarantine passed");
 }

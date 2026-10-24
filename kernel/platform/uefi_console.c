@@ -21,7 +21,11 @@ static uint32_t fb_width, fb_height, fb_stride, fb_format;
 static uint32_t fb_red_mask, fb_green_mask, fb_blue_mask, fb_reserved_mask;
 static uint32_t cursor_x, cursor_y;
 static int ready;
+static int graphics_logging=1;
+void uefi_console_set_graphics_logging(int enabled) {graphics_logging=enabled;}
+
 char chos_uefi_boot_log[16384];
+const char *uefi_console_boot_log(void) {return chos_uefi_boot_log;}
 static unsigned log_used;
 static int serial_ready;
 void uefi_console_enable_serial(void) { serial_ready=1; }
@@ -131,7 +135,7 @@ void uefi_console_write(const char *text) {
         chos_uefi_boot_log[log_used++]=text[i];
     chos_uefi_boot_log[log_used]=0;
     if (serial_ready) uart_puts(text);
-    if (!ready) return;
+    if (!ready || !graphics_logging) return;
     while (*text != '\0') {
         char ch = *text++;
         if (ch == '\r') continue;
