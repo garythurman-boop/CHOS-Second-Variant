@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/platform.h"
+#include "chos/virtio_transport.h"
 #include "chos/virtio_input.h"
 #include "chos/gui.h"
 #include "chos/input.h"
@@ -97,9 +98,8 @@ static input_device_t devices[INPUT_DEVICE_LIMIT];
 static unsigned device_count;
 static const char *last_error = "probe not run";
 
-static volatile uint32_t *reg32(uintptr_t base, uint32_t offset) { return (volatile uint32_t *)(base + offset); }
-static uint32_t read_reg(uintptr_t base, uint32_t offset) { return *reg32(base, offset); }
-static void write_reg(uintptr_t base, uint32_t offset, uint32_t value) { *reg32(base, offset) = value; }
+static uint32_t read_reg(uintptr_t base, uint32_t offset) { return chos_virtio_read(base,offset); }
+static void write_reg(uintptr_t base, uint32_t offset, uint32_t value) { chos_virtio_write(base,offset,value); }
 static void dma_store_barrier(void) { __asm__ volatile("dmb oshst" ::: "memory"); }
 static void dma_load_barrier(void) { __asm__ volatile("dmb oshld" ::: "memory"); }
 static void cpu_full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
@@ -214,7 +214,7 @@ static int initialize_device(input_device_t *device, uintptr_t base) {
 }
 
 int chos_input_init(void) {
-    uintptr_t first_base = platform_virtio_mmio_base();
+    uintptr_t first_base = chos_virtio_aperture();
     uint32_t slot;
     if (device_count) return (int)device_count; /* idempotent: do not clear live DMA queues */
     device_count = 0u;

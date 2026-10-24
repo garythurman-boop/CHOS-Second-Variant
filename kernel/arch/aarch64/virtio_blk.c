@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "chos/blockdev.h"
 #include "chos/platform.h"
+#include "chos/virtio_transport.h"
 #include "chos/virtio_blk.h"
 #include "chos/dma.h"
 
@@ -79,9 +80,8 @@ static void dma_store_barrier(void) { __asm__ volatile("":::"memory"); }
 static void dma_load_barrier(void) { __asm__ volatile("":::"memory"); }
 static void cpu_full_barrier(void) { __asm__ volatile("":::"memory"); }
 #else
-static volatile uint32_t *reg32(uint32_t offset) { return (volatile uint32_t *)(mmio_base + offset); }
-static uint32_t read_reg(uint32_t offset) { return *reg32(offset); }
-static void write_reg(uint32_t offset, uint32_t value) { *reg32(offset) = value; }
+static uint32_t read_reg(uint32_t offset) { return chos_virtio_read(mmio_base,offset); }
+static void write_reg(uint32_t offset, uint32_t value) { chos_virtio_write(mmio_base,offset,value); }
 static void dma_store_barrier(void) { __asm__ volatile("dmb oshst" ::: "memory"); }
 static void dma_load_barrier(void) { __asm__ volatile("dmb oshld" ::: "memory"); }
 static void cpu_full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
@@ -172,7 +172,7 @@ int virtio_blk_init(chos_block_device_t *out) {
     if(driver_ready) { *out=active_device; return 1; }
     out->ready = 0; out->sector_count = 0u;
     driver_ready = 0; flush_supported = 0; detected_mmio_base = 0u;
-    first_base = platform_virtio_mmio_base();
+    first_base = chos_virtio_aperture();
     if (first_base == 0u) { last_error = "platform has no VirtIO-MMIO aperture"; return 0; }
 
     /* QEMU virt allocates one 0x200-byte MMIO transport slot per device.

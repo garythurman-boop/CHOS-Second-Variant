@@ -90,3 +90,43 @@ desktop. In the fallback kernel Console, `bootlog` shows retained initialization
 messages and `pci` filters the PCI inventory. This gives Fusion a diagnostic path even
 when no supported serial UART exists. Boot logs include the source revision and dirty
 state; generated artifacts continue to carry SHA-256 hashes in the delivery manifest.
+
+## Iteration 3: modern PCI VirtIO in ACPI-only UEFI
+
+A standards-discovered PCI capability transport now shares the device queue drivers
+with the original FDT MMIO path. Common/notification/ISR/device regions must fit a
+sized firmware-assigned BAR. Capability loops, malformed lengths, unaligned regions,
+invalid queue/notification offsets, RAM conflicts and unverified IORT translation
+are rejected. The upper dword of a 64-bit BAR cannot be treated as another BAR.
+PCI operation currently requires identity DMA with MMU/cache off. Legacy-only PCI
+and general IOMMU mapping remain unsupported. Firmware runtime still uses kernel
+GUI applications; this change does not establish generic UEFI EL0 processes.
+
+The fallback Console adds `write PATH TEXT`, `sync`, `rng-test`, `netstatus` and
+`ping a.b.c.d`. Entropy receipt is verified through actual device completion and
+never derived from timers. No file system is automatically formatted.
+
+`pci-virtio-live1` and `pci-virtio-debug` failed DHCP/TX during development; evidence
+is retained. A PCI queue-enable zero write differs from the MMIO reset vocabulary;
+the PCI adapter now ignores zero queue-ready writes and uses device reset.
+`pci-virtio-trace` then received DHCP, wrote/flushed/read CHFS and received entropy,
+but failed because the test attempted to read a compiler-split static symbol. The
+runner now checks the actual Console ping result. `pci-virtio-live2` passes without
+tracing: nested USB hubs/tablet, PCI disk persistence after a fresh boot, hardware
+RNG and DHCP/ARP/ICMP. `pci-direct-regression` also passes with MMIO storage/network,
+EL0 entropy validation and the stronger window geometry checks.
+
+The runner uses copied disks and firmware variables and hashes its kernel/ISO. The
+PCI profiles never write a host physical disk. `--trace` is optional diagnostic
+QEMU tracing and is absent in normal performance runs. Host/sanitizer suites pass
+(`pci-final-host.log`, `pci-final-sanitize.log`).
+
+`pci-no-rng` passes with explicit entropy unavailability while storage, networking,
+input and reboot persistence continue working. `pci-prepared-live2` passes firmware
+boot plus actual kernel CHFS partition write/flush/read/reboot, PCI network/RNG and
+USB hub/tablet checks. An earlier `pci-prepared-live.log` records a mistyped image
+filename before QEMU launched, corrected using the Makefile's actual artifact path.
+Measured normal idle was 2% of one host CPU over the two-second observation in the
+ISO PCI and MMIO regression runs. Pointer visible response was about 45 ms including
+the runner's 40 ms post-input delay; these are emulator observations, not Fusion
+latency measurements.

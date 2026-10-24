@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/platform.h"
+#include "chos/virtio_transport.h"
 #include "chos/virtio_net.h"
 #include "chos/virtio_net_abi.h"
 
@@ -86,11 +87,8 @@ static int tx_busy;
 static chos_virtio_net_info_t net_info;
 static const char *last_error = "probe not run";
 
-static volatile uint32_t *reg32(uint32_t offset) {
-    return (volatile uint32_t *)(mmio_base + (uintptr_t)offset);
-}
-static uint32_t read_reg(uint32_t offset) { return *reg32(offset); }
-static void write_reg(uint32_t offset, uint32_t value) { *reg32(offset) = value; }
+static uint32_t read_reg(uint32_t offset) { return chos_virtio_read(mmio_base,offset); }
+static void write_reg(uint32_t offset, uint32_t value) { chos_virtio_write(mmio_base,offset,value); }
 static void dma_store_barrier(void) { __asm__ volatile("dmb oshst" ::: "memory"); }
 static void dma_load_barrier(void) { __asm__ volatile("dmb oshld" ::: "memory"); }
 static void cpu_full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
@@ -142,7 +140,7 @@ static void mark_failed(const char *reason) {
 }
 
 int virtio_net_init(void) {
-    uintptr_t first_base = platform_virtio_mmio_base();
+    uintptr_t first_base = chos_virtio_aperture();
     uint32_t slot, features0, features1, driver0, driver1, status;
     uint32_t mac_word0, mac_word1, device_status, rx_max, tx_max, queue_max;
     uint16_t i;
@@ -152,9 +150,8 @@ int virtio_net_init(void) {
     if (first_base == 0u) { last_error = "platform has no VirtIO-MMIO aperture"; return 0; }
     for (slot = 0u; slot < VIRTIO_MMIO_SLOT_COUNT; ++slot) {
         uintptr_t candidate = first_base + (uintptr_t)slot * VIRTIO_MMIO_SLOT_SIZE;
-        volatile uint32_t *magic = (volatile uint32_t *)candidate;
-        if (magic[0] != VIRTIO_MAGIC || magic[2] != VIRTIO_DEVICE_NET) continue;
-        if (magic[1] < 2u) { last_error = "legacy VirtIO-net MMIO transport is unsupported"; continue; }
+        if (chos_virtio_read(candidate,REG_MAGIC)!=VIRTIO_MAGIC || chos_virtio_read(candidate,REG_DEVICE_ID)!=VIRTIO_DEVICE_NET)continue;
+        if (chos_virtio_read(candidate,REG_VERSION)<2u) { last_error = "legacy VirtIO-net MMIO transport is unsupported"; continue; }
         mmio_base = candidate;
         found = 1;
         break;

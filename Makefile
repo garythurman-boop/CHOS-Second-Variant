@@ -15,7 +15,7 @@ LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 
 SOURCES_C := kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
-             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/uefi_console.c \
+             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
              kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
@@ -1026,3 +1026,16 @@ force-build-stamp:
 $(BUILD_STAMP): force-build-stamp tools/build_stamp.py
 	python3 tools/build_stamp.py $@
 $(BUILD)/kernel/core/kernel.o $(UEFI_KERNEL_BUILD)/kernel/core/kernel.o: $(BUILD_STAMP)
+
+$(BUILD)/test-virtio-transport: tests/test_virtio_transport.c kernel/platform/virtio_transport.c include/chos/virtio_transport.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-virtio-transport: tests/test_virtio_transport.c kernel/platform/virtio_transport.c include/chos/virtio_transport.h
+	@mkdir -p $(SAN_DIR)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+.PHONY: test-virtio-transport test-virtio-transport-sanitize
+test-virtio-transport: $(BUILD)/test-virtio-transport
+	./$(BUILD)/test-virtio-transport
+test-virtio-transport-sanitize: $(SAN_DIR)/test-virtio-transport
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-virtio-transport
+test: test-virtio-transport
+test-sanitize: test-virtio-transport-sanitize

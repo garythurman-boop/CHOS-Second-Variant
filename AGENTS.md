@@ -32,9 +32,9 @@ git diff --check, not a redundant kernel rebuild.
 
 ## Stage 1 scope
 
-Stage 1 is incomplete. Native IOMMU ownership,
-PCI VirtIO support in the ACPI-only UEFI runtime, and target-specific networking are
-not completed. Some gaps can be implemented/tested in QEMU; do not describe all
+Stage 1 is incomplete. Native IOMMU ownership and target-specific networking are
+not completed. PCI VirtIO block/network/RNG in ACPI-only UEFI now have QEMU evidence;
+UEFI EL0/process runtime is still outside the validated profile. Some gaps can be implemented/tested in QEMU; do not describe all
 remaining work as blocked solely by unavailable physical hardware.
 QEMU evidence does not establish VMware, Pi 5 or laptop support. Do not enable
 experimental NVMe probing on valuable media. Never disable TLS, signature or artifact

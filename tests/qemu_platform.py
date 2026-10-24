@@ -26,6 +26,7 @@ class Guest:
              '-global','virtio-mmio.force-legacy=false','-serial','stdio',
              '-qmp',f'unix:{self.sockpath},server=on,wait=off']
         if args.qemu_data: cmd+=['-L',str(args.qemu_data)]
+        if args.trace:cmd+=['-trace','enable=virtio_*,file='+str(out/'virtio.trace')]
         if args.mode=='direct':
             cmd+=['-device',f'loader,file={elf},cpu-num=0','-device','virtio-gpu-device',
                   '-device','virtio-keyboard-device','-device','virtio-mouse-device',
@@ -35,8 +36,13 @@ class Guest:
         else:
             vars=out/'vars.fd';shutil.copyfile(args.firmware.parent/'AAVMF_VARS.fd',vars)
             cmd+=['-drive',f'if=pflash,format=raw,readonly=on,file={args.firmware}',
-                  '-drive',f'if=pflash,format=raw,file={vars}','-device','ramfb','-net','none',
+                  '-drive',f'if=pflash,format=raw,file={vars}','-device','ramfb',
                   '-device','qemu-xhci,id=xhci']
+            if args.pci_virtio:
+                cmd+=['-drive',f'if=none,file={disk},format=raw,id=storage','-device','virtio-blk-pci,disable-legacy=on,drive=storage',
+                      '-netdev','user,id=net','-device','virtio-net-pci,disable-legacy=on,netdev=net']
+                if not args.no_rng:cmd+=['-object','rng-random,filename=/dev/urandom,id=rng','-device','virtio-rng-pci,disable-legacy=on,rng=rng']
+            else:cmd+=['-net','none']
             self.usb_bus='xhci.0';self.mouse_port=None
             path='1'
             for depth in range(args.hub_depth):
@@ -49,7 +55,7 @@ class Guest:
                   '-device',('usb-tablet' if args.tablet else 'usb-mouse')+',bus=xhci.0,id=mouse'+mouse_port]
             if args.mode=='uefi': cmd+=['-device','virtio-scsi-device,id=scsi',
                   '-drive',f'if=none,file={iso},format=raw,media=cdrom,id=cd','-device','scsi-cd,drive=cd']
-            else: cmd+=['-drive',f'if=none,file={disk},format=raw,id=disk','-device','virtio-blk-device,drive=disk']
+            elif not args.pci_virtio: cmd+=['-drive',f'if=none,file={disk},format=raw,id=disk','-device','virtio-blk-device,drive=disk']
         (out/'command.json').write_text(json.dumps(cmd,indent=2))
         self.started=time.monotonic()
         self.process=subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=self.logfile,stderr=subprocess.STDOUT)
@@ -84,6 +90,12 @@ class Guest:
         raise AssertionError('No visible foreground window')
     def serial(self,c):
         self.process.stdin.write((c+'\n').encode());self.process.stdin.flush()
+    def terminal(self):return self.block('terminal_lines',size=69*29).decode('ascii',errors='replace').replace('\x00','\n')
+    def type(self,command):
+        keys={'.':'dot','/':'slash','-':'minus',' ':'spc'}
+        for c in command:
+            self.hmp('sendkey '+keys.get(c,c));time.sleep(.055)
+        self.hmp('sendkey ret');time.sleep(.1)
     def screen(self,name):
         p=self.out/(name+'.ppm');self.qmp('screendump',filename=str(p));data=p.read_bytes()
         # Compare only canvas, excluding the RTC taskbar clock.
@@ -113,6 +125,8 @@ def main():
     ap.add_argument('--qemu-data',type=pathlib.Path)
     ap.add_argument('--hub-depth',type=int,choices=range(0,5),default=0)
     ap.add_argument('--tablet',action='store_true')
+    ap.add_argument('--pci-virtio',action='store_true')
+    ap.add_argument('--trace',action='store_true')
     ap.add_argument('--memory',default='512M')
     ap.add_argument('--uefi-kernel',type=pathlib.Path,default=ROOT/'build/uefi-kernel/chos.elf')
     ap.add_argument('--timer-fault',action='store_true')
@@ -121,7 +135,7 @@ def main():
     # Refuse to overwrite prior evidence or a user disk.
     if (out/'serial.log').exists():raise SystemExit('Use a new --out directory to preserve evidence')
     disk=out/'disposable.img'
-    if args.mode!='uefi':shutil.copyfile(args.disk,disk)
+    if args.mode!='uefi' or args.pci_virtio:shutil.copyfile(args.disk,disk)
     if args.mode=='direct' and not args.baseline:
         subprocess.run(['python3',str(ROOT/'tools/mkchfs.py'),'put',str(disk),'/BIN/RNGTEST.CHX',str(ROOT/'build/userland/rng_test.chcx')],check=True)
     g=None;result={'mode':args.mode,'checks':[]}
@@ -173,6 +187,25 @@ def main():
         before=g.screen('desktop');t=time.monotonic();g.hmp('sendkey c')
         wait(lambda:g.screen('console')!=before,2,'keyboard shortcut visible response')
         result['keyboard_visible_ms']=round((time.monotonic()-t)*1000,2)
+        if args.pci_virtio:
+            wait(lambda:g.symbol('net_state')==3,15,'PCI VirtIO DHCP lease')
+            assert '[OK] UEFI VirtIO/CHFS mounted.' in g.text()
+            g.type('write /stage1.txt pci-persistence')
+            wait(lambda:'File written and flushed.' in g.terminal(),5,'PCI CHFS write and flush')
+            g.type('type /stage1.txt')
+            wait(lambda:'pci-persistence' in g.terminal(),3,'PCI CHFS read')
+            g.type('rng-test');g.type('rng-test')
+            expected='Entropy unavailable:' if args.no_rng else 'Received 32 hardware entropy bytes.'
+            wait(lambda:expected in g.terminal(),3,'PCI entropy hardware receipt or explicit absence')
+            g.type('ping 10.0.2.2')
+            next_status=[0.0]
+            def gui_ping_replied():
+                if time.monotonic()>next_status[0]:
+                    g.type('netstatus');next_status[0]=time.monotonic()+.5
+                return 'Ping: reply received' in g.terminal()
+            wait(gui_ping_replied,10,'PCI VirtIO ARP/ICMP reply')
+            (out/'pci-console.txt').write_text(g.terminal());g.screen('pci-diagnostics')
+            result['checks']+=['PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly','PCI VirtIO DHCP/ARP/ICMP']
         before=g.screen('pointer-before');t=time.monotonic()
         motion(-200,150)
         wait(lambda:g.screen('pointer-after')!=before,2,'pointer visible response')
@@ -253,12 +286,18 @@ def main():
         ticks=g.cpu_ticks();start=time.monotonic();time.sleep(2)
         result['idle_cpu_percent']=round(100*(g.cpu_ticks()-ticks)/os.sysconf('SC_CLK_TCK')/(time.monotonic()-start),2)
         result['checks']+=['2-second idle observation']
-        if args.mode=='direct':
+        if args.mode=='direct' or args.pci_virtio:
             g.close();g=None
             # Second fresh machine on the same disposable disk checks persistence.
             reboot=out/'reboot';reboot.mkdir();g=Guest(args,reboot,disk)
-            wait(lambda:'chos> ' in g.text(),45,'second boot');g.serial('fsread /STAGE1.TXT')
-            wait(lambda:'stage1-persistence' in g.text(),5,'CHFS persisted after restart')
+            if args.mode=='direct':
+                wait(lambda:'chos> ' in g.text(),45,'second boot');g.serial('fsread /STAGE1.TXT')
+                wait(lambda:'stage1-persistence' in g.text(),5,'CHFS persisted after restart')
+            else:
+                wait(lambda:'[OK] Initial CHOS GUI frame rendered.' in g.text(),45,'second boot')
+                wait(lambda:g.symbol('splash_active')==0,10,'second desktop')
+                g.hmp('sendkey c');time.sleep(.2);g.type('type /stage1.txt')
+                wait(lambda:'pci-persistence' in g.terminal(),5,'PCI CHFS persisted after restart')
             result['checks']+=['storage persistence after fresh guest boot']
         result['status']='PASS'
     except Exception as e:
@@ -266,6 +305,9 @@ def main():
         if g and not args.baseline:
             result['input_counters']={k:g.symbol('chos_input_diagnostics',offset) for k,offset in [('keys',0),('buttons',8),('relative',16),('wheel',24)]}
             result['guest_view']=g.symbol('view')
+            if args.pci_virtio:
+                result['virtio_devices']=g.qmp('x-query-virtio')
+                result['network_debug']={name:g.block(name,size=size).hex() for name,size in [('net_state',112),('net_info',112),('tx_used',24),('rx_used',32)]}
     finally:
         if g:g.close()
         (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))

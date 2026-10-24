@@ -120,6 +120,13 @@ int chos_pci_decode_memory_bar(const chos_pci_device_t *device, unsigned bar_ind
     uint64_t address;
     int is64;
     if (device == NULL || address_out == NULL || bar_index >= 6u) return 0;
+    /* A capability must not name the upper dword of a preceding 64-bit BAR. */
+    for (unsigned i=0; i<bar_index; ++i) {
+        if (!(device->bars[i]&1u) && ((device->bars[i]>>1u)&3u)==2u) {
+            if (i+1u==bar_index) return 0;
+            ++i;
+        }
+    }
     low = device->bars[bar_index];
     if (low == 0u || (low & 1u) != 0u) return 0; /* I/O BAR or unassigned */
     type = (low >> 1u) & 3u;

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "chos/entropy.h"
 #include "chos/platform.h"
+#include "chos/virtio_transport.h"
 
 #define VIRTIO_MAGIC UINT32_C(0x74726976)
 #define VIRTIO_DEVICE_RNG 4u
@@ -104,12 +105,12 @@ static void clean_memory(const void *ptr, size_t length) { (void)ptr; (void)leng
 static void invalidate_memory(const void *ptr, size_t length) { (void)ptr; (void)length; }
 static void io_barrier(void) { __asm__ volatile("" ::: "memory"); }
 #else
-static uintptr_t mmio_base(void) { return platform_virtio_mmio_base(); }
+static uintptr_t mmio_base(void) { return chos_virtio_aperture(); }
 static uint32_t mmio_read(uintptr_t base, uint32_t offset) {
-    return *(volatile uint32_t *)(base + offset);
+    return chos_virtio_read(base,offset);
 }
 static void mmio_write(uintptr_t base, uint32_t offset, uint32_t value) {
-    *(volatile uint32_t *)(base + offset) = value;
+    chos_virtio_write(base,offset,value);
     __asm__ volatile("dsb sy" ::: "memory");
 }
 static size_t cache_line_size(void) {

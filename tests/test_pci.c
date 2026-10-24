@@ -97,6 +97,9 @@ int main(void) {
         assert(config == UINT32_C(0x077015ad));
         assert(chos_pci_decode_memory_bar(&devices[2], 0u, &bar_address, &bar64));
         assert(bar64 && bar_address == UINT64_C(0x1fec00000));
+        devices[2].bars[1]=0x1000; /* high half looks like a valid 32-bit BAR */
+        assert(!chos_pci_decode_memory_bar(&devices[2],1u,&bar_address,&bar64));
+        devices[2].bars[1]=1;
         /* The command register write must enable memory decoding and bus mastering. */
         assert(chos_pci_write_config32(&boot, &acpi, 0u, 0u, 3u, 1u, 0x04u, 0u));
         assert(chos_pci_enable_memory_busmaster(&boot, &acpi, &devices[1]));

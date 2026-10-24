@@ -21,6 +21,7 @@
 #include "chos/pci.h"
 #include "chos/nvme.h"
 #include "chos/entropy.h"
+#include "chos/virtio_transport.h"
 #include "chos/xhci.h"
 #include "chos/build_stamp.h"
 #include "../platform/uefi_console.h"
@@ -287,6 +288,24 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         if (console_ready) uefi_console_write("[OK] Kernel heap initialized.\n");
 
+        int firmware_mmio=uefi_fdt_has_virtio_mmio(boot_info);
+        if(firmware_mmio)chos_virtio_use_mmio(platform_virtio_mmio_base());
+        else {
+            unsigned transports=chos_virtio_use_pci(boot_info,&acpi_info,pci_devices,pci_summary.devices_stored);
+            if(console_ready) {
+                uefi_console_write("[PCI] VirtIO transports: ");uefi_console_write_u64(transports);
+                uefi_console_write("; ");uefi_console_write(chos_virtio_transport_error());uefi_console_write("\n");
+            }
+        }
+        if(chos_virtio_aperture()) {
+            if(storage_init()) {
+                if(console_ready)uefi_console_write(storage_mounted()?"[OK] UEFI VirtIO/CHFS mounted.\n":"[INFO] UEFI VirtIO block present; filesystem left unchanged.\n");
+            } else if(console_ready) {uefi_console_write("[INFO] UEFI block unavailable: ");uefi_console_write(storage_error());uefi_console_write("\n");}
+            if(virtio_net_init()) {
+                chos_net_stack_init();
+                if(console_ready)uefi_console_write("[OK] UEFI VirtIO network queues initialized.\n");
+            }
+        }
 #ifdef CHOS_ENABLE_EXPERIMENTAL_NVME
         /* UEFI has no VirtIO-MMIO storage assumptions: attach a native PCI NVMe
          * namespace when one is present. It is never formatted automatically. */
@@ -356,12 +375,12 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
          * initialized the existing polled input driver. Only probe the fixed
          * VirtIO-MMIO aperture when the validated firmware FDT advertises it;
          * never dereference QEMU addresses on an arbitrary Fusion/UEFI host. */
-        if (uefi_fdt_has_virtio_mmio(boot_info)) {
+        if (uefi_fdt_has_virtio_mmio(boot_info) || chos_virtio_aperture()) {
             input_ready = chos_input_init() > 0;
             if (console_ready) {
-                if (input_ready) uefi_console_write("[OK] FDT-confirmed VirtIO input queues initialized.\n");
+                if (input_ready) uefi_console_write("[OK] Discovered VirtIO input queues initialized.\n");
                 else {
-                    uefi_console_write("[WARN] FDT advertises VirtIO-MMIO but input queues failed: ");
+                    uefi_console_write("[INFO] No usable VirtIO input queues: ");
                     uefi_console_write(chos_input_last_error()); uefi_console_write("\n");
                 }
                 if (chos_entropy_init()) uefi_console_write("[OK] VirtIO RNG initialized; nonblocking hardware-backed entropy is available.\n");
@@ -370,7 +389,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
                 (void)chos_entropy_init();
             }
         } else if (console_ready) {
-            uefi_console_write("[INFO] No verified VirtIO-MMIO input aperture in FDT; native PCI USB HID is not attached.\n");
+            uefi_console_write("[INFO] No usable VirtIO transport; native PCI USB discovery follows.\n");
         }
         for (uint32_t i=0; i<pci_summary.devices_stored && acpi_result==CHOS_ACPI_OK; ++i) {
             const chos_pci_device_t *d=&pci_devices[i];
@@ -418,7 +437,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         uefi_console_set_graphics_logging(0);
         for (;;) {
-            chos_xhci_poll();
+            chos_xhci_poll();chos_net_stack_poll();
             if (input_ready) chos_input_poll();
             else chos_gui_pump();
             if (gic_timer_ready) __asm__ volatile("wfi" ::: "memory");
@@ -443,6 +462,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
 
     fdt_result = fdt_parse_blob((const void *)platform_dtb_address(), &boot_device_tree);
     if (fdt_result == FDT_OK) {
+        if(fdt_info_has_qemu_virtio_mmio(&boot_device_tree))chos_virtio_use_mmio(platform_virtio_mmio_base());
         uart_puts("[ OK ] Device tree parsed\n");
         pmm_result = pmm_init(&boot_device_tree,
                               (uint64_t)(uintptr_t)&__kernel_start,

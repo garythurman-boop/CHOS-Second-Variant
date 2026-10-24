@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "chos/audio.h"
 #include "chos/platform.h"
+#include "chos/virtio_transport.h"
 
 #define VIRTIO_MAGIC 0x74726976u
 #define VIRTIO_DEVICE_SOUND 25u
@@ -131,10 +132,9 @@ static int sound_chime_started;
 static chos_audio_chime_state_t sound_chime_state;
 static const char *sound_error = "VirtIO-Sound has not been probed";
 
-static volatile uint32_t *reg32(uint32_t offset) { return (volatile uint32_t *)(snd_base + offset); }
-static uint32_t read_reg(uint32_t offset) { return *reg32(offset); }
-static void write_reg(uint32_t offset, uint32_t value) { *reg32(offset) = value; }
-static uint32_t read_config32(uint32_t offset) { return *(volatile uint32_t *)(snd_base + SND_CONFIG + offset); }
+static uint32_t read_reg(uint32_t offset) { return chos_virtio_read(snd_base,offset); }
+static void write_reg(uint32_t offset, uint32_t value) { chos_virtio_write(snd_base,offset,value); }
+static uint32_t read_config32(uint32_t offset) { return read_reg(SND_CONFIG+offset); }
 static void dma_store_barrier(void) { __asm__ volatile("dmb oshst" ::: "memory"); }
 static void dma_load_barrier(void) { __asm__ volatile("dmb oshld" ::: "memory"); }
 static void cpu_full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
@@ -361,7 +361,7 @@ static void synthesize_chime(void) {
 }
 
 int chos_audio_init(void) {
-    uintptr_t first_base = platform_virtio_mmio_base();
+    uintptr_t first_base = chos_virtio_aperture();
     uint32_t slot, features1, status;
     size_t i;
     sound_ready = 0; sound_pending = 0; sound_chime_started = 0; sound_chime_state = CHOS_AUDIO_CHIME_IDLE; snd_base = 0u;
@@ -371,8 +371,8 @@ int chos_audio_init(void) {
     bytes_zero(event_buffers, sizeof(event_buffers));
     for (slot = 0u; slot < VIRTIO_MMIO_SLOT_COUNT; ++slot) {
         uintptr_t candidate = first_base + (uintptr_t)slot * VIRTIO_MMIO_SLOT_SIZE;
-        if (*(volatile uint32_t *)(candidate) == VIRTIO_MAGIC &&
-            *(volatile uint32_t *)(candidate + 0x008u) == VIRTIO_DEVICE_SOUND) {
+        if (chos_virtio_read(candidate,REG_MAGIC) == VIRTIO_MAGIC &&
+            chos_virtio_read(candidate,REG_DEVICE_ID) == VIRTIO_DEVICE_SOUND) {
             snd_base = candidate; break;
         }
     }

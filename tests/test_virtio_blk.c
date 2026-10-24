@@ -6,7 +6,7 @@
 static uint32_t regs[128];
 static uint8_t disk[32*512];
 static int drop_completion,invalid_completion,io_error,reset_stuck;
-uintptr_t platform_virtio_mmio_base(void) {return 0x10000;}
+uintptr_t chos_virtio_aperture(void) {return 0x10000;}
 uint32_t chos_blk_mock_read(uintptr_t base,uint32_t o) {
     if(base!=0x10000) return 0;
     if(o==REG_MAGIC)return VIRTIO_MAGIC;

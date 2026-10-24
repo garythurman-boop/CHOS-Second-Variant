@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/platform.h"
+#include "chos/virtio_transport.h"
 #include "chos/virtio_gpu.h"
 
 #define VIRTIO_MAGIC 0x74726976u
@@ -196,9 +197,8 @@ static uint32_t gop_stride, gop_format;
 static uint32_t gop_red_mask, gop_green_mask, gop_blue_mask, gop_reserved_mask;
 static const char *last_error = "probe not run";
 
-static volatile uint32_t *reg32(uint32_t offset) { return (volatile uint32_t *)(mmio_base + offset); }
-static uint32_t read_reg(uint32_t offset) { return *reg32(offset); }
-static void write_reg(uint32_t offset, uint32_t value) { *reg32(offset) = value; }
+static uint32_t read_reg(uint32_t offset) { return chos_virtio_read(mmio_base,offset); }
+static void write_reg(uint32_t offset, uint32_t value) { chos_virtio_write(mmio_base,offset,value); }
 static void dma_store_barrier(void) { __asm__ volatile("dmb oshst" ::: "memory"); }
 static void dma_load_barrier(void) { __asm__ volatile("dmb oshld" ::: "memory"); }
 static void cpu_full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
@@ -520,7 +520,7 @@ int virtio_gpu_init(chos_surface_t *surface) {
     for (i = 0u; i < CHOS_DISPLAY_MODE_COUNT; ++i) resource_created[i] = 0;
     active_mode_index = 0u;
     detected_base = 0u;
-    first_base = platform_virtio_mmio_base();
+    first_base = chos_virtio_aperture();
     if (first_base == 0u) { last_error = "platform has no VirtIO-MMIO aperture"; return 0; }
     for (slot = 0u; slot < VIRTIO_MMIO_SLOT_COUNT; ++slot) {
         uintptr_t candidate = first_base + (uintptr_t)slot * VIRTIO_MMIO_SLOT_SIZE;

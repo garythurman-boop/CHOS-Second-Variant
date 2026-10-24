@@ -13,6 +13,8 @@
 #include "chos/romfs.h"
 #include "chos/timer.h"
 #include "chos/power.h"
+#include "chos/net_stack.h"
+#include "chos/entropy.h"
 
 static uint32_t pixels[CHOS_DISPLAY_MAX_WIDTH * CHOS_DISPLAY_MAX_HEIGHT];
 static size_t mock_screen_width = 800u;
@@ -63,6 +65,16 @@ static const char test_file_contents[] =
     "row 19: viewer scrolling works.\n"
     "row 20: viewer scrolling works.\n";
 
+int storage_sync(void) {return 1;}
+const char *storage_error(void) {return "mock storage error";}
+size_t chos_entropy_read(void *p,size_t n) {(void)p;(void)n;return 0;}
+int chos_entropy_ready(void) {return 0;}
+const char *chos_entropy_last_error(void) {return "unavailable";}
+void chos_net_stack_get_info(chos_net_stack_info_t *out) {*out=(chos_net_stack_info_t){0};}
+void chos_net_ping_get_info(chos_net_ping_info_t *out) {*out=(chos_net_ping_info_t){0};}
+const char *chos_net_dhcp_state_name(chos_net_dhcp_state_t s) {(void)s;return "offline";}
+const char *chos_net_ping_state_name(chos_net_ping_state_t s) {(void)s;return "idle";}
+int chos_net_ping_start(uint32_t ip) {(void)ip;return 0;}
 const char *uefi_console_boot_log(void) {return "PCI test inventory\n";}
 int timer_is_ready(void) { return mock_timer_ready; }
 uint64_t timer_ticks(void) { return mock_ticks; }

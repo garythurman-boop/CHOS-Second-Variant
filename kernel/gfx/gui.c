@@ -17,6 +17,8 @@
 #include "chos/uart.h"
 #include "chos/audio.h"
 #include "chos/platform.h"
+#include "chos/net_stack.h"
+#include "chos/entropy.h"
 
 typedef struct { uint32_t width, height; const uint32_t *pixels; } gui_embedded_image_t;
 typedef struct { const char *name; const gui_embedded_image_t *image; } gui_embedded_named_image_t;
@@ -2157,6 +2159,21 @@ static void terminal_process_status(const char *argument) {
     terminal_putc('\n');
 }
 
+static int terminal_ipv4(const char *p,uint32_t *out) {
+    uint32_t address=0;unsigned part=0,value=0,digits=0;
+    while(*p) {
+        if(*p>='0' && *p<='9') {value=value*10u+(unsigned)(*p-'0');if(value>255 || ++digits>3)return 0;}
+        else if(*p=='.' && digits && part<3) {address=(address<<8)|value;++part;value=digits=0;}
+        else return 0;
+        ++p;
+    }
+    if(part!=3 || !digits)return 0;
+    *out=(address<<8)|value;return *out && *out!=UINT32_MAX;
+}
+static void terminal_print_ipv4(uint32_t a) {
+    for(unsigned i=0;i<4;++i) {if(i)terminal_putc('.');terminal_put_uint((a>>(24-8*i))&255);}
+}
+
 static void terminal_execute(char *input) {
     char command_copy[TERMINAL_COMMAND_CAPACITY];
     char *command, *argument, *split;
@@ -2173,7 +2190,7 @@ static void terminal_execute(char *input) {
     argument = split;
     while (*argument == ' ' || *argument == '\t') ++argument;
     if (gui_strings_equal(command, "help")) {
-        terminal_puts("Commands:\n  help       Show this help\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+        terminal_puts("Commands:\n  help       Show this help\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
     } else if (gui_strings_equal(command,"bootlog") || gui_strings_equal(command,"pci")) {
         const char *log=uefi_console_boot_log();
         if(!log[0])terminal_puts("No retained UEFI log; direct boot uses the serial console.\n");
@@ -2204,6 +2221,36 @@ static void terminal_execute(char *input) {
         }
     } else if (gui_strings_equal(command, "type") || gui_strings_equal(command, "cat")) {
         terminal_command_type(argument);
+    } else if (gui_strings_equal(command,"write")) {
+        char path[CHOS_CHFS_PATH_MAX];char *data=argument;
+        while(*data && *data!=' ' && *data!='\t')++data;
+        if(!*data)terminal_puts("Usage: write PATH TEXT\n");
+        else {
+            *data++='\0';while(*data==' ' || *data=='\t')++data;
+            size_t length=0;while(data[length])++length;
+            if(!terminal_resolve_path(argument,path))terminal_puts("Invalid path.\n");
+            else if(storage_write_file(path,data,length) && storage_sync())terminal_puts("File written and flushed.\n");
+            else {terminal_puts("Write failed: ");terminal_puts(storage_error());terminal_putc('\n');}
+        }
+    } else if (gui_strings_equal(command,"sync")) {
+        terminal_puts(storage_sync()?"Storage flushed.\n":"Storage flush failed.\n");
+    } else if (gui_strings_equal(command,"rng-test")) {
+        uint8_t bytes[32];size_t count=chos_entropy_read(bytes,sizeof(bytes));
+        if(count==sizeof(bytes))terminal_puts("Received 32 hardware entropy bytes.\n");
+        else if(chos_entropy_ready())terminal_puts("Entropy completion pending; repeat rng-test.\n");
+        else {terminal_puts("Entropy unavailable: ");terminal_puts(chos_entropy_last_error());terminal_putc('\n');}
+        for(size_t j=0;j<sizeof(bytes);++j)((volatile uint8_t *)bytes)[j]=0;
+    } else if (gui_strings_equal(command,"netstatus")) {
+        chos_net_stack_info_t info;chos_net_ping_info_t ping;
+        chos_net_stack_get_info(&info);chos_net_ping_get_info(&ping);
+        terminal_puts("DHCP: ");terminal_puts(chos_net_dhcp_state_name(info.dhcp_state));
+        terminal_puts("\nIPv4: ");terminal_print_ipv4(info.ipv4_address);
+        terminal_puts("\nGateway: ");terminal_print_ipv4(info.gateway_address);
+        terminal_puts("\nPing: ");terminal_puts(chos_net_ping_state_name(ping.state));terminal_putc('\n');
+    } else if (gui_strings_equal(command,"ping")) {
+        uint32_t ip;
+        if(!terminal_ipv4(argument,&ip))terminal_puts("Usage: ping a.b.c.d\n");
+        else terminal_puts(chos_net_ping_start(ip)?"ICMP echo started; inspect netstatus.\n":"Ping unavailable; inspect netstatus.\n");
     } else if (gui_strings_equal(command, "run") || gui_strings_equal(command, "spawn")) {
         terminal_run_path(argument);
     } else if (gui_strings_equal(command, "tasklist") || gui_strings_equal(command, "ps")) {
