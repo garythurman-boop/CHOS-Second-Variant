@@ -2,9 +2,10 @@
 
 Source goes to GitHub after every completed iteration. The user's updated preference
 publishes ISO and related binary files after every other future implementation
-iteration. The current `2ed3e6d` build is the initial publication; the next iteration
-is source-only and the one after that publishes artifacts. Bookkeeping commits do
-not count as separate implementation iterations.
+iteration. Build `2ed3e6d` was the initial publication. The latest pointer and
+iteration counter are persisted below; after each artifact publication the next
+iteration is source-only and the following one publishes artifacts. Bookkeeping
+commits do not count as separate implementation iterations.
 
 [Download the current build](../artifacts/README.md). Machine-readable state and the
 latest source/tag/directory are in `artifacts/publication.json`. Binaries identify

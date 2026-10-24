@@ -109,3 +109,22 @@ driver reports and capture their actual controller/device/refusal information.
 If a panic occurs, capture the single stable page including build ID and PC
 offset. Keep NVMe disabled on valuable media. Actual Fusion device acceptance
 and remaining Stage 1 platform/network/IOMMU gates remain open.
+
+## Clean delivery build 816aa55
+
+Source `816aa553adb2b81bcd942d3e7be26a9eb6e0664a` was rebuilt from a clean
+tree. Both kernels embed `816aa553adb2` without a dirty suffix. The final ISO
+contains the exact tested EFI loader and UEFI ELF. Full host checks, ASan/UBSan
+and direct smoke pass. `final-direct` passes the preserved MMU/EL0/input/RTC and
+persistence profile. `final-native` passes the native USB/clock/PCI profile above
+using NEC xHCI on PCI bus 10, two nested hubs, one CPU and 2 GiB RAM.
+`final-panic/{serial,no-uart}` both pass the real BRK/unusable-SP/held-lock/nested
+fault checks. All recorded ELF/ISO hashes match the delivery bytes.
+
+The [816aa55 downloads](../artifacts/816aa55/README.md) include the bootable ISO,
+source ZIP, prepared distribution image, kernels, EFI loader, checksums and a
+handoff ZIP with final test results/logs/screenshots. This is the artifact iteration
+after the separately pushed synchronization correction. The next implementation
+iteration is source-only under the user's every-other-iteration binary cadence.
+Actual Fusion acceptance remains pending; this candidate is not labelled a
+successful Fusion test or Stage 1 completion.
