@@ -6,6 +6,6 @@
   },
   "schema": 1,
   "artifact_interval": 2,
-  "iterations_since_artifacts": 0,
-  "last_counted_source_commit": "2ed3e6d571dfd5988b1a5b15774ffe0e553a8e5f"
+  "iterations_since_artifacts": 1,
+  "last_counted_source_commit": "046a5bbb8ac57e034ea51a0102aed8351e9dd5cd"
 }
