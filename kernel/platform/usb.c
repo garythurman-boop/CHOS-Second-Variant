@@ -115,9 +115,13 @@ int chos_usb_decode_report(const chos_hid_report_layout_t *l, chos_usb_input_sta
             }
         }
     }
-    if (keyboard && !rollover) for (unsigned k=4;k<256;++k) {
-        int change=transition(s->keys[k],id,keys[k]);
-        if(change && keycode(k)) chos_input_key(keycode(k),change>0);
+    if(keyboard && !rollover) {
+        /* Modifiers precede letters when a device reports both in one packet. */
+        for(unsigned pass=0;pass<2;++pass)for(unsigned k=pass?4u:0xe0u;k<(pass?256u:0xe8u);++k) {
+            if(pass && k>=0xe0 && k<=0xe7)continue;
+            int change=transition(s->keys[k],id,keys[k]);
+            if(change && keycode(k))chos_input_key(keycode(k),change>0);
+        }
     }
     if (pointer) for (unsigned k=0;k<8;++k) {
         int change=transition(s->buttons[k],id,buttons[k]);

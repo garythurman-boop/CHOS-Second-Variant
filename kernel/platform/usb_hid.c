@@ -92,6 +92,7 @@ static int append_field(chos_hid_report_layout_t *layout, const hid_global_t *gl
     if (global->usage_page == 0x07u) layout->has_keyboard = 1u;
     if (global->usage_page == 0x09u) layout->has_pointer = 1u;
     if (global->usage_page == 0x01u) {
+        if(usage==0x30 || usage==0x31)layout->has_pointer=1u;
         if (usage == 0x01u || (local->has_min && local->usage_min == 0x01u)) layout->has_pointer = 1u;
         if (usage == 0x02u || (local->has_min && local->usage_min == 0x02u)) layout->has_mouse = 1u;
         if (usage == 0x38u || (local->has_min && local->usage_min <= 0x38u && local->has_max >= 0x38u)) layout->has_wheel = 1u;

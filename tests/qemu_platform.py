@@ -26,6 +26,7 @@ class Guest:
              '-global','virtio-mmio.force-legacy=false','-serial','stdio',
              '-qmp',f'unix:{self.sockpath},server=on,wait=off']
         if args.qemu_data: cmd+=['-L',str(args.qemu_data)]
+        if args.rtc_base:cmd+=['-rtc','base='+args.rtc_base+',clock=vm']
         if args.trace:cmd+=['-trace','enable=virtio_*,file='+str(out/'virtio.trace')]
         if args.mode=='direct':
             cmd+=['-device',f'loader,file={elf},cpu-num=0','-device','virtio-gpu-device',
@@ -102,10 +103,10 @@ class Guest:
         for c in command:
             self.hmp('sendkey '+keys.get(c,c));time.sleep(.055)
         self.hmp('sendkey ret');time.sleep(.1)
-    def screen(self,name):
+    def screen(self,name,full=False):
         p=self.out/(name+'.ppm');self.qmp('screendump',filename=str(p));data=p.read_bytes()
         # Compare only canvas, excluding the RTC taskbar clock.
-        pixels=data.split(b'\n',3)[3];return pixels[:800*540*3]
+        pixels=data.split(b'\n',3)[3];return pixels if full else pixels[:800*540*3]
     def cpu_ticks(self):
         fields=pathlib.Path(f'/proc/{self.process.pid}/stat').read_text().split()
         return int(fields[13])+int(fields[14])
@@ -131,6 +132,8 @@ def main():
     ap.add_argument('--qemu-data',type=pathlib.Path)
     ap.add_argument('--hub-depth',type=int,choices=range(0,5),default=0)
     ap.add_argument('--tablet',action='store_true')
+    ap.add_argument('--clock-test',action='store_true')
+    ap.add_argument('--rtc-base')
     ap.add_argument('--pci-virtio',action='store_true')
     ap.add_argument('--trace',action='store_true')
     ap.add_argument('--nvme',action='store_true')
@@ -212,6 +215,19 @@ def main():
         before=g.screen('desktop');t=time.monotonic();g.hmp('sendkey c')
         wait(lambda:g.screen('console')!=before,2,'keyboard shortcut visible response')
         result['keyboard_visible_ms']=round((time.monotonic()-t)*1000,2)
+        if args.clock_test:
+            g.type('clock');first=int(re.findall(r'Unix seconds: (\d+)',g.terminal())[-1])
+            time.sleep(2);g.type('clock');second=int(re.findall(r'Unix seconds: (\d+)',g.terminal())[-1])
+            assert second>first>1577836800,'wall clock must advance independently of GUI input'
+            if args.mode!='direct':assert 'UEFI GetTime snapshot' in g.terminal()
+            def taskbar_clock(name):
+                pixels=g.screen(name,full=True)
+                return b''.join(pixels[(row*800+716)*3:(row*800+799)*3] for row in range(574,598))
+            initial_clock=taskbar_clock('clock-before')
+            def minute_changed():
+                time.sleep(.2);return taskbar_clock('clock-progress')!=initial_clock
+            wait(minute_changed,65,'visible taskbar clock minute rollover')
+            result['checks']+=['UEFI clock snapshot/counter progress and visible minute rollover' if args.mode!='direct' else 'FDT RTC progress and visible minute rollover']
         if args.pci_virtio:
             wait(lambda:g.symbol('net_state')==3,15,'PCI VirtIO DHCP lease')
             assert ('[OK] CHFS filesystem mounted on NVMe.' if args.nvme else '[OK] UEFI VirtIO/CHFS mounted.') in g.text()

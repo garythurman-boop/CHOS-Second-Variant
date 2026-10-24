@@ -19,6 +19,7 @@
 #include "chos/platform.h"
 #include "chos/net_stack.h"
 #include "chos/entropy.h"
+#include "chos/clock.h"
 
 typedef struct { uint32_t width, height; const uint32_t *pixels; } gui_embedded_image_t;
 typedef struct { const char *name; const gui_embedded_image_t *image; } gui_embedded_named_image_t;
@@ -295,6 +296,7 @@ static int drag_preview_dirty;
 static int32_t drag_preview_x, drag_preview_y;
 static uint64_t clock_last_minute;
 static uint64_t clock_last_poll_tick;
+static int clock_poll_started;
 static int clock_initialized;
 static unsigned timezone_index = 5u;
 static int32_t cursor_under_x, cursor_under_y;
@@ -384,11 +386,10 @@ static void gui_format_clock(char output[12]) {
 }
 
 static void gui_clock_poll(void) {
-    uint64_t ticks, epoch, minute;
-    if (!timer_is_ready()) return;
-    ticks = timer_ticks();
-    if (ticks == clock_last_poll_tick || (ticks % CHOS_TIMER_HZ) != 0u) return;
-    clock_last_poll_tick = ticks;
+    uint64_t epoch,minute;
+    uint64_t now=timer_counter(),frequency=timer_frequency_hz();
+    if(clock_poll_started && frequency && now-clock_last_poll_tick<frequency)return;
+    clock_last_poll_tick=now;clock_poll_started=1;
     epoch = platform_rtc_unix_seconds();
     if (epoch == 0u) return;
     minute = epoch / 60u;
@@ -2190,7 +2191,10 @@ static void terminal_execute(char *input) {
     argument = split;
     while (*argument == ' ' || *argument == '\t') ++argument;
     if (gui_strings_equal(command, "help")) {
-        terminal_puts("Commands:\n  help       Show this help\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+        terminal_puts("Commands:\n  help       Show this help\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+    } else if(gui_strings_equal(command,"clock")) {
+        terminal_puts("Clock source: ");terminal_puts(chos_clock_source());
+        terminal_puts("\nUnix seconds: ");terminal_put_uint(platform_rtc_unix_seconds());terminal_putc('\n');
     } else if (gui_strings_equal(command,"bootlog") || gui_strings_equal(command,"pci")) {
         const char *log=uefi_console_boot_log();
         if(!log[0])terminal_puts("No retained UEFI log; direct boot uses the serial console.\n");
@@ -4473,7 +4477,7 @@ int chos_gui_init(const chos_surface_t *surface) {
     app_pointer_capture_window_id = CHOS_WM_NO_WINDOW;
     cursor_under_valid = 0;
     cursor_move_pending = 0;
-    clock_last_minute = 0u; clock_last_poll_tick = 0u; clock_initialized = 0;
+    clock_last_minute = 0u; clock_last_poll_tick = 0u; clock_initialized = 0; clock_poll_started=0;
     selected_icon = 0;
     selected_desktop_icon = -1;
     start_menu_selected_item = -1;

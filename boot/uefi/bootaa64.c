@@ -8,6 +8,7 @@
  * The kernel's device drivers remain platform-specific; this loader makes the
  * kernel image placement relocatable, not the current QEMU-virt hardware model.
  */
+#include "chos/firmware_time.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/boot_info.h"
@@ -188,6 +189,11 @@ struct EFI_BOOT_SERVICES {
     void *SetMem;
     void *CreateEventEx;
 };
+
+typedef struct {
+    EFI_TABLE_HEADER Hdr;
+    EFI_STATUS (EFIAPI *GetTime)(chos_firmware_time_t *,void *);
+} CHOS_EFI_RUNTIME_SERVICES;
 
 struct EFI_SYSTEM_TABLE {
     EFI_TABLE_HEADER Hdr;
@@ -919,6 +925,15 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
     capture_firmware_tables(boot_info);
     capture_gop(boot_info);
     capture_pci_windows(boot_info);
+    CHOS_EFI_RUNTIME_SERVICES *runtime=(CHOS_EFI_RUNTIME_SERVICES *)g_st->RuntimeServices;
+    chos_firmware_time_t firmware_time;
+    if(runtime && runtime->GetTime && runtime->GetTime(&firmware_time,NULL)==EFI_SUCCESS &&
+       chos_firmware_time_epoch(&firmware_time,&boot_info->clock_unix_seconds)) {
+        __asm__ volatile("isb; mrs %0,cntpct_el0":"=r"(boot_info->clock_counter));
+        __asm__ volatile("mrs %0,cntfrq_el0":"=r"(boot_info->clock_frequency));
+        if(boot_info->clock_frequency)boot_info->flags|=CHOS_BOOT_FLAG_CLOCK;
+    }
+
     /* Never pass firmware input protocol pointers into the OS. CHOS takes
      * exclusive ownership of the machine after ExitBootServices; UEFI text/pointer
      * protocols are not a safe post-handoff input mechanism. */

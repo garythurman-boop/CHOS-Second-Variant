@@ -69,13 +69,3 @@ uintptr_t platform_gic_cpu_interface_base(void) {
 uintptr_t platform_virtio_mmio_base(void) {
     return QEMU_VIRT_VIRTIO_BLK_BASE;
 }
-
-/* QEMU virt exposes a PL031-compatible RTC at 0x09010000 (RTCDR at +0). */
-uint64_t platform_rtc_unix_seconds(void) {
-    volatile const uint32_t *rtc_data = (volatile const uint32_t *)QEMU_VIRT_RTC_BASE;
-    uint32_t seconds_a = rtc_data[0];
-    uint32_t seconds_b = rtc_data[0];
-    uint32_t seconds = seconds_b >= seconds_a ? seconds_b : rtc_data[0];
-    if (seconds < RTC_EPOCH_MIN || seconds > RTC_EPOCH_MAX) return 0u;
-    return (uint64_t)seconds;
-}

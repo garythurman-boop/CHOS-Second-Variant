@@ -7,6 +7,7 @@
 #include "chos/kheap.h"
 #include "chos/interrupt.h"
 #include "chos/timer.h"
+#include "chos/clock.h"
 #include "chos/vmm.h"
 #include "chos/scheduler.h"
 #include "chos/storage.h"
@@ -172,6 +173,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
          * publish the heap's lock-free mode before any heap/GUI initialization. */
         kheap_begin_bootstrap();
         if (!chos_boot_info_validate(boot_info)) kernel_halt_safely();
+        (void)chos_clock_init_uefi(boot_info);
         console_ready = uefi_console_init(boot_info);
         if (console_ready) {
             uefi_console_write("[BOOT] Heap bootstrap mode explicitly initialized; runtime heap lock bypassed until startup completes.\n");
@@ -187,6 +189,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         if (console_ready) {
             uefi_console_write("[BUILD] " CHOS_BUILD_REVISION "\n");
+            uefi_console_write("[CLOCK] ");uefi_console_write(chos_clock_source());uefi_console_write("\n");
             uefi_console_write("\nACPI parser: "); uefi_console_write(chos_acpi_error_string(acpi_result)); uefi_console_write("\n");
             if (acpi_result == CHOS_ACPI_OK) {
                 uefi_console_write("GIC distributor base: "); uefi_console_write_hex(acpi_info.gic_distributor_base); uefi_console_write("\n");
@@ -462,6 +465,12 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
 
     fdt_result = fdt_parse_blob((const void *)platform_dtb_address(), &boot_device_tree);
     if (fdt_result == FDT_OK) {
+        for(size_t i=0;i<boot_device_tree.device_count;++i) {
+            const fdt_device_t *d=&boot_device_tree.devices[i];
+            static const char pl031[]="arm,pl031";unsigned k=0;
+            while(k<sizeof(pl031) && d->compatible[k]==pl031[k])++k;
+            if(k==sizeof(pl031) && d->has_reg && d->reg_size>=4)(void)chos_clock_use_pl031((uintptr_t)d->reg_base);
+        }
         if(fdt_info_has_qemu_virtio_mmio(&boot_device_tree))chos_virtio_use_mmio(platform_virtio_mmio_base());
         uart_puts("[ OK ] Device tree parsed\n");
         pmm_result = pmm_init(&boot_device_tree,

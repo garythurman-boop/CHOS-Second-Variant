@@ -4,6 +4,7 @@
  * owned by hardware. Single bootstrap/GUI task is the sole producer. */
 #include "chos/xhci.h"
 #include "chos/usb.h"
+#include "chos/xhci_compat.h"
 #define MAX_SLOTS 16u
 #define MAX_PORTS 255u
 #define TRB(t) ((uint32_t)(t)<<10)
@@ -35,7 +36,7 @@ typedef struct {
     endpoint_t endpoints[CHOS_USB_MAX_HID];
     uint8_t port, slot, speed, endpoint_count;
     uint8_t parent, parent_port, depth, hub, hub_ports, tt_think;
-    uint16_t vendor,product;
+    uint16_t vendor,product,received;
     uint32_t route;
     uint64_t hub_changes, hub_ready, port_ready[32], port_deadline[32];
     uint8_t port_phase[32], hub_status_pending;
@@ -52,7 +53,9 @@ static uintptr_t mmio, op, runtime, doorbells;
 static uint32_t context_bytes, port_count, slot_limit;
 static unsigned event_head, event_cycle, online, port_cursor;
 static uint64_t awaited, completed, completion_parameter, control_data_trb;
-static int control_short;
+static int control_short,control_data_done;
+static uint32_t control_requested,control_received;
+static uint8_t control_slot;
 static uint32_t completion_status, completion_control;
 static int running, poisoned;
 static uint8_t port_attempted[MAX_PORTS];
@@ -134,8 +137,13 @@ static void drain(void) {
         event_head++;
         if(event_head==256) { event_head=0; event_cycle^=1; }
         wr64(runtime+0x38,(uintptr_t)&events[event_head]|8u); /* ERDP + EHB */
-        if(type==32 && control_data_trb && (v.parameter&~UINT64_C(15))==control_data_trb) {
-            if(code!=SUCCESS || (v.status&0xffffff)) control_short=1;
+        if(type==32 && control_data_trb && v.control>>24==control_slot &&
+           ((v.control>>16)&31)==1 && (v.parameter&~UINT64_C(15))==control_data_trb) {
+            uint32_t residual=v.status&0xffffff;
+            control_data_done=1;
+            if((code!=SUCCESS && code!=SHORT_PACKET) || residual>control_requested) {
+                control_short=1;completed=awaited;completion_status=v.status;
+            } else control_received=control_requested-residual;
         } else if ((type==33 || type==32) && (v.parameter&~UINT64_C(15))==awaited && awaited) {
             completed=awaited; completion_status=v.status; completion_control=v.control;
             completion_parameter=v.parameter;
@@ -201,24 +209,28 @@ static int (*test_control)(usb_device_t *,uint8_t,uint8_t,uint16_t,uint16_t,uint
 static int control(usb_device_t *d,uint8_t request_type,uint8_t request,uint16_t value,
                    uint16_t index,uint16_t length) {
 #ifdef CHOS_HOST_TEST
-    if(test_control)return test_control(d,request_type,request,value,index,length);
+    if(test_control){d->received=length;return test_control(d,request_type,request,value,index,length);}
 #endif
     uint64_t setup=request_type|((uint64_t)request<<8)|((uint64_t)value<<16)|((uint64_t)index<<32)|((uint64_t)length<<48);
     uint32_t in=(request_type&0x80)!=0;
     uint64_t status_trb;
     if(length>sizeof(d->data)) return 0;
     zero(d->data,sizeof(d->data));
-    control_data_trb=0;control_short=0;
+    d->received=0;control_data_trb=0;control_short=0;control_data_done=!length;
+    control_requested=length;control_received=0;control_slot=d->slot;
     if(!push(&d->control,setup,8,TRB(2)|(1u<<6)|((length?(in?3u:2u):0u)<<16))) {error="USB invalid control ring state";return 0;}
-    if(length) control_data_trb=push(&d->control,(uintptr_t)d->data,length,TRB(3)|(in<<16)|(1u<<2));
+    if(length) control_data_trb=push(&d->control,(uintptr_t)d->data,length,TRB(3)|(in<<16)|(1u<<2)|(1u<<5));
     status_trb=push(&d->control,0,0,TRB(4)|(1u<<5)|((length?!in:1u)<<16));
     if(!status_trb || (length && !control_data_trb)) {error="USB invalid control ring state";return 0;}
     ring_doorbell(d->slot,1);
     int done=await(status_trb,TIMEOUT_MS,0);
     control_data_trb=0;
     if(!done) return 0;
-    if(control_short) {error="USB short or failed control descriptor transfer";return 0;}
+    if(control_short || !control_data_done || (length && control_received!=length)) {
+        error="USB control data length/completion mismatch";return 0;
+    }
     if((completion_status>>24)!=SUCCESS) { error="USB control transfer failed"; return 0; }
+    d->received=(uint16_t)control_received;
     (void)completion_parameter;
     return 1;
 }
@@ -270,11 +282,11 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
     ep[1]=(3u<<1)|(4u<<3)|((speed==4?512u:(speed==3?64u:8u))<<16);
     context_pointer(ep,2,(uintptr_t)d->control.trbs|1); ep[4]=8;
     if(!command(11,(uintptr_t)d->input,slot<<24,0)) goto bad;
-    if(!control(d,0x80,6,0x100,0,18)) goto bad;
-    if(d->data[0]!=18 || d->data[1]!=1 || !d->data[17]) {error="USB malformed device descriptor";goto bad;}
-    d->vendor=(uint16_t)(d->data[8]|(uint16_t)d->data[9]<<8);
-    d->product=(uint16_t)(d->data[10]|(uint16_t)d->data[11]<<8);
-    d->hub=d->data[4]==9;
+    /* Learn EP0's packet size from the standard eight-byte prefix before
+     * requesting a descriptor spanning multiple packets. Fusion's virtual USB
+     * devices exercise this sequence; QEMU previously tolerated the mismatch. */
+    if(!control(d,0x80,6,0x100,0,8)) goto bad;
+    if(d->data[0]!=18 || d->data[1]!=1) {error="USB malformed device descriptor prefix";goto bad;}
     unsigned packet=d->data[7];
     if(speed==4) packet=packet==9?512:0;
     if((speed==1 && packet!=8 && packet!=16 && packet!=32 && packet!=64) ||
@@ -286,6 +298,11 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
         ep[1]=(ep[1]&0xffffu)|(packet<<16);
         if(!command(13,(uintptr_t)d->input,slot<<24,0)) goto bad;
     }
+    if(!control(d,0x80,6,0x100,0,18))goto bad;
+    if(d->data[0]!=18 || d->data[1]!=1 || !d->data[17]) {error="USB malformed device descriptor";goto bad;}
+    d->vendor=(uint16_t)(d->data[8]|(uint16_t)d->data[9]<<8);
+    d->product=(uint16_t)(d->data[10]|(uint16_t)d->data[11]<<8);
+    d->hub=d->data[4]==9;
     if(!control(d,0x80,6,0x200,0,9)) goto bad;
     unsigned config_bytes=d->data[2]|((unsigned)d->data[3]<<8);
     if(config_bytes<9 || config_bytes>sizeof(d->data)) { error="USB configuration length out of bounds"; goto bad; }
@@ -320,9 +337,20 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
         if(speed==3)ctx(d,0)[2]|=(uint32_t)d->tt_think<<16;
         ctx(d,0)[3]=0; /* input Slot Context reserved/state bits */
     }
-    unsigned highest=1;
+    unsigned highest=1,accepted=0;
     for(unsigned i=0;i<count;++i) {
-        endpoint_t *e=&d->endpoints[i]; e->iface=interfaces[i];
+        endpoint_t *e=&d->endpoints[accepted]; e->iface=interfaces[i];
+        if(!d->hub) {
+            if(e->iface.boot_protocol && !control(d,0x21,11,1,e->iface.interface,0))goto bad;
+            if(!control(d,0x81,6,0x2200,e->iface.interface,e->iface.report_bytes))goto bad;
+            if(chos_hid_parse_report_descriptor(d->data,e->iface.report_bytes,&e->layout)!=CHOS_HID_OK ||
+               (!e->layout.has_keyboard && !e->layout.has_pointer && !e->layout.has_mouse)) {
+                log_device(d,"unclaimed HID interface: report layout outside input policy");continue;
+            }
+            int fits=1;
+            for(unsigned id=0;id<256;++id)if((e->layout.input_bits[id]+7u)/8u+(e->layout.uses_report_ids?1u:0u)>e->iface.packet_bytes)fits=0;
+            if(!fits){log_device(d,"unclaimed HID interface: report exceeds endpoint packet");continue;}
+        }
         e->dci=(uint8_t)(2u*(interfaces[i].endpoint&15u)+1u);
         if((speed==2 && interfaces[i].packet_bytes>8) || (speed==1 && interfaces[i].packet_bytes>64)) {
             error="USB endpoint packet exceeds port speed limit";goto bad;
@@ -337,18 +365,10 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
         context_pointer(ep,2,(uintptr_t)e->ring.trbs|1);
         ep[4]=e->iface.packet_bytes|((uint32_t)e->iface.packet_bytes<<16);
         icc[1]|=1u<<e->dci; if(e->dci>highest) highest=e->dci;
-        if(d->hub)continue;
-        if(e->iface.boot_protocol && !control(d,0x21,11,1,e->iface.interface,0)) goto bad;
-        if(!control(d,0x81,6,0x2200,e->iface.interface,e->iface.report_bytes)) goto bad;
-        if(chos_hid_parse_report_descriptor(d->data,e->iface.report_bytes,&e->layout)!=CHOS_HID_OK ||
-           (!e->layout.has_keyboard && !e->layout.has_pointer && !e->layout.has_mouse)) { error="USB unsupported HID report descriptor"; goto bad; }
-        /* Default protocol is report protocol. SET_IDLE is optional and often
-         * stalls on otherwise valid devices: don't require it or switch to boot
-         * protocol, which would invalidate the report descriptor's layout. */
-        for(unsigned id=0;id<256;++id) if((e->layout.input_bits[id]+7u)/8u+(e->layout.uses_report_ids?1u:0u)>e->iface.packet_bytes) {
-            error="USB HID report exceeds endpoint packet"; goto bad;
-        }
+        ++accepted;
     }
+    if(!accepted){error="USB no accepted HID interface";goto bad;}
+    count=accepted;
     sc=ctx(d,0); sc[0]=(sc[0]&~(31u<<27))|(highest<<27);
     if(!command(12,(uintptr_t)d->input,slot<<24,0)) goto bad;
     d->endpoint_count=(uint8_t)count;d->active=1;
@@ -469,9 +489,11 @@ int chos_xhci_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,con
     uint32_t cap=rd(mmio),hcs=rd(mmio+4),hcs2=rd(mmio+8),hcc=rd(mmio+16);
     uint32_t db=rd(mmio+20)&~3u,rt=rd(mmio+24)&~31u;
     op=0;
-    if((cap&255)<0x20 || (cap&3u) || (cap>>16)<0x100 || (cap>>16)>0x120 ||
+    uint16_t version=chos_xhci_version(pci->vendor_id,pci->device_id,(uint16_t)(cap>>16));
+    if((cap&255)<0x20 || (cap&3u) || !version ||
        db<0x100 || db>bar_bytes-4u*(MAX_SLOTS+1u) || rt<0x100 || rt>bar_bytes-0x40 ||
        !(hcs&255) || !(hcs>>24) || (cap&255)+0x400u+16u*(hcs>>24)>bar_bytes) {fail("xHCI invalid/unsupported capabilities");return 0;}
+    if(version!=(cap>>16) && logger)logger("[XHCI] VMware compact HCIVERSION normalized by compatibility table.\n");
     op=mmio+(cap&255);
     if(!(rd(op+8)&1u)){fail("xHCI 4 KiB DMA pages unsupported");return 0;}
     if (!(hcc&1u) && ((uintptr_t)(devices+MAX_SLOTS)>UINT32_MAX ||

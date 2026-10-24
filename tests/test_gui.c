@@ -75,6 +75,7 @@ void chos_net_ping_get_info(chos_net_ping_info_t *out) {*out=(chos_net_ping_info
 const char *chos_net_dhcp_state_name(chos_net_dhcp_state_t s) {(void)s;return "offline";}
 const char *chos_net_ping_state_name(chos_net_ping_state_t s) {(void)s;return "idle";}
 int chos_net_ping_start(uint32_t ip) {(void)ip;return 0;}
+const char *chos_clock_source(void) {return "mock clock";}
 const char *uefi_console_boot_log(void) {return "PCI test inventory\n";}
 int timer_is_ready(void) { return mock_timer_ready; }
 uint64_t timer_ticks(void) { return mock_ticks; }

@@ -4,10 +4,13 @@ This report supersedes the driver summary in the original 0.30.0 handoff. See
 [hardware matrix](HARDWARE_SUPPORT.md), [validation evidence](STAGE1_VALIDATION.md),
 and the current [Fusion follow-up](STAGE1_FUSION_FOLLOWUP.md).
 Builds and host mocks do not establish hardware support. Stage 1 is not declared complete.
+See [current Fusion fixes](FUSION_DRIVER_FIXES.md) for the recorded controller-version
+refusal, clock defect and composite-HID changes based on the separate tested project.
 
 | Subsystem | Implemented and verified | Remaining limits |
 |---|---|---|
 | Direct ARM64 boot / MMU | QEMU serial boot; translation, guard pages, dynamic aliases with 512 MiB RAM | Single CPU; QEMU platform addresses; no universal ARM64 boot claim |
+| Wall clock | UEFI GetTime snapshot + architectural counter; FDT PL031 in direct boot; calendar/counter/absence host tests and visible QEMU minute rollover | Firmware snapshot accuracy/timezone; no runtime firmware calls or NTP |
 | UEFI / GOP | AAVMF ISO and prepared-image boot with QEMU RAMFB | Generic UEFI EL0/process runtime is not established; kernel GUI runs with MMU/cache off |
 | PCI discovery / resources | ACPI MCFG inventory; EFI root-bridge resource snapshot; sized assigned BARs; CPU/bus translation; RAM-overlap rejection | No PCI resource allocator; platform must assign BARs; no native IOMMU ownership |
 | Native xHCI | Bounded ownership/halt/reset/start; no-op command validation; command/event/transfer rings; 32/64-byte contexts; scratchpads; control transfers; root-port HID enumeration; interrupt-IN reports | One controller, 16 devices, up to 255 root ports, 4 HID endpoints/device, 1024-byte packets, 4096-byte descriptors; standard speed IDs only; bounded hubs/depth; no streams or high-bandwidth burst endpoints |
@@ -23,7 +26,7 @@ Builds and host mocks do not establish hardware support. Stage 1 is not declared
 
 ## Ownership and failure contracts
 
-* UEFI handoff ABI version 4 copies EFI PCI root-bridge resource windows **before**
+* UEFI handoff ABI version 5 copies EFI PCI root-bridge resource windows **before**
   ExitBootServices. The kernel never invokes those firmware callbacks afterward.
   BAR sizing temporarily disables decode/bus mastering and restores the original
   BARs/command register. A window must translate the entire BAR unambiguously and

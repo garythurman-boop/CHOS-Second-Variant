@@ -4,8 +4,9 @@
 #include "chos/usb.h"
 #include "chos/xhci.h"
 static unsigned events, keys, releases, buttons;
+static uint16_t first_key;
 static int dx,dy,scroll,abs_x=-1,abs_y=-1;
-void chos_input_key(uint16_t c,int down) {assert(c);++events;if(down)++keys;else ++releases;}
+void chos_input_key(uint16_t c,int down) {assert(c);if(!events)first_key=c;++events;if(down)++keys;else ++releases;}
 void chos_input_button(uint16_t c,int down) {assert(c>=0x110 && c<0x118);(void)down;++buttons;++events;}
 void chos_input_relative(int32_t x,int32_t y) {dx+=x;dy+=y;++events;}
 void chos_input_absolute(int32_t x,int32_t y){abs_x=x;abs_y=y;++events;}
@@ -20,7 +21,7 @@ int main(void) {
     chos_hid_report_layout_t l; chos_usb_input_state_t s={0};
     assert(chos_hid_parse_report_descriptor(keyboard,sizeof(keyboard),&l)==CHOS_HID_OK);
     uint8_t k[8]={2,0,4,5,0,0,0,0};
-    assert(chos_usb_decode_report(&l,&s,k,8)); assert(keys==3);
+    assert(chos_usb_decode_report(&l,&s,k,8)); assert(keys==3 && first_key==42);
     assert(chos_usb_decode_report(&l,&s,k,8)); assert(keys==3); /* duplicates */
     k[2]=1; assert(chos_usb_decode_report(&l,&s,k,8)); assert(releases==0); /* rollover */
     memset(k,0,8);assert(chos_usb_decode_report(&l,&s,k,8));assert(releases==3);
