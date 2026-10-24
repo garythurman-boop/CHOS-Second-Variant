@@ -82,7 +82,9 @@ catalogue currently attaches PCI drivers; new FDT adapters need discovery glue.
 
 ## USB and recovery behavior
 
-USB HID admission uses descriptors and usages, rather than a VMware peripheral-ID
+USB HID admission accepts bounded endpoint padding while interpreting only the
+descriptor-defined payload. Unknown IDs and short/oversized reports are rejected.
+Admission uses descriptors and usages, rather than a VMware peripheral-ID
 allowlist. A vendor/consumer-only function cannot reject a usable keyboard/pointer
 on the same device. Report IDs and interfaces retain held state; USB source counts
 prevent one interface from releasing another's held key/button. Modifiers precede

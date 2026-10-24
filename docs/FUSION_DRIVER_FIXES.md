@@ -134,3 +134,16 @@ separate tested reference, rather than an assumption that QEMU success closes it
 NVMe remains disabled in the standard ISO, and no native NIC is claimed without
 current-project adapter inventory. The experimental NVMe path remains an explicit
 opt-in legacy attachment outside the current PCI registry adapters.
+
+## Endpoint-padded report compatibility
+
+A final comparison with the tested reference decoder identified another acceptance
+difference: it accepts a report padded to the endpoint packet size, while this
+branch required an exact descriptor-defined length. A five-byte numbered mouse
+report carried in an eight-byte packet failed in the new regression before the
+correction (`padded-report-before.log`). The decoder now requires at least the
+descriptor's logical payload and trims interpretation to that payload. The complete
+wire transfer must still fit the endpoint and the 1024-byte driver bound; unknown
+IDs and truncated/oversized reports still fail without state changes. Tail bytes
+cannot produce input events. Corrected host/sanitizer and full regression results
+are in `padded-report-after.log`, `padded-full-host.log`, `padded-full-sanitize.log`.

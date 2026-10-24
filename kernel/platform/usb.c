@@ -92,9 +92,13 @@ int chos_usb_decode_report(const chos_hid_report_layout_t *l, chos_usb_input_sta
     uint8_t id=0, keys[256]={0}, buttons[8]={0};
     int keyboard=0, pointer=0, rollover=0;
     int32_t x=0,y=0,wheel=0,absolute_x=-1,absolute_y=-1;
-    if (!l || !s || !d || !n || l->field_count > CHOS_HID_MAX_FIELDS) return 0;
+    if (!l || !s || !d || !n || n>CHOS_USB_REPORT_BYTES || l->field_count > CHOS_HID_MAX_FIELDS) return 0;
     if (l->uses_report_ids) { id=*d++; --n; if (!id) return 0; }
-    if (!l->input_bits[id] || n != (l->input_bits[id]+7u)/8u) return 0;
+    size_t payload=(l->input_bits[id]+7u)/8u;
+    if(!payload || n<payload)return 0;
+    /* Some devices pad reports to the interrupt endpoint's packet size. Keep
+     * transport bounds, but interpret only the descriptor-defined bytes. */
+    n=payload;
     for (size_t i=0;i<l->field_count;++i) {
         const chos_hid_field_t *f=&l->fields[i];
         if (f->report_id!=id || (f->flags & CHOS_HID_FIELD_CONSTANT)) continue;

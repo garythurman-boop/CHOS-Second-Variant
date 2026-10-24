@@ -29,6 +29,15 @@ int main(void) {
     assert(chos_hid_parse_report_descriptor(mouse,sizeof(mouse),&l)==CHOS_HID_OK);
     uint8_t m[]={7,1,0xff,2,1};
     assert(chos_usb_decode_report(&l,&s,m,sizeof(m)));assert(dx==-1 && dy==2 && scroll==-1 && buttons==1);
+    /* HID endpoints may pad a shorter numbered report to their packet size.
+     * Only the descriptor-defined payload is decoded, regardless of tail bytes. */
+    uint8_t padded_mouse[]={7,1,0xff,2,1,0xa5,0x7e,0xff};
+    int previous_dx=dx,previous_dy=dy;
+    assert(chos_usb_decode_report(&l,&s,padded_mouse,sizeof(padded_mouse)));
+    assert(dx==previous_dx-1 && dy==previous_dy+2 && buttons==1);
+    before=events;
+    assert(!chos_usb_decode_report(&l,&s,padded_mouse,4) && events==before);
+    assert(!chos_usb_decode_report(&l,&s,padded_mouse,CHOS_USB_REPORT_BYTES+1) && events==before);
     m[0]=8;before=events;assert(!chos_usb_decode_report(&l,&s,m,sizeof(m)));assert(events==before);
     chos_usb_release_input(&s);assert(buttons==2);chos_usb_release_input(&s);assert(buttons==2);
     /* The same key held by two report IDs is released only after both let go. */
