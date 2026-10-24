@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "chos/exception.h"
 #include "chos/uart.h"
+#include "chos/build_stamp.h"
 #include "../platform/uefi_console.h"
 
 static void print_hex64(uint64_t value) {
@@ -42,6 +43,7 @@ static const char *data_fault_status_name(uint64_t dfsc) {
         case 0x10: return "synchronous external abort";
         case 0x11: return "tag check fault";
         case 0x21: return "alignment fault";
+        case 0x35: return "unsupported exclusive or atomic access";
         default:   return "unclassified data fault";
     }
 }
@@ -110,21 +112,52 @@ static const char *esr_class_name(uint64_t ec) {
     }
 }
 
+/* First-fault evidence remains readable through a debugger even if a damaged
+ * framebuffer/UART faults during reporting. Never use an atomic in this path. */
+volatile struct {
+    uint64_t esr, elr, far, spsr, vector_kind, kernel_base, sctlr;
+} chos_first_panic;
+volatile uint32_t chos_panic_report_complete;
+static volatile uint32_t panic_entered;
+extern uint8_t __kernel_start;
+
 CHOS_NORETURN void exception_panic(uint64_t esr, uint64_t elr,
                                    uint64_t far, uint64_t spsr,
                                    uint64_t vector_kind) {
+    __asm__ volatile("msr daifset, #0xf\n\tisb" ::: "memory");
+    /* DAIF does not mask synchronous exceptions. A nested abort parks without
+     * overwriting the original evidence or recursively rendering the screen. */
+    if (panic_entered) for (;;) __asm__ volatile("wfe");
+    panic_entered = 1u;
+    chos_first_panic.esr = esr;
+    chos_first_panic.elr = elr;
+    chos_first_panic.far = far;
+    chos_first_panic.spsr = spsr;
+    chos_first_panic.vector_kind = vector_kind;
+    chos_first_panic.kernel_base = (uintptr_t)&__kernel_start;
+    chos_first_panic.sctlr = read_sctlr_el1();
     const uint64_t ec = (esr >> 26) & 0x3fu;
 
-    /* A fault may occur while the console lock is held. Panic is terminal, so
-       make polled serial diagnostics available again before printing details. */
     uart_console_emergency_reset();
-    /* Generic UEFI hardware may have no supported serial UART. Preserve a
-     * visible terminal diagnostic instead of leaving a frozen-looking splash. */
-    uefi_console_set_graphics_logging(1);
-    uefi_console_write("\n[FATAL] Kernel exception; halted. ESR=");
-    uefi_console_write_hex(esr);uefi_console_write(" ELR=");
-    uefi_console_write_hex(elr);uefi_console_write(" FAR=");
-    uefi_console_write_hex(far);uefi_console_write("\n");
+    uefi_console_begin_panic();
+    /* Keep GOP compact so the first fault stays visible at 800x600. The full
+     * serial report below bypasses locks and never restores IRQ state. */
+    uefi_console_write("[FATAL] Kernel exception; halted.\n");
+    uefi_console_write("[BUILD] " CHOS_BUILD_REVISION "\n");
+    uefi_console_write("ESR: "); uefi_console_write_hex(esr);
+    uefi_console_write("\nCause: "); uefi_console_write(esr_class_name(ec));
+    if (ec == 0x24u || ec == 0x25u) {
+        uefi_console_write("\nData fault: "); uefi_console_write(data_fault_status_name(esr));
+    }
+    uefi_console_write("\nELR: "); uefi_console_write_hex(elr);
+    uefi_console_write("\nFAR: "); uefi_console_write_hex(far);
+    uefi_console_write("\nSCTLR: "); uefi_console_write_hex(read_sctlr_el1());
+    uefi_console_write("\nImage base: "); uefi_console_write_hex((uintptr_t)&__kernel_start);
+    if (elr >= (uintptr_t)&__kernel_start) {
+        uefi_console_write("\nPC offset: "); uefi_console_write_hex(elr - (uintptr_t)&__kernel_start);
+    }
+    uefi_console_write("\nReset the VM to continue.\n");
+    uefi_console_set_graphics_logging(0);
     uart_puts("\n\n*** CHOS KERNEL PANIC ***\n");
     uart_puts("Unhandled ARM64 exception; system halted.\n");
     uart_puts("Vector: ");
@@ -166,6 +199,7 @@ CHOS_NORETURN void exception_panic(uint64_t esr, uint64_t elr,
     uart_puts("\n  TTBR0_EL1: "); print_hex64(read_ttbr0_el1());
     uart_puts("\n  MAIR_EL1:  "); print_hex64(read_mair_el1());
     uart_puts("\n\nCHOS halted in the exception panic handler. Reset the VM to continue.\n");
+    chos_panic_report_complete = 1u;
 
     for (;;) {
         __asm__ volatile("wfe");

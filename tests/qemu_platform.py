@@ -26,6 +26,8 @@ class Guest:
              '-global','virtio-mmio.force-legacy=false','-serial','stdio',
              '-qmp',f'unix:{self.sockpath},server=on,wait=off']
         if args.qemu_data: cmd+=['-L',str(args.qemu_data)]
+        if getattr(args,'gdb_socket',None):
+            cmd+=['-gdb','unix:'+str(args.gdb_socket)+',server=on,wait=off']
         if args.rtc_base:cmd+=['-rtc','base='+args.rtc_base+',clock=vm']
         if args.trace:cmd+=['-trace','enable=virtio_*,file='+str(out/'virtio.trace')]
         if args.mode=='direct':

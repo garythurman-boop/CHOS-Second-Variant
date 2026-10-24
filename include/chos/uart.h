@@ -5,7 +5,7 @@
 
 void uart_init(void);
 void uart_attach_pl011(uintptr_t base);
-/* Terminal panic path: release a lock held by the faulting single CPU. */
+/* Terminal single-CPU panic path: bypass locks; caller must mask all DAIF. */
 void uart_console_emergency_reset(void);
 
 /* Each standalone write is serialized against other tasks on the current CPU. */

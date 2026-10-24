@@ -61,3 +61,51 @@ visible clock minute rollover, PCI VirtIO storage/network/RNG and persistence
 across a fresh guest. It uses one CPU and 2 GiB RAM; idle sample is 1.0% CPU.
 QEMU results never establish Fusion acceptance. Terminal panic-containment is a
 separate follow-up so reporting cannot hide a later unrelated fault.
+
+## Terminal panic containment
+
+Fatal vectors latch once using plain aligned accesses before touching SP or
+calling C, then switch to a reserved 8 KiB emergency stack. Nested synchronous
+exceptions park at the vector without recursively logging or clearing GOP. A C
+guard also covers fatal calls from the syscall dispatcher. DAIF remains masked.
+The first ESR/ELR/FAR/SPSR/vector/image-base/SCTLR is retained in
+`chos_first_panic`; `chos_panic_report_complete` marks a completed terminal report.
+
+Emergency UART output bypasses its lock permanently and ignores an unattached
+UART. GOP resets to a compact first-fault page with build revision, decoded cause,
+addresses, SCTLR and relocated image/PC offset. Detailed serial output cannot
+wrap away that page. DFSC `0x35` now has an explicit diagnostic description.
+
+`tests/qemu_panic.py` boots immutable copies in disposable VMs, inserts a real
+BRK at the completed bootstrap entry through QEMU's debugger, makes the ordinary
+UART lock held and SP unusable, and verifies terminal reporting. It triggers a
+second distinct BRK and checks byte-for-byte preservation of the first record,
+framebuffer and serial output. A second VM detaches the UART before both faults.
+This deliberately modifies guest instructions/registers only for fault injection;
+it does not call CHOS input APIs or modify the copied disk/ISO/kernel files.
+`panic-stack-injection/{serial,no-uart}/result.json` both pass with MMU off.
+Host regression, ASan/UBSan and direct serial smoke also pass after this change.
+
+An earlier `panic-injection` attempt completed its serial case, but its second VM
+timed out in firmware before any EFI-loader/kernel log. Its immutable ELF and ISO
+match. The later emergency-stack run boots both profiles and passes; the earlier
+firmware timeout is retained and is not counted as a successful kernel test.
+
+Reproduce with the prepared tool environment:
+
+```sh
+python3 tests/qemu_panic.py --out /workspace/chos-evidence/NEW-PANIC \
+  --firmware /workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd \
+  --qemu-data /workspace/chos-tools/root/usr/share/qemu
+```
+
+## Required Fusion retest
+
+Use the newly published ISO identified in `artifacts/publication.json`, one CPU
+and 2 GiB RAM. Verify desktop entry, advancing taskbar clock, keyboard typing and
+Shift+letters, pointer alignment, buttons/wheel, dragging/maximize/restore,
+reconnect and an idle soak. If input is missing, wait for the automatic rotating
+driver reports and capture their actual controller/device/refusal information.
+If a panic occurs, capture the single stable page including build ID and PC
+offset. Keep NVMe disabled on valuable media. Actual Fusion device acceptance
+and remaining Stage 1 platform/network/IOMMU gates remain open.

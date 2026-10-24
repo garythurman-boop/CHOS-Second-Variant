@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include <stdint.h>
-#include "chos/atomic.h"
 #include "chos/uart.h"
 #include "chos/platform.h"
 #include "chos/spinlock.h"
@@ -8,6 +7,7 @@
 /* Set once from the active platform profile; MMIO stays direct and polled. */
 static uintptr_t uart0_base;
 static chos_spinlock_t uart_console_lock = CHOS_SPINLOCK_INITIALIZER;
+static int emergency_output;
 #define UART_DR    (*(volatile uint32_t *)(uart0_base + 0x00))
 #define UART_FR    (*(volatile uint32_t *)(uart0_base + 0x18))
 #define UART_IBRD  (*(volatile uint32_t *)(uart0_base + 0x24))
@@ -27,8 +27,9 @@ static void uart_putc_raw(char c) {
 }
 
 void uart_console_emergency_reset(void) {
-    /* CHOS is currently single-core; panic never returns to the faulting context. */
-    chos_atomic_store_u32(&uart_console_lock.held, 0u);
+    /* Terminal single-CPU path, all DAIF masked. Do not use atomics, acquire a
+     * possibly held lock, or re-enable IRQs while reporting a kernel fault. */
+    emergency_output = 1;
 }
 
 void uart_attach_pl011(uintptr_t base) { uart0_base=base; }
@@ -45,10 +46,12 @@ void uart_init(void) {
 }
 
 uint64_t uart_write_begin(void) {
+    if (emergency_output || !uart0_base) return 0u;
     return chos_spin_lock_irqsave(&uart_console_lock);
 }
 
 void uart_write_end(uint64_t irq_state) {
+    if (emergency_output || !uart0_base) return;
     chos_spin_unlock_irqrestore(&uart_console_lock, irq_state);
 }
 

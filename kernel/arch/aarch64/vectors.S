@@ -168,14 +168,35 @@ exception_serror_entry:
 
 .type exception_common, %function
 exception_common:
-    /* Keep a faulting or interrupting context from recursively re-entering. */
+    /* DAIF cannot mask synchronous aborts. Latch BEFORE touching the interrupted
+     * stack or calling C, so a reporting fault cannot recursively overflow it.
+     * Plain aligned accesses are intentional: MMU-off Device memory need not
+     * support exclusive operations. Secondary CPUs remain parked. */
     msr daifset, #0xf
+    adrp x5, panic_vector_entered
+    add x5, x5, :lo12:panic_vector_entered
+    ldr w6, [x5]
+    cbnz w6, 1f
+    mov w6, #1
+    str w6, [x5]
     mrs x0, esr_el1
     mrs x1, elr_el1
     mrs x2, far_el1
     mrs x3, spsr_el1
+    /* A damaged/overflowed interrupted stack must not prevent diagnostics. */
+    adrp x5, panic_stack_top
+    add x5, x5, :lo12:panic_stack_top
+    mov sp, x5
     bl exception_panic
 1:
     wfe
     b 1b
 .size exception_common, . - exception_common
+
+.section .bss.panic, "aw", %nobits
+.balign 16
+panic_vector_entered:
+    .skip 4
+.balign 16
+    .skip 8192
+panic_stack_top:

@@ -94,6 +94,17 @@ static void newline(void) {
     }
 }
 
+void uefi_console_begin_panic(void) {
+    /* Serial is emitted separately through the lock-free emergency UART path.
+     * Retain the boot transcript, but put the first fault at the top of GOP. */
+    serial_ready = 0;
+    graphics_logging = 1;
+    cursor_x = 24u;
+    cursor_y = 68u;
+    current_fg = C_RED;
+    if (ready) fill_rect(0u, 58u, fb_width, fb_height > 58u ? fb_height - 58u : 0u, C_BG);
+}
+
 int uefi_console_init(const chos_boot_info_t *info) {
     uint64_t expected;
     if (info == NULL || !chos_boot_info_validate(info) ||

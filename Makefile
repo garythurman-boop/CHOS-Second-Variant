@@ -411,6 +411,7 @@ test-assets:
 test-uefi-iso:
 	python3 tests/test_mkuefi_iso.py
 	python3 -m py_compile tests/qemu_smoke.py
+	python3 -m py_compile tests/qemu_panic.py
 	python3 tests/test_release_version.py
 	python3 tests/test_mkchos_install_disk.py
 
