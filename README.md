@@ -2,7 +2,8 @@
 
 Stage 1 development changes and current runtime evidence are described in
 [Stage 1 validation](docs/STAGE1_VALIDATION.md), [driver status](docs/DRIVER_STATUS.md)
-and the [hardware support matrix](docs/HARDWARE_SUPPORT.md). The original 0.30.0
+and the [hardware support matrix](docs/HARDWARE_SUPPORT.md). See the
+[build expectations and test checklist](docs/STAGE1_TEST_CHECKLIST.md) before testing. The original 0.30.0
 feature notes below describe the supplied baseline; they are not the latest driver status.
 
 For this cloud machine, run `bash scripts/setup-cloud.sh`, then source

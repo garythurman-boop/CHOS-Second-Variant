@@ -2,7 +2,9 @@
 
 Stage 1 remains **incomplete as a cross-platform acceptance gate**. The direct QEMU
 VirtIO workflow and a native USB UEFI workflow are implemented and tested locally.
-Fusion, Pi 5 and ARM64 laptop tests are BLOCKED by unavailable hardware. Native USB
+Fusion, Pi 5 and ARM64 laptop tests are BLOCKED by unavailable hardware. There are
+also software gaps that can be implemented and tested in QEMU now; see
+[build expectations and test checklist](STAGE1_TEST_CHECKLIST.md). Native USB
 hubs, absolute tablets, arbitrary DMA/IOMMU platforms and vmxnet3 remain unsupported
 or unimplemented; this report does not describe universal USB/platform compatibility.
 
@@ -10,9 +12,11 @@ or unimplemented; this report does not describe universal USB/platform compatibi
 
 The uploaded ZIP is untouched. Its SHA-256 and original prebuilt copies/check results
 are in `/workspace/chos-evidence/baseline/`. Original prebuilt SHA256SUMS all passed.
-Local commit `93729cb` imports the supplied source before Stage 1 edits. Nothing has
-been pushed to GitHub. The remote was empty at onboarding. Local commits/source must
-be retained in the environment snapshot or exported; remote restoration is unverified.
+Local commit `93729cb` imports the supplied source before Stage 1 edits. The first
+Stage 1 source commit `d15e25f` was pushed to GitHub `main`, and its remote SHA was
+verified. The remote was empty at onboarding. Subsequent completed iterations are
+committed and pushed to main under the user's standing instruction. New cloud-task
+restoration/publication remains unverified; retain the prepared snapshot/export too.
 
 Baseline clean direct, UEFI ISO and prepared-image builds passed, as did aggregate
 `make test` and `make test-sanitize`; this machine did not reproduce the old handoff's
