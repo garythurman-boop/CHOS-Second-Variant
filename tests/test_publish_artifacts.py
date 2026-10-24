@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+"""Publication cadence and integrity regressions; no network or Git writes."""
+import importlib.util
+import json
+import pathlib
+import tempfile
+import unittest
+from unittest import mock
+
+spec = importlib.util.spec_from_file_location('publisher', pathlib.Path(__file__).resolve().parents[1] / 'tools/publish_artifacts.py')
+publisher = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(publisher)
+
+
+class PublicationTests(unittest.TestCase):
+    def test_every_other_iteration_and_duplicate(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            state = {'latest': {'source_commit': 'baseline'}, 'iterations_since_artifacts': 0,
+                     'last_counted_source_commit': 'baseline'}
+            folder = root / 'artifacts'; folder.mkdir()
+            (folder / 'publication.json').write_text(json.dumps(state))
+            first = publisher.run(root, root / 'build', 'a' * 40)
+            self.assertEqual(first['status'], 'source-only-iteration')
+            self.assertEqual(first['iterations_since_artifacts'], 1)
+            self.assertEqual(publisher.run(root, root / 'build', 'a' * 40)['status'], 'already-recorded')
+            with mock.patch.object(publisher, 'stage', return_value=folder / ('b' * 7)) as stage:
+                second = publisher.run(root, root / 'build', 'b' * 40)
+            stage.assert_called_once()
+            self.assertEqual(second['iterations_since_artifacts'], 0)
+            self.assertEqual(second['latest']['source_commit'], 'b' * 40)
+            third = publisher.run(root, root / 'build', 'c' * 40)
+            self.assertEqual(third['status'], 'source-only-iteration')
+
+    def test_failed_staging_does_not_advance_counter(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp); folder = root / 'artifacts'; folder.mkdir()
+            path = folder / 'publication.json'
+            path.write_text(json.dumps({'iterations_since_artifacts': 1, 'last_counted_source_commit': 'a' * 40}))
+            before = path.read_bytes()
+            with mock.patch.object(publisher, 'stage', side_effect=ValueError('invalid build')):
+                with self.assertRaises(ValueError): publisher.run(root, root / 'build', 'b' * 40)
+            self.assertEqual(path.read_bytes(), before)
+
+    def test_compression_preserves_exact_bytes(self):
+        import gzip
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp); data = bytes(range(256)) * 100
+            source = root / 'source'; source.write_bytes(data)
+            one, two = root / 'one.gz', root / 'two.gz'
+            publisher.compressed(source, one); publisher.compressed(source, two)
+            self.assertEqual(one.read_bytes(), two.read_bytes())
+            self.assertEqual(gzip.decompress(one.read_bytes()), data)
+
+    def test_dirty_build_rejected_before_artifact_creation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp); build = root / 'build'
+            (build / 'uefi-kernel').mkdir(parents=True)
+            source = 'a' * 40
+            dirty = ('[BUILD] ' + source[:12] + '-dirty\n\0').encode()
+            (build / 'chos.elf').write_bytes(dirty)
+            (build / 'uefi-kernel/chos.elf').write_bytes(dirty)
+            with self.assertRaisesRegex(ValueError, 'not a clean build'):
+                publisher.stage(root, build, source)
+            self.assertFalse((root / 'artifacts').exists())
+
+    def test_checksum_mismatch_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            asset = root / 'asset.iso'; asset.write_bytes(b'original')
+            manifest = root / 'manifest.json'
+            manifest.write_text(json.dumps({'assets': [{'name': asset.name, 'sha256': publisher.digest(asset), 'bytes': asset.stat().st_size}]}))
+            (root / 'SHA256SUMS').write_text(publisher.digest(asset) + '  asset.iso\n' + publisher.digest(manifest) + '  manifest.json\n')
+            publisher.verify(root); asset.write_bytes(b'changed')
+            with self.assertRaises(ValueError): publisher.verify(root)
+
+
+if __name__ == '__main__':
+    unittest.main()

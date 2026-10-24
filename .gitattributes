@@ -1,0 +1,2 @@
+# Source archives omit versioned binary publications; GitHub retains the assets.
+/artifacts export-ignore

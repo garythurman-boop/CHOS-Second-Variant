@@ -1108,3 +1108,8 @@ test-sanitize: test-driver-report-sanitize
 $(BUILD)/test-xhci $(SAN_DIR)/test-xhci: include/chos/xhci.h include/chos/xhci_compat.h include/chos/usb.h
 $(BUILD)/test-driver-registry $(SAN_DIR)/test-driver-registry: include/chos/pci.h include/chos/boot_info.h
 $(BUILD)/test-driver-report $(SAN_DIR)/test-driver-report: include/chos/drivers.h include/chos/driver_registry.h include/chos/xhci.h
+
+.PHONY: test-publish-artifacts
+test-publish-artifacts:
+	python3 tests/test_publish_artifacts.py
+test: test-publish-artifacts

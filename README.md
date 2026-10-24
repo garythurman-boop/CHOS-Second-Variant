@@ -1,5 +1,8 @@
 # CHOS ARM64 Operating System — 0.30.0
 
+Current downloadable ISO and related files: **[GitHub build downloads](artifacts/README.md)**.
+Source is pushed each iteration; binary downloads are updated every other iteration.
+
 Current [Fusion follow-up](docs/STAGE1_FUSION_FOLLOWUP.md) tracks the reported boot/input failure and subsequent fixes.
 
 Current [Fusion fixes](docs/FUSION_DRIVER_FIXES.md) and the [modular driver acceptance guide](docs/DRIVER_ACCEPTANCE.md) cover clock/input corrections and automatic diagnostics.
