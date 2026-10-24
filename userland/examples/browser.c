@@ -1,6 +1,10 @@
 #include <stddef.h>
 #include <stdint.h>
+#ifdef CHOS_KERNEL_BROWSER
+#include "../../kernel/core/browser_kernel_api.h"
+#else
 #include "chos/user.h"
+#endif
 #include "browser_core.h"
 
 #define BROWSER_WINDOW_W 760u
@@ -774,7 +778,7 @@ static void handle_key(const chos_gui_message_t *event) {
     uint32_t mod=event->payload.key_event.modifiers;
     char ch;
     if((event->payload.key_event.event_flags&CHOS_GUI_EVENT_KEY_DOWN)==0u) return;
-    if(key==1u) { destroy_window(); chos_exit(0); }
+    if(key==1u) { destroy_window(); chos_exit(0); return; }
     if((mod&2u)!=0u && (key==38u)) { address_focused=1; return; } /* Ctrl+L */
     if(address_focused) {
         size_t n=chos_strlen(address);
@@ -794,6 +798,32 @@ static void handle_key(const chos_gui_message_t *event) {
     if(key==102u) { scroll_line=0u; return; }
     if(key==107u) { size_t lines=page_line_count(); scroll_line=lines>BROWSER_VISIBLE_LINES?lines-BROWSER_VISIBLE_LINES:0u; return; }
 }
+#ifdef CHOS_KERNEL_BROWSER
+int chos_kernel_browser_start(void) {
+    if (kernel_browser_active) return 1;
+    if (!create_window()) return 0;
+    kernel_browser_active=1;
+    page_set("Welcome to CHOS Web Browser.\n\nEnter a hostname or http:// URL in the address bar and press Enter.\n\nThe browser supports HTTP redirects, clickable HTML links, scrolling, basic semantic text layout, and safe image-alt placeholders. JavaScript, full CSS layout, and image decoding are not available. HTTPS remains blocked until TLS and certificate verification are integrated.");
+    redraw();
+    return 1;
+}
+void chos_kernel_browser_poll(void) {
+    chos_gui_message_t event;
+    if (!kernel_browser_active) return;
+    /* One event and one bounded network step per desktop tick. */
+    int received=chos_gui_poll_event(&event,sizeof(event))>0;
+    if (received) {
+        if(event.header.type==CHOS_GUI_MSG_CLOSE_REQUEST) { destroy_window(); chos_exit(0); return; }
+        if(event.header.type==CHOS_GUI_MSG_KEY_EVENT) handle_key(&event);
+        else if(event.header.type==CHOS_GUI_MSG_POINTER_EVENT) handle_pointer(&event);
+    }
+    if (!kernel_browser_active) return;
+    browser_phase_t old_phase=phase;
+    size_t old_length=response_length;
+    poll_network();
+    if(received || old_phase!=phase || old_length!=response_length)redraw();
+}
+#else
 int main(int argc, char **argv) {
     chos_gui_message_t event;
     (void)argc;(void)argv;
@@ -802,7 +832,7 @@ int main(int argc, char **argv) {
     for(;;) {
         long got=chos_gui_poll_event(&event,sizeof(event));
         if(got>0) {
-            if(event.header.type==CHOS_GUI_MSG_CLOSE_REQUEST) { destroy_window(); chos_exit(0); }
+            if(event.header.type==CHOS_GUI_MSG_CLOSE_REQUEST) { destroy_window(); chos_exit(0); return 0; }
             if(event.header.type==CHOS_GUI_MSG_KEY_EVENT) handle_key(&event);
             else if(event.header.type==CHOS_GUI_MSG_POINTER_EVENT) handle_pointer(&event);
         }
@@ -811,3 +841,5 @@ int main(int argc, char **argv) {
         (void)chos_sleep_ticks(1u);
     }
 }
+
+#endif
