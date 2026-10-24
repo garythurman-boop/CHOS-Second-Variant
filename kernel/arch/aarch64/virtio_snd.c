@@ -364,6 +364,8 @@ int chos_audio_init(void) {
     uintptr_t first_base = chos_virtio_aperture();
     uint32_t slot, features1, status;
     size_t i;
+    if(sound_ready)return 1;
+    if(snd_base){sound_error="VirtIO-Sound transport quarantined until reboot";return 0;}
     sound_ready = 0; sound_pending = 0; sound_chime_started = 0; sound_chime_state = CHOS_AUDIO_CHIME_IDLE; snd_base = 0u;
     sound_error = "no VirtIO-Sound device found";
     if (first_base == 0u) return 0;

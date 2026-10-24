@@ -508,6 +508,7 @@ int virtio_gpu_init(chos_surface_t *surface) {
     int found = 0;
     if (surface == NULL) { last_error = "invalid framebuffer output pointer"; return 0; }
     size_t i;
+    if(mmio_base || driver_ready) {last_error="VirtIO-GPU already initialized or quarantined; reboot before rebinding";return 0;}
     driver_ready = 0;
     gop_backend = 0;
     gop_framebuffer = NULL;

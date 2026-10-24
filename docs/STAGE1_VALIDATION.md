@@ -1,15 +1,10 @@
 # Stage 1 validation and handoff
 
-This is the original Stage 1 build record. See [Fusion follow-up](STAGE1_FUSION_FOLLOWUP.md)
-for subsequent driver/timer changes and updated evidence.
-
-Stage 1 remains **incomplete as a cross-platform acceptance gate**. The direct QEMU
-VirtIO workflow and a native USB UEFI workflow are implemented and tested locally.
-Fusion, Pi 5 and ARM64 laptop tests are BLOCKED by unavailable hardware. There are
-also software gaps that can be implemented and tested in QEMU now; see
-[build expectations and test checklist](STAGE1_TEST_CHECKLIST.md). Native USB
-hubs, absolute tablets, arbitrary DMA/IOMMU platforms and vmxnet3 remain unsupported
-or unimplemented; this report does not describe universal USB/platform compatibility.
+This file preserves the first Stage 1 build record and its baseline measurements.
+Use the [current report](STAGE1_FINAL_REPORT.md) and [Fusion follow-up](STAGE1_FUSION_FOLLOWUP.md)
+for later timer, hub/tablet, PCI VirtIO, NVMe containment and live validation results.
+Statements below describe that earlier snapshot; later results supersede its support
+limits. Cross-platform acceptance remains open pending actual Fusion/Pi 5/laptop tests.
 
 ## Source and baseline preservation
 

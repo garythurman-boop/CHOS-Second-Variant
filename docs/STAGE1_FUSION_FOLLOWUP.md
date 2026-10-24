@@ -130,3 +130,47 @@ Measured normal idle was 2% of one host CPU over the two-second observation in t
 ISO PCI and MMIO regression runs. Pointer visible response was about 45 ms including
 the runner's 40 ms post-input delay; these are emulator observations, not Fusion
 latency measurements.
+
+## Iteration 4: storage and queue failure containment
+
+The experimental NVMe driver now sizes/translates its BAR through the same validated
+firmware resources, requires MMU/cache-off identity DMA and rejects unverified IORT
+translation. Repeated successful initialization returns the existing backend; failed
+initialization cannot allocate/rebind again before reboot. Reset/admin/I/O waits
+have a one-second architectural-counter deadline plus an independent iteration cap.
+Completions validate command ID, queue ID and submission head. Fatal status fails
+immediately. Flush failures now quarantine the backend like read/write failures.
+DMA pages remain allocated on every failure. Normal builds still disable probing.
+
+`nvme-io-host.log` and `nvme-deadline-host.log`: host and ASan/UBSan mocks pass
+chunked reads/writes, flush, ring wraps, repeated init, invalid bounds, missing device,
+allocation/reset failure, lost/bad completions, fatal status and quarantine.
+`nvme-live1` and `nvme-deadline-live`: opt-in QEMU NVMe namespace 1 passes actual CHFS
+read/write/flush/reboot alongside PCI network/RNG and USB input. `nvme-write-error`
+uses QEMU blkdebug to return real write errors; the Console reports failure while
+input, window operations and network/RNG remain usable. This is emulator evidence,
+not validation of a physical or Fusion NVMe controller.
+
+VirtIO net now rejects invalid TX IDs/index jumps and RX used-ring overruns. Its
+initialization is idempotent and refuses rebinding after failure; GPU and sound also
+refuse unsafe rebinding. New host/sanitizer tests exercise real driver queue handling
+with completion fault injection (`net-completion-host2.log`). The first new test
+compile had an incorrect local type name (`net-completion-host.log`), corrected
+before execution; no failed compile is counted as a pass.
+
+The live runner adds opt-in NVMe, injected write errors and mixed input/storage
+stress. Fresh-guest persistence tests now reuse the first guest's copied kernel/ISO,
+including when build outputs change; each segment retains hashes.
+
+Final clean builds, aggregate host/sanitizer checks and serial smoke pass
+(`final-clean-build.log`, `final-clean-host.log`, `final-clean-sanitize.log`,
+`final-clean-smoke.log`). Final direct and prepared-image profiles pass after the
+network-completion changes. Explicit no-controller and empty-controller firmware
+profiles leave the splash, advance timer ticks and consume 1.00% / 0.66% CPU over
+three-second observations. These distinguish missing input from a broken interrupt
+wakeup path. See [current acceptance report](STAGE1_FINAL_REPORT.md).
+
+`final-pci-stress` passes 120 mixed input/storage transactions over 192.226 seconds,
+then fresh-guest persistence using the same copied kernel/ISO. Idle after stress is
+1.50% of a host CPU. `final-nvme` and `final-nvme-error` pass against the final
+experimental build, including the new network completion checks.

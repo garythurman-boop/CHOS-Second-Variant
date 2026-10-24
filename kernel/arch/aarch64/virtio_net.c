@@ -23,7 +23,9 @@
 #define NET_HEADER_SIZE CHOS_VIRTIO_NET_HEADER_V1_SIZE
 #define NET_FRAME_CAPACITY CHOS_NET_MAX_ETHERNET_FRAME
 #define NET_RX_BUFFER_SIZE (NET_HEADER_SIZE + NET_FRAME_CAPACITY)
+#ifndef NET_TX_WAIT_LIMIT
 #define NET_TX_WAIT_LIMIT 20000000u
+#endif
 #define NET_RX_QUEUE 0u
 #define NET_TX_QUEUE 1u
 
@@ -89,9 +91,15 @@ static const char *last_error = "probe not run";
 
 static uint32_t read_reg(uint32_t offset) { return chos_virtio_read(mmio_base,offset); }
 static void write_reg(uint32_t offset, uint32_t value) { chos_virtio_write(mmio_base,offset,value); }
-static void dma_store_barrier(void) { __asm__ volatile("dmb oshst" ::: "memory"); }
-static void dma_load_barrier(void) { __asm__ volatile("dmb oshld" ::: "memory"); }
-static void cpu_full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
+static void cpu_full_barrier(void) {
+#ifdef __aarch64__
+    __asm__ volatile("dsb sy" ::: "memory");
+#else
+    __asm__ volatile("" ::: "memory");
+#endif
+}
+static void dma_store_barrier(void) {cpu_full_barrier();}
+static void dma_load_barrier(void) {cpu_full_barrier();}
 static void set_status(uint32_t value) { write_reg(REG_STATUS, value); cpu_full_barrier(); }
 static void zero_bytes(void *destination, size_t size) {
     uint8_t *out = (uint8_t *)destination;
@@ -145,6 +153,8 @@ int virtio_net_init(void) {
     uint32_t mac_word0, mac_word1, device_status, rx_max, tx_max, queue_max;
     uint16_t i;
     int found = 0;
+    if(driver_ready)return 1;
+    if(mmio_base){last_error="VirtIO-net transport quarantined until reboot";return 0;}
     reset_state();
     last_error = "no modern VirtIO network device found";
     if (first_base == 0u) { last_error = "platform has no VirtIO-MMIO aperture"; return 0; }
@@ -292,6 +302,9 @@ int virtio_net_send_frame(const void *frame, size_t length) {
         mark_failed("VirtIO-net TX completion timed out; queue quarantined");
         return 0;
     }
+    if((uint16_t)(tx_used.idx-used_before)!=1 || tx_used.ring[used_before&(queue_size-1u)].id!=0) {
+        ++net_info.tx_errors;tx_busy=0;mark_failed("VirtIO-net invalid TX completion; queue quarantined");return 0;
+    }
     tx_last_used_idx = tx_used.idx;
     (void)tx_last_used_idx;
     ++net_info.tx_frames;
@@ -308,6 +321,9 @@ int virtio_net_receive_frame(void *frame, size_t capacity, size_t *length_out) {
     if (!driver_ready || frame == NULL || length_out == NULL) return -1;
     dma_load_barrier();
     if (rx_used.idx == rx_last_used_idx) return 0;
+    if((uint16_t)(rx_used.idx-rx_last_used_idx)>queue_size) {
+        mark_failed("VirtIO-net RX used-ring overrun; queue quarantined");return -1;
+    }
     used_index = (uint16_t)(rx_last_used_idx & (queue_size - 1u));
     id = rx_used.ring[used_index].id;
     used_length = rx_used.ring[used_index].len;

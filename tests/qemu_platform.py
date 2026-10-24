@@ -36,23 +36,29 @@ class Guest:
         else:
             vars=out/'vars.fd';shutil.copyfile(args.firmware.parent/'AAVMF_VARS.fd',vars)
             cmd+=['-drive',f'if=pflash,format=raw,readonly=on,file={args.firmware}',
-                  '-drive',f'if=pflash,format=raw,file={vars}','-device','ramfb',
-                  '-device','qemu-xhci,id=xhci']
+                  '-drive',f'if=pflash,format=raw,file={vars}','-device','ramfb']
+            if not args.no_usb:cmd+=['-device','qemu-xhci,id=xhci']
             if args.pci_virtio:
-                cmd+=['-drive',f'if=none,file={disk},format=raw,id=storage','-device','virtio-blk-pci,disable-legacy=on,drive=storage',
+                disk_backend=str(disk)
+                if args.storage_error:
+                    config=out/'blkdebug.conf';config.write_text('[inject-error]\nevent = "write_aio"\nerrno = "5"\nimmediately = "on"\nonce = "off"\n')
+                    disk_backend='blkdebug:'+str(config)+':'+str(disk)
+                cmd+=['-drive',f'if=none,file={disk_backend},format=raw,id=storage','-device',
+                      'nvme,serial=CHOS-DISPOSABLE,drive=storage' if args.nvme else 'virtio-blk-pci,disable-legacy=on,drive=storage',
                       '-netdev','user,id=net','-device','virtio-net-pci,disable-legacy=on,netdev=net']
                 if not args.no_rng:cmd+=['-object','rng-random,filename=/dev/urandom,id=rng','-device','virtio-rng-pci,disable-legacy=on,rng=rng']
             else:cmd+=['-net','none']
             self.usb_bus='xhci.0';self.mouse_port=None
             path='1'
-            for depth in range(args.hub_depth):
+            for depth in range(0 if args.no_usb or args.empty_usb else args.hub_depth):
                 cmd+=['-device',f'usb-hub,id=hub{depth},bus=xhci.0,port={path}']
                 if depth+1<args.hub_depth:path+='.1'
             keyboard_port=',port='+path+'.1' if args.hub_depth else ''
             if args.hub_depth:self.mouse_port=path+'.2'
             mouse_port=',port='+self.mouse_port if self.mouse_port else ''
-            cmd+=['-device','usb-kbd,bus=xhci.0,id=kbd'+keyboard_port,
-                  '-device',('usb-tablet' if args.tablet else 'usb-mouse')+',bus=xhci.0,id=mouse'+mouse_port]
+            if not args.no_usb and not args.empty_usb:
+                cmd+=['-device','usb-kbd,bus=xhci.0,id=kbd'+keyboard_port,
+                      '-device',('usb-tablet' if args.tablet else 'usb-mouse')+',bus=xhci.0,id=mouse'+mouse_port]
             if args.mode=='uefi': cmd+=['-device','virtio-scsi-device,id=scsi',
                   '-drive',f'if=none,file={iso},format=raw,media=cdrom,id=cd','-device','scsi-cd,drive=cd']
             elif not args.pci_virtio: cmd+=['-drive',f'if=none,file={disk},format=raw,id=disk','-device','virtio-blk-device,drive=disk']
@@ -127,11 +133,20 @@ def main():
     ap.add_argument('--tablet',action='store_true')
     ap.add_argument('--pci-virtio',action='store_true')
     ap.add_argument('--trace',action='store_true')
+    ap.add_argument('--nvme',action='store_true')
+    ap.add_argument('--no-usb',action='store_true')
+    ap.add_argument('--empty-usb',action='store_true')
+    ap.add_argument('--storage-error',action='store_true')
+    ap.add_argument('--stress',type=int,default=0,help='additional mixed input/storage cycles')
     ap.add_argument('--memory',default='512M')
     ap.add_argument('--uefi-kernel',type=pathlib.Path,default=ROOT/'build/uefi-kernel/chos.elf')
     ap.add_argument('--timer-fault',action='store_true')
     ap.add_argument('--baseline',action='store_true');ap.add_argument('--no-rng',action='store_true')
-    args=ap.parse_args();out=args.out.resolve();out.mkdir(parents=True,exist_ok=True)
+    args=ap.parse_args()
+    if args.nvme:args.pci_virtio=True
+    if (args.no_usb or args.empty_usb) and args.mode=='direct':ap.error('USB absence profiles require firmware boot')
+    if args.storage_error and not args.nvme:ap.error('--storage-error requires --nvme and an experimental kernel')
+    out=args.out.resolve();out.mkdir(parents=True,exist_ok=True)
     # Refuse to overwrite prior evidence or a user disk.
     if (out/'serial.log').exists():raise SystemExit('Use a new --out directory to preserve evidence')
     disk=out/'disposable.img'
@@ -148,7 +163,8 @@ def main():
         time.sleep(.1)
         result['desktop_ready_seconds']=round(time.monotonic()-g.started,3)
         if args.mode!='direct':
-            wait(lambda:g.symbol('online')==2,10,'USB HID enumeration through root/hub topology')
+            if not args.no_usb and not args.empty_usb:
+                wait(lambda:g.symbol('online')==2,10,'USB HID enumeration through root/hub topology')
             assert 'IRQ delivery enabled after initial desktop frame' in g.text()
             if args.timer_fault: assert 'Timer IRQ delivery did not progress' in g.text()
             else: assert 'Timer IRQ delivery verified' in g.text()
@@ -176,6 +192,15 @@ def main():
         if args.mode=='direct' and not args.baseline:
             assert 'Post-enable translation, dynamic map/unmap and RAM alias probe passed' in g.text()
             result['checks']+=['MMU permissions, guard pages and dynamic aliases with 512 MiB RAM']
+        if args.no_usb or args.empty_usb:
+            assert g.symbol('online')==0
+            before=g.symbol('tick_count');ticks=g.cpu_ticks();started=time.monotonic()
+            g.screen('no-input-desktop');time.sleep(3)
+            assert g.symbol('tick_count')>before,'timer must keep progressing without input devices'
+            result['idle_cpu_percent']=round(100*(g.cpu_ticks()-ticks)/os.sysconf('SC_CLK_TCK')/(time.monotonic()-started),2)
+            assert result['idle_cpu_percent']<20,'missing input must not introduce a busy loop'
+            result['checks']+=['desktop leaves splash with '+('absent controller' if args.no_usb else 'empty xHCI controller'),'timer progress and low idle CPU without input']
+            result['status']='PASS';return 0
         def motion(x,y):
             if args.tablet:
                 xx=max(0,min(799,g.symbol('mouse_x')+x));yy=max(0,min(599,g.symbol('mouse_y')+y))
@@ -189,11 +214,16 @@ def main():
         result['keyboard_visible_ms']=round((time.monotonic()-t)*1000,2)
         if args.pci_virtio:
             wait(lambda:g.symbol('net_state')==3,15,'PCI VirtIO DHCP lease')
-            assert '[OK] UEFI VirtIO/CHFS mounted.' in g.text()
+            assert ('[OK] CHFS filesystem mounted on NVMe.' if args.nvme else '[OK] UEFI VirtIO/CHFS mounted.') in g.text()
             g.type('write /stage1.txt pci-persistence')
-            wait(lambda:'File written and flushed.' in g.terminal(),5,'PCI CHFS write and flush')
-            g.type('type /stage1.txt')
-            wait(lambda:'pci-persistence' in g.terminal(),3,'PCI CHFS read')
+            if args.storage_error:
+                wait(lambda:'Write failed:' in g.terminal(),5,'NVMe write failure surfaced in Console')
+                g.type('echo storage-failure-responsive')
+                wait(lambda:'storage-failure-responsive' in g.terminal(),3,'GUI responsive after real storage error')
+            else:
+                wait(lambda:'File written and flushed.' in g.terminal(),5,'PCI CHFS write and flush')
+                g.type('type /stage1.txt')
+                wait(lambda:'pci-persistence' in g.terminal(),3,'PCI CHFS read')
             g.type('rng-test');g.type('rng-test')
             expected='Entropy unavailable:' if args.no_rng else 'Received 32 hardware entropy bytes.'
             wait(lambda:expected in g.terminal(),3,'PCI entropy hardware receipt or explicit absence')
@@ -205,7 +235,7 @@ def main():
                 return 'Ping: reply received' in g.terminal()
             wait(gui_ping_replied,10,'PCI VirtIO ARP/ICMP reply')
             (out/'pci-console.txt').write_text(g.terminal());g.screen('pci-diagnostics')
-            result['checks']+=['PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly','PCI VirtIO DHCP/ARP/ICMP']
+            result['checks']+=[('NVMe injected write failure and responsive GUI' if args.storage_error else 'NVMe CHFS write/flush/read') if args.nvme else 'PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly','PCI VirtIO DHCP/ARP/ICMP']
         before=g.screen('pointer-before');t=time.monotonic()
         motion(-200,150)
         wait(lambda:g.screen('pointer-after')!=before,2,'pointer visible response')
@@ -283,13 +313,31 @@ def main():
                 wait(lambda:g.screen('rehub-after')!=before,2,'input after whole hub reconnect')
                 result['checks']+=['whole hub subtree unplug/reconnect and held-key/button release']
 
+        if args.stress:
+            stress_started=time.monotonic()
+            # Mixed traffic through real input hardware; each command performs a
+            # persistent filesystem transaction and flush before the next cycle.
+            for i in range(args.stress):
+                if args.pci_virtio and not args.storage_error:
+                    g.type('write /stress.txt cycle-'+str(i))
+                motion((-1 if i%2 else 1)*40,(-1 if i%3 else 1)*20)
+                if i%10==0:g.screen('stress-'+str(i))
+            if args.pci_virtio and not args.storage_error:
+                g.type('type /stress.txt')
+                wait(lambda:'cycle-'+str(args.stress-1) in g.terminal(),5,'last stress transaction readable')
+            result['stress_seconds']=round(time.monotonic()-stress_started,3)
+            result['checks']+=[str(args.stress)+' mixed input/storage cycles']
         ticks=g.cpu_ticks();start=time.monotonic();time.sleep(2)
         result['idle_cpu_percent']=round(100*(g.cpu_ticks()-ticks)/os.sysconf('SC_CLK_TCK')/(time.monotonic()-start),2)
         result['checks']+=['2-second idle observation']
-        if args.mode=='direct' or args.pci_virtio:
+        if args.mode=='direct' or (args.pci_virtio and not args.storage_error):
             g.close();g=None
             # Second fresh machine on the same disposable disk checks persistence.
-            reboot=out/'reboot';reboot.mkdir();g=Guest(args,reboot,disk)
+            reboot=out/'reboot';reboot.mkdir()
+            reboot_args=argparse.Namespace(**vars(args))
+            reboot_args.kernel=out/'kernel.elf';reboot_args.uefi_kernel=out/'kernel.elf'
+            if args.mode=='uefi':reboot_args.iso=out/'boot.iso'
+            g=Guest(reboot_args,reboot,disk)
             if args.mode=='direct':
                 wait(lambda:'chos> ' in g.text(),45,'second boot');g.serial('fsread /STAGE1.TXT')
                 wait(lambda:'stage1-persistence' in g.text(),5,'CHFS persisted after restart')

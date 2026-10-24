@@ -1,20 +1,22 @@
-# CHOS 0.30.0 Classic — source and prebuilt handoff
+# CHOS Stage 1 development status
 
-This bundle contains the full working source tree, tests, documentation, assets, a prebuilt ISO, experimental prepared disk image, direct/UEFI kernels, EFI loader and a SHA-256 manifest. Generated build intermediates are intentionally omitted; rebuild with the instructions in `README.md`.
+Current source and validation supersede the original 0.30.0 prebuilt handoff. See
+[the current report](docs/STAGE1_FINAL_REPORT.md), [driver status](docs/DRIVER_STATUS.md),
+[hardware matrix](docs/HARDWARE_SUPPORT.md) and [test checklist](docs/STAGE1_TEST_CHECKLIST.md).
+`prebuilt/` remains the original historical baseline; rebuild current main or use a
+revision-labelled delivery package with its SHA-256 manifest.
 
-## Release characterization
+Clean direct/UEFI/prepared builds, aggregate host/sanitizer checks and live QEMU
+MMIO/PCI VirtIO plus native USB profiles pass. This includes hub/tablet input,
+persistence, network/entropy, failure containment and explicitly enabled disposable
+NVMe testing. Standard builds disable NVMe probing. No physical disk is used by the
+automated live tests.
 
-This is a clean, reproducible **development handoff snapshot**, not a claim that CHOS is a stable, production-ready operating system. The configured ASan/UBSan suite and clean direct/UEFI builds pass. The aggregate `make test` command exceeded the environment execution limit; its remaining checks were run independently. No live QEMU, ARM64 UEFI firmware or VMware Fusion was available.
+Cross-platform Stage 1 remains open: the corrected ISO needs Fusion retesting, and
+Pi 5/laptop tests require their hardware. General IOMMU ownership, generic UEFI EL0
+process execution, native vmxnet3, TLS/HTTPS and an on-device installer are not
+established. HTTPS continues to fail closed without peer verification.
 
-## Important feature boundaries
-
-- The desktop uses an original Windows 9x/2000-era visual direction.
-- USB HID report parsing and a guarded QEMU VirtIO input path exist; native xHCI/USB transport and VMware keyboard/mouse integration do not.
-- A VirtIO RNG driver and nonblocking random-bytes syscall are present and host-mock tested, but the guest hardware path is not runtime-verified.
-- HTTPS URL parsing/redirect resolution is tested; TLS and certificate verification are not integrated. HTTPS intentionally fails closed.
-- The installer layout planner is non-destructive; the graphical installer and disk writer are not implemented.
-- VMware `vmxnet3` is not implemented. NVMe remains experimental.
-
-## Best next document for Codex
-
-Start with `docs/CODEX_HANDOFF_0.30.0.md`. It contains the work order, security boundaries, implementation requirements and explicit acceptance gates. Also read `docs/DRIVER_STATUS.md`, `docs/HTTPS_TLS_BOUNDARY.md`, `docs/INSTALLER_PLAN.md` and `docs/VALIDATION_0.30.0.md` before modifying drivers or security-sensitive paths.
+Original baseline details and development failures remain in
+[historical validation](docs/STAGE1_VALIDATION.md) and the
+[Fusion follow-up](docs/STAGE1_FUSION_FOLLOWUP.md). CHOS is not an acronym.

@@ -1039,3 +1039,29 @@ test-virtio-transport-sanitize: $(SAN_DIR)/test-virtio-transport
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-virtio-transport
 test: test-virtio-transport
 test-sanitize: test-virtio-transport-sanitize
+
+$(BUILD)/test-nvme-io: tests/test_nvme_io.c kernel/arch/aarch64/nvme.c kernel/platform/nvme_parse.c include/chos/dma.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< kernel/platform/nvme_parse.c -o $@
+$(SAN_DIR)/test-nvme-io: tests/test_nvme_io.c kernel/arch/aarch64/nvme.c kernel/platform/nvme_parse.c include/chos/dma.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< kernel/platform/nvme_parse.c -o $@
+.PHONY: test-nvme-io test-nvme-io-sanitize
+test-nvme-io: $(BUILD)/test-nvme-io
+	./$(BUILD)/test-nvme-io
+test-nvme-io-sanitize: $(SAN_DIR)/test-nvme-io
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-nvme-io
+test: test-nvme-io
+test-sanitize: test-nvme-io-sanitize
+
+$(BUILD)/test-virtio-net: tests/test_virtio_net.c kernel/arch/aarch64/virtio_net.c
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-virtio-net: tests/test_virtio_net.c kernel/arch/aarch64/virtio_net.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+.PHONY: test-virtio-net test-virtio-net-sanitize
+test-virtio-net: $(BUILD)/test-virtio-net
+	./$(BUILD)/test-virtio-net
+test-virtio-net-sanitize: $(SAN_DIR)/test-virtio-net
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-virtio-net
+test: test-virtio-net
+test-sanitize: test-virtio-net-sanitize

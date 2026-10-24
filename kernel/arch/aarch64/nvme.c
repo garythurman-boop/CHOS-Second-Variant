@@ -3,6 +3,8 @@
 #include "chos/nvme.h"
 #include "chos/pci.h"
 #include "chos/pmm.h"
+#include "chos/dma.h"
+#include "chos/timer.h"
 
 #define NVME_PCI_CLASS 0x01u
 #define NVME_PCI_SUBCLASS 0x08u
@@ -12,7 +14,9 @@
 #define NVME_MMIO_MIN_BYTES 0x2000u
 #define NVME_PAGE_SIZE 4096u
 #define NVME_QUEUE_DEPTH 16u
+#ifndef NVME_WAIT_SPINS
 #define NVME_WAIT_SPINS 50000000u
+#endif
 #define NVME_DOORBELL_BASE 0x1000u
 #define NVME_IDENTIFY_CONTROLLER 0x01u
 #define NVME_IDENTIFY_NAMESPACE 0x00u
@@ -87,6 +91,8 @@ typedef struct {
 } nvme_state_t;
 
 static nvme_state_t nvme;
+static chos_block_device_t published_device;
+static int probe_attempted;
 static const char *last_error = "NVMe probe not run";
 
 static void bytes_zero(void *ptr, size_t length) {
@@ -98,48 +104,34 @@ static void bytes_copy(void *dst, const void *src, size_t length) {
     uint8_t *d = (uint8_t *)dst; const uint8_t *s = (const uint8_t *)src; size_t i;
     for (i = 0u; i < length; ++i) d[i] = s[i];
 }
-static uint32_t mmio_read32(uint32_t offset) { return *(volatile uint32_t *)(uintptr_t)(nvme.bar_base + offset); }
-static void mmio_write32(uint32_t offset, uint32_t value) { *(volatile uint32_t *)(uintptr_t)(nvme.bar_base + offset) = value; }
-static uint64_t mmio_read64(uint32_t offset) {
-    uint32_t low = mmio_read32(offset), high = mmio_read32(offset + 4u);
-    return (uint64_t)low | ((uint64_t)high << 32u);
-}
-static void mmio_write64(uint32_t offset, uint64_t value) {
-    mmio_write32(offset + 4u, (uint32_t)(value >> 32u));
-    mmio_write32(offset, (uint32_t)value);
+#ifdef CHOS_HOST_TEST
+extern uint32_t chos_nvme_mock_read(uint32_t offset);
+extern void chos_nvme_mock_write(uint32_t offset,uint32_t value);
+static uint32_t mmio_read32(uint32_t offset) {return chos_nvme_mock_read(offset);}
+static void mmio_write32(uint32_t offset,uint32_t value) {chos_nvme_mock_write(offset,value);}
+#else
+static uint32_t mmio_read32(uint32_t offset) {return *(volatile uint32_t *)(uintptr_t)(nvme.bar_base+offset);}
+static void mmio_write32(uint32_t offset,uint32_t value) {*(volatile uint32_t *)(uintptr_t)(nvme.bar_base+offset)=value;}
+#endif
+static void full_barrier(void) {
+#ifdef __aarch64__
     __asm__ volatile("dsb sy" ::: "memory");
+#else
+    __asm__ volatile("" ::: "memory");
+#endif
 }
-static void full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
-
-static size_t cache_line_size(void) {
-    uint64_t ctr;
-    __asm__ volatile("mrs %0, ctr_el0" : "=r"(ctr));
-    return (size_t)4u << ((ctr >> 16u) & 0x0fu);
+static void cpu_yield(void) {
+#ifdef __aarch64__
+    __asm__ volatile("yield" ::: "memory");
+#endif
 }
-static void cache_clean(const void *ptr, size_t length) {
-    uintptr_t start = (uintptr_t)ptr, end = start + length, p;
-    size_t line = cache_line_size();
-    if (length == 0u || end < start || line == 0u) return;
-    start &= ~((uintptr_t)line - 1u); end = (end + line - 1u) & ~((uintptr_t)line - 1u);
-    for (p = start; p < end; p += line) __asm__ volatile("dc cvac, %0" :: "r"(p) : "memory");
-    __asm__ volatile("dsb osh" ::: "memory");
+static uint64_t mmio_read64(uint32_t offset) {return (uint64_t)mmio_read32(offset)|((uint64_t)mmio_read32(offset+4)<<32);}
+static void mmio_write64(uint32_t offset,uint64_t value) {
+    mmio_write32(offset,(uint32_t)value);mmio_write32(offset+4,(uint32_t)(value>>32));full_barrier();
 }
-static void cache_clean_invalidate(void *ptr, size_t length) {
-    uintptr_t start = (uintptr_t)ptr, end = start + length, p;
-    size_t line = cache_line_size();
-    if (length == 0u || end < start || line == 0u) return;
-    start &= ~((uintptr_t)line - 1u); end = (end + line - 1u) & ~((uintptr_t)line - 1u);
-    for (p = start; p < end; p += line) __asm__ volatile("dc civac, %0" :: "r"(p) : "memory");
-    __asm__ volatile("dsb osh" ::: "memory");
-}
-static void cache_invalidate(void *ptr, size_t length) {
-    uintptr_t start = (uintptr_t)ptr, end = start + length, p;
-    size_t line = cache_line_size();
-    if (length == 0u || end < start || line == 0u) return;
-    start &= ~((uintptr_t)line - 1u); end = (end + line - 1u) & ~((uintptr_t)line - 1u);
-    for (p = start; p < end; p += line) __asm__ volatile("dc ivac, %0" :: "r"(p) : "memory");
-    __asm__ volatile("dsb osh" ::: "memory");
-}
+static void cache_clean(const void *p,size_t n) {chos_dma_cache(p,n,0);}
+static void cache_invalidate(void *p,size_t n) {chos_dma_cache(p,n,1);}
+static void cache_clean_invalidate(void *p,size_t n) {cache_clean(p,n);cache_invalidate(p,n);}
 
 static int allocate_page(uint64_t *physical, void **virtual_address) {
     if (!pmm_alloc_pages(1u, physical) || *physical == 0u) return 0;
@@ -150,12 +142,13 @@ static int allocate_page(uint64_t *physical, void **virtual_address) {
 }
 
 static int wait_csts(uint32_t mask, uint32_t expected) {
-    uint32_t spin;
+    uint32_t spin;uint64_t start=timer_counter(),budget=timer_frequency_hz();
     for (spin = 0u; spin < NVME_WAIT_SPINS; ++spin) {
+        if(budget && timer_counter()-start>=budget)break;
         uint32_t csts = mmio_read32(REG_CSTS);
         if ((csts & NVME_CSTS_CFS) != 0u) { last_error = "controller fatal status set"; return 0; }
         if ((csts & mask) == expected) return 1;
-        __asm__ volatile("yield" ::: "memory");
+        cpu_yield();
     }
     last_error = "timeout waiting for NVMe controller ready state";
     return 0;
@@ -177,18 +170,21 @@ static int submit_admin(nvme_command_t *command, uint32_t *result_out) {
     nvme.admin_sq_tail = (uint16_t)((nvme.admin_sq_tail + 1u) % nvme.queue_depth);
     full_barrier();
     mmio_write32(doorbell_offset(0u, 0), nvme.admin_sq_tail);
+    uint64_t start=timer_counter(),budget=timer_frequency_hz();
     for (spin = 0u; spin < NVME_WAIT_SPINS; ++spin) {
+        if(budget && timer_counter()-start>=budget)break;
         nvme_completion_t c;
         volatile nvme_completion_t *entry = &nvme.admin_cq[nvme.admin_cq_head];
+        if(mmio_read32(REG_CSTS)&NVME_CSTS_CFS) {last_error="NVMe fatal status during command";return 0;}
         cache_invalidate((void *)entry, sizeof(*entry));
         c.status = entry->status;
         if ((c.status & 1u) != nvme.admin_phase) {
-            __asm__ volatile("yield" ::: "memory");
+            cpu_yield();
             continue;
         }
         c.result = entry->result; c.reserved = entry->reserved;
         c.sq_head = entry->sq_head; c.sq_id = entry->sq_id; c.command_id = entry->command_id;
-        if (c.command_id != cid) { last_error = "unexpected NVMe admin completion ID"; return 0; }
+        if (c.command_id != cid || c.sq_id!=0 || c.sq_head>=nvme.queue_depth) { last_error = "invalid NVMe admin completion ID/queue/head"; return 0; }
         nvme.admin_cq_head++;
         if (nvme.admin_cq_head == nvme.queue_depth) { nvme.admin_cq_head = 0u; nvme.admin_phase ^= 1u; }
         full_barrier(); mmio_write32(doorbell_offset(0u, 1), nvme.admin_cq_head);
@@ -208,15 +204,18 @@ static int submit_io(nvme_command_t *command) {
     cache_clean((const void *)&nvme.io_sq[nvme.io_sq_tail], sizeof(*command));
     nvme.io_sq_tail = (uint16_t)((nvme.io_sq_tail + 1u) % nvme.queue_depth);
     full_barrier(); mmio_write32(doorbell_offset(1u, 0), nvme.io_sq_tail);
+    uint64_t start=timer_counter(),budget=timer_frequency_hz();
     for (spin = 0u; spin < NVME_WAIT_SPINS; ++spin) {
+        if(budget && timer_counter()-start>=budget)break;
         nvme_completion_t c;
         volatile nvme_completion_t *entry = &nvme.io_cq[nvme.io_cq_head];
+        if(mmio_read32(REG_CSTS)&NVME_CSTS_CFS) {last_error="NVMe fatal status during command";return 0;}
         cache_invalidate((void *)entry, sizeof(*entry));
         c.status = entry->status;
-        if ((c.status & 1u) != nvme.io_phase) { __asm__ volatile("yield" ::: "memory"); continue; }
+        if ((c.status & 1u) != nvme.io_phase) { cpu_yield(); continue; }
         c.result = entry->result; c.reserved = entry->reserved;
         c.sq_head = entry->sq_head; c.sq_id = entry->sq_id; c.command_id = entry->command_id;
-        if (c.command_id != cid) { last_error = "unexpected NVMe I/O completion ID"; return 0; }
+        if (c.command_id != cid || c.sq_id!=1 || c.sq_head>=nvme.queue_depth) { last_error = "invalid NVMe I/O completion ID/queue/head"; return 0; }
         nvme.io_cq_head++;
         if (nvme.io_cq_head == nvme.queue_depth) { nvme.io_cq_head = 0u; nvme.io_phase ^= 1u; }
         full_barrier(); mmio_write32(doorbell_offset(1u, 1), nvme.io_cq_head);
@@ -247,7 +246,7 @@ static int admin_identify(uint32_t nsid, uint32_t cns, uint64_t buffer_phys, voi
 static void release_controller(void) {
     /* Keep DMA pages allocated on failures; a timed-out controller might still
      * own them. Disable it only when the status register is safe to access. */
-    nvme.ready = 0;
+    nvme.ready = 0;published_device.ready=0;
 }
 
 static int nvme_read(chos_block_device_t *device, uint64_t first_sector,
@@ -265,7 +264,7 @@ static int nvme_read(chos_block_device_t *device, uint64_t first_sector,
         command.cdw11 = (uint32_t)(first_sector >> 32u);
         command.cdw12 = count - 1u;
         cache_clean_invalidate(nvme.bounce, (size_t)count * CHOS_NVME_SECTOR_SIZE);
-        if (!submit_io(&command)) { release_controller(); return 0; }
+        if (!submit_io(&command)) { release_controller(); if(device)device->ready=0; return 0; }
         cache_invalidate(nvme.bounce, (size_t)count * CHOS_NVME_SECTOR_SIZE);
         bytes_copy(dst, nvme.bounce, (size_t)count * CHOS_NVME_SECTOR_SIZE);
         dst += (size_t)count * CHOS_NVME_SECTOR_SIZE;
@@ -290,7 +289,7 @@ static int nvme_write(chos_block_device_t *device, uint64_t first_sector,
         command.cdw10 = (uint32_t)first_sector;
         command.cdw11 = (uint32_t)(first_sector >> 32u);
         command.cdw12 = count - 1u;
-        if (!submit_io(&command)) { release_controller(); return 0; }
+        if (!submit_io(&command)) { release_controller(); if(device)device->ready=0; return 0; }
         src += (size_t)count * CHOS_NVME_SECTOR_SIZE;
         first_sector += count; sector_count -= count;
     }
@@ -302,7 +301,8 @@ static int nvme_flush(chos_block_device_t *device) {
     (void)device;
     if (!nvme.ready) return 0;
     command_init(&command, NVME_OP_FLUSH, 1u);
-    return submit_io(&command);
+    if(!submit_io(&command)) {release_controller();if(device)device->ready=0;return 0;}
+    return 1;
 }
 
 static int find_nvme(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
@@ -323,22 +323,30 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
                    chos_block_device_t *device_out) {
     chos_pci_device_t device;
     chos_nvme_capabilities_t caps;
-    uint64_t cap, bar_address, required_mmio;
-    uint32_t spin, ready;
+    uint64_t cap, bar_address, bar_size, required_mmio;
+    uint32_t ready;
     uint32_t identify_nn;
     uint16_t queue_depth;
     void *mem;
     if (device_out == NULL || !chos_boot_info_validate(boot) || acpi == NULL || acpi->valid == 0u) {
         last_error = "invalid NVMe boot/platform information"; return 0;
     }
-    bytes_zero(&nvme, sizeof(nvme)); bytes_zero(device_out, sizeof(*device_out));
+    if(nvme.ready) {*device_out=published_device;return 1;}
+    bytes_zero(device_out,sizeof(*device_out));
+    if(probe_attempted) {last_error="NVMe probe/queue quarantined until reboot";return 0;}
+    if(acpi->dma_translation_unverified) {last_error="NVMe IOMMU/DMA topology unsupported";return 0;}
+#ifdef __aarch64__
+    uint64_t sctlr;__asm__ volatile("mrs %0,sctlr_el1":"=r"(sctlr));
+    if(sctlr&5u) {last_error="NVMe requires identity DMA with MMU/cache off";return 0;}
+#endif
+    probe_attempted=1;bytes_zero(&nvme,sizeof(nvme));
     if (!find_nvme(boot, acpi, &device)) { last_error = "no PCI NVMe controller found"; return 0; }
-    if (!chos_pci_decode_memory_bar(&device, 0u, &bar_address, NULL)) {
-        last_error = "NVMe BAR0 is not an assigned memory BAR"; return 0;
+    if (!chos_pci_map_bar(boot,acpi,&device,0,&bar_address,&bar_size)) {
+        last_error = "NVMe BAR0 cannot be sized/translated safely"; return 0;
     }
     if ((bar_address & (NVME_PAGE_SIZE - 1u)) != 0u ||
-        !chos_boot_info_contains_mmio(boot, bar_address, NVME_MMIO_MIN_BYTES)) {
-        last_error = "NVMe BAR0 is unaligned or not covered by EFI MMIO reservations"; return 0;
+        bar_size < NVME_MMIO_MIN_BYTES) {
+        last_error = "NVMe mapped BAR0 is unaligned or too small"; return 0;
     }
     if (!chos_pci_enable_memory_busmaster(boot, acpi, &device)) {
         last_error = "could not enable PCI memory decoding and bus mastering"; return 0;
@@ -350,7 +358,7 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
     }
     nvme.doorbell_stride_log2 = caps.doorbell_stride_log2;
     required_mmio = NVME_DOORBELL_BASE + (uint64_t)3u * (UINT64_C(4) << caps.doorbell_stride_log2) + 4u;
-    if (!chos_boot_info_contains_mmio(boot, bar_address, required_mmio)) {
+    if (bar_size < required_mmio) {
         last_error = "NVMe BAR reservation is too small for queue doorbells"; return 0;
     }
     queue_depth = caps.maximum_queue_entries < NVME_QUEUE_DEPTH ? caps.maximum_queue_entries : NVME_QUEUE_DEPTH;
@@ -360,10 +368,7 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
     if ((mmio_read32(REG_CC) & NVME_CC_EN) != 0u) {
         mmio_write32(REG_CC, mmio_read32(REG_CC) & ~NVME_CC_EN);
         if (!wait_csts(NVME_CSTS_RDY, 0u)) return 0;
-    } else if (!wait_csts(NVME_CSTS_RDY, 0u)) {
-        /* Some firmware leaves the controller unready; continue only if RDY=0. */
-        if ((mmio_read32(REG_CSTS) & NVME_CSTS_RDY) != 0u) return 0;
-    }
+    } else if (!wait_csts(NVME_CSTS_RDY,0u)) return 0;
     if (!allocate_page(&nvme.admin_sq_phys, &mem)) { last_error = "no PMM page for NVMe admin SQ"; return 0; } nvme.admin_sq = (volatile nvme_command_t *)mem;
     if (!allocate_page(&nvme.admin_cq_phys, &mem)) { last_error = "no PMM page for NVMe admin CQ"; return 0; } nvme.admin_cq = (volatile nvme_completion_t *)mem;
     if (!allocate_page(&nvme.io_sq_phys, &mem)) { last_error = "no PMM page for NVMe I/O SQ"; return 0; } nvme.io_sq = (volatile nvme_command_t *)mem;
@@ -423,7 +428,7 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
     if ((ready & NVME_CSTS_CFS) != 0u) {
         nvme.ready = 0; device_out->ready = 0; last_error = "NVMe fatal status after I/O queue setup"; return 0;
     }
-    for (spin = 0u; spin < 1u; ++spin) __asm__ volatile("nop");
+    published_device=*device_out;
     return 1;
 }
 

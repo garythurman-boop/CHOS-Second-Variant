@@ -3,7 +3,7 @@
 Current [Fusion follow-up](docs/STAGE1_FUSION_FOLLOWUP.md) tracks the reported boot/input failure and subsequent fixes.
 
 Stage 1 development changes and current runtime evidence are described in
-[Stage 1 validation](docs/STAGE1_VALIDATION.md), [driver status](docs/DRIVER_STATUS.md)
+[current Stage 1 report](docs/STAGE1_FINAL_REPORT.md), [driver status](docs/DRIVER_STATUS.md)
 and the [hardware support matrix](docs/HARDWARE_SUPPORT.md). See the
 [build expectations and test checklist](docs/STAGE1_TEST_CHECKLIST.md) before testing. The original 0.30.0
 feature notes below describe the supplied baseline; they are not the latest driver status.
@@ -90,7 +90,7 @@ See [TLS boundary](docs/HTTPS_TLS_BOUNDARY.md), [installer planner](docs/INSTALL
 - **VMware USB input:** native PCI xHCI controller startup, USB enumeration/hub support, USB HID keyboard/mouse polling, and Fusion runtime tests are not implemented. The UEFI path still may display a desktop without working VMware keyboard/mouse input.
 - **VMware networking:** native `vmxnet3` is not implemented; current VirtIO-net support targets the QEMU platform.
 - **Graphical installer:** there is no interactive installer wizard, partition editor, on-device deployment/repair flow, or verified first boot from the generated image. `make install-disk-image` creates a prepared disk-image file only.
-- **NVMe:** native PCI NVMe code remains experimental and runtime-unvalidated. It is limited to namespace 1, plain 512-byte logical blocks, and no metadata; use only a disposable disk for testing.
+- **NVMe:** native PCI NVMe remains experimental and disabled by default. An explicitly enabled QEMU test build passes disposable namespace I/O, flush, reboot persistence and injected write-error recovery; physical controllers remain unvalidated. It is limited to namespace 1, plain 512-byte logical blocks, and no metadata; use only a disposable disk for testing.
 - **Browser:** HTTP text preview only; the stack is not a modern browser platform.
 - **Runtime evidence:** this source/build environment did not have AArch64 QEMU or ARM64 UEFI firmware, nor VMware Fusion. Do not interpret clean compilation or host tests as a successful guest boot.
 

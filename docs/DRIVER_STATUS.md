@@ -17,7 +17,7 @@ Builds and host mocks do not establish hardware support. Stage 1 is not declared
 | VirtIO block / CHFS | MMIO and PCI disposable disk write/flush/read and persistence across a fresh guest; permanent DMA bounce buffers; cache ownership; completion validation; host timeout/error mocks | 512-byte sectors; 4 KiB chunks; single serialized owner through storage lock; timeout quarantines until reboot |
 | VirtIO net | MMIO and PCI QEMU DHCP lease, ARP reply and ICMP echo exchange | No VMware networking result; QEMU user networking only |
 | VirtIO RNG | MMIO and PCI guest receives real queue bytes; absent-device run returns unavailable; EL0 pointer/length/guard tests; host feature/bounds/reinitialization tests | No entropy quality/certification claim; no timer/counter fallback; unavailable without supported transport |
-| NVMe | Parser/build coverage; automatic probing disabled | Experimental; no guest I/O/flush acceptance; opt-in source macro only after a separate disposable-controller test |
+| NVMe | Opt-in QEMU disposable namespace read/write/flush/reboot; injected write error leaves GUI responsive; host/sanitizer reset/completion/allocation faults | Experimental, disabled in normal builds; identity DMA/MMU/cache off; namespace 1, 512-byte sectors; no physical-controller validation |
 | VMware vmxnet3 | Not implemented | Actual Fusion PCI inventory is required before selecting/implementing an adapter |
 | Audio | Existing bounded VirtIO sound implementation | Optional and untested here; silent profile |
 
@@ -48,8 +48,15 @@ Builds and host mocks do not establish hardware support. Stage 1 is not declared
   all device registers use shared accessors.
 * VirtIO input uses separate cache lines for CPU-owned available and device-owned
   used queues. Oversized reports and used-ring overruns fail the device. RNG init is
-  idempotent and a used-ring jump is rejected. Block completions validate the used
+  idempotent and a used-ring jump is rejected. Network initialization is idempotent; invalid TX completions and RX overruns
+  quarantine the queue. GPU/sound initialization refuses unsafe rebinding after failure.
+  Block completions validate the used
   index/id, use explicit cache maintenance and preserve static buffers on timeout.
+* Experimental NVMe uses sized/translated firmware BARs and rejects unverified IORT
+  translation or MMU/cache-on DMA. Reset/admin/I/O waits have counter deadlines and
+  iteration caps. Completion IDs, queue IDs and heads are validated. All failures
+  retain DMA pages; flush failure quarantines as read/write failure does. A failed
+  probe cannot allocate/rebind again before reboot.
 * The storage IRQ-save lock serializes CHFS/device access; no scheduler yield or
   allocation occurs inside the block transport's waits. These contracts are single
   core. IRQ handlers do not call USB enumeration, storage or GUI routines.

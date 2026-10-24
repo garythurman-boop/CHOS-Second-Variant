@@ -42,6 +42,11 @@ python3 tests/qemu_platform.py --mode installed --pci-virtio --tablet \
 
 On this cloud machine append `--qemu-data /workspace/chos-tools/root/usr/share/qemu`
 and use `/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd` as firmware.
+The optional `--stress 120` adds mixed real input and flushed filesystem transactions.
+`--nvme` requires an explicitly compiled experimental kernel/ISO; `--storage-error`
+adds QEMU blkdebug write failures on a disposable image. Do not pass that kernel to
+a valuable disk. Normal artifacts keep probing disabled.
+
 Also run `--no-rng` to prove explicit entropy failure, relative-pointer variants,
 and the documented deliberately unrouted timer build. Normal performance runs omit
 `--trace`. The runner injects actual emulated USB/VirtIO hardware input, reads guest
