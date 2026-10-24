@@ -6,3 +6,6 @@ build/
 /build/
 
 /chos-disk.img
+
+__pycache__/
+*.pyc

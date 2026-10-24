@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/boot_info.h"
+#include "chos/uart.h"
 #include "uefi_console.h"
 #include "../gfx/font8x12.h"
 
@@ -20,6 +21,10 @@ static uint32_t fb_width, fb_height, fb_stride, fb_format;
 static uint32_t fb_red_mask, fb_green_mask, fb_blue_mask, fb_reserved_mask;
 static uint32_t cursor_x, cursor_y;
 static int ready;
+char chos_uefi_boot_log[16384];
+static unsigned log_used;
+static int serial_ready;
+void uefi_console_enable_serial(void) { serial_ready=1; }
 static uint32_t current_fg = C_TEXT;
 static uint32_t current_bg = C_BG;
 
@@ -121,7 +126,12 @@ int uefi_console_init(const chos_boot_info_t *info) {
 }
 
 void uefi_console_write(const char *text) {
-    if (!ready || text == NULL) return;
+    if (text == NULL) return;
+    for (unsigned i=0;text[i] && log_used+1<sizeof(chos_uefi_boot_log);++i)
+        chos_uefi_boot_log[log_used++]=text[i];
+    chos_uefi_boot_log[log_used]=0;
+    if (serial_ready) uart_puts(text);
+    if (!ready) return;
     while (*text != '\0') {
         char ch = *text++;
         if (ch == '\r') continue;

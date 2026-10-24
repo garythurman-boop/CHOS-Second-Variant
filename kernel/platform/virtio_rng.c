@@ -59,8 +59,8 @@ _Static_assert(sizeof(rng_vq_desc_t) == 16u, "VirtIO descriptor ABI");
 _Static_assert(sizeof(rng_vq_used_element_t) == 8u, "VirtIO used element ABI");
 
 static rng_vq_desc_t rng_descriptors[RNG_VQ_SIZE] __attribute__((aligned(64)));
-static rng_vq_avail_t rng_available __attribute__((aligned(2)));
-static rng_vq_used_t rng_used __attribute__((aligned(4)));
+static rng_vq_avail_t rng_available __attribute__((aligned(64)));
+static rng_vq_used_t rng_used __attribute__((aligned(64)));
 static uint8_t rng_buffer[RNG_BUFFER_SIZE] __attribute__((aligned(64)));
 static uintptr_t rng_mmio;
 static uint16_t rng_queue_size;
@@ -254,6 +254,7 @@ static int initialize_device(uintptr_t base) {
 int chos_entropy_init(void) {
     uintptr_t base = mmio_base();
     unsigned slot;
+    if (rng_is_ready) return 1; /* preserve live DMA and unconsumed entropy */
     rng_is_ready = 0;
     rng_mmio = 0u;
     rng_queue_size = 0u;
@@ -286,6 +287,9 @@ static int poll_completion(void) {
     invalidate_memory((const void *)&rng_used, sizeof(rng_used));
     device_index = rng_used.index;
     if (device_index == rng_last_used) return 0;
+    if ((uint16_t)(device_index-rng_last_used)!=1u) {
+        set_failed(rng_mmio,"VirtIO RNG used-ring overrun"); return 0;
+    }
     ring_slot = (uint16_t)(rng_last_used % rng_queue_size);
     io_barrier();
     id = rng_used.ring[ring_slot].id;

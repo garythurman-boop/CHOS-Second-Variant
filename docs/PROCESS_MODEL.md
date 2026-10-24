@@ -14,8 +14,8 @@ are RW and XN.
 
 ## Syscalls and user runtime
 
-EL0 programs use `SVC #0`, with syscall ID in `x8` and arguments in `x0`/`x1`. Supported
-calls are WRITE, EXIT, GETPID, YIELD and SLEEP. The tiny optional C header is
+EL0 programs use `SVC #0`, with syscall ID in `x8` and arguments in `x0`/`x1`. The syscall ABI now includes file, GUI, network and entropy calls as defined in
+`include/chos/syscall.h`; WRITE, EXIT, GETPID, YIELD and SLEEP remain supported. The tiny optional C header is
 `userland/libchos/include/chos/user.h`. `/BIN/ASYNC.CHX` exercises PID lookup, write,
 sleep, yield and exit. The example C source is compiled to an AArch64 object to verify
 the ABI, but no general CHCX packer/startup runtime exists yet.
@@ -57,3 +57,15 @@ Single-core only; scheduled runtime preemption is enabled automatically on graph
 ## File descriptor ownership
 
 Since 0.7.0-dev, each process table record contains four read-only file descriptor slots. Each slot stores its file data pointer, size, current offset, and optional owned kernel buffer. A CHFS open allocates and checksum-validates a private kernel buffer; a ROMFS open references immutable embedded bytes. Descriptors are local to the owning process and are inaccessible through another process's address space. `CLOSE` detaches the slot before freeing its buffer. Process reaping closes every remaining descriptor after the process address space is no longer live, so a fault or exit cannot leave file buffers behind. File writes and cross-process descriptor passing are not currently exposed to EL0.
+
+
+## Stage 1 entropy validation
+
+`CHOS_SYS_RANDOM_BYTES` is bounded to 256 bytes, validates the owning process and
+entire writable user range before consuming entropy, and returns EAGAIN without a
+hardware result. `userland/examples/rng_test.c` is a live EL0 regression for null,
+read-only and wrapping pointers, oversized/zero requests, output guards and both
+present/absent entropy. The QEMU runner installs it only on its disposable CHFS copy.
+Process code loading can resolve CHFS files before falling back to embedded ROMFS;
+a corrupt found disk file fails closed. No TLS provider or entropy quality claim is
+implied by a successful syscall transport test.

@@ -20,7 +20,8 @@ static chos_spinlock_t uart_console_lock = CHOS_SPINLOCK_INITIALIZER;
 #define UART_DR_DATA_MASK 0xffu
 
 static void uart_putc_raw(char c) {
-    while (UART_FR & UART_FR_TXFF) { }
+    if (!uart0_base) return;
+    for (unsigned budget=0; UART_FR & UART_FR_TXFF; ++budget) if (budget==100000u) return;
     UART_DR = (uint32_t)c;
 }
 
@@ -28,6 +29,8 @@ void uart_console_emergency_reset(void) {
     /* CHOS is currently single-core; panic never returns to the faulting context. */
     __atomic_store_n(&uart_console_lock.held, 0u, __ATOMIC_RELEASE);
 }
+
+void uart_attach_pl011(uintptr_t base) { uart0_base=base; }
 
 void uart_init(void) {
     uart0_base = platform_uart_base();

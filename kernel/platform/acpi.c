@@ -198,6 +198,33 @@ chos_acpi_error_t chos_acpi_parse(const chos_boot_info_t *boot, chos_acpi_info_t
         } else if (sig_is(table, "MCFG")) {
             result = parse_mcfg(boot, child, out);
             if (result != CHOS_ACPI_OK) return result;
+        } else if (sig_is(table, "IORT")) {
+            /* IORT can describe MSI routing through an ITS without an SMMU.
+             * Accept only bounded ITS/root nodes; any SMMU, unknown node or
+             * malformed stream requires native DMA topology support first. */
+            out->dma_translation_unverified=1u;
+            if(valid_table(boot,child,"IORT",48u,&length)) {
+                uint32_t nodes=le32(table+36), offset=le32(table+40), n;
+                if(nodes<=256 && offset>=48 && offset<=length) {
+                    for(n=0;n<nodes;++n) {
+                        if(length-offset<16u) break;
+                        const uint8_t *node=table+offset;
+                        uint32_t bytes=(uint32_t)node[1]|((uint32_t)node[2]<<8);
+                        uint32_t mappings=le32(node+8), map_offset=le32(node+12);
+                        if(bytes<20 || bytes>length-offset || (node[0]!=0 && node[0]!=2) ||
+                           (node[0]==0 && le32(node+16)>(bytes-20)/4) || (node[0]==2 && bytes<36) ||
+                           (mappings && (map_offset<16 || map_offset>bytes || mappings>(bytes-map_offset)/20))) break;
+                        offset+=bytes;
+                    }
+                    if(n==nodes) out->dma_translation_unverified=0;
+                }
+            }
+        } else if (sig_is(table, "SPCR")) {
+            if (valid_table(boot, child, "SPCR", 80u, &length) && table[36]==3u &&
+                table[40]==0u && table[42]==0u && (table[43]==0u || table[43]==3u)) {
+                uint64_t base=le64(table+44);
+                if (base && !(base&3u) && chos_boot_info_mmio_safe(boot,base,0x1000u)) out->pl011_base=base;
+            }
         } else if (!valid_table(boot, child, NULL, ACPI_HEADER_SIZE, &length)) {
             /* Unknown invalid ACPI tables are not consumed by this parser. */
             continue;

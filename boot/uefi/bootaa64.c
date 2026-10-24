@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/boot_info.h"
+#include "chos/pci_resources.h"
 
 #define EFIAPI
 #define EFI_SUCCESS ((uintptr_t)0)
@@ -178,7 +179,7 @@ struct EFI_BOOT_SERVICES {
     void *CloseProtocol;
     void *OpenProtocolInformation;
     void *ProtocolsPerHandle;
-    void *LocateHandleBuffer;
+    EFI_STATUS (EFIAPI *LocateHandleBuffer)(uint32_t, EFI_GUID *, void *, EFI_UINTN *, EFI_HANDLE **);
     EFI_LOCATE_PROTOCOL LocateProtocol;
     void *InstallMultipleProtocolInterfaces;
     void *UninstallMultipleProtocolInterfaces;
@@ -815,6 +816,36 @@ static uintptr_t find_acpi_rsdp(void) {
     return acpi10;
 }
 
+typedef struct EFI_PCI_ROOT_IO EFI_PCI_ROOT_IO;
+struct EFI_PCI_ROOT_IO {
+    EFI_HANDLE ParentHandle;
+    void *PollMem, *PollIo;
+    struct { void *Read, *Write; } Mem, Io, Pci;
+    void *CopyMem, *Map, *Unmap, *AllocateBuffer, *FreeBuffer, *Flush, *GetAttributes, *SetAttributes;
+    EFI_STATUS (EFIAPI *Configuration)(EFI_PCI_ROOT_IO *, void **);
+    uint32_t SegmentNumber;
+};
+static void capture_pci_windows(chos_boot_info_t *info) {
+    EFI_GUID guid={0x2f707ebb,0x4a1a,0x11d4,{0x9a,0x38,0,0x90,0x27,0x3f,0xc1,0x4d}};
+    EFI_HANDLE *handles=NULL;
+    EFI_UINTN count=0;
+    if (g_st->BootServices->LocateHandleBuffer(2u,&guid,NULL,&count,&handles)!=EFI_SUCCESS) return;
+    if(count<=16) for(EFI_UINTN i=0;i<count;++i) {
+        EFI_PCI_ROOT_IO *root=NULL;void *resources=NULL;
+        if(g_st->BootServices->HandleProtocol(handles[i],&guid,(void **)&root)!=EFI_SUCCESS || !root || !root->Configuration) continue;
+        if(root->Configuration(root,&resources)!=EFI_SUCCESS || !resources) continue;
+        /* Firmware protocol owns the stream; cap traversal at 16 descriptors,
+         * reading each header before trusting its exact QWORD length. */
+        const uint8_t *p=resources; size_t bytes=0;
+        for(unsigned j=0;j<17;++j) {
+            if(p[bytes]==0x79) { (void)chos_pci_capture_resources(info,root->SegmentNumber,p,bytes+1); break; }
+            if(p[bytes]!=0x8a || p[bytes+1]!=43 || p[bytes+2]!=0) break;
+            bytes+=46;
+        }
+    }
+    g_st->BootServices->FreePool(handles);
+}
+
 static void capture_gop(chos_boot_info_t *info) {
     EFI_GRAPHICS_OUTPUT_PROTOCOL *gop = NULL;
     EFI_STATUS status;
@@ -887,6 +918,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
     boot_info->kernel_entry = kernel_entry;
     capture_firmware_tables(boot_info);
     capture_gop(boot_info);
+    capture_pci_windows(boot_info);
     /* Never pass firmware input protocol pointers into the OS. CHOS takes
      * exclusive ownership of the machine after ExitBootServices; UEFI text/pointer
      * protocols are not a safe post-handoff input mechanism. */

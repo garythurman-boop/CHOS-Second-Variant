@@ -3,6 +3,7 @@
 #include "chos/platform.h"
 #include "chos/virtio_input.h"
 #include "chos/gui.h"
+#include "chos/input.h"
 
 #define VIRTIO_MAGIC 0x74726976u
 #define VIRTIO_DEVICE_INPUT 18u
@@ -52,7 +53,7 @@ typedef struct {
     volatile uint16_t idx;
     volatile uint16_t ring[INPUT_VQ_SIZE];
     volatile uint16_t used_event;
-} __attribute__((aligned(2))) input_avail_t;
+} __attribute__((aligned(64))) input_avail_t;
 
 typedef struct {
     volatile uint32_t id;
@@ -64,12 +65,12 @@ typedef struct {
     volatile uint16_t idx;
     volatile input_used_elem_t ring[INPUT_VQ_SIZE];
     volatile uint16_t avail_event;
-} __attribute__((aligned(4))) input_used_t;
+} __attribute__((aligned(64))) input_used_t;
 
-typedef struct __attribute__((aligned(16))) {
-    input_desc_t desc[INPUT_VQ_SIZE] __attribute__((aligned(16)));
-    input_avail_t avail __attribute__((aligned(2)));
-    input_used_t used __attribute__((aligned(4)));
+typedef struct __attribute__((aligned(64))) {
+    input_desc_t desc[INPUT_VQ_SIZE] __attribute__((aligned(64)));
+    input_avail_t avail __attribute__((aligned(64)));
+    input_used_t used __attribute__((aligned(64)));
     uint16_t size;
 } input_queue_t;
 
@@ -89,7 +90,7 @@ typedef struct __attribute__((aligned(4096))) {
     uint16_t event_last_used;
     input_queue_t event_queue;
     input_queue_t status_queue;
-    input_event_t event_buffer[INPUT_VQ_SIZE] __attribute__((aligned(16)));
+    input_event_t event_buffer[INPUT_VQ_SIZE] __attribute__((aligned(64)));
 } input_device_t;
 
 static input_device_t devices[INPUT_DEVICE_LIMIT];
@@ -215,6 +216,7 @@ static int initialize_device(input_device_t *device, uintptr_t base) {
 int chos_input_init(void) {
     uintptr_t first_base = platform_virtio_mmio_base();
     uint32_t slot;
+    if (device_count) return (int)device_count; /* idempotent: do not clear live DMA queues */
     device_count = 0u;
     last_error = "no modern VirtIO input devices found";
     if (first_base == 0u) { last_error = "platform has no VirtIO-MMIO aperture"; return 0; }
@@ -234,14 +236,14 @@ int chos_input_init(void) {
 static void handle_event(const input_event_t *event) {
     if (event->type == INPUT_EV_KEY) {
         if (event->code >= INPUT_BTN_LEFT) {
-            chos_gui_input_button(event->code, event->value != 0u);
+            chos_input_button(event->code, event->value != 0u);
         } else {
-            chos_gui_input_key(event->code, event->value != 0u);
+            chos_input_key(event->code, event->value != 0u);
         }
     } else if (event->type == INPUT_EV_REL) {
-        if (event->code == INPUT_REL_X) chos_gui_input_pointer_relative((int32_t)event->value, 0);
-        else if (event->code == INPUT_REL_Y) chos_gui_input_pointer_relative(0, (int32_t)event->value);
-        else if (event->code == INPUT_REL_WHEEL) chos_gui_input_scroll(-(int32_t)event->value);
+        if (event->code == INPUT_REL_X) chos_input_relative((int32_t)event->value, 0);
+        else if (event->code == INPUT_REL_Y) chos_input_relative(0, (int32_t)event->value);
+        else if (event->code == INPUT_REL_WHEEL) chos_input_scroll(-(int32_t)event->value);
         else if (event->code == INPUT_REL_HWHEEL) { /* reserved for horizontal scrolling */ }
     } else if (event->type == INPUT_EV_ABS) {
         if (event->code == INPUT_ABS_X) chos_gui_input_pointer_absolute((int32_t)event->value, -1);
@@ -262,13 +264,17 @@ void chos_input_poll(void) {
         invalidate_range_from_poc((const void *)&q->used, sizeof(q->used));
         dma_load_barrier();
         end = q->used.idx;
+        if ((uint16_t)(end - d->event_last_used) > q->size) {
+            d->ready = 0; last_error = "VirtIO input used-ring overrun";
+            set_status(d->base, VIRTIO_STATUS_FAILED); continue;
+        }
         while (d->event_last_used != end) {
             input_used_elem_t used;
             uint16_t ring_index = (uint16_t)(d->event_last_used & (q->size - 1u));
             used.id = q->used.ring[ring_index].id;
             used.len = q->used.ring[ring_index].len;
             ++d->event_last_used;
-            if (used.id < q->size && used.len >= sizeof(input_event_t)) {
+            if (used.id < q->size && used.len == sizeof(input_event_t)) {
                 input_event_t *event = &d->event_buffer[used.id];
                 invalidate_range_from_poc(event, sizeof(*event));
                 handle_event(event);

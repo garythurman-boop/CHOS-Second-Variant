@@ -26,6 +26,7 @@ int main(void) {
     for (i = 0u; i < sizeof(supplied); ++i) supplied[i] = (uint8_t)(i ^ 0x5au);
     assert(chos_entropy_test_supply(supplied, sizeof(supplied)) == 1);
     memset(output, 0, sizeof(output));
+    assert(chos_entropy_init()==1); /* repeated init must retain pending DMA data */
     assert(chos_entropy_read(output, 13u) == 13u);
     assert(memcmp(output, supplied, 13u) == 0);
     assert(chos_entropy_read(output + 13u, sizeof(output) - 13u) == sizeof(output) - 13u);

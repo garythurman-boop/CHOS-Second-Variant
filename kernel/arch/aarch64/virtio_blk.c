@@ -3,6 +3,7 @@
 #include "chos/blockdev.h"
 #include "chos/platform.h"
 #include "chos/virtio_blk.h"
+#include "chos/dma.h"
 
 #define VIRTIO_MAGIC 0x74726976u
 #define VIRTIO_DEVICE_BLOCK 2u
@@ -42,44 +43,62 @@ typedef struct { uint32_t id; uint32_t len; } __attribute__((packed)) virtq_used
 typedef struct {
     volatile uint16_t flags; volatile uint16_t idx; volatile uint16_t ring[VQ_SIZE];
     volatile uint16_t used_event;
-} __attribute__((aligned(2))) virtq_avail_t;
+} __attribute__((aligned(64))) virtq_avail_t;
 typedef struct {
     volatile uint16_t flags; volatile uint16_t idx; volatile virtq_used_elem_t ring[VQ_SIZE];
     volatile uint16_t avail_event;
-} __attribute__((aligned(4))) virtq_used_t;
+} __attribute__((aligned(64))) virtq_used_t;
 
-static virtq_desc_t queue_desc[VQ_SIZE] __attribute__((aligned(16)));
-static virtq_avail_t queue_avail __attribute__((aligned(2)));
-static virtq_used_t queue_used __attribute__((aligned(4)));
-static virtio_blk_req_t request_header __attribute__((aligned(16)));
-static volatile uint8_t request_status;
+static virtq_desc_t queue_desc[VQ_SIZE] __attribute__((aligned(64)));
+static virtq_avail_t queue_avail __attribute__((aligned(64)));
+static virtq_used_t queue_used __attribute__((aligned(64)));
+static virtio_blk_req_t request_header __attribute__((aligned(64)));
+static struct { volatile uint8_t status; uint8_t padding[63]; } request_state __attribute__((aligned(64)));
+#define request_status request_state.status
 static uint16_t queue_size;
 static uint16_t available_idx;
 static uint16_t last_used_idx;
 static int driver_ready;
+static int quarantined;
 static int flush_supported;
 static uintptr_t mmio_base;
 static uintptr_t detected_mmio_base;
+static uint8_t dma_bounce[4096] __attribute__((aligned(4096)));
+static chos_block_device_t active_device;
 static const char *last_error = "probe not run";
 
 const char *virtio_blk_last_error(void) { return last_error; }
 uintptr_t virtio_blk_detected_base(void) { return detected_mmio_base; }
 
+#ifdef CHOS_HOST_TEST
+extern uint32_t chos_blk_mock_read(uintptr_t,uint32_t);
+extern void chos_blk_mock_write(uintptr_t,uint32_t,uint32_t);
+static uint32_t read_reg(uint32_t offset) { return chos_blk_mock_read(mmio_base,offset); }
+static void write_reg(uint32_t offset,uint32_t value) { chos_blk_mock_write(mmio_base,offset,value); }
+static void dma_store_barrier(void) { __asm__ volatile("":::"memory"); }
+static void dma_load_barrier(void) { __asm__ volatile("":::"memory"); }
+static void cpu_full_barrier(void) { __asm__ volatile("":::"memory"); }
+#else
 static volatile uint32_t *reg32(uint32_t offset) { return (volatile uint32_t *)(mmio_base + offset); }
 static uint32_t read_reg(uint32_t offset) { return *reg32(offset); }
 static void write_reg(uint32_t offset, uint32_t value) { *reg32(offset) = value; }
 static void dma_store_barrier(void) { __asm__ volatile("dmb oshst" ::: "memory"); }
 static void dma_load_barrier(void) { __asm__ volatile("dmb oshld" ::: "memory"); }
 static void cpu_full_barrier(void) { __asm__ volatile("dsb sy" ::: "memory"); }
+#endif
 static uint64_t join_u64(uint32_t low, uint32_t high) { return (uint64_t)low | ((uint64_t)high << 32); }
 static void set_status(uint32_t value) { write_reg(REG_STATUS, value); cpu_full_barrier(); }
 
 static int virtio_request(uint32_t type, uint64_t sector, uint32_t count, void *buffer, int guest_writes) {
-    uint16_t used_before; uint32_t spin; uint64_t buffer_address = (uint64_t)(uintptr_t)buffer;
+    uint16_t used_before; uint32_t spin;
+    uint64_t buffer_address = (uint64_t)(uintptr_t)dma_bounce;
+    size_t bytes=(size_t)count*CHOS_BLOCK_SECTOR_SIZE;
     if (!driver_ready) return 0;
     if ((type == VIRTIO_BLK_T_IN || type == VIRTIO_BLK_T_OUT) &&
-        (count == 0u || buffer == NULL || count > UINT32_MAX / CHOS_BLOCK_SECTOR_SIZE)) return 0;
+        (count == 0u || buffer == NULL || count > sizeof(dma_bounce) / CHOS_BLOCK_SECTOR_SIZE)) return 0;
     if (type == VIRTIO_BLK_T_FLUSH && !flush_supported) return 1;
+    if (guest_writes && buffer) for(size_t i=0;i<bytes;++i) dma_bounce[i]=((const uint8_t *)buffer)[i];
+    chos_dma_cache(dma_bounce,sizeof(dma_bounce),0);
     request_header.type = type; request_header.reserved = 0u; request_header.sector = sector;
     request_status = 0xffu;
     queue_desc[0].addr = (uint64_t)(uintptr_t)&request_header; queue_desc[0].len = sizeof(request_header);
@@ -90,18 +109,33 @@ static int virtio_request(uint32_t type, uint64_t sector, uint32_t count, void *
     }
     queue_desc[2].addr = (uint64_t)(uintptr_t)&request_status; queue_desc[2].len = 1u;
     queue_desc[2].flags = VIRTQ_DESC_F_WRITE; queue_desc[2].next = 0u;
+    chos_dma_cache((const void *)&queue_used,sizeof(queue_used),1);
     used_before = queue_used.idx;
+    chos_dma_cache(queue_desc,sizeof(queue_desc),0);
+    chos_dma_cache(&request_header,sizeof(request_header),0);
+    chos_dma_cache((const void *)&request_status,sizeof(request_status),0);
     queue_avail.ring[available_idx & (queue_size - 1u)] = 0u;
     dma_store_barrier(); ++available_idx; queue_avail.idx = available_idx; dma_store_barrier();
+    chos_dma_cache((const void *)&queue_avail,sizeof(queue_avail),0);
     write_reg(REG_QUEUE_NOTIFY, 0u);
     for (spin = 0u; spin < WAIT_LIMIT; ++spin) {
+        chos_dma_cache((const void *)&queue_used,sizeof(queue_used),1);
         dma_load_barrier();
         if (queue_used.idx != used_before) break;
     }
     if (spin == WAIT_LIMIT) {
         /* A missing completion makes queue reuse unsafe. Quarantine the driver. */
-        driver_ready = 0;
+        driver_ready = 0; quarantined=1; last_error="VirtIO block request timeout; DMA quarantined";
         return 0;
+    }
+    if ((uint16_t)(queue_used.idx-used_before)!=1u || queue_used.ring[used_before&(queue_size-1u)].id!=0u) {
+        driver_ready=0;quarantined=1;last_error="VirtIO block invalid completion; DMA quarantined";return 0;
+    }
+    chos_dma_cache((const void *)&request_status,sizeof(request_status),1);
+    if(request_status!=0) {last_error="VirtIO block device returned I/O error";return 0;}
+    if(!guest_writes && buffer) {
+        chos_dma_cache(dma_bounce,sizeof(dma_bounce),1);
+        for(size_t i=0;i<bytes;++i) ((uint8_t *)buffer)[i]=dma_bounce[i];
     }
     last_used_idx = queue_used.idx;
     (void)last_used_idx;
@@ -110,10 +144,22 @@ static int virtio_request(uint32_t type, uint64_t sector, uint32_t count, void *
 }
 
 static int block_read_cb(chos_block_device_t *device, uint64_t first, uint32_t count, void *buffer) {
-    (void)device; return virtio_request(VIRTIO_BLK_T_IN, first, count, buffer, 0);
+    (void)device;
+    while(count) {
+        uint32_t n=count>8?8:count;
+        if(!virtio_request(VIRTIO_BLK_T_IN,first,n,buffer,0)) return 0;
+        first+=n;count-=n;buffer=(uint8_t *)buffer+n*CHOS_BLOCK_SECTOR_SIZE;
+    }
+    return 1;
 }
 static int block_write_cb(chos_block_device_t *device, uint64_t first, uint32_t count, const void *buffer) {
-    (void)device; return virtio_request(VIRTIO_BLK_T_OUT, first, count, (void *)buffer, 1);
+    (void)device;
+    while(count) {
+        uint32_t n=count>8?8:count;
+        if(!virtio_request(VIRTIO_BLK_T_OUT,first,n,(void *)buffer,1)) return 0;
+        first+=n;count-=n;buffer=(const uint8_t *)buffer+n*CHOS_BLOCK_SECTOR_SIZE;
+    }
+    return 1;
 }
 static int block_flush_cb(chos_block_device_t *device) { (void)device; return virtio_request(VIRTIO_BLK_T_FLUSH, 0u, 0u, NULL, 1); }
 
@@ -122,6 +168,8 @@ int virtio_blk_init(chos_block_device_t *out) {
     uint32_t capacity_low, capacity_high; uint16_t q;
     uintptr_t first_base; uint32_t slot; int found = 0; int saw_legacy_block = 0;
     if (out == NULL) { last_error = "invalid output block-device pointer"; return 0; }
+    if(quarantined) {out->ready=0;last_error="VirtIO block DMA quarantined until reboot";return 0;}
+    if(driver_ready) { *out=active_device; return 1; }
     out->ready = 0; out->sector_count = 0u;
     driver_ready = 0; flush_supported = 0; detected_mmio_base = 0u;
     first_base = platform_virtio_mmio_base();
@@ -143,7 +191,11 @@ int virtio_blk_init(chos_block_device_t *out) {
         return 0;
     }
 
-    set_status(0u); set_status(VIRTIO_STATUS_ACKNOWLEDGE); set_status(VIRTIO_STATUS_ACKNOWLEDGE | VIRTIO_STATUS_DRIVER);
+    set_status(0u);
+    unsigned resets;
+    for(resets=0;resets<1000 && read_reg(REG_STATUS)!=0;++resets) { }
+    if(resets==1000) {quarantined=1;last_error="VirtIO block reset timeout";return 0;}
+    set_status(VIRTIO_STATUS_ACKNOWLEDGE); set_status(VIRTIO_STATUS_ACKNOWLEDGE | VIRTIO_STATUS_DRIVER);
     write_reg(REG_DEVICE_FEATURES_SEL, 0u); features0 = read_reg(REG_DEVICE_FEATURES);
     write_reg(REG_DEVICE_FEATURES_SEL, 1u); features1 = read_reg(REG_DEVICE_FEATURES);
     if ((features1 & VIRTIO_F_VERSION_1) == 0u) { set_status(VIRTIO_STATUS_FAILED); last_error = "device does not offer VIRTIO_F_VERSION_1"; return 0; }
@@ -160,6 +212,9 @@ int virtio_blk_init(chos_block_device_t *out) {
     queue_avail.flags=0u; queue_avail.idx=0u; queue_avail.used_event=0u;
     queue_used.flags=0u; queue_used.idx=0u; queue_used.avail_event=0u;
     available_idx = 0u; last_used_idx = 0u;
+    chos_dma_cache(queue_desc,sizeof(queue_desc),0);
+    chos_dma_cache((const void *)&queue_avail,sizeof(queue_avail),0);
+    chos_dma_cache((const void *)&queue_used,sizeof(queue_used),0);
     write_reg(REG_QUEUE_NUM, queue_size);
     write_reg(REG_QUEUE_DESC_LOW, (uint32_t)(uintptr_t)queue_desc); write_reg(REG_QUEUE_DESC_HIGH, (uint32_t)((uint64_t)(uintptr_t)queue_desc >> 32));
     write_reg(REG_QUEUE_DRIVER_LOW, (uint32_t)(uintptr_t)&queue_avail); write_reg(REG_QUEUE_DRIVER_HIGH, (uint32_t)((uint64_t)(uintptr_t)&queue_avail >> 32));
@@ -172,6 +227,6 @@ int virtio_blk_init(chos_block_device_t *out) {
     out->flush = flush_supported ? block_flush_cb : NULL; out->ready = 1;
     set_status(status | VIRTIO_STATUS_DRIVER_OK);
     if ((read_reg(REG_STATUS) & VIRTIO_STATUS_FAILED) != 0u) { out->ready = 0; last_error = "device entered FAILED state during startup"; return 0; }
-    driver_ready = 1; last_error = "ready";
+    driver_ready = 1; active_device=*out; last_error = "ready";
     return 1;
 }

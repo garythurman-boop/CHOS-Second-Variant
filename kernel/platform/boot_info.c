@@ -18,7 +18,12 @@ int chos_boot_info_validate(const chos_boot_info_t *info) {
         info->memory_map_size / info->memory_descriptor_size > UINT32_MAX ||
         info->memory_descriptor_count != info->memory_map_size / info->memory_descriptor_size)
         return 0;
-    if (info->memory_map_address > UINT64_MAX - info->memory_map_size) return 0;
+    if (info->memory_map_address > UINT64_MAX - info->memory_map_size ||
+        info->pci_window_count > CHOS_BOOT_MAX_PCI_WINDOWS) return 0;
+    for(uint32_t i=0;i<info->pci_window_count;++i) {
+        const chos_pci_window_t *w=&info->pci_windows[i];
+        if(!w->size || w->bus_base>UINT64_MAX-w->size || w->cpu_base>UINT64_MAX-w->size) return 0;
+    }
     if (((info->flags & CHOS_BOOT_FLAG_FDT) != 0u) != (info->fdt_address != 0u)) return 0;
     if (((info->flags & CHOS_BOOT_FLAG_ACPI) != 0u) != (info->acpi_rsdp_address != 0u)) return 0;
     if (((info->flags & CHOS_BOOT_FLAG_UEFI_TEXT_INPUT) != 0u) !=
@@ -141,6 +146,19 @@ int chos_boot_info_memory_summary(const chos_boot_info_t *info,
         if (bytes > summary->largest_conventional_range) summary->largest_conventional_range = bytes;
         if (end > summary->highest_conventional_end) summary->highest_conventional_end = end;
         ++summary->conventional_range_count;
+    }
+    return 1;
+}
+
+int chos_boot_info_mmio_safe(const chos_boot_info_t *info,uint64_t address,uint64_t length) {
+    if(!chos_boot_info_validate(info) || !address || !length || address>UINT64_MAX-length) return 0;
+    const uint8_t *map=(const uint8_t *)(uintptr_t)info->memory_map_address;
+    for(uint64_t off=0;off<info->memory_map_size;off+=info->memory_descriptor_size) {
+        const chos_efi_memory_descriptor_t *d=(const void *)(map+off);
+        if(!d->number_of_pages) continue;
+        if(d->number_of_pages>UINT64_MAX/4096 || d->physical_start>UINT64_MAX-d->number_of_pages*4096) return 0;
+        uint64_t end=d->physical_start+d->number_of_pages*4096;
+        if(d->physical_start<address+length && end>address && d->type!=0 && d->type!=11) return 0;
     }
     return 1;
 }

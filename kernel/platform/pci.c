@@ -247,3 +247,41 @@ int chos_pci_enumerate(const chos_boot_info_t *boot,
     }
     return 1;
 }
+
+int chos_pci_map_bar(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,
+                     const chos_pci_device_t *d,unsigned index,uint64_t *cpu,uint64_t *size) {
+    uint64_t bus,mask,bytes,physical=0;
+    uint32_t command,lo=0,hi=0,original_lo,original_hi=0;
+    int is64;
+    if(!cpu || !size || !chos_pci_decode_memory_bar(d,index,&bus,&is64) ||
+       !chos_boot_info_validate(boot)) return 0;
+    if(!chos_pci_read_config32(boot,acpi,d->segment,d->bus,d->device,d->function,4,&command) ||
+       !chos_pci_read_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x10+index*4),&original_lo)) return 0;
+    if(is64 && !chos_pci_read_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x14+index*4),&original_hi)) return 0;
+    /* Caller owns this function. Never size a BAR with active decode/DMA. */
+    if(!chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,4,(command&0xffffu)&~6u)) return 0;
+    int ok=chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x10+index*4),UINT32_MAX);
+    if(is64) ok &= chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x14+index*4),UINT32_MAX);
+    ok &= chos_pci_read_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x10+index*4),&lo);
+    if(is64) ok &= chos_pci_read_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x14+index*4),&hi);
+    ok &= chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x10+index*4),original_lo);
+    if(is64) ok &= chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,(uint16_t)(0x14+index*4),original_hi);
+    ok &= chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,4,command&0xffffu);
+    if(!ok) return 0;
+    mask=(lo&~UINT32_C(15))|((uint64_t)(is64?hi:UINT32_MAX)<<32);
+    bytes=~mask+1;
+    if(!bytes || (bytes&(bytes-1)) || bus&(bytes-1) || bus>UINT64_MAX-bytes) return 0;
+    unsigned found=0;
+    for(unsigned i=0;i<boot->pci_window_count;++i) {
+        const chos_pci_window_t *w=&boot->pci_windows[i];
+        if(w->segment!=d->segment || bus<w->bus_base || bus-w->bus_base>w->size ||
+            bytes>w->size-(bus-w->bus_base)) continue;
+        physical=w->cpu_base+(bus-w->bus_base);++found;
+    }
+    if(found!=1) {
+        if(found || !chos_boot_info_contains_mmio(boot,bus,bytes)) return 0;
+        physical=bus;
+    }
+    if(!ecam_window_safe(boot,physical,bytes)) return 0;
+    *cpu=physical;*size=bytes;return 1;
+}

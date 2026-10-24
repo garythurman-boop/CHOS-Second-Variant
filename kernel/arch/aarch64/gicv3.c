@@ -73,7 +73,7 @@ static int find_current_redistributor(const chos_boot_info_t *boot,
         uint64_t typer;
         uint32_t step = GICR_FRAME_SIZE;
         uintptr_t frame = (uintptr_t)(base + offset);
-        if (!chos_boot_info_contains_mmio(boot, (uint64_t)frame, GICR_FRAME_SIZE)) return 0;
+        if (!chos_boot_info_mmio_safe(boot, (uint64_t)frame, GICR_FRAME_SIZE)) return 0;
         typer = read64(frame + GICR_TYPER);
         if ((uint32_t)(typer >> 32u) == affinity) {
             *found = frame;
@@ -118,7 +118,7 @@ int chos_gicv3_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
         acpi->gic_distributor_base == 0u || acpi->gic_redistributor_base == 0u ||
         acpi->gic_redistributor_length < GICR_FRAME_SIZE || physical_timer_irq < 16u || physical_timer_irq >= 32u ||
         (acpi->gic_distributor_base & 0xffffu) != 0u ||
-        !chos_boot_info_contains_mmio(boot, acpi->gic_distributor_base, GICD_MIN_SIZE))
+        !chos_boot_info_mmio_safe(boot, acpi->gic_distributor_base, GICD_MIN_SIZE))
         return 0;
     if (!find_current_redistributor(boot, acpi->gic_redistributor_base,
                                     acpi->gic_redistributor_length, &rdist)) return 0;

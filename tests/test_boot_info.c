@@ -94,6 +94,12 @@ int main(void) {
     assert(chos_boot_info_contains_mmio(&info, 0x40000000u, 0x100000u));
     assert(!chos_boot_info_contains_mmio(&info, 0x40000000u, 0x101000u));
     assert(!chos_boot_info_contains_mmio(&info, 0x40100000u, 0x1000u));
+    /* Authoritative ACPI MMIO may be omitted, but never overlap RAM. */
+    assert(chos_boot_info_mmio_safe(&info,0x08000000u,0x10000u));
+    assert(!chos_boot_info_mmio_safe(&info,0x40100000u,0x1000u));
+    assert(!chos_boot_info_mmio_safe(&info,UINT64_MAX-16,32));
+    info.pci_window_count=CHOS_BOOT_MAX_PCI_WINDOWS+1;
+    assert(!chos_boot_info_validate(&info));
     puts("UEFI boot-info ABI: descriptor stride, framebuffer bounds, map summaries and contiguous MMIO coverage passed");
     return 0;
 }

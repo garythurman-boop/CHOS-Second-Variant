@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 void uart_init(void);
+void uart_attach_pl011(uintptr_t base);
 /* Terminal panic path: release a lock held by the faulting single CPU. */
 void uart_console_emergency_reset(void);
 

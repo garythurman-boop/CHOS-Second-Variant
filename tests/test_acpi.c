@@ -71,6 +71,21 @@ int main(void) {
     assert(acpi.pci_segment_count==1u && acpi.pci_segments[0].ecam_base==0x40000000u);
     assert(acpi.pci_segments[0].end_bus==255u);
 
+    /* Optional SPCR must be checksum-valid, PL011, SystemMemory, aligned,
+     * and must not alias an EFI RAM descriptor. */
+    init_sdt(at(0x800),"SPCR",80);at(0x800)[36]=3;at(0x800)[41]=32;at(0x800)[43]=3;
+    put64(at(0x800)+44,0x09000000);fix_sdt(at(0x800),80);
+    put32(at(0x200)+4,68);put64(at(0x200)+60,(uintptr_t)at(0x800));fix_sdt(at(0x200),68);
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && acpi.pl011_base==0x09000000);
+    at(0x800)[9]^=1;assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && !acpi.pl011_base);
+    make_fixture(&boot);
+    init_sdt(at(0x900),"IORT",68);put32(at(0x900)+36,1);put32(at(0x900)+40,48);
+    at(0x900)[48]=0;put16(at(0x900)+49,20);fix_sdt(at(0x900),68);
+    put32(at(0x200)+4,68);put64(at(0x200)+60,(uintptr_t)at(0x900));fix_sdt(at(0x200),68);
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && !acpi.dma_translation_unverified);
+    at(0x900)[48]=4;fix_sdt(at(0x900),68);
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && acpi.dma_translation_unverified);
+    make_fixture(&boot);
     /* Root corruption is rejected rather than exposing table contents. */
     at(0x200)[9] ^= 1u;
     assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_ERR_BAD_ROOT);

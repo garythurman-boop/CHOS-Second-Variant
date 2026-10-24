@@ -26,6 +26,8 @@ typedef struct {
 } chos_acpi_pci_segment_t;
 
 typedef struct {
+    uint64_t pl011_base; /* checksum-validated optional SPCR SystemMemory GAS */
+    uint32_t dma_translation_unverified; /* SMMU/unknown IORT nodes: no native IOMMU ownership yet */
     uint32_t valid;
     uint8_t rsdp_revision;
     uint8_t root_is_xsdt;

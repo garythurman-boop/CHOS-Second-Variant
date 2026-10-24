@@ -1,5 +1,13 @@
 # CHOS ARM64 Operating System — 0.30.0
 
+Stage 1 development changes and current runtime evidence are described in
+[Stage 1 validation](docs/STAGE1_VALIDATION.md), [driver status](docs/DRIVER_STATUS.md)
+and the [hardware support matrix](docs/HARDWARE_SUPPORT.md). The original 0.30.0
+feature notes below describe the supplied baseline; they are not the latest driver status.
+
+For this cloud machine, run `bash scripts/setup-cloud.sh`, then source
+`/workspace/chos-tools/activate`. The original ZIP/prebuilt baseline is preserved.
+
 CHOS is a lightweight AArch64 hobby OS with a classic Windows 9x/2000-era desktop prototype, a CHFS filesystem, a bounded HTTP text-preview browser, and separate QEMU direct-boot and UEFI boot paths. This is a substantial development snapshot, **not yet a production-ready general-purpose OS**. Native VMware USB/HID transport, real TLS/HTTPS, the graphical on-device installer, and VMware `vmxnet3` remain incomplete and are explicitly listed in the validation report.
 
 ## What changed in 0.30.0

@@ -4,6 +4,7 @@
 #include "chos/exception.h"
 #include "chos/fdt.h"
 #include "chos/platform.h"
+#include "chos/entropy.h"
 #include "chos/uart.h"
 #include "chos/pmm.h"
 #include "chos/kheap.h"
@@ -1815,6 +1816,7 @@ static void print_help(void) {
     uart_puts("  mkfs       FORMAT the attached disk as CHFS (destructive)\n");
     uart_puts("  fsls       List files on persistent storage\n");
     uart_puts("  fsread P   Print a text file from storage\n");
+    uart_puts("  rng-test   Read 32 bytes from the actual entropy queue (no byte dump)\n");
     uart_puts("  fswrite P  Store the rest of the command line as text\n");
     uart_puts("  fsrm P     Remove a storage file\n");
     uart_puts("  exec PATH  Run a packaged CHCX file in foreground; async in runtime mode\n");
@@ -2190,6 +2192,17 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         command_fsls();
     } else if (starts_with(line, "fsread ")) {
         command_fsread(skip_spaces(line + 7));
+    } else if (strings_equal(line, "rng-test")) {
+        uint8_t bytes[32]; size_t amount=0;
+        uint64_t start=timer_counter(), limit=timer_frequency_hz()/10u;
+        for (unsigned polls=0;polls<100000u && amount<sizeof(bytes);++polls) {
+            amount+=chos_entropy_read(bytes+amount,sizeof(bytes)-amount);
+            if (limit && timer_counter()-start>limit) break;
+        }
+        /* Do not print entropy or manufacture a fallback. This is a transport
+         * readiness test, not a statistical/certification test. */
+        uart_puts(amount==sizeof(bytes)?"[ OK ] RNG received 32 hardware bytes\n":"[FAIL] RNG hardware bytes unavailable\n");
+        for(unsigned i=0;i<sizeof(bytes);++i) ((volatile uint8_t *)bytes)[i]=0;
     } else if (starts_with(line, "fswrite ")) {
         command_fswrite(line + 8);
     } else if (starts_with(line, "fsrm ")) {
@@ -2282,7 +2295,8 @@ static void shell_loop(const fdt_info_t *device_tree, int runtime_mode) {
                     if ((++idle_polls & 255u) == 0u) process_reap_pending();
                 }
                 if (uart_try_getc(&c)) break;
-                __asm__ volatile("yield");
+                if (timer_is_ready()) __asm__ volatile("wfi" ::: "memory");
+                else __asm__ volatile("yield");
             } while (1);
 
             if (c == '\r' || c == '\n') {

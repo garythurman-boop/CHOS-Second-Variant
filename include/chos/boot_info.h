@@ -7,7 +7,7 @@
  * ExitBootServices. Physical addresses in this structure remain valid; UEFI
  * protocol function pointers must not be called from the kernel. */
 #define CHOS_BOOT_INFO_MAGIC UINT64_C(0x43484f53424f4f54) /* CHOSBOOT */
-#define CHOS_BOOT_INFO_VERSION 3u
+#define CHOS_BOOT_INFO_VERSION 4u
 #define CHOS_UEFI_ENTRY_MAGIC UINT64_C(0x43484f5355454631) /* CHOSUEF1 */
 
 #define CHOS_BOOT_FLAG_UEFI        (UINT64_C(1) << 0)
@@ -36,6 +36,12 @@ typedef struct {
     uint64_t attributes;
 } chos_efi_memory_descriptor_t;
 
+#define CHOS_BOOT_MAX_PCI_WINDOWS 16u
+typedef struct {
+    uint64_t bus_base, cpu_base, size;
+    uint16_t segment, reserved16;
+    uint32_t reserved32;
+} chos_pci_window_t;
 typedef struct {
     uint64_t magic;
     uint32_t version;
@@ -66,6 +72,8 @@ typedef struct {
     uint64_t uefi_text_input_address;
     uint64_t uefi_simple_pointer_address;
     uint64_t uefi_absolute_pointer_address;
+    uint32_t pci_window_count, reserved;
+    chos_pci_window_t pci_windows[CHOS_BOOT_MAX_PCI_WINDOWS];
 } chos_boot_info_t;
 
 typedef struct {
@@ -79,6 +87,9 @@ int chos_boot_info_validate(const chos_boot_info_t *info);
 /* True when an address range is wholly contained in one advertised EFI descriptor. */
 int chos_boot_info_contains_memory(const chos_boot_info_t *info, uint64_t address, uint64_t length);
 /* True only for firmware descriptors typed ReservedMemory or MemoryMappedIO. */
+/* With independently validated ACPI/PCI resource metadata, reject every RAM or
+ * malformed-map overlap; EFI is permitted to omit device apertures. */
+int chos_boot_info_mmio_safe(const chos_boot_info_t *info, uint64_t address, uint64_t length);
 int chos_boot_info_contains_mmio(const chos_boot_info_t *info, uint64_t address, uint64_t length);
 int chos_boot_info_memory_summary(const chos_boot_info_t *info,
                                  chos_boot_memory_summary_t *summary);

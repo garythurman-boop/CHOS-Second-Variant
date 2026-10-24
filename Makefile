@@ -9,13 +9,13 @@ BUILD := build
 CFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -ffreestanding -fno-builtin \
           -fno-stack-protector -fno-pic -mgeneral-regs-only -mstrict-align \
           -Wall -Wextra -Werror \
-          -O2 -g -std=c11 -Iinclude
+          -O2 -g -std=c11 -Iinclude -MMD -MP
 ASFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -g
 LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 
 SOURCES_C := kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
-             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/virtio_rng.c kernel/platform/uefi_console.c \
+             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
              kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
@@ -280,7 +280,7 @@ run-uefi: $(BUILD)/chos-$(CHOS_VERSION).iso disk-image-ready
 	  -bios "$(UEFI_FIRMWARE)" -display default -monitor none -serial stdio -no-reboot \
 	  -object rng-random,filename=/dev/urandom,id=chosrng -device virtio-rng-device,rng=chosrng \
 	  -drive if=none,file=$(BUILD)/chos-$(CHOS_VERSION).iso,format=raw,media=cdrom,id=choscd \
-	  -device scsi-cd,drive=choscd -drive if=none,file=chos-disk.img,format=raw,id=chosdisk \
+	  -device virtio-scsi-device,id=chosscsi -device scsi-cd,drive=choscd -drive if=none,file=chos-disk.img,format=raw,id=chosdisk \
 	  -device virtio-blk-device,drive=chosdisk -netdev user,id=chosnet -device virtio-net-device,netdev=chosnet \
 	  -device virtio-gpu-device -device virtio-keyboard-device -device virtio-tablet-device
 
@@ -929,3 +929,78 @@ test-uefi-handoff-contract:
 $(BUILD)/kernel/platform/virtio_rng.o: include/chos/entropy.h include/chos/platform.h
 $(BUILD)/kernel/core/installer_plan.o: include/chos/installer.h
 $(BUILD)/kernel/core/syscall.o: include/chos/entropy.h
+
+# Native USB transport policy and report normalization tests.
+USB_TEST_SOURCES := tests/test_usb.c kernel/platform/usb.c kernel/platform/usb_hid.c kernel/platform/xhci_ring.c
+$(BUILD)/test-usb: $(USB_TEST_SOURCES) include/chos/usb.h include/chos/xhci.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $(USB_TEST_SOURCES) -o $@
+$(SAN_DIR)/test-usb: $(USB_TEST_SOURCES) include/chos/usb.h include/chos/xhci.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $(USB_TEST_SOURCES) -o $@
+.PHONY: test-usb
+test-usb: $(BUILD)/test-usb
+	./$(BUILD)/test-usb
+test: test-usb
+test-sanitize: test-usb-sanitize
+.PHONY: test-usb-sanitize
+test-usb-sanitize: $(SAN_DIR)/test-usb
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-usb
+
+# Rebuild consumers after platform/header contract changes in both boot modes.
+-include $(patsubst %.o,%.d,$(OBJECTS) $(UEFI_KERNEL_OBJECTS))
+
+XHCI_TEST_SOURCES := tests/test_xhci.c kernel/platform/usb.c kernel/platform/usb_hid.c kernel/platform/xhci_ring.c
+$(BUILD)/test-xhci: $(XHCI_TEST_SOURCES) kernel/platform/xhci.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $(XHCI_TEST_SOURCES) -o $@
+$(SAN_DIR)/test-xhci: $(XHCI_TEST_SOURCES) kernel/platform/xhci.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $(XHCI_TEST_SOURCES) -o $@
+.PHONY: test-xhci test-xhci-sanitize
+test-xhci: $(BUILD)/test-xhci
+	./$(BUILD)/test-xhci
+test-xhci-sanitize: $(SAN_DIR)/test-xhci
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-xhci
+test: test-xhci
+test-sanitize: test-xhci-sanitize
+
+$(BUILD)/test-pci-resources: tests/test_pci_resources.c include/chos/pci_resources.h include/chos/boot_info.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-pci-resources: tests/test_pci_resources.c include/chos/pci_resources.h include/chos/boot_info.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+.PHONY: test-pci-resources test-pci-resources-sanitize
+test-pci-resources: $(BUILD)/test-pci-resources
+	./$(BUILD)/test-pci-resources
+test-pci-resources-sanitize: $(SAN_DIR)/test-pci-resources
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-pci-resources
+test: test-pci-resources
+test-sanitize: test-pci-resources-sanitize
+
+$(BUILD)/test-virtio-blk: tests/test_virtio_blk.c kernel/arch/aarch64/virtio_blk.c include/chos/dma.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-virtio-blk: tests/test_virtio_blk.c kernel/arch/aarch64/virtio_blk.c include/chos/dma.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+.PHONY: test-virtio-blk test-virtio-blk-sanitize
+test-virtio-blk: $(BUILD)/test-virtio-blk
+	./$(BUILD)/test-virtio-blk
+test-virtio-blk-sanitize: $(SAN_DIR)/test-virtio-blk
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-virtio-blk
+test: test-virtio-blk
+test-sanitize: test-virtio-blk-sanitize
+
+$(BUILD)/userland/rng_test.o: userland/examples/rng_test.c userland/libchos/include/chos/user.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) -c $< -o $@
+$(BUILD)/userland/rng_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/rng_test.o userland/user.ld
+	$(LD) -T userland/user.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/rng_test.o
+$(BUILD)/userland/rng_test.chcx: $(BUILD)/userland/rng_test.elf tools/mkchcx.py
+	$(OBJCOPY) -O binary $< $(BUILD)/userland/rng_test.bin
+	$(NM) --defined-only --numeric-sort $< > $(BUILD)/userland/rng_test.sym
+	python3 tools/mkchcx.py --v2-symbols $(BUILD)/userland/rng_test.sym $(BUILD)/userland/rng_test.bin $@
+	python3 tools/mkchcx.py --verify $@
+test-userland test qemu-smoke: $(BUILD)/userland/rng_test.chcx

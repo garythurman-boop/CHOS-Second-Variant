@@ -63,4 +63,9 @@ int chos_pci_enable_memory_busmaster(const chos_boot_info_t *boot,
                                     const chos_acpi_info_t *acpi,
                                     const chos_pci_device_t *device);
 
+/* Driver-owned BAR sizing with decoding disabled, then translation through the
+ * EFI root bridge resource snapshot. Reject RAM overlaps and ambiguous windows. */
+int chos_pci_map_bar(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,
+                     const chos_pci_device_t *device,unsigned index,
+                     uint64_t *cpu_address,uint64_t *size);
 #endif

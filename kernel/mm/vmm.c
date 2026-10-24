@@ -44,7 +44,9 @@ static uint64_t l2_ram[L2_ENTRIES] __attribute__((aligned(VMM_PAGE_SIZE)));
 static uint64_t l3_pool[VMM_MAX_L3_TABLES][L3_ENTRIES] __attribute__((aligned(VMM_PAGE_SIZE)));
 static uint16_t l3_slots[2][L2_ENTRIES];
 #define DYNAMIC_BITMAP_BYTES VMM_DYNAMIC_BITMAP_BYTES
-static uint8_t dynamic_map_bitmap[DYNAMIC_BITMAP_BYTES];
+static uint8_t dynamic_map_bitmap[DYNAMIC_BITMAP_BYTES]; /* owned dynamic aliases only */
+static uint8_t dynamic_candidate_bitmap[DYNAMIC_BITMAP_BYTES]; /* identity RAM + aliases */
+static uint64_t highest_ram_end;
 static uint64_t dynamic_search_hint = VMM_DYNAMIC_VA_BASE;
 static uint32_t dynamic_mappings;
 static uint32_t l3_tables_used;
@@ -119,6 +121,8 @@ static void dynamic_bitmap_set(uint64_t virtual_address, int value) {
     uint8_t mask = (uint8_t)(1u << (index % 8u));
     if (value) dynamic_map_bitmap[index / 8u] |= mask;
     else dynamic_map_bitmap[index / 8u] &= (uint8_t)~mask;
+    if (value) dynamic_candidate_bitmap[index / 8u] |= mask;
+    else dynamic_candidate_bitmap[index / 8u] &= (uint8_t)~mask;
 }
 
 static void clean_range_to_poc(const void *memory, size_t length) {
@@ -265,6 +269,14 @@ static int map_ram_regions(const fdt_info_t *tree) {
         if (!interval_end(tree->memory[i].base, tree->memory[i].size, &raw_end)) return 0;
         page = (tree->memory[i].base + VMM_PAGE_SIZE - 1u) & ~((uint64_t)VMM_PAGE_SIZE - 1u);
         aligned_end = raw_end & ~((uint64_t)VMM_PAGE_SIZE - 1u);
+        if(aligned_end>highest_ram_end) highest_ram_end=aligned_end;
+        /* The candidate window can overlap identity RAM with >256 MiB. Mark
+         * it occupied without granting ownership to unmap_page(). */
+        uint64_t occupied=page<VMM_DYNAMIC_VA_BASE?VMM_DYNAMIC_VA_BASE:page;
+        for(;occupied<aligned_end && occupied<VMM_DYNAMIC_VA_LIMIT;occupied+=VMM_PAGE_SIZE) {
+            uint64_t index=(occupied-VMM_DYNAMIC_VA_BASE)/VMM_PAGE_SIZE;
+            dynamic_candidate_bitmap[index/8]|=(uint8_t)(1u<<(index%8));
+        }
         if (page >= aligned_end) continue;
         for (; page < aligned_end; page += VMM_PAGE_SIZE) {
             if (page == guard_page || is_task_stack_guard_page(page)) continue; /* Guard pages stay unmapped. */
@@ -286,6 +298,8 @@ static int build_fine_grained_map(const fdt_info_t *tree) {
     dynamic_mappings = 0u;
     dynamic_search_hint = VMM_DYNAMIC_VA_BASE;
     zero_bytes(dynamic_map_bitmap, sizeof(dynamic_map_bitmap));
+    zero_bytes(dynamic_candidate_bitmap,sizeof(dynamic_candidate_bitmap));
+    highest_ram_end=0;
     for (i = 0u; i < 2u * L2_ENTRIES; ++i) ((uint16_t *)l3_slots)[i] = INVALID_L3_SLOT;
 
     l1_table[0] = vmm_make_table_descriptor((uint64_t)(uintptr_t)l2_device);
@@ -528,7 +542,7 @@ int vmm_find_free_dynamic_va(uint64_t *virtual_address) {
         restore_daif(daif);
         return 0;
     }
-    if (!vmm_find_dynamic_candidate(dynamic_map_bitmap, sizeof(dynamic_map_bitmap),
+    if (!vmm_find_dynamic_candidate(dynamic_candidate_bitmap, sizeof(dynamic_candidate_bitmap),
                                     dynamic_search_hint, &candidate)) {
         restore_daif(daif);
         return 0;
@@ -639,7 +653,7 @@ vmm_error_t vmm_map_page_auto(uint64_t physical_address,
         restore_daif(daif);
         return VMM_ERR_KERNEL_ROOT_NOT_ACTIVE;
     }
-    if (!vmm_find_dynamic_candidate(dynamic_map_bitmap, sizeof(dynamic_map_bitmap),
+    if (!vmm_find_dynamic_candidate(dynamic_candidate_bitmap, sizeof(dynamic_candidate_bitmap),
                                     dynamic_search_hint, &candidate)) {
         record_last_error(VMM_ERR_NO_FREE_DYNAMIC_VA);
         restore_daif(daif);
@@ -776,7 +790,7 @@ int vmm_self_test(void) {
             map.executable_at_el1 || map.accessible_at_el0) return 0;
     }
     if (vmm_query_mapping(0x0b000000ull, &map)) return 0; /* unmapped MMIO hole */
-    if (vmm_query_mapping(VMM_RAM_BASE + 0x10000000ull, &map)) return 0; /* end of 256 MiB RAM */
+    if (vmm_query_mapping(highest_ram_end, &map)) return 0; /* actual advertised RAM end */
     if (!vmm_virt_to_phys((const void *)(uintptr_t)&vmm_probe_word, &pa) ||
         pa != (uint64_t)(uintptr_t)&vmm_probe_word ||
         vmm_phys_to_virt(pa) != (void *)(uintptr_t)&vmm_probe_word) return 0;

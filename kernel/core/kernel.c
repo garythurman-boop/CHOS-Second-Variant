@@ -21,6 +21,7 @@
 #include "chos/pci.h"
 #include "chos/nvme.h"
 #include "chos/entropy.h"
+#include "chos/xhci.h"
 #include "../platform/uefi_console.h"
 
 static fdt_info_t boot_device_tree;
@@ -149,10 +150,12 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         chos_acpi_info_t acpi_info;
         chos_acpi_error_t acpi_result;
         chos_pci_device_t pci_devices[CHOS_PCI_MAX_DEVICES];
-        chos_pci_scan_summary_t pci_summary;
+        chos_pci_scan_summary_t pci_summary = {0};
         pmm_stats_t memory_stats;
         chos_surface_t surface;
+#ifdef CHOS_ENABLE_EXPERIMENTAL_NVME
         chos_block_device_t nvme_block;
+#endif
         int console_ready;
         int gic_timer_ready = 0;
         int input_ready = 0;
@@ -176,6 +179,10 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
 
         acpi_result = chos_acpi_parse(boot_info, &acpi_info);
+        if (acpi_result==CHOS_ACPI_OK && acpi_info.pl011_base) {
+            uart_attach_pl011((uintptr_t)acpi_info.pl011_base);
+            uefi_console_enable_serial();
+        }
         if (console_ready) {
             uefi_console_write("\nACPI parser: "); uefi_console_write(chos_acpi_error_string(acpi_result)); uefi_console_write("\n");
             if (acpi_result == CHOS_ACPI_OK) {
@@ -278,6 +285,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         if (console_ready) uefi_console_write("[OK] Kernel heap initialized.\n");
 
+#ifdef CHOS_ENABLE_EXPERIMENTAL_NVME
         /* UEFI has no VirtIO-MMIO storage assumptions: attach a native PCI NVMe
          * namespace when one is present. It is never formatted automatically. */
         if (console_ready) uefi_console_write("[BOOT] Probing PCI NVMe storage controller...\n");
@@ -301,6 +309,10 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             uefi_console_write(chos_nvme_last_error());
             uefi_console_write("; UEFI desktop continues without disk writes.\n");
         }
+
+#else
+        if (console_ready) uefi_console_write("[INFO] Experimental NVMe probing disabled by default.\n");
+#endif
 
         if (console_ready) uefi_console_write("[BOOT] Initializing scheduler in bootstrap mode...\n");
         scheduler_init();
@@ -358,6 +370,17 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         } else if (console_ready) {
             uefi_console_write("[INFO] No verified VirtIO-MMIO input aperture in FDT; native PCI USB HID is not attached.\n");
         }
+        for (uint32_t i=0; i<pci_summary.devices_stored && acpi_result==CHOS_ACPI_OK; ++i) {
+            const chos_pci_device_t *d=&pci_devices[i];
+            if(d->class_code!=12 || d->subclass!=3 || d->programming_interface!=0x30) continue;
+            int ok=chos_xhci_init(boot_info,&acpi_info,d);
+            if(console_ready) {
+                uefi_console_write(ok?"[OK] Native xHCI: ":"[WARN] Native xHCI: ");
+                uefi_console_write(chos_xhci_error()); uefi_console_write("; HID devices=");
+                uefi_console_write_u64(chos_xhci_device_count()); uefi_console_write("\n");
+            }
+            break; /* one controller, explicitly bounded */
+        }
         chos_gui_startup_complete();
         chos_gui_show();
         if (console_ready) uefi_console_write("[OK] Initial CHOS GUI frame rendered.\n");
@@ -372,9 +395,11 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             if (console_ready) uefi_console_write("[OK] IRQ delivery enabled after initial desktop frame.\n");
         }
         for (;;) {
+            chos_xhci_poll();
             if (input_ready) chos_input_poll();
             else chos_gui_pump();
-            __asm__ volatile("yield" ::: "memory");
+            if (gic_timer_ready) __asm__ volatile("wfi" ::: "memory");
+            else __asm__ volatile("yield" ::: "memory");
         }
     }
 
