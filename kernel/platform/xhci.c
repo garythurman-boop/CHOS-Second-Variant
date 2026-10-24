@@ -260,13 +260,6 @@ static int enumerate(unsigned port) {
         if(!control(d,0x81,6,0x2200,e->iface.interface,e->iface.report_bytes)) goto bad;
         if(chos_hid_parse_report_descriptor(d->data,e->iface.report_bytes,&e->layout)!=CHOS_HID_OK ||
            (!e->layout.has_keyboard && !e->layout.has_pointer && !e->layout.has_mouse)) { error="USB unsupported HID report descriptor"; goto bad; }
-        for(size_t field=0;field<e->layout.field_count;++field) {
-            const chos_hid_field_t *f=&e->layout.fields[field];
-            if(f->usage_page==1 && (f->usage==0x30 || f->usage==0x31) &&
-               !(f->flags&CHOS_HID_FIELD_RELATIVE)) {
-                error="USB absolute pointer reports unsupported";goto bad;
-            }
-        }
         /* Default protocol is report protocol. SET_IDLE is optional and often
          * stalls on otherwise valid devices: don't require it or switch to boot
          * protocol, which would invalidate the report descriptor's layout. */

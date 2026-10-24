@@ -1,5 +1,7 @@
 # CHOS ARM64 Operating System — 0.30.0
 
+Current [Fusion follow-up](docs/STAGE1_FUSION_FOLLOWUP.md) tracks the reported boot/input failure and subsequent fixes.
+
 Stage 1 development changes and current runtime evidence are described in
 [Stage 1 validation](docs/STAGE1_VALIDATION.md), [driver status](docs/DRIVER_STATUS.md)
 and the [hardware support matrix](docs/HARDWARE_SUPPORT.md). See the

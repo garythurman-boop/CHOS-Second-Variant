@@ -4,10 +4,11 @@
 #include "chos/usb.h"
 #include "chos/xhci.h"
 static unsigned events, keys, releases, buttons;
-static int dx,dy,scroll;
+static int dx,dy,scroll,abs_x=-1,abs_y=-1;
 void chos_input_key(uint16_t c,int down) {assert(c);++events;if(down)++keys;else ++releases;}
 void chos_input_button(uint16_t c,int down) {assert(c>=0x110 && c<0x118);(void)down;++buttons;++events;}
 void chos_input_relative(int32_t x,int32_t y) {dx+=x;dy+=y;++events;}
+void chos_input_absolute(int32_t x,int32_t y){abs_x=x;abs_y=y;++events;}
 void chos_input_scroll(int32_t w) {scroll+=w;++events;}
 static const uint8_t keyboard[]={
 0x05,1,0x09,6,0xa1,1,0x05,7,0x19,0xe0,0x29,0xe7,0x15,0,0x25,1,0x75,1,0x95,8,0x81,2,
@@ -40,6 +41,19 @@ int main(void) {
     assert(chos_usb_decode_report(&l,&s,r1,2));assert(chos_usb_decode_report(&l,&s,r2,2));assert(keys==old_keys+1);
     r1[1]=0;assert(chos_usb_decode_report(&l,&s,r1,2));assert(releases==old_releases);
     r2[1]=0;assert(chos_usb_decode_report(&l,&s,r2,2));assert(releases==old_releases+1);
+    /* Absolute pointer range scaling, unsigned maxima and atomic rejection. */
+    const uint8_t tablet[]={0x05,1,0x09,2,0xa1,1,0x09,0x30,0x09,0x31,0x15,0,0x26,0xff,0x7f,0x75,16,0x95,2,0x81,2,0xc0};
+    assert(chos_hid_parse_report_descriptor(tablet,sizeof(tablet),&l)==CHOS_HID_OK);
+    uint8_t coords[]={0,0,0xff,0x7f};
+    assert(chos_usb_decode_report(&l,&s,coords,4) && abs_x==0 && abs_y==32767);
+    coords[0]=0;coords[1]=0x40;coords[2]=0;coords[3]=0x40;
+    assert(chos_usb_decode_report(&l,&s,coords,4) && abs_x==16384 && abs_y==16384);
+    l.fields[0].logical_max=0;before=events;
+    assert(!chos_usb_decode_report(&l,&s,coords,4) && events==before);
+    const uint8_t unsigned_axis[]={0x05,1,0x09,2,0xa1,1,0x09,0x30,0x15,0,0x25,0xff,0x75,8,0x95,1,0x81,2,0xc0};
+    assert(chos_hid_parse_report_descriptor(unsigned_axis,sizeof(unsigned_axis),&l)==CHOS_HID_OK);
+    assert(l.fields[0].logical_max==255);uint8_t max=255;
+    assert(chos_usb_decode_report(&l,&s,&max,1) && abs_x==32767);
     uint8_t config[]={9,2,34,0,1,1,0,0x80,50,9,4,0,0,1,3,1,1,0,9,0x21,0x11,1,0,1,0x22,45,0,7,5,0x81,3,8,0,10};
     chos_usb_hid_interface_t out[CHOS_USB_MAX_HID];size_t count;
     assert(chos_usb_parse_config(config,sizeof(config),out,&count) && count==1);

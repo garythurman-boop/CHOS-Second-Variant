@@ -394,6 +394,25 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             interrupt_enable_irqs();
             if (console_ready) uefi_console_write("[OK] IRQ delivery enabled after initial desktop frame.\n");
         }
+        if (gic_timer_ready) {
+            /* Do not WFI on a timer that only initialized registers. Prove that
+             * IRQ delivery advances ticks first, using the independent counter
+             * and an iteration cap so a broken GIC cannot trap the splash. */
+            uint64_t ticks=timer_ticks(), start=timer_counter();
+            uint64_t budget=timer_frequency_hz()/5u;
+            unsigned polls;
+            for(polls=0;polls<2000000u && timer_ticks()-ticks<2u;++polls) {
+                chos_xhci_poll();chos_gui_pump();
+                if(!budget || timer_counter()-start>=budget) break;
+                __asm__ volatile("yield" ::: "memory");
+            }
+            if(timer_ticks()-ticks<2u) {
+                interrupt_disable_irqs();timer_stop();gic_timer_ready=0;
+                if(console_ready) uefi_console_write("[WARN] Timer IRQ delivery did not progress; using polled desktop (no WFI).\n");
+            } else if(console_ready) {
+                uefi_console_write("[OK] Timer IRQ delivery verified before low-power idle.\n");
+            }
+        }
         for (;;) {
             chos_xhci_poll();
             if (input_ready) chos_input_poll();

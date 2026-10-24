@@ -39,6 +39,7 @@ typedef struct {
     uint8_t bit_size;
     uint8_t count;
     uint8_t flags;
+    int64_t logical_min, logical_max; /* unsigned maxima up to UINT32_MAX are valid */
 } chos_hid_field_t;
 
 typedef struct {

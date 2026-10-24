@@ -120,7 +120,12 @@ void chos_audio_pump(void) {
     }
 }
 const char *chos_audio_last_error(void) { return "mock audio unavailable"; }
-int virtio_gpu_present(void) { ++presentations; return gpu_present_success; }
+static int mutate_during_present;
+int virtio_gpu_present(void) {
+    ++presentations;
+    if(mutate_during_present) {mutate_during_present=0;chos_gui_input_key(30u,1);}
+    return gpu_present_success;
+}
 int virtio_gpu_present_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
     if (width == 0u || height == 0u || x + width > mock_screen_width || y + height > mock_screen_height) return 0;
     ++partial_presentations; return gpu_present_success;
@@ -485,6 +490,13 @@ int main(void) {
     chos_gui_pump(); /* splash completes only after the 3 second minimum. */
     assert(pixels[0] == 0xff008080u); /* classic teal desktop */
 
+    /* A syscall/task may invalidate the scene while the shell presents. That
+     * update must not be erased by the old frame's final dirty=0 store. */
+    unsigned before_preempt=presentations;
+    mutate_during_present=1;chos_gui_show();
+    assert(strcmp(chos_gui_view_name(),"About CHOS")==0);
+    chos_gui_pump();assert(presentations>=before_preempt+2);
+    chos_gui_show();
     chos_gui_input_key(15u, 1); /* Tab selects File Manager */
     chos_gui_input_key(28u, 1); /* Enter opens it */
     chos_gui_pump();

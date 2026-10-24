@@ -216,6 +216,11 @@ static int viewer_save_error;
  * landscape remains available from Settings, rather than being the default. */
 static int wallpaper_alt = 0;
 static int dirty;
+static uint64_t dirty_generation, presented_generation;
+static void gui_mark_dirty(void) {
+    (void)__atomic_fetch_add(&dirty_generation,1u,__ATOMIC_RELAXED);
+    dirty=1;
+}
 static int32_t mouse_x = 400;
 static int32_t mouse_y = 300;
 static int left_button_down;
@@ -385,7 +390,7 @@ static void gui_clock_poll(void) {
     if (epoch == 0u) return;
     minute = epoch / 60u;
     if (!clock_initialized || minute != clock_last_minute) {
-        clock_last_minute = minute; clock_initialized = 1; dirty = 1;
+        clock_last_minute = minute; clock_initialized = 1; gui_mark_dirty();
     }
 }
 
@@ -927,7 +932,7 @@ static void gui_desktop_label_fit(const char *source, char output[CHOS_CHFS_PATH
 static void gui_desktop_status(const char *message) {
     gui_copy_string(desktop_status_message, sizeof(desktop_status_message), message);
     desktop_status_until_tick = timer_is_ready() ? timer_ticks() + 5u * CHOS_TIMER_HZ : 0u;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static int gui_path_join(const char *directory, const char *leaf, char output[CHOS_CHFS_PATH_MAX]) {
@@ -970,27 +975,27 @@ static void gui_prompt_open(int kind, const char *target_path) {
     }
     context_menu_open = 0;
     context_menu_submenu = 0;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static int gui_text_editor_save(void) {
     if (!viewer_editable || viewer_load_error || !storage_mounted()) {
         viewer_save_error = 1;
         gui_desktop_status("Text document could not be saved.");
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     if (!storage_write_file(viewer_path, viewer_content, viewer_content_size)) {
         viewer_save_error = 1;
         gui_desktop_status("Text document could not be saved.");
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     viewer_unsaved = 0;
     viewer_save_error = 0;
     viewer_empty_file = viewer_content_size == 0u;
     gui_desktop_status("Text document saved.");
-    dirty = 1;
+    gui_mark_dirty();
     return 1;
 }
 
@@ -1135,7 +1140,7 @@ static int gui_desktop_move_into_folder(int source_index, int target_index) {
     gui_desktop_refresh_icons();
     gui_desktop_save_layout();
     gui_desktop_status("Item moved into folder.");
-    dirty = 1;
+    gui_mark_dirty();
     return 1;
 }
 
@@ -1164,7 +1169,7 @@ static void gui_trash_open(void) {
     }
     trash_selected_index = 0u;
     (void)gui_open_window(VIEW_TRASH);
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void gui_desktop_open_path(const char *path, int is_directory) {
@@ -1173,7 +1178,7 @@ static void gui_desktop_open_path(const char *path, int is_directory) {
         uint32_t pid = 0u;
         if (process_spawn_path_args("/BIN/FILEMAN.CHX", path, &pid) == PROCESS_OK && pid != 0u) {
             gui_file_manager_pid = pid;
-            start_menu_open = 0; context_menu_open = 0; dirty = 1;
+            start_menu_open = 0; context_menu_open = 0; gui_mark_dirty();
             return;
         }
         (void)gui_open_window(VIEW_FILES);
@@ -1181,7 +1186,7 @@ static void gui_desktop_open_path(const char *path, int is_directory) {
     } else if (file_is_program(path)) {
         (void)gui_open_window(VIEW_CONSOLE);
         terminal_puts("run "); terminal_puts(path); terminal_newline();
-        terminal_run_path(path); terminal_prompt(); dirty = 1;
+        terminal_run_path(path); terminal_prompt(); gui_mark_dirty();
     } else {
         (void)file_viewer_load(path);
         viewer_editable = string_ends_with_fold(path, ".TXT") && storage_lookup(path, &(chos_chfs_entry_t){0});
@@ -1201,7 +1206,7 @@ static void gui_desktop_activate(int index) {
     else gui_desktop_open_path(icon->path, icon->kind == GUI_DESKTOP_DIRECTORY ||
                                         icon->kind == GUI_DESKTOP_DOCUMENTS);
     context_menu_open = 0;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void gui_start_menu_update_hover(void) {
@@ -1214,7 +1219,7 @@ static void gui_start_menu_update_hover(void) {
     index = relative_y / (31 * scale);
     if (index >= 0 && index < 6 && index != start_menu_selected_item) {
         start_menu_selected_item = index;
-        dirty = 1;
+        gui_mark_dirty();
     }
 }
 
@@ -1227,11 +1232,11 @@ static void gui_start_menu_activate_item(int index) {
     if (index == 5) {
         if (!gui_launch_or_focus_app(&gui_browser_pid, "/BIN/BROWSER.CHX"))
             gui_desktop_status("Could not launch CHOS Web Browser.");
-        dirty = 1;
+        gui_mark_dirty();
         return;
     }
     open_view(icon_views[index]);
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void gui_context_menu_open_at(int32_t x, int32_t y) {
@@ -1256,7 +1261,7 @@ static void gui_context_menu_open_at(int32_t x, int32_t y) {
     if (context_menu_y < 0) context_menu_y = 0;
     context_menu_open = 1;
     start_menu_open = 0;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static size_t gui_context_row_count(void) {
@@ -1278,7 +1283,7 @@ static void gui_context_menu_update_hover(void) {
     if (x >= 2 * scale && x < (GUI_CONTEXT_WIDTH - 2) * scale && y >= 0 &&
         y < (int)gui_context_row_count() * GUI_CONTEXT_ROW_HEIGHT * scale)
         index = y / (GUI_CONTEXT_ROW_HEIGHT * scale);
-    if (index != context_menu_hover_index) { context_menu_hover_index = index; dirty = 1; }
+    if (index != context_menu_hover_index) { context_menu_hover_index = index; gui_mark_dirty(); }
 }
 
 static void gui_prompt_submit(void) {
@@ -1290,7 +1295,7 @@ static void gui_prompt_submit(void) {
         result = gui_remove_tree(prompt_target_path);
         if (result) { desktop_icons_dirty = 1; gui_desktop_status("Item permanently deleted."); }
         else gui_desktop_status("Could not delete item.");
-        prompt_kind = 0; dirty = 1; return;
+        prompt_kind = 0; gui_mark_dirty(); return;
     }
     if (prompt_kind == GUI_PROMPT_EMPTY_TRASH) {
         size_t count = 0u;
@@ -1300,26 +1305,26 @@ static void gui_prompt_submit(void) {
         }
         if (gui_trash_count() == 0u) { result = 1; desktop_icons_dirty = 1; gui_desktop_status("Trash emptied."); }
         else gui_desktop_status("Some Trash items could not be removed.");
-        prompt_kind = 0; dirty = 1; return;
+        prompt_kind = 0; gui_mark_dirty(); return;
     }
-    if (!gui_name_valid(prompt_name)) { prompt_error = 1; dirty = 1; return; }
+    if (!gui_name_valid(prompt_name)) { prompt_error = 1; gui_mark_dirty(); return; }
     if (prompt_kind == GUI_PROMPT_NEW_FOLDER || prompt_kind == GUI_PROMPT_NEW_TEXT) {
         char filename[GUI_DESKTOP_NAME_CAPACITY];
         gui_copy_string(filename, sizeof(filename), prompt_name);
         if (prompt_kind == GUI_PROMPT_NEW_TEXT && !string_ends_with_fold(filename, ".TXT")) {
             size_t length = gui_string_length(filename);
-            if (length + 4u >= sizeof(filename)) { prompt_error = 1; dirty = 1; return; }
+            if (length + 4u >= sizeof(filename)) { prompt_error = 1; gui_mark_dirty(); return; }
             filename[length++] = '.'; filename[length++] = 'T'; filename[length++] = 'X'; filename[length++] = 'T'; filename[length] = '\0';
         }
         if (!gui_ensure_desktop_directory() || !gui_path_join(GUI_DESKTOP_PATH, filename, destination)) {
-            prompt_error = 1; dirty = 1; return;
+            prompt_error = 1; gui_mark_dirty(); return;
         }
         if (storage_lookup(destination, &entry) || storage_is_directory(destination)) {
-            prompt_error = 1; dirty = 1; return;
+            prompt_error = 1; gui_mark_dirty(); return;
         }
         if (prompt_kind == GUI_PROMPT_NEW_FOLDER) result = storage_make_directory(destination);
         else result = storage_write_file(destination, "", 0u);
-        if (!result) { prompt_error = 1; dirty = 1; return; }
+        if (!result) { prompt_error = 1; gui_mark_dirty(); return; }
         {
             int created_text = prompt_kind == GUI_PROMPT_NEW_TEXT;
             desktop_icons_dirty = 1;
@@ -1333,29 +1338,29 @@ static void gui_prompt_submit(void) {
             viewer_editable = 1; viewer_unsaved = 0; viewer_save_error = 0;
             (void)gui_open_window(VIEW_FILE_VIEWER);
         }
-        dirty = 1;
+        gui_mark_dirty();
         return;
     }
     if (prompt_kind == GUI_PROMPT_RENAME) {
         parent_length = gui_string_length(prompt_target_path);
         while (parent_length > 0u && prompt_target_path[parent_length - 1u] != '/') --parent_length;
-        if (parent_length == 0u || parent_length >= sizeof(parent)) { prompt_error = 1; dirty = 1; return; }
+        if (parent_length == 0u || parent_length >= sizeof(parent)) { prompt_error = 1; gui_mark_dirty(); return; }
         for (i = 0u; i < parent_length; ++i) parent[i] = prompt_target_path[i];
         if (parent_length == 1u) parent[1] = '\0'; else parent[parent_length - 1u] = '\0';
         if (!gui_path_join(parent, prompt_name, destination)) {
-            prompt_error = 1; dirty = 1; return;
+            prompt_error = 1; gui_mark_dirty(); return;
         }
         if (storage_lookup(destination, &entry) || storage_is_directory(destination)) {
             /* A case-insensitive no-op rename is permitted by CHFS itself. */
-            if (!gui_strings_equal(destination, prompt_target_path)) { prompt_error = 1; dirty = 1; return; }
+            if (!gui_strings_equal(destination, prompt_target_path)) { prompt_error = 1; gui_mark_dirty(); return; }
         }
         if (storage_is_directory(prompt_target_path)) result = storage_rename_directory(prompt_target_path, destination);
         else result = storage_rename_file(prompt_target_path, destination);
-        if (!result) { prompt_error = 1; dirty = 1; return; }
+        if (!result) { prompt_error = 1; gui_mark_dirty(); return; }
         desktop_icons_dirty = 1;
         gui_desktop_refresh_icons();
         gui_desktop_save_layout();
-        prompt_kind = 0; gui_desktop_status("Item renamed."); dirty = 1; return;
+        prompt_kind = 0; gui_desktop_status("Item renamed."); gui_mark_dirty(); return;
     }
 }
 
@@ -1373,7 +1378,7 @@ static void gui_context_menu_click(int32_t x, int32_t y) {
     if (!context_menu_open) return;
     count = gui_context_row_count();
     if (local_x < 2 * scale || local_x >= GUI_CONTEXT_WIDTH * scale || local_y < 0 ||
-        local_y >= (int)count * GUI_CONTEXT_ROW_HEIGHT * scale) { context_menu_open = 0; context_menu_submenu = 0; dirty = 1; return; }
+        local_y >= (int)count * GUI_CONTEXT_ROW_HEIGHT * scale) { context_menu_open = 0; context_menu_submenu = 0; gui_mark_dirty(); return; }
     row = (size_t)(local_y / (GUI_CONTEXT_ROW_HEIGHT * scale));
     if (context_menu_submenu) rows = new_rows;
     else if (context_menu_kind == GUI_CONTEXT_APP_ICON) rows = app_rows;
@@ -1386,7 +1391,7 @@ static void gui_context_menu_click(int32_t x, int32_t y) {
         context_menu_submenu = 1;
         context_menu_x += GUI_CONTEXT_WIDTH * scale - 2 * scale;
         if (context_menu_x + GUI_CONTEXT_WIDTH * scale > SCREEN_W) context_menu_x = SCREEN_W - GUI_CONTEXT_WIDTH * scale;
-        context_menu_hover_index = -1; dirty = 1; return;
+        context_menu_hover_index = -1; gui_mark_dirty(); return;
     }
     if (context_menu_submenu) {
         context_menu_open = 0; context_menu_submenu = 0;
@@ -1425,7 +1430,7 @@ static void gui_context_menu_click(int32_t x, int32_t y) {
     context_menu_open = 0;
     context_menu_submenu = 0;
     desktop_icons_dirty = 1;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void draw_number(int x, int y, uint32_t value, uint32_t color) {
@@ -1598,7 +1603,7 @@ static void gui_set_active_view(int next_view) {
         if (gui_app_find_window(next_view) != NULL)
             gui_app_queue_focus(next_view, CHOS_GUI_EVENT_FOCUS_GAINED);
     }
-    dirty = 1;
+    gui_mark_dirty();
 }
 static void gui_sync_active_view(void) {
     int active = chos_wm_active_id(&window_manager);
@@ -1635,7 +1640,7 @@ static void gui_close_window(int id) {
         event.header.size_bytes = (uint32_t)(offsetof(chos_gui_message_t, payload) + sizeof(event.payload.window));
         event.payload.window.window_id = (uint32_t)id;
         gui_app_queue_message(client, &event);
-        dirty = 1;
+        gui_mark_dirty();
         return;
     }
     if (id == VIEW_CONSOLE) terminal_command[0] = '\0';
@@ -1652,7 +1657,7 @@ static int gui_apply_display_mode(size_t mode_index) {
     display_mode_error = 0;
     if (!virtio_gpu_set_mode(mode_index, &updated_surface)) {
         display_mode_error = 1;
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     screen = updated_surface;
@@ -1691,7 +1696,7 @@ static int gui_apply_display_mode(size_t mode_index) {
     if (mouse_y < 0) mouse_y = 0;
     if (mouse_x >= SCREEN_W) mouse_x = SCREEN_W - 1;
     if (mouse_y >= SCREEN_H) mouse_y = SCREEN_H - 1;
-    dirty = 1;
+    gui_mark_dirty();
     gui_save_settings();
     return 1;
 }
@@ -1753,7 +1758,7 @@ static const char *gui_taskbar_full_title(int target) {
 static void gui_taskbar_tooltip_update_hover(void) {
     const int target = gui_taskbar_tooltip_target_at(mouse_x, mouse_y);
     if (target == taskbar_tooltip_window_id) return;
-    if (taskbar_tooltip_fade_step != 0u) dirty = 1;
+    if (taskbar_tooltip_fade_step != 0u) gui_mark_dirty();
     taskbar_tooltip_window_id = target;
     taskbar_tooltip_fade_step = 0u;
     taskbar_tooltip_started_tick = timer_is_ready() ? timer_ticks() : 0u;
@@ -1769,7 +1774,7 @@ static void gui_taskbar_tooltip_tick(void) {
         return;
     if (!timer_is_ready()) {
         taskbar_tooltip_fade_step = TASKBAR_TOOLTIP_FADE_STEPS;
-        dirty = 1;
+        gui_mark_dirty();
         return;
     }
     now = timer_ticks();
@@ -1779,7 +1784,7 @@ static void gui_taskbar_tooltip_tick(void) {
     next_step = requested_step > TASKBAR_TOOLTIP_FADE_STEPS ? TASKBAR_TOOLTIP_FADE_STEPS : (unsigned)requested_step;
     if (next_step > taskbar_tooltip_fade_step) {
         taskbar_tooltip_fade_step = next_step;
-        dirty = 1;
+        gui_mark_dirty();
     }
 }
 
@@ -1790,7 +1795,7 @@ static void terminal_clear_lines(void) {
     }
     terminal_row = 0u;
     terminal_column = 0u;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void terminal_newline(void) {
@@ -1807,7 +1812,7 @@ static void terminal_newline(void) {
     }
     terminal_column = 0u;
     terminal_lines[terminal_row][0] = '\0';
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void terminal_putc(char ch) {
@@ -1817,7 +1822,7 @@ static void terminal_putc(char ch) {
         if (terminal_column > 0u) {
             --terminal_column;
             terminal_lines[terminal_row][terminal_column] = '\0';
-            dirty = 1;
+            gui_mark_dirty();
         }
         return;
     }
@@ -1830,7 +1835,7 @@ static void terminal_putc(char ch) {
     if (terminal_column >= TERMINAL_COLUMNS - 1u) terminal_newline();
     terminal_lines[terminal_row][terminal_column++] = ch;
     terminal_lines[terminal_row][terminal_column] = '\0';
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void terminal_puts(const char *value) {
@@ -2244,7 +2249,7 @@ static void terminal_set_current_input(const char *value) {
         terminal_command[length++] = ch;
     }
     terminal_command[length] = '\0';
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void terminal_submit(void) {
@@ -2259,7 +2264,7 @@ static void terminal_submit(void) {
     terminal_command[0] = '\0';
     terminal_execute(command);
     if (view == VIEW_CONSOLE) terminal_prompt();
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static char terminal_key_to_ascii(uint16_t keycode) {
@@ -2475,7 +2480,7 @@ static void viewer_scroll_by(int direction, size_t amount) {
             viewer_scroll_offset += amount < remaining ? amount : remaining;
         }
     }
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 static void file_manager_open_selected(int run_program) {
@@ -2488,14 +2493,14 @@ static void file_manager_open_selected(int run_program) {
             terminal_puts(entry.path);
             terminal_putc('\n');
             terminal_prompt();
-            dirty = 1;
+            gui_mark_dirty();
             return;
         }
         if (!gui_open_window(VIEW_CONSOLE)) return;
         terminal_puts("run "); terminal_puts(entry.path); terminal_newline();
         terminal_run_path(entry.path);
         terminal_prompt();
-        dirty = 1;
+        gui_mark_dirty();
     } else {
         /* Register the viewer with the window manager before activating it.
          * Merely assigning `view` updates the reported active view, but the
@@ -3413,7 +3418,7 @@ static int gui_cursor_move_only(void) {
         if (virtio_gpu_cursor_move(mouse_x, mouse_y, !splash_active)) return 1;
         /* Cursorq failure disables the hardware cursor in the driver. Redraw now
          * so the software bitmap fallback takes over immediately. */
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     if (!cursor_under_valid || splash_active) return 0;
@@ -3560,7 +3565,7 @@ static void gui_drag_overlay_update(void) {
     if (window->width <= 2 * thickness || window->height <= 2 * thickness ||
         window->width > (int32_t)CHOS_DISPLAY_MAX_WIDTH ||
         window->height > (int32_t)CHOS_DISPLAY_MAX_HEIGHT) {
-        dirty = 1;
+        gui_mark_dirty();
         drag_preview_dirty = 0;
         return;
     }
@@ -3929,7 +3934,7 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
             if (mutable_window == NULL) return -(int64_t)CHOS_ERRNO_ENOENT;
             mutable_window->title = client->title;
         }
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     window = chos_wm_get_const(&window_manager, client->window_id);
@@ -3939,7 +3944,7 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
         client->background_argb = message->payload.clear.background_argb != 0u
             ? message->payload.clear.background_argb : C_PANEL;
         client->op_count = 0u;
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     if (message->header.type == CHOS_GUI_MSG_FILL_RECT) {
@@ -3954,7 +3959,7 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
         op = &client->ops[client->op_count++];
         op->type = CHOS_GUI_MSG_FILL_RECT; op->x = r->x; op->y = r->y;
         op->width = r->width; op->height = r->height; op->argb = r->argb | 0xff000000u;
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     if (message->header.type == CHOS_GUI_MSG_DRAW_TEXT) {
@@ -3970,7 +3975,7 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
         op->argb = r->argb | 0xff000000u; op->text_length = r->text_length;
         for (i = 0u; i < r->text_length; ++i) op->text[i] = r->text[i];
         op->text[r->text_length] = '\0';
-        dirty = 1;
+        gui_mark_dirty();
         return 0;
     }
     return -(int64_t)CHOS_ERRNO_EINVAL;
@@ -4051,6 +4056,7 @@ static void gui_draw_app_window(int id, const chos_wm_window_t *window) {
 }
 
 static void gui_render(void) {
+    uint64_t frame_generation=__atomic_load_n(&dirty_generation,__ATOMIC_RELAXED);
     const chos_wm_window_t *window;
     uint32_t z_order = 0u;
     int cursor_move_failed = 0;
@@ -4110,7 +4116,9 @@ static void gui_render(void) {
     /* A hardware cursor failure disables cursorq in the driver. Keep one redraw
      * pending so the software bitmap immediately takes over instead of leaving
      * the screen cursorless until an unrelated UI action occurs. */
-    dirty = cursor_move_failed ? 1 : 0;
+    presented_generation=frame_generation;
+    dirty=0;
+    if(cursor_move_failed) gui_mark_dirty();
 }
 
 static int gui_launch_or_focus_app(uint32_t *pid_slot, const char *path) {
@@ -4130,7 +4138,7 @@ static int gui_launch_or_focus_app(uint32_t *pid_slot, const char *path) {
         if (process_spawn_path(path, &pid) == PROCESS_OK && pid != 0u) {
             *pid_slot = pid;
             start_menu_open = 0;
-            dirty = 1;
+            gui_mark_dirty();
             return 1;
         }
     }
@@ -4190,7 +4198,7 @@ static void gui_handle_power_confirmation_click(int32_t x, int32_t y) {
         if (x >= dialog_x + 172 * scale && x < dialog_x + 266 * scale) gui_confirm_power_action();
         else if (x >= dialog_x + 276 * scale && x < dialog_x + 368 * scale) {
             power_confirmation_action = 0;
-            dirty = 1;
+            gui_mark_dirty();
         }
     }
 }
@@ -4214,25 +4222,25 @@ static void click_at(int32_t x, int32_t y, int in_window) {
                 if (power_confirmation_action != 0) {
                     start_menu_open = 0;
                     start_menu_selected_item = -1;
-                    dirty = 1;
+                    gui_mark_dirty();
                     return;
                 }
             }
             start_menu_open = 0;
             start_menu_selected_item = -1;
-            dirty = 1;
+            gui_mark_dirty();
             return;
         }
         start_menu_open = 0;
         start_menu_selected_item = -1;
-        dirty = 1;
+        gui_mark_dirty();
         return;
     }
     if (!in_window && y >= TASKBAR_Y && x >= 0 && x < 66 * (int)gui_scale_factor()) {
         start_menu_open = 1;
         context_menu_open = 0;
         if (start_menu_selected_item < 0 || start_menu_selected_item >= 6) start_menu_selected_item = 0;
-        gui_start_menu_update_hover(); dirty = 1; return;
+        gui_start_menu_update_hover(); gui_mark_dirty(); return;
     }
     if (!in_window && y >= TASKBAR_Y && y < SCREEN_H && x >= 70 * (int)gui_scale_factor() &&
         x < SCREEN_W - 84 * (int)gui_scale_factor()) {
@@ -4268,7 +4276,7 @@ static void click_at(int32_t x, int32_t y, int in_window) {
         if (y >= 160 && y < 390) {
             size_t row = (size_t)(y - 160) / 23u;
             size_t index = trash_scroll_offset + row;
-            if (row < 10u && index < count) { trash_selected_index = index; dirty = 1; return; }
+            if (row < 10u && index < count) { trash_selected_index = index; gui_mark_dirty(); return; }
         }
         if (y >= 475 && y < 503) {
             chos_chfs_entry_t entry;
@@ -4295,37 +4303,37 @@ static void click_at(int32_t x, int32_t y, int in_window) {
         if (y >= 162 && y < 395) {
             size_t row = (size_t)((y - 164) / 21);
             size_t index = file_scroll_offset + row;
-            if (y >= 164 && index < count && row < FILE_VIEW_ROWS) { file_selected_index = index; dirty = 1; return; }
+            if (y >= 164 && index < count && row < FILE_VIEW_ROWS) { file_selected_index = index; gui_mark_dirty(); return; }
         }
         if (y >= 408 && y < 441) {
             if (x >= 198 && x < 276) { file_manager_open_selected(0); return; }
             if (x >= 282 && x < 360) { file_manager_open_selected(1); return; }
-            if (x >= 490 && x < 564 && file_scroll_offset > 0u) { --file_scroll_offset; dirty = 1; return; }
-            if (x >= 570 && x < 644 && file_scroll_offset + FILE_VIEW_ROWS < count) { ++file_scroll_offset; dirty = 1; return; }
+            if (x >= 490 && x < 564 && file_scroll_offset > 0u) { --file_scroll_offset; gui_mark_dirty(); return; }
+            if (x >= 570 && x < 644 && file_scroll_offset + FILE_VIEW_ROWS < count) { ++file_scroll_offset; gui_mark_dirty(); return; }
         }
     }
     if (view == VIEW_FILE_VIEWER && x >= 204 && x < 378 && y >= 475 && y < 503) { open_view(VIEW_FILES); return; }
     if (view == VIEW_FILE_VIEWER && viewer_editable && x >= 390 && x < 470 && y >= 475 && y < 503) { gui_text_editor_save(); return; }
     if (view == VIEW_SETTINGS) {
         if (y >= 151 && y < 194 && x >= 205 && x < 343) {
-            wallpaper_alt = 0; wallpaper_cache_valid = 0; gui_save_settings(); dirty = 1;
+            wallpaper_alt = 0; wallpaper_cache_valid = 0; gui_save_settings(); gui_mark_dirty();
         } else if (y >= 151 && y < 194 && x >= 354 && x < 492) {
-            wallpaper_alt = 1; wallpaper_cache_valid = 0; gui_save_settings(); dirty = 1;
+            wallpaper_alt = 1; wallpaper_cache_valid = 0; gui_save_settings(); gui_mark_dirty();
         } else if (y >= 151 && y < 194 && x >= 510 && x < 615) {
-            startup_sound_enabled = !startup_sound_enabled; gui_save_settings(); dirty = 1;
+            startup_sound_enabled = !startup_sound_enabled; gui_save_settings(); gui_mark_dirty();
         } else if (y >= 151 && y < 194 && x >= 620 && x < 734) {
             timezone_index = (timezone_index + 1u) % GUI_TIMEZONE_COUNT;
-            gui_save_settings(); dirty = 1;
+            gui_save_settings(); gui_mark_dirty();
         } else if (y >= 261 && y < 399 && x >= 205 && x < 539) {
             size_t row = (size_t)(y - 261) / 28u;
             size_t index = display_mode_page * DISPLAY_MODES_PER_PAGE + row;
             if (row < DISPLAY_MODES_PER_PAGE && index < chos_display_mode_count())
                 (void)gui_apply_display_mode(index);
         } else if (y >= 261 && y < 288 && x >= 548 && x < 633 && display_mode_page > 0u) {
-            --display_mode_page; dirty = 1;
+            --display_mode_page; gui_mark_dirty();
         } else if (y >= 261 && y < 288 && x >= 640 && x < 730 &&
                    (display_mode_page + 1u) * DISPLAY_MODES_PER_PAGE < chos_display_mode_count()) {
-            ++display_mode_page; dirty = 1;
+            ++display_mode_page; gui_mark_dirty();
         }
     }
 }
@@ -4368,7 +4376,7 @@ void chos_gui_set_pci_input_status(uint32_t pci_devices, uint32_t xhci_count,
         for (i = 0u; i < sizeof(missing); ++i) platform_xhci_id[i] = missing[i];
         for (i = 0u; i < sizeof(no_bars); ++i) platform_xhci_bars[i] = no_bars[i];
     }
-    if (gui_active) dirty = 1;
+    if (gui_active) gui_mark_dirty();
 }
 
 int chos_gui_init(const chos_surface_t *surface) {
@@ -4467,7 +4475,7 @@ int chos_gui_init(const chos_surface_t *surface) {
     }
     mouse_y = 10;
     left_button_down = 0;
-    dirty = 1;
+    gui_mark_dirty();
     gui_render_splash();
     return gui_active && frames_drawn > 0u && virtio_gpu_ready();
 }
@@ -4477,18 +4485,18 @@ void chos_gui_show(void) {
     gui_clock_poll();
     gui_taskbar_tooltip_tick();
     if (splash_active) {
-        dirty = 1;
+        gui_mark_dirty();
         chos_gui_pump();
         return;
     }
     (void)gui_open_window(VIEW_WELCOME);
-    dirty = 1;
+    gui_mark_dirty();
     gui_render();
 }
 
 void chos_gui_startup_complete(void) {
     splash_startup_complete = 1;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 void chos_gui_input_key_unicode(uint16_t keycode, uint16_t unicode_char, int pressed) {
@@ -4508,34 +4516,34 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
     if (!gui_active) return;
     if (splash_active) return; /* Input must not bypass the minimum splash interval. */
     if (power_confirmation_action != 0 && pressed) {
-        if (keycode == 1u) { power_confirmation_action = 0; dirty = 1; }
+        if (keycode == 1u) { power_confirmation_action = 0; gui_mark_dirty(); }
         else if (keycode == 28u) gui_confirm_power_action();
         return;
     }
     if (prompt_kind != 0) {
         char ch;
         if (!pressed) return;
-        if (keycode == 1u) { prompt_kind = 0; prompt_error = 0; dirty = 1; return; }
+        if (keycode == 1u) { prompt_kind = 0; prompt_error = 0; gui_mark_dirty(); return; }
         if (keycode == 28u) { gui_prompt_submit(); return; }
         if (prompt_kind >= GUI_PROMPT_CONFIRM_DELETE) return;
         if (keycode == 14u) {
             if (prompt_name_length > 0u) prompt_name[--prompt_name_length] = '\0';
-            prompt_error = 0; dirty = 1; return;
+            prompt_error = 0; gui_mark_dirty(); return;
         }
         ch = terminal_key_to_ascii(keycode);
         if (ch >= 32 && ch <= 126 && prompt_name_length + 1u < sizeof(prompt_name)) {
             prompt_name[prompt_name_length++] = ch; prompt_name[prompt_name_length] = '\0';
-            prompt_error = 0; dirty = 1;
+            prompt_error = 0; gui_mark_dirty();
         }
         return;
     }
     if (start_menu_open && pressed) {
-        if (keycode == 1u) { start_menu_open = 0; start_menu_selected_item = -1; dirty = 1; return; }
+        if (keycode == 1u) { start_menu_open = 0; start_menu_selected_item = -1; gui_mark_dirty(); return; }
         if (keycode == 103u || keycode == 105u) {
-            start_menu_selected_item = (start_menu_selected_item + 5) % 6; dirty = 1; return;
+            start_menu_selected_item = (start_menu_selected_item + 5) % 6; gui_mark_dirty(); return;
         }
         if (keycode == 108u || keycode == 106u) {
-            start_menu_selected_item = (start_menu_selected_item + 1) % 6; dirty = 1; return;
+            start_menu_selected_item = (start_menu_selected_item + 1) % 6; gui_mark_dirty(); return;
         }
         if (keycode == 28u || keycode == 57u) { gui_start_menu_activate_item(start_menu_selected_item); return; }
     }
@@ -4543,7 +4551,7 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         gui_app_queue_key(view, keycode, pressed);
         return;
     }
-    if (view == VIEW_CONSOLE) { (void)terminal_handle_key(keycode, pressed); dirty = 1; return; }
+    if (view == VIEW_CONSOLE) { (void)terminal_handle_key(keycode, pressed); gui_mark_dirty(); return; }
     if (!pressed) return;
     if (view == VIEW_FILE_VIEWER && viewer_editable) {
         char ch;
@@ -4555,12 +4563,12 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         if (keycode == 108u) { viewer_scroll_by(1, 1u); return; }
         if (keycode == 104u) { viewer_scroll_by(-1, VIEWER_VISIBLE_LINES > 1u ? VIEWER_VISIBLE_LINES - 1u : 1u); return; }
         if (keycode == 109u) { viewer_scroll_by(1, VIEWER_VISIBLE_LINES > 1u ? VIEWER_VISIBLE_LINES - 1u : 1u); return; }
-        if (keycode == 102u) { viewer_scroll_offset = 0u; dirty = 1; return; }
-        if (keycode == 107u) { viewer_scroll_offset = viewer_max_scroll(); dirty = 1; return; }
+        if (keycode == 102u) { viewer_scroll_offset = 0u; gui_mark_dirty(); return; }
+        if (keycode == 107u) { viewer_scroll_offset = viewer_max_scroll(); gui_mark_dirty(); return; }
         if (keycode == 14u) {
             if (viewer_content_size > 0u) {
                 viewer_content[--viewer_content_size] = '\0';
-                viewer_unsaved = 1; viewer_empty_file = viewer_content_size == 0u; viewer_scroll_offset = viewer_max_scroll(); dirty = 1;
+                viewer_unsaved = 1; viewer_empty_file = viewer_content_size == 0u; viewer_scroll_offset = viewer_max_scroll(); gui_mark_dirty();
             }
             return;
         }
@@ -4570,8 +4578,8 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
             if (viewer_content_size + 1u < sizeof(viewer_content)) {
                 viewer_content[viewer_content_size++] = ch;
                 viewer_content[viewer_content_size] = '\0';
-                viewer_unsaved = 1; viewer_empty_file = 0; viewer_scroll_offset = viewer_max_scroll(); dirty = 1;
-            } else { viewer_save_error = 1; dirty = 1; }
+                viewer_unsaved = 1; viewer_empty_file = 0; viewer_scroll_offset = viewer_max_scroll(); gui_mark_dirty();
+            } else { viewer_save_error = 1; gui_mark_dirty(); }
         }
         return;
     }
@@ -4581,26 +4589,26 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         if (keycode == 108u) { viewer_scroll_by(1, 1u); return; }  /* Down */
         if (keycode == 104u) { viewer_scroll_by(-1, VIEWER_VISIBLE_LINES > 1u ? VIEWER_VISIBLE_LINES - 1u : 1u); return; }
         if (keycode == 109u) { viewer_scroll_by(1, VIEWER_VISIBLE_LINES > 1u ? VIEWER_VISIBLE_LINES - 1u : 1u); return; }
-        if (keycode == 102u) { viewer_scroll_offset = 0u; dirty = 1; return; } /* Home */
-        if (keycode == 107u) { viewer_scroll_offset = viewer_max_scroll(); dirty = 1; return; } /* End */
+        if (keycode == 102u) { viewer_scroll_offset = 0u; gui_mark_dirty(); return; } /* Home */
+        if (keycode == 107u) { viewer_scroll_offset = viewer_max_scroll(); gui_mark_dirty(); return; } /* End */
     }
     if (view == VIEW_FILES) {
         size_t count = file_manager_entry_count();
-        if (keycode == 103u && file_selected_index > 0u) { --file_selected_index; if (file_selected_index < file_scroll_offset) file_scroll_offset = file_selected_index; dirty = 1; return; }
-        if (keycode == 108u && file_selected_index + 1u < count) { ++file_selected_index; if (file_selected_index >= file_scroll_offset + FILE_VIEW_ROWS) file_scroll_offset = file_selected_index - FILE_VIEW_ROWS + 1u; dirty = 1; return; }
+        if (keycode == 103u && file_selected_index > 0u) { --file_selected_index; if (file_selected_index < file_scroll_offset) file_scroll_offset = file_selected_index; gui_mark_dirty(); return; }
+        if (keycode == 108u && file_selected_index + 1u < count) { ++file_selected_index; if (file_selected_index >= file_scroll_offset + FILE_VIEW_ROWS) file_scroll_offset = file_selected_index - FILE_VIEW_ROWS + 1u; gui_mark_dirty(); return; }
         if (keycode == 28u) { file_manager_open_selected(0); return; }
     }
-    if (keycode == 15u) { selected_icon = (selected_icon + 1) % 5; dirty = 1; }
+    if (keycode == 15u) { selected_icon = (selected_icon + 1) % 5; gui_mark_dirty(); }
     else if (keycode == 28u || keycode == 57u) activate_selected();
-    else if (keycode == 1u) { if (start_menu_open) { start_menu_open = 0; dirty = 1; } else gui_minimize_window(view); }
+    else if (keycode == 1u) { if (start_menu_open) { start_menu_open = 0; gui_mark_dirty(); } else gui_minimize_window(view); }
     else if (keycode == 59u) open_view(VIEW_DIAGNOSTICS);
     else if (keycode == 46u) open_view(VIEW_CONSOLE);
     else if (keycode == 33u) open_view(VIEW_FILES);
     else if (keycode == 32u) open_view(VIEW_DIAGNOSTICS);
     else if (keycode == 31u) open_view(VIEW_SETTINGS);
     else if (keycode == 30u) open_view(VIEW_ABOUT);
-    else if (keycode == 103u || keycode == 105u) { selected_icon = (selected_icon + 4) % 5; dirty = 1; }
-    else if (keycode == 108u || keycode == 106u) { selected_icon = (selected_icon + 1) % 5; dirty = 1; }
+    else if (keycode == 103u || keycode == 105u) { selected_icon = (selected_icon + 4) % 5; gui_mark_dirty(); }
+    else if (keycode == 108u || keycode == 106u) { selected_icon = (selected_icon + 1) % 5; gui_mark_dirty(); }
 }
 
 static void update_drag_position(void) {
@@ -4660,7 +4668,7 @@ void chos_gui_input_pointer_relative(int32_t dx, int32_t dy) {
         if (dx > threshold || dy > threshold) desktop_drag_moved = 1;
         if (desktop_drag_moved) {
             int next_cell = (int)gui_desktop_cell_at(mouse_x, mouse_y);
-            if (next_cell != desktop_drag_current_cell) { desktop_drag_current_cell = next_cell; dirty = 1; }
+            if (next_cell != desktop_drag_current_cell) { desktop_drag_current_cell = next_cell; gui_mark_dirty(); }
         }
     }
     update_drag_position();
@@ -4678,7 +4686,7 @@ void chos_gui_input_pointer_relative(int32_t dx, int32_t dy) {
         return;
     }
     cursor_move_pending = 0;
-    dirty = 1;
+    gui_mark_dirty();
 }
 void chos_gui_input_pointer_absolute(int32_t x, int32_t y) {
     int was_dirty, old_x, old_y;
@@ -4702,7 +4710,7 @@ void chos_gui_input_pointer_absolute(int32_t x, int32_t y) {
         if (dx > threshold || dy > threshold) desktop_drag_moved = 1;
         if (desktop_drag_moved) {
             int next_cell = (int)gui_desktop_cell_at(mouse_x, mouse_y);
-            if (next_cell != desktop_drag_current_cell) { desktop_drag_current_cell = next_cell; dirty = 1; }
+            if (next_cell != desktop_drag_current_cell) { desktop_drag_current_cell = next_cell; gui_mark_dirty(); }
         }
     }
     update_drag_position();
@@ -4720,7 +4728,7 @@ void chos_gui_input_pointer_absolute(int32_t x, int32_t y) {
         return;
     }
     cursor_move_pending = 0;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 void chos_gui_input_scroll(int32_t lines) {
@@ -4740,7 +4748,7 @@ void chos_gui_input_scroll(int32_t lines) {
         }
         if (trash_selected_index < trash_scroll_offset) trash_scroll_offset = trash_selected_index;
         if (trash_selected_index >= trash_scroll_offset + 10u) trash_scroll_offset = trash_selected_index - 9u;
-        dirty = 1; return;
+        gui_mark_dirty(); return;
     }
     if (view != VIEW_FILE_VIEWER) return;
     if (lines > 20) lines = 20;
@@ -4760,7 +4768,7 @@ void chos_gui_input_button(uint16_t button, int pressed) {
                 (void)chos_wm_activate(&window_manager, right_hit);
                 gui_set_active_view(right_hit);
                 gui_app_queue_pointer(right_hit, CHOS_GUI_EVENT_POINTER_DOWN, 2u);
-                dirty = 1;
+                gui_mark_dirty();
             }
         }
         return;
@@ -4824,7 +4832,7 @@ void chos_gui_input_button(uint16_t button, int pressed) {
             desktop_drag_index = -1;
             desktop_drag_moved = 0;
             left_button_down = 0;
-            dirty = 1;
+            gui_mark_dirty();
             return;
         }
         /* Commit the preview once on release. During the drag only the outline
@@ -4842,7 +4850,7 @@ void chos_gui_input_button(uint16_t button, int pressed) {
             drag_outline_visible = 0;
             drag_preview_dirty = 0;
             left_button_down = 0;
-            if (gui_active) dirty = 1;
+            if (gui_active) gui_mark_dirty();
             return;
         }
         /* Deliver release to the app that received the matching press, even if
@@ -4856,7 +4864,7 @@ void chos_gui_input_button(uint16_t button, int pressed) {
         drag_outline_visible = 0;
         drag_preview_dirty = 0;
         left_button_down = 0;
-        if (gui_active) dirty = 1;
+        if (gui_active) gui_mark_dirty();
         return;
     }
     if (splash_active || left_button_down) return;
@@ -4866,24 +4874,24 @@ void chos_gui_input_button(uint16_t button, int pressed) {
         const int x = (SCREEN_W - width) / 2, y = (TASKBAR_Y - height) / 2;
         if (mouse_y >= y + 146 * scale && mouse_y < y + 174 * scale) {
             if (mouse_x >= x + 214 * scale && mouse_x < x + 306 * scale) gui_prompt_submit();
-            else if (mouse_x >= x + 314 * scale && mouse_x < x + 406 * scale) { prompt_kind = 0; prompt_error = 0; dirty = 1; }
+            else if (mouse_x >= x + 314 * scale && mouse_x < x + 406 * scale) { prompt_kind = 0; prompt_error = 0; gui_mark_dirty(); }
         }
-        left_button_down = 1; dirty = 1; return;
+        left_button_down = 1; gui_mark_dirty(); return;
     }
     if (context_menu_open) {
         gui_context_menu_click(mouse_x, mouse_y);
-        left_button_down = 1; dirty = 1; return;
+        left_button_down = 1; gui_mark_dirty(); return;
     }
     if (power_confirmation_action != 0) {
         gui_handle_power_confirmation_click(mouse_x, mouse_y);
         left_button_down = 1;
-        dirty = 1;
+        gui_mark_dirty();
         return;
     }
     if (start_menu_open) {
         click_at(mouse_x, mouse_y, 0);
         left_button_down = 1;
-        dirty = 1;
+        gui_mark_dirty();
         return;
     }
     hit = chos_wm_hit_test(&window_manager, mouse_x, mouse_y);
@@ -4910,7 +4918,7 @@ void chos_gui_input_button(uint16_t button, int pressed) {
                         drag_preview_dirty = 0;
                         drag_outline_visible = 0;
                     }
-                    dirty = 1;
+                    gui_mark_dirty();
                 } else if (gui_app_find_window(hit) != NULL) {
                     gui_app_queue_pointer(hit, CHOS_GUI_EVENT_POINTER_DOWN, 1u);
                     app_pointer_capture_window_id = hit;
@@ -4925,13 +4933,13 @@ void chos_gui_input_button(uint16_t button, int pressed) {
             desktop_drag_start_x = mouse_x; desktop_drag_start_y = mouse_y;
             desktop_drag_current_cell = (int)desktop_icons[desktop_index].cell;
             desktop_drag_moved = 0;
-            left_button_down = 1; dirty = 1; return;
+            left_button_down = 1; gui_mark_dirty(); return;
         }
         selected_desktop_icon = -1;
         click_at(mouse_x, mouse_y, 0);
     }
     left_button_down = 1;
-    dirty = 1;
+    gui_mark_dirty();
 }
 
 void chos_gui_pump(void) {
@@ -4954,7 +4962,7 @@ void chos_gui_pump(void) {
                    can be lost while a newly created backend starts. */
                 startup_chime_next_probe_ms = 250u;
             }
-            dirty = 1;
+            gui_mark_dirty();
         } else {
             if (splash_counter_frequency != 0u) {
                 uint64_t counter_now = timer_counter();
@@ -5019,9 +5027,9 @@ void chos_gui_pump(void) {
     }
     if (virtio_gpu_cursor_available() && cursor_move_pending && !dirty) {
         cursor_move_pending = 0;
-        if (!virtio_gpu_cursor_move(mouse_x, mouse_y, !splash_active)) dirty = 1;
+        if (!virtio_gpu_cursor_move(mouse_x, mouse_y, !splash_active)) gui_mark_dirty();
     }
-    if (dirty) {
+    if (dirty || __atomic_load_n(&dirty_generation,__ATOMIC_RELAXED)!=presented_generation) {
         gui_render();
         /* If another state change arrives during a drag, redraw the base scene
          * once and then restore the lightweight preview over it. */

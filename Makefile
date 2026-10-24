@@ -1004,3 +1004,17 @@ $(BUILD)/userland/rng_test.chcx: $(BUILD)/userland/rng_test.elf tools/mkchcx.py
 	python3 tools/mkchcx.py --v2-symbols $(BUILD)/userland/rng_test.sym $(BUILD)/userland/rng_test.bin $@
 	python3 tools/mkchcx.py --verify $@
 test-userland test qemu-smoke: $(BUILD)/userland/rng_test.chcx
+
+$(BUILD)/test-gicv3: tests/test_gicv3.c kernel/arch/aarch64/gicv3.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-gicv3: tests/test_gicv3.c kernel/arch/aarch64/gicv3.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+.PHONY: test-gicv3 test-gicv3-sanitize
+test-gicv3: $(BUILD)/test-gicv3
+	./$(BUILD)/test-gicv3
+test-gicv3-sanitize: $(SAN_DIR)/test-gicv3
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-gicv3
+test: test-gicv3
+test-sanitize: test-gicv3-sanitize

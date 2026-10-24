@@ -1,5 +1,8 @@
 # Stage 1 validation and handoff
 
+This is the original Stage 1 build record. See [Fusion follow-up](STAGE1_FUSION_FOLLOWUP.md)
+for subsequent driver/timer changes and updated evidence.
+
 Stage 1 remains **incomplete as a cross-platform acceptance gate**. The direct QEMU
 VirtIO workflow and a native USB UEFI workflow are implemented and tested locally.
 Fusion, Pi 5 and ARM64 laptop tests are BLOCKED by unavailable hardware. There are

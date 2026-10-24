@@ -246,8 +246,8 @@ static void handle_event(const input_event_t *event) {
         else if (event->code == INPUT_REL_WHEEL) chos_input_scroll(-(int32_t)event->value);
         else if (event->code == INPUT_REL_HWHEEL) { /* reserved for horizontal scrolling */ }
     } else if (event->type == INPUT_EV_ABS) {
-        if (event->code == INPUT_ABS_X) chos_gui_input_pointer_absolute((int32_t)event->value, -1);
-        else if (event->code == INPUT_ABS_Y) chos_gui_input_pointer_absolute(-1, (int32_t)event->value);
+        if (event->code == INPUT_ABS_X) chos_input_absolute((int32_t)event->value, -1);
+        else if (event->code == INPUT_ABS_Y) chos_input_absolute(-1, (int32_t)event->value);
     } else if (event->type == INPUT_EV_SYN) {
         /* SYN_REPORT is useful to device consumers, but the current UI redraw is coalesced in gui_pump. */
     }

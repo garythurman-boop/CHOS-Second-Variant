@@ -77,7 +77,7 @@ int chos_usb_decode_report(const chos_hid_report_layout_t *l, chos_usb_input_sta
                           const uint8_t *d, size_t n) {
     uint8_t id=0, keys[256]={0}, buttons[8]={0};
     int keyboard=0, pointer=0, rollover=0;
-    int32_t x=0,y=0,wheel=0;
+    int32_t x=0,y=0,wheel=0,absolute_x=-1,absolute_y=-1;
     if (!l || !s || !d || !n || l->field_count > CHOS_HID_MAX_FIELDS) return 0;
     if (l->uses_report_ids) { id=*d++; --n; if (!id) return 0; }
     if (!l->input_bits[id] || n != (l->input_bits[id]+7u)/8u) return 0;
@@ -97,14 +97,19 @@ int chos_usb_decode_report(const chos_hid_report_layout_t *l, chos_usb_input_sta
             } else if (f->usage_page==9) {
                 pointer=1;
                 if (f->usage>=1 && f->usage<=8 && v) buttons[f->usage-1]=1;
-            } else if (f->usage_page==1 && (f->flags & CHOS_HID_FIELD_RELATIVE)) {
-                int32_t value=(f->flags & CHOS_HID_FIELD_SIGNED)?chos_hid_sign_extend(v,f->bit_size):(int32_t)v;
-                /* Bound untrusted 32-bit deltas before GUI coordinate arithmetic. */
-                if (value>32767) value=32767;
-                if (value< -32767) value=-32767;
-                if (f->usage==0x30) x=value;
-                if (f->usage==0x31) y=value;
-                if (f->usage==0x38) wheel=-value;
+            } else if (f->usage_page==1) {
+                int64_t value=(f->flags & CHOS_HID_FIELD_SIGNED)?(int64_t)chos_hid_sign_extend(v,f->bit_size):(int64_t)v;
+                if(f->flags & CHOS_HID_FIELD_RELATIVE) {
+                    if(value>32767)value=32767;
+                    if(value< -32767)value=-32767;
+                    if(f->usage==0x30)x=(int32_t)value;
+                    if(f->usage==0x31)y=(int32_t)value;
+                    if(f->usage==0x38)wheel=-(int32_t)value;
+                } else if(f->usage==0x30 || f->usage==0x31) {
+                    if(f->logical_max<=f->logical_min || value<f->logical_min || value>f->logical_max) return 0;
+                    int32_t normalized=(int32_t)(((value-f->logical_min)*32767)/(f->logical_max-f->logical_min));
+                    if(f->usage==0x30)absolute_x=normalized;else absolute_y=normalized;
+                }
             }
         }
     }
@@ -116,6 +121,7 @@ int chos_usb_decode_report(const chos_hid_report_layout_t *l, chos_usb_input_sta
         int change=transition(s->buttons[k],id,buttons[k]);
         if(change) chos_input_button((uint16_t)(0x110+k),change>0);
     }
+    if(absolute_x>=0 || absolute_y>=0) chos_input_absolute(absolute_x,absolute_y);
     if (x || y) chos_input_relative(x,y);
     if (wheel) chos_input_scroll(wheel);
     return 1;

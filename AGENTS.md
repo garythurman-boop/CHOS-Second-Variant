@@ -32,7 +32,7 @@ git diff --check, not a redundant kernel rebuild.
 
 ## Stage 1 scope
 
-Stage 1 is incomplete. USB hubs, absolute USB tablets, native IOMMU ownership,
+Stage 1 is incomplete. USB hubs, native IOMMU ownership,
 PCI VirtIO support in the ACPI-only UEFI runtime, and target-specific networking are
 not completed. Some gaps can be implemented/tested in QEMU; do not describe all
 remaining work as blocked solely by unavailable physical hardware.

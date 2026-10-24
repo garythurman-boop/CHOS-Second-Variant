@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "chos/exception.h"
 #include "chos/uart.h"
+#include "../platform/uefi_console.h"
 
 static void print_hex64(uint64_t value) {
     static const char digits[] = "0123456789ABCDEF";
@@ -117,6 +118,12 @@ CHOS_NORETURN void exception_panic(uint64_t esr, uint64_t elr,
     /* A fault may occur while the console lock is held. Panic is terminal, so
        make polled serial diagnostics available again before printing details. */
     uart_console_emergency_reset();
+    /* Generic UEFI hardware may have no supported serial UART. Preserve a
+     * visible terminal diagnostic instead of leaving a frozen-looking splash. */
+    uefi_console_write("\n[FATAL] Kernel exception; halted. ESR=");
+    uefi_console_write_hex(esr);uefi_console_write(" ELR=");
+    uefi_console_write_hex(elr);uefi_console_write(" FAR=");
+    uefi_console_write_hex(far);uefi_console_write("\n");
     uart_puts("\n\n*** CHOS KERNEL PANIC ***\n");
     uart_puts("Unhandled ARM64 exception; system halted.\n");
     uart_puts("Vector: ");

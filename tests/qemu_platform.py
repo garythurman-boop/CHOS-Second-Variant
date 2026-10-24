@@ -3,13 +3,13 @@
 Screenshots prove visible changes; QMP injects real emulated input devices.
 No QMP event is injected directly into a CHOS API.
 """
-import argparse,hashlib,json,os,pathlib,re,shutil,socket,subprocess,tempfile,time
+import argparse,hashlib,json,math,os,pathlib,re,shutil,socket,struct,subprocess,tempfile,time
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 class Guest:
     def __init__(self,args,out,disk):
         self.out=out;self.log=out/'serial.log';self.logfile=self.log.open('wb')
         self.args=args
-        original=args.kernel if args.mode=='direct' else ROOT/'build/uefi-kernel/chos.elf'
+        original=args.kernel if args.mode=='direct' else args.uefi_kernel
         elf=out/'kernel.elf';shutil.copyfile(original,elf)
         iso=out/'boot.iso'
         if args.mode=='uefi':shutil.copyfile(args.iso,iso)
@@ -22,7 +22,7 @@ class Guest:
             if len(parts)==3:self.symbols[parts[2]]=int(parts[0],16)
         self.sockpath=out/'qmp.sock'
         cmd=['qemu-system-aarch64','-M','virt,gic-version='+('2' if args.mode=='direct' else '3'),
-             '-cpu','cortex-a72','-m','512M','-display','none','-no-reboot',
+             '-cpu','cortex-a72','-m',args.memory,'-display','none','-no-reboot',
              '-global','virtio-mmio.force-legacy=false','-serial','stdio',
              '-qmp',f'unix:{self.sockpath},server=on,wait=off']
         if args.qemu_data: cmd+=['-L',str(args.qemu_data)]
@@ -37,7 +37,7 @@ class Guest:
             cmd+=['-drive',f'if=pflash,format=raw,readonly=on,file={args.firmware}',
                   '-drive',f'if=pflash,format=raw,file={vars}','-device','ramfb','-net','none',
                   '-device','qemu-xhci,id=xhci','-device','usb-kbd,bus=xhci.0,id=kbd',
-                  '-device','usb-mouse,bus=xhci.0,id=mouse']
+                  '-device',('usb-tablet' if args.tablet else 'usb-mouse')+',bus=xhci.0,id=mouse']
             if args.mode=='uefi': cmd+=['-device','virtio-scsi-device,id=scsi',
                   '-drive',f'if=none,file={iso},format=raw,media=cdrom,id=cd','-device','scsi-cd,drive=cd']
             else: cmd+=['-drive',f'if=none,file={disk},format=raw,id=disk','-device','virtio-blk-device,drive=disk']
@@ -55,16 +55,24 @@ class Guest:
             if 'error' in r: raise RuntimeError(r)
             if 'return' in r:return r['return']
     def hmp(self,c):return self.qmp('human-monitor-command',**{'command-line':c})
-    def symbol(self,name,offset=0):
+    def block(self,name,offset=0,size=4):
         address=self.symbols[name]+offset
         if self.args.mode!='direct':
             match=re.search(r'Kernel physical base: (0x[0-9a-f]+)',self.text())
             if not match: return 1
             address+=int(match[1],16)-self.symbols['__kernel_start']
         target=self.out/'probe.bin'
-        result=self.hmp(f'pmemsave {address:#x} 4 "{target}"')
+        result=self.hmp(f'pmemsave {address:#x} {size} "{target}"')
         if result:raise AssertionError(result)
-        return int.from_bytes(target.read_bytes(),'little')
+        return target.read_bytes()
+    def symbol(self,name,offset=0):return int.from_bytes(self.block(name,offset),'little')
+    def window(self):
+        view=self.symbol('view');data=self.block('window_manager',size=12*64)
+        for offset in range(0,len(data),64):
+            row=struct.unpack('<i4xQiiiiI7i',data[offset:offset+64])
+            if row[0]==view and row[7]:
+                return dict(id=view,x=row[2],y=row[3],width=row[4],height=row[5],minimized=row[8],maximized=row[9])
+        raise AssertionError('No visible foreground window')
     def serial(self,c):
         self.process.stdin.write((c+'\n').encode());self.process.stdin.flush()
     def screen(self,name):
@@ -94,6 +102,10 @@ def main():
     ap.add_argument('--disk',type=pathlib.Path,default=ROOT/'build/qemu-smoke-disk.img')
     ap.add_argument('--out',type=pathlib.Path,required=True)
     ap.add_argument('--qemu-data',type=pathlib.Path)
+    ap.add_argument('--tablet',action='store_true')
+    ap.add_argument('--memory',default='512M')
+    ap.add_argument('--uefi-kernel',type=pathlib.Path,default=ROOT/'build/uefi-kernel/chos.elf')
+    ap.add_argument('--timer-fault',action='store_true')
     ap.add_argument('--baseline',action='store_true');ap.add_argument('--no-rng',action='store_true')
     args=ap.parse_args();out=args.out.resolve();out.mkdir(parents=True,exist_ok=True)
     # Refuse to overwrite prior evidence or a user disk.
@@ -114,6 +126,8 @@ def main():
         if args.mode!='direct':
             assert 'HID devices=2' in g.text(),g.text()
             assert 'IRQ delivery enabled after initial desktop frame' in g.text()
+            if args.timer_fault: assert 'Timer IRQ delivery did not progress' in g.text()
+            else: assert 'Timer IRQ delivery verified' in g.text()
         else:
             if not args.baseline:
                 g.serial('rng-test')
@@ -138,14 +152,22 @@ def main():
         if args.mode=='direct' and not args.baseline:
             assert 'Post-enable translation, dynamic map/unmap and RAM alias probe passed' in g.text()
             result['checks']+=['MMU permissions, guard pages and dynamic aliases with 512 MiB RAM']
+        def motion(x,y):
+            if args.tablet:
+                xx=max(0,min(799,g.symbol('mouse_x')+x));yy=max(0,min(599,g.symbol('mouse_y')+y))
+                g.qmp('input-send-event',events=[{'type':'abs','data':{'axis':'x','value':round(xx*32767/799)}},
+                                                {'type':'abs','data':{'axis':'y','value':round(yy*32767/599)}}])
+            else:
+                g.qmp('input-send-event',events=[{'type':'rel','data':{'axis':'x','value':x}},{'type':'rel','data':{'axis':'y','value':y}}])
+            time.sleep(.04)
         before=g.screen('desktop');t=time.monotonic();g.hmp('sendkey c')
         wait(lambda:g.screen('console')!=before,2,'keyboard shortcut visible response')
         result['keyboard_visible_ms']=round((time.monotonic()-t)*1000,2)
         before=g.screen('pointer-before');t=time.monotonic()
-        g.qmp('input-send-event',events=[{'type':'rel','data':{'axis':'x','value':-200}},{'type':'rel','data':{'axis':'y','value':150}}])
+        motion(-200,150)
         wait(lambda:g.screen('pointer-after')!=before,2,'pointer visible response')
         result['pointer_visible_ms']=round((time.monotonic()-t)*1000,2)
-        result['checks']+=['keyboard shortcut','relative pointer']
+        result['checks']+=['keyboard shortcut','absolute tablet' if args.tablet else 'relative pointer']
         if not args.baseline:
             wheel=g.symbol('chos_input_diagnostics',24)
             for button_name in ['wheel-up','wheel-down']:
@@ -154,10 +176,11 @@ def main():
                 time.sleep(.1)
             wait(lambda:g.symbol('chos_input_diagnostics',24)>=wheel+2,2,'actual wheel reports reach shared input')
             result['checks']+=['wheel reports through hardware transport to shared input']
-        def motion(x,y):
-            g.qmp('input-send-event',events=[{'type':'rel','data':{'axis':'x','value':x}},{'type':'rel','data':{'axis':'y','value':y}}])
-            time.sleep(.04)
         def move_to(x,y):
+            if args.tablet:
+                g.qmp('input-send-event',events=[{'type':'abs','data':{'axis':'x','value':math.ceil(x*32767/799)}},
+                                                {'type':'abs','data':{'axis':'y','value':math.ceil(y*32767/599)}}])
+                time.sleep(.06);return
             # Saturate to the top-left through real relative reports, then move
             # in chunks below both USB's signed 8-bit and GUI delta bounds.
             for _ in range(9): motion(-100,-100)
@@ -166,16 +189,25 @@ def main():
         def button(down):
             g.qmp('input-send-event',events=[{'type':'btn','data':{'button':'left','down':down}}]);time.sleep(.06)
         # Maximize/restore is the desktop's implemented resize operation.
-        move_to(748,70);before=g.screen('maximize-before');t=time.monotonic()
-        button(True);button(False);time.sleep(.1);after=g.screen('maximize-after')
-        assert sum(a!=b for a,b in zip(before,after))>20000,'maximize must change window content, not just cursor'
+        original=g.window()
+        assert original['id']!=0,'keyboard shortcut must open Console, not merely change splash/clock pixels'
+        move_to(original['x']+original['width']-38,original['y']+13)
+        before=g.screen('maximize-before');t=time.monotonic()
+        button(True);button(False)
+        wait(lambda:g.window()['id']==original['id'] and g.window()['maximized'],2,'maximize foreground window')
+        after=g.screen('maximize-after')
+        assert sum(a!=b for a,b in zip(before,after))>20000
         result['maximize_visible_ms']=round((time.monotonic()-t)*1000,2)
-        move_to(748,12);button(True);button(False);time.sleep(.1)
-        # A restored Console has its title bar at y=58; actual drag changes a
-        # large canvas area rather than passing on cursor pixels alone.
-        move_to(300,70);before=g.screen('drag-before');t=time.monotonic()
-        button(True);motion(-50,40);button(False);time.sleep(.1);after=g.screen('drag-after')
-        assert sum(a!=b for a,b in zip(before,after))>20000,'window drag must move the window'
+        maximized=g.window()
+        move_to(maximized['x']+maximized['width']-38,maximized['y']+13)
+        button(True);button(False)
+        wait(lambda:g.window()==original,2,'restore exact foreground window geometry')
+        move_to(original['x']+100,original['y']+13)
+        before=g.screen('drag-before');t=time.monotonic()
+        button(True);motion(50,40);button(False)
+        wait(lambda:g.window()['id']==original['id'] and (g.window()['x'],g.window()['y'])!=(original['x'],original['y']),2,'move same window by title bar')
+        after=g.screen('drag-after')
+        assert sum(a!=b for a,b in zip(before,after))>20000
         result['drag_visible_ms']=round((time.monotonic()-t)*1000,2)
         result['checks']+=['window maximize/restore','title-bar drag']
         if args.mode!='direct':
@@ -185,7 +217,7 @@ def main():
             for i in range(20):
                 g.qmp('device_del',id=current);time.sleep(.12)
                 current='mouse'+str(i)
-                g.qmp('device_add',driver='usb-mouse',bus='xhci.0',id=current);time.sleep(.25)
+                g.qmp('device_add',driver='usb-tablet' if args.tablet else 'usb-mouse',bus='xhci.0',id=current);time.sleep(.25)
             before=g.screen('reconnect-before');motion(100,0)
             wait(lambda:g.screen('reconnect-after')!=before,2,'hot-reconnected mouse after 20 cycles')
             result['checks']+=['20 USB hot-unplug/reconnect cycles with ring wraps']

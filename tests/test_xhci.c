@@ -34,6 +34,7 @@ int chos_pci_write_config32(const chos_boot_info_t *b,const chos_acpi_info_t *a,
 void chos_input_key(uint16_t c,int d){(void)c;(void)d;}
 void chos_input_button(uint16_t c,int d){(void)c;(void)d;}
 void chos_input_relative(int32_t x,int32_t y){(void)x;(void)y;}
+void chos_input_absolute(int32_t x,int32_t y){(void)x;(void)y;}
 void chos_input_scroll(int32_t w){(void)w;}
 static void fixture(void) {
     memset(regs,0,sizeof(regs)); regs[0]=0x01000020;regs[1]=(2u<<24)|8u;

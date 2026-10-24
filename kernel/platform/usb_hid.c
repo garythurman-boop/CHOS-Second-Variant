@@ -22,8 +22,8 @@
 
 typedef struct {
     uint32_t usage_page;
-    int32_t logical_min;
-    int32_t logical_max;
+    int64_t logical_min;
+    int64_t logical_max;
     uint32_t report_size;
     uint32_t report_count;
     uint8_t report_id;
@@ -88,6 +88,7 @@ static int append_field(chos_hid_report_layout_t *layout, const hid_global_t *gl
     field->bit_size = bit_size;
     field->count = count;
     field->flags = flags;
+    field->logical_min=global->logical_min;field->logical_max=global->logical_max;
     if (global->usage_page == 0x07u) layout->has_keyboard = 1u;
     if (global->usage_page == 0x09u) layout->has_pointer = 1u;
     if (global->usage_page == 0x01u) {
@@ -179,7 +180,8 @@ chos_hid_error_t chos_hid_parse_report_descriptor(const uint8_t *descriptor,
             switch (item_tag) {
                 case HID_GLOBAL_USAGE_PAGE: global.usage_page = value; break;
                 case HID_GLOBAL_LOGICAL_MIN: global.logical_min = item_signed(value, item_size); break;
-                case HID_GLOBAL_LOGICAL_MAX: global.logical_max = item_signed(value, item_size); break;
+                case HID_GLOBAL_LOGICAL_MAX:
+                    global.logical_max = global.logical_min<0 ? (int64_t)item_signed(value,item_size) : (int64_t)value; break;
                 case HID_GLOBAL_REPORT_SIZE: global.report_size = value; break;
                 case HID_GLOBAL_REPORT_COUNT: global.report_count = value; break;
                 case HID_GLOBAL_REPORT_ID:
