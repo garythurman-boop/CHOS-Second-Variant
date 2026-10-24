@@ -193,7 +193,7 @@ static int driver_ready;
 static int gop_backend;
 static volatile uint8_t *gop_framebuffer;
 static uint64_t gop_framebuffer_size;
-static uint32_t gop_stride, gop_format;
+static uint32_t gop_stride, gop_format, gop_width, gop_height;
 static uint32_t gop_red_mask, gop_green_mask, gop_blue_mask, gop_reserved_mask;
 static const char *last_error = "probe not run";
 
@@ -647,6 +647,7 @@ int virtio_gpu_init_gop(const chos_boot_info_t *boot_info, chos_surface_t *surfa
     gop_backend = 1;
     gop_framebuffer = (volatile uint8_t *)(uintptr_t)boot_info->framebuffer_base;
     gop_framebuffer_size = boot_info->framebuffer_size;
+    gop_width = boot_info->framebuffer_width; gop_height = boot_info->framebuffer_height;
     gop_stride = boot_info->framebuffer_stride;
     gop_format = boot_info->framebuffer_pixel_format;
     gop_red_mask = boot_info->framebuffer_red_mask;
@@ -680,11 +681,13 @@ int virtio_gpu_set_mode(size_t mode_index, chos_surface_t *surface) {
         return 1;
     }
     if (gop_backend) {
-        last_error = "GOP display mode switching is not implemented; retaining firmware mode";
-        return 0;
+        /* Logical desktop sizing over the firmware-owned scanout. Firmware
+         * services are never called after ExitBootServices. */
+        resource_created[mode_index] = 1;
+    } else {
+        if (!resource_created[mode_index] && !create_display_resource(mode_index)) return 0;
+        if (!activate_scanout(mode_index)) return 0;
     }
-    if (!resource_created[mode_index] && !create_display_resource(mode_index)) return 0;
-    if (!activate_scanout(mode_index)) return 0;
     active_mode_index = mode_index;
     active_surface.pixels = framebuffer;
     active_surface.width = mode.width;
@@ -743,24 +746,30 @@ static int flush_rect_to_scanout(const gpu_rect_t *rect, uint32_t resource_id) {
 static int gop_blit_rect(uint32_t x, uint32_t y, uint32_t width, uint32_t height) {
     uint32_t row, col;
     if (!gop_backend || gop_framebuffer == NULL || !present_rect_valid(x, y, width, height)) return 0;
-    for (row = 0u; row < height; ++row) {
-        const uint32_t *src = framebuffer + ((size_t)y + row) * active_surface.stride_pixels + x;
-        uint64_t target_offset = ((uint64_t)y + row) * gop_stride * 4u + (uint64_t)x * 4u;
-        if (target_offset > gop_framebuffer_size || (uint64_t)width * 4u > gop_framebuffer_size - target_offset)
-            return 0;
+    uint32_t left=(uint32_t)(((uint64_t)x*gop_width+active_surface.width-1)/active_surface.width);
+    uint32_t right=(uint32_t)(((uint64_t)(x+width)*gop_width+active_surface.width-1)/active_surface.width);
+    uint32_t top=(uint32_t)(((uint64_t)y*gop_height+active_surface.height-1)/active_surface.height);
+    uint32_t bottom=(uint32_t)(((uint64_t)(y+height)*gop_height+active_surface.height-1)/active_surface.height);
+    for (row = top; row < bottom; ++row) {
+        uint32_t sy=(uint32_t)((uint64_t)row*active_surface.height/gop_height);
+        const uint32_t *src = framebuffer + (size_t)sy * active_surface.stride_pixels;
+        uint64_t target_offset = (uint64_t)row*gop_stride*4u+(uint64_t)left*4u;
+        if (target_offset > gop_framebuffer_size || (uint64_t)(right-left)*4u > gop_framebuffer_size-target_offset) return 0;
         volatile uint8_t *dst = gop_framebuffer + target_offset;
-        for (col = 0u; col < width; ++col) {
-            uint32_t pixel = src[col];
+        for (col = left; col < right; ++col) {
+            uint32_t sx=(uint32_t)((uint64_t)col*active_surface.width/gop_width);
+            uint32_t pixel = src[sx];
+            uint32_t output_col=col-left;
             uint8_t r = (uint8_t)(pixel >> 16), g = (uint8_t)(pixel >> 8), b = (uint8_t)pixel;
             if (gop_format == CHOS_GOP_PIXEL_BGRX8) {
-                dst[col * 4u] = b; dst[col * 4u + 1u] = g; dst[col * 4u + 2u] = r; dst[col * 4u + 3u] = 0xffu;
+                dst[output_col * 4u] = b; dst[output_col * 4u + 1u] = g; dst[output_col * 4u + 2u] = r; dst[output_col * 4u + 3u] = 0xffu;
             } else if (gop_format == CHOS_GOP_PIXEL_RGBX8) {
-                dst[col * 4u] = r; dst[col * 4u + 1u] = g; dst[col * 4u + 2u] = b; dst[col * 4u + 3u] = 0xffu;
+                dst[output_col * 4u] = r; dst[output_col * 4u + 1u] = g; dst[output_col * 4u + 2u] = b; dst[output_col * 4u + 3u] = 0xffu;
             } else {
                 uint32_t word = gop_pack_channel(r, gop_red_mask) | gop_pack_channel(g, gop_green_mask) |
                                 gop_pack_channel(b, gop_blue_mask) | gop_reserved_mask;
-                dst[col * 4u] = (uint8_t)word; dst[col * 4u + 1u] = (uint8_t)(word >> 8);
-                dst[col * 4u + 2u] = (uint8_t)(word >> 16); dst[col * 4u + 3u] = (uint8_t)(word >> 24);
+                dst[output_col * 4u] = (uint8_t)word; dst[output_col * 4u + 1u] = (uint8_t)(word >> 8);
+                dst[output_col * 4u + 2u] = (uint8_t)(word >> 16); dst[output_col * 4u + 3u] = (uint8_t)(word >> 24);
             }
         }
     }
@@ -943,3 +952,5 @@ int virtio_gpu_cursor_move(int32_t x, int32_t y, int visible) {
     cursor_is_visible = visible != 0;
     return 1;
 }
+
+const char *virtio_gpu_backend_name(void) {return gop_backend?"Firmware framebuffer (scaled desktop)":"VirtIO GPU";}

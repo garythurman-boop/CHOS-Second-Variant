@@ -71,6 +71,12 @@ static void finish_gpt(void) {
     put32(hdr+88,crc);
     put32(hdr+16,0u);
     put32(hdr+16,crc32(hdr,92u));
+    uint8_t *backup=disk_bytes+(TEST_SECTORS-1u)*512u;
+    memcpy(disk_bytes+(TEST_SECTORS-33u)*512u,entries,128u*128u);
+    memcpy(backup,hdr,512u);
+    put64(backup+24,TEST_SECTORS-1u);put64(backup+32,1u);
+    put64(backup+72,TEST_SECTORS-33u);put32(backup+16,0u);
+    put32(backup+16,crc32(backup,92u));
 }
 static void make_gpt(void) {
     uint8_t *mbr=disk_bytes;
@@ -152,7 +158,18 @@ static void test_bad_mbr_and_capacity(void) {
     assert(chos_gpt_read(&device,p,1,&n)==CHOS_GPT_ERR_CAPACITY);
     assert(n==1);
 }
+static void test_backup_integrity(void){
+    chos_gpt_partition_t parts[4];size_t count;
+    make_gpt();disk_bytes[(TEST_SECTORS-1u)*512u+16]^=1;
+    assert(chos_gpt_read(&device,parts,4,&count)==CHOS_GPT_ERR_HEADER_CRC);
+    make_gpt();disk_bytes[(TEST_SECTORS-33u)*512u+20]^=1;
+    assert(chos_gpt_read(&device,parts,4,&count)==CHOS_GPT_ERR_ENTRIES_CRC);
+    make_gpt();put64(disk_bytes+(TEST_SECTORS-1u)*512u+32,2);
+    assert(chos_gpt_read(&device,parts,4,&count)==CHOS_GPT_ERR_HEADER);
+    make_gpt();
+}
 int main(void) {
+    test_backup_integrity();
     make_gpt(); test_valid_and_slice(); make_gpt(); test_header_crc();
     make_gpt(); test_entry_crc(); make_gpt(); test_ranges_and_overlap();
     make_gpt(); test_bad_mbr_and_capacity();

@@ -3,7 +3,7 @@
 This report supersedes the driver summary in the original 0.30.0 handoff. See
 [hardware matrix](HARDWARE_SUPPORT.md), [validation evidence](STAGE1_VALIDATION.md),
 and the current [Fusion follow-up](STAGE1_FUSION_FOLLOWUP.md).
-Builds and host mocks do not establish hardware support. Stage 1 is not declared complete.
+Builds and host mocks do not establish hardware support. The user reports 816aa55 desktop/input success on Fusion and authorizes Stage 2. See [installer lifecycle and current limits](STAGE2_VALIDATION.md). Remaining Stage 1 platform gates stay tracked.
 The published `2ed3e6d` ISO has a user-reported Fusion panic. See the
 [symbolicated failure and MMU-off synchronization correction](FUSION_PANIC_2ED3E6D.md).
 See [current Fusion fixes](FUSION_DRIVER_FIXES.md) for the recorded controller-version

@@ -6,6 +6,8 @@
 #include "chos/chfs.h"
 
 int storage_init(void);
+/* Single-CPU installer ownership transfer: no filesystem I/O may be active. */
+void storage_detach(void);
 /* Attach an already initialized platform block backend without auto-formatting. */
 int storage_attach_block_device(chos_block_device_t *device);
 const char *storage_error(void);

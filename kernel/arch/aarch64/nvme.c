@@ -309,14 +309,14 @@ static int find_nvme(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
                      chos_pci_device_t *out) {
     chos_pci_device_t devices[CHOS_PCI_MAX_DEVICES];
     chos_pci_scan_summary_t summary;
-    uint32_t i;
-    if (!chos_pci_enumerate(boot, acpi, devices, CHOS_PCI_MAX_DEVICES, &summary)) return 0;
+    uint32_t i,matches=0;
+    if (!chos_pci_enumerate(boot, acpi, devices, CHOS_PCI_MAX_DEVICES, &summary) || summary.output_truncated) return 0;
     for (i = 0u; i < summary.devices_stored; ++i) {
         const chos_pci_device_t *d = &devices[i];
         if (d->class_code == NVME_PCI_CLASS && d->subclass == NVME_PCI_SUBCLASS &&
-            d->programming_interface == NVME_PCI_PROGIF) { *out = *d; return 1; }
+            d->programming_interface == NVME_PCI_PROGIF) { *out = *d; ++matches; }
     }
-    return 0;
+    return matches==1;
 }
 
 int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
@@ -340,7 +340,7 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
     if(sctlr&5u) {last_error="NVMe requires identity DMA with MMU/cache off";return 0;}
 #endif
     probe_attempted=1;bytes_zero(&nvme,sizeof(nvme));
-    if (!find_nvme(boot, acpi, &device)) { last_error = "no PCI NVMe controller found"; return 0; }
+    if (!find_nvme(boot, acpi, &device)) { last_error = "exactly one NVMe controller required; inventory may be absent, ambiguous or truncated"; return 0; }
     if (!chos_pci_map_bar(boot,acpi,&device,0,&bar_address,&bar_size)) {
         last_error = "NVMe BAR0 cannot be sized/translated safely"; return 0;
     }
@@ -434,3 +434,15 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
 
 const char *chos_nvme_last_error(void) { return last_error; }
 int chos_nvme_ready(void) { return nvme.ready; }
+/* Re-identify immediately before destructive installation; cached labels and
+ * pointer identity cannot detect a replaced namespace. */
+int chos_nvme_snapshot(uint64_t *identity,uint64_t *sectors) {
+    if(!identity||!sectors||!nvme.ready)return 0;
+    if(!admin_identify(0u,NVME_IDENTIFY_CONTROLLER,nvme.identify_phys,nvme.identify)||
+       !admin_identify(1u,NVME_IDENTIFY_NAMESPACE,nvme.namespace_phys,nvme.namespace_identify)||
+       !chos_nvme_parse_namespace_identify(nvme.namespace_identify,4096,sectors))return 0;
+    uint64_t hash=1469598103934665603ull;
+    for(unsigned i=4;i<64;i++){hash^=nvme.identify[i];hash*=1099511628211ull;}
+    hash^=nvme.bar_base;hash*=1099511628211ull;
+    *identity=hash?hash:1;return 1;
+}

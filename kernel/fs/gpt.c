@@ -148,6 +148,31 @@ chos_gpt_error_t chos_gpt_read(chos_block_device_t *disk,
     if (!entry_array_read(disk, entries_lba, array_bytes, gpt_entries_scratch)) return CHOS_GPT_ERR_IO;
     calculated_crc = crc32_bytes(gpt_entries_scratch, array_bytes);
     if (calculated_crc != entries_crc) return CHOS_GPT_ERR_ENTRIES_CRC;
+    /* A valid primary alone does not establish a recoverable GPT. Validate
+     * the independent backup header and compare every entry-array byte. */
+    {
+        uint8_t backup[512], sector[512];
+        uint64_t sectors=((uint64_t)array_bytes+511u)/512u;
+        if (backup_lba!=disk->sector_count-1u || sectors>=backup_lba ||
+            last_usable>=backup_lba-sectors) return CHOS_GPT_ERR_HEADER;
+        if (!block_read(disk,backup_lba,1u,backup)) return CHOS_GPT_ERR_IO;
+        if (backup[0]!='E' || backup[1]!='F' || backup[2]!='I' || backup[3]!=' ' ||
+            backup[4]!='P' || backup[5]!='A' || backup[6]!='R' || backup[7]!='T' ||
+            get32(backup+8)!=get32(gpt_header_sector+8) || get32(backup+12)!=header_size ||
+            get32(backup+20)!=0u || get64(backup+24)!=backup_lba || get64(backup+32)!=1u ||
+            get64(backup+40)!=first_usable || get64(backup+48)!=last_usable ||
+            get64(backup+72)!=backup_lba-sectors || get32(backup+80)!=entry_count ||
+            get32(backup+84)!=entry_size || get32(backup+88)!=entries_crc)
+            return CHOS_GPT_ERR_HEADER;
+        for (i=56u;i<72u;++i) if(backup[i]!=gpt_header_sector[i])return CHOS_GPT_ERR_HEADER;
+        uint32_t expected=get32(backup+16);put32(backup+16,0);
+        if(crc32_bytes(backup,header_size)!=expected)return CHOS_GPT_ERR_HEADER_CRC;
+        for(uint32_t offset=0;offset<array_bytes;offset+=512u) {
+            if(!block_read(disk,backup_lba-sectors+offset/512u,1u,sector))return CHOS_GPT_ERR_IO;
+            uint32_t take=array_bytes-offset;if(take>512u)take=512u;
+            for(uint32_t k=0;k<take;++k)if(sector[k]!=gpt_entries_scratch[offset+k])return CHOS_GPT_ERR_ENTRIES_CRC;
+        }
+    }
     for (i = 0u; i < entry_count; ++i) {
         const uint8_t *entry = gpt_entries_scratch + (size_t)i * entry_size;
         chos_gpt_partition_t decoded;

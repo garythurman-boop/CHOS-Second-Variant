@@ -29,3 +29,10 @@ These functions calculate/validate plans only. They do not open a disk, write GP
 ## What is not implemented
 
 No graphical installer, partition editor, block-device write path, image deployment flow, recovery mode, first-run wizard, or confirmed installed-disk boot is included in this snapshot. `make install-disk-image` is host tooling to build a prepared image, not an in-OS installer.
+
+## Stage 2 implementation supersedes the groundwork-only description
+
+The graphical wizard, bounded deployment engine, live NVMe identity checks, GPT/
+FAT32/CHFS writes and readback verification are now implemented. See
+[the current lifecycle and validation report](STAGE2_VALIDATION.md) for supported
+targets, safeguards, actual ISO-to-installed-disk evidence, faults and limits.

@@ -23,12 +23,52 @@
 #include "chos/acpi.h"
 #include "chos/pci.h"
 #include "chos/nvme.h"
+#include "chos/installer_io.h"
 #include "chos/entropy.h"
 #include "chos/virtio_transport.h"
 #include "chos/xhci.h"
 #include "chos/build_stamp.h"
 #include "../platform/uefi_console.h"
 
+/* Native discovery is explicit from the GUI. Probe never formats a disk; the
+ * filesystem receives a read-only view until a separate write authorization. */
+static const chos_boot_info_t *native_storage_boot;
+static chos_acpi_info_t native_storage_acpi;
+static chos_block_device_t native_storage_disk;
+static uint64_t native_storage_selected_identity;
+int chos_probe_native_storage(void) {
+    chos_block_device_t read_only;
+    if(storage_block_ready())return 1;
+    if(!native_storage_boot || !chos_nvme_init(native_storage_boot,&native_storage_acpi,&native_storage_disk))return 0;
+    uint64_t sectors;if(!chos_nvme_snapshot(&native_storage_selected_identity,&sectors)||sectors!=native_storage_disk.sector_count)return 0;
+    read_only=native_storage_disk;read_only.write=0;read_only.flush=0;
+    return storage_attach_block_device(&read_only);
+}
+int chos_native_storage_enable_writes(void){
+    uint64_t id,n;
+    if(!native_storage_disk.ready || !chos_nvme_snapshot(&id,&n) || id!=native_storage_selected_identity || n!=native_storage_disk.sector_count)return 0;
+    return storage_attach_block_device(&native_storage_disk) && storage_mounted();
+}
+const char *chos_native_storage_status(void){return chos_nvme_last_error();}
+static chos_install_job_t installation;
+chos_install_job_t *chos_install_runtime(void){return &installation;}
+int chos_install_choose_native(void) {
+    if(!native_storage_boot)return 0;
+    if(!native_storage_disk.ready && !chos_nvme_init(native_storage_boot,&native_storage_acpi,&native_storage_disk))return 0;
+    uint64_t address=native_storage_boot->installer_payload_address,bytes=native_storage_boot->installer_payload_size;
+    if(!bytes||!chos_boot_info_contains_memory(native_storage_boot,address,bytes))return 0;
+    return chos_install_select(&installation,&native_storage_disk,chos_nvme_snapshot,(const void *)(uintptr_t)address,(size_t)bytes);
+}
+int chos_install_start(const char *text) {
+    if(!chos_install_confirm(&installation,text))return 0;
+    storage_detach();return 1;
+}
+void chos_install_abort(void){chos_install_cancel(&installation);}
+void chos_install_tick(void){
+    chos_install_state_t previous=installation.state;
+    chos_install_step(&installation);
+    if(previous!=INSTALL_DONE && installation.state==INSTALL_DONE)(void)storage_attach_block_device(&native_storage_disk);
+}
 static fdt_info_t boot_device_tree;
 extern uint8_t __kernel_start;
 
@@ -185,6 +225,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
 
         acpi_result = chos_acpi_parse(boot_info, &acpi_info);
+        native_storage_boot=boot_info;native_storage_acpi=acpi_info;
         if (acpi_result==CHOS_ACPI_OK && acpi_info.pl011_base) {
             uart_attach_pl011((uintptr_t)acpi_info.pl011_base);
             uefi_console_enable_serial();

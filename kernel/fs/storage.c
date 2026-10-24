@@ -182,3 +182,5 @@ void storage_get_stats(chos_chfs_stats_t *out) {
     chfs_get_stats(fs_ready ? &root_fs : 0, out);
     chos_spin_unlock_irqrestore(&storage_lock, flags);
 }
+
+void storage_detach(void){disk_ready=0;fs_ready=0;filesystem_disk=0;format_allowed=0;}

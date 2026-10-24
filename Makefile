@@ -13,7 +13,7 @@ CFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -ffreestanding -fno-builtin
 ASFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -g
 LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 
-SOURCES_C := kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
+SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/examples/browser_core.c kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
              kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
@@ -260,15 +260,17 @@ $(UEFI_KERNEL_BUILD)/kernel/arch/aarch64/romfs_userland.o: kernel/arch/aarch64/r
     $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx \
     $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx
 
-$(BUILD)/chos-$(CHOS_VERSION).iso: $(UEFI_KERNEL_ELF) $(BUILD)/uefi/BOOTAA64.EFI tools/mkuefi_iso.py tests/test_uefi_kernel.py docs/RELEASE_NOTES_0.30.0.md
+$(BUILD)/chos-$(CHOS_VERSION).iso: $(BUILD)/installer.payload $(UEFI_KERNEL_ELF) $(BUILD)/uefi/BOOTAA64.EFI tools/mkuefi_iso.py tests/test_uefi_kernel.py docs/RELEASE_NOTES_0.30.0.md
 	python3 tests/test_uefi_kernel.py $(UEFI_KERNEL_ELF)
-	python3 tools/mkuefi_iso.py --kernel $(UEFI_KERNEL_ELF) --efi $(BUILD)/uefi/BOOTAA64.EFI --readme docs/RELEASE_NOTES_0.30.0.md --output $@
+	python3 tools/mkuefi_iso.py --kernel $(UEFI_KERNEL_ELF) --efi $(BUILD)/uefi/BOOTAA64.EFI --readme docs/RELEASE_NOTES_0.30.0.md --install-payload $(BUILD)/installer.payload --output $@
 
 uefi-iso: $(BUILD)/chos-$(CHOS_VERSION).iso
 
 # Create an installable disk *image file*; this target never writes a host device.
 .PHONY: install-disk-image
-install-disk-image: $(UEFI_KERNEL_ELF) $(BUILD)/uefi/BOOTAA64.EFI $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/browser.chcx $(BUILD)/userland/file_manager.chcx
+install-disk-image: $(BUILD)/chos-$(CHOS_VERSION)-installed.img
+
+$(BUILD)/chos-$(CHOS_VERSION)-installed.img: tools/mkchos_install_disk.py tools/fat32_builder.py tools/mkchfs.py $(UEFI_KERNEL_ELF) $(BUILD)/uefi/BOOTAA64.EFI $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/browser.chcx $(BUILD)/userland/file_manager.chcx
 	python3 tools/mkchos_install_disk.py --kernel $(UEFI_KERNEL_ELF) --efi $(BUILD)/uefi/BOOTAA64.EFI --readme docs/RELEASE_NOTES_0.30.0.md --size-mib 256 --output $(BUILD)/chos-$(CHOS_VERSION)-installed.img --force --app /BIN/CDEMO.CHX=$(BUILD)/userland/cdemo.chcx --app /BIN/GUIAPP.CHX=$(BUILD)/userland/gui_demo.chcx --app /BIN/TEXTVIEW.CHX=$(BUILD)/userland/text_viewer.chcx --app /BIN/CONSOLE.CHX=$(BUILD)/userland/console.chcx --app /BIN/BROWSER.CHX=$(BUILD)/userland/browser.chcx --app /BIN/FILEMAN.CHX=$(BUILD)/userland/file_manager.chcx
 
 # This target requires an AArch64 UEFI firmware image (EDK2/AAVMF). On macOS,
@@ -403,6 +405,7 @@ test-gui-protocol: $(BUILD)/test-gui-protocol
 	./$(BUILD)/test-usb-hid
 	./$(BUILD)/test-virtio-rng
 	./$(BUILD)/test-installer-plan
+	./$(BUILD)/test-installer-io $(BUILD)/installer.payload
 	./$(BUILD)/test-gui-protocol
 
 test-assets:
@@ -479,15 +482,17 @@ $(BUILD)/test-installer-plan: tests/test_installer_plan.c kernel/core/installer_
 
 test-installer-plan: $(BUILD)/test-installer-plan
 	./$(BUILD)/test-installer-plan
+	./$(BUILD)/test-installer-io $(BUILD)/installer.payload
 
 $(BUILD)/test-boot-info: tests/test_boot_info.c kernel/platform/boot_info.c include/chos/boot_info.h
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -Wall -Wextra -Werror -std=c11 -Iinclude tests/test_boot_info.c kernel/platform/boot_info.c -o $@
 
-test: $(BUILD)/test-atomic $(BUILD)/chos.elf $(UEFI_KERNEL_ELF) $(BUILD)/test-usb-hid $(BUILD)/test-virtio-rng $(BUILD)/test-installer-plan $(BUILD)/test-boot-info $(BUILD)/test-acpi $(BUILD)/test-pci $(BUILD)/test-nvme-parse $(BUILD)/test-gpt $(BUILD)/test-pmm-uefi $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx $(BUILD)/test-browser-core $(BUILD)/test-gpu-damage $(BUILD)/test-net-packet $(BUILD)/test-virtio-net-abi $(BUILD)/test-net-services $(BUILD)/test-net-stack $(BUILD)/test-net-tcp $(BUILD)/test-platform-boot $(BUILD)/test-taskbar-text $(BUILD)/test-gui-protocol $(BUILD)/test-fdt $(BUILD)/test-pmm $(BUILD)/test-kheap $(BUILD)/test-vmm $(BUILD)/test-scheduler $(BUILD)/test-irqctx $(BUILD)/test-spinlock $(BUILD)/test-address-space $(BUILD)/test-process-format $(BUILD)/test-romfs $(BUILD)/test-user-abi $(BUILD)/test-chfs $(BUILD)/test-gfx $(BUILD)/test-gui $(BUILD)/test-window-manager $(BUILD)/test-display-modes $(BUILD)/userland/async_demo.o $(BUILD)/userland/cdemo.chcx $(BUILD)/test-net-tcp-api-compile.o $(BUILD)/test-browser-api-compile.o
+test: $(BUILD)/test-installer-io $(BUILD)/installer.payload $(BUILD)/test-atomic $(BUILD)/chos.elf $(UEFI_KERNEL_ELF) $(BUILD)/test-usb-hid $(BUILD)/test-virtio-rng $(BUILD)/test-installer-plan $(BUILD)/test-boot-info $(BUILD)/test-acpi $(BUILD)/test-pci $(BUILD)/test-nvme-parse $(BUILD)/test-gpt $(BUILD)/test-pmm-uefi $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx $(BUILD)/test-browser-core $(BUILD)/test-gpu-damage $(BUILD)/test-net-packet $(BUILD)/test-virtio-net-abi $(BUILD)/test-net-services $(BUILD)/test-net-stack $(BUILD)/test-net-tcp $(BUILD)/test-platform-boot $(BUILD)/test-taskbar-text $(BUILD)/test-gui-protocol $(BUILD)/test-fdt $(BUILD)/test-pmm $(BUILD)/test-kheap $(BUILD)/test-vmm $(BUILD)/test-scheduler $(BUILD)/test-irqctx $(BUILD)/test-spinlock $(BUILD)/test-address-space $(BUILD)/test-process-format $(BUILD)/test-romfs $(BUILD)/test-user-abi $(BUILD)/test-chfs $(BUILD)/test-gfx $(BUILD)/test-gui $(BUILD)/test-window-manager $(BUILD)/test-display-modes $(BUILD)/userland/async_demo.o $(BUILD)/userland/cdemo.chcx $(BUILD)/test-net-tcp-api-compile.o $(BUILD)/test-browser-api-compile.o
 	./$(BUILD)/test-usb-hid
 	./$(BUILD)/test-virtio-rng
 	./$(BUILD)/test-installer-plan
+	./$(BUILD)/test-installer-io $(BUILD)/installer.payload
 	./$(BUILD)/test-gui-protocol
 	./$(BUILD)/test-boot-info
 	./$(BUILD)/test-acpi
@@ -600,10 +605,11 @@ $(SAN_DIR)/test-pmm-uefi: tests/test_pmm_uefi.c kernel/mm/pmm.c kernel/platform/
 	@mkdir -p $(dir $@)
 	$(CC_HOST) $(SAN_FLAGS) -pthread -DCHOS_HOST_TEST tests/test_pmm_uefi.c kernel/mm/pmm.c kernel/platform/boot_info.c kernel/core/spinlock.c -o $@
 
-test-sanitize: $(SAN_DIR)/test-atomic $(SAN_DIR)/test-usb-hid $(SAN_DIR)/test-virtio-rng $(SAN_DIR)/test-installer-plan $(SAN_DIR)/test-boot-info $(SAN_DIR)/test-acpi $(SAN_DIR)/test-pci $(SAN_DIR)/test-gpt $(SAN_DIR)/test-pmm-uefi $(SAN_DIR)/test-gpu-damage $(SAN_DIR)/test-net-packet $(SAN_DIR)/test-virtio-net-abi $(SAN_DIR)/test-net-services $(SAN_DIR)/test-net-stack $(SAN_DIR)/test-net-tcp $(SAN_DIR)/test-platform-boot $(SAN_DIR)/test-taskbar-text $(SAN_DIR)/test-gui-protocol $(SAN_DIR)/test-fdt $(SAN_DIR)/test-pmm $(SAN_DIR)/test-kheap $(SAN_DIR)/test-vmm $(SAN_DIR)/test-scheduler $(SAN_DIR)/test-irqctx $(SAN_DIR)/test-spinlock $(SAN_DIR)/test-address-space $(SAN_DIR)/test-process-format $(SAN_DIR)/test-romfs $(SAN_DIR)/test-user-abi $(SAN_DIR)/test-chfs $(SAN_DIR)/test-gfx $(SAN_DIR)/test-gui $(SAN_DIR)/test-window-manager $(SAN_DIR)/test-display-modes $(SAN_DIR)/test-browser-core
+test-sanitize: $(SAN_DIR)/test-installer-io $(BUILD)/installer.payload $(SAN_DIR)/test-atomic $(SAN_DIR)/test-usb-hid $(SAN_DIR)/test-virtio-rng $(SAN_DIR)/test-installer-plan $(SAN_DIR)/test-boot-info $(SAN_DIR)/test-acpi $(SAN_DIR)/test-pci $(SAN_DIR)/test-gpt $(SAN_DIR)/test-pmm-uefi $(SAN_DIR)/test-gpu-damage $(SAN_DIR)/test-net-packet $(SAN_DIR)/test-virtio-net-abi $(SAN_DIR)/test-net-services $(SAN_DIR)/test-net-stack $(SAN_DIR)/test-net-tcp $(SAN_DIR)/test-platform-boot $(SAN_DIR)/test-taskbar-text $(SAN_DIR)/test-gui-protocol $(SAN_DIR)/test-fdt $(SAN_DIR)/test-pmm $(SAN_DIR)/test-kheap $(SAN_DIR)/test-vmm $(SAN_DIR)/test-scheduler $(SAN_DIR)/test-irqctx $(SAN_DIR)/test-spinlock $(SAN_DIR)/test-address-space $(SAN_DIR)/test-process-format $(SAN_DIR)/test-romfs $(SAN_DIR)/test-user-abi $(SAN_DIR)/test-chfs $(SAN_DIR)/test-gfx $(SAN_DIR)/test-gui $(SAN_DIR)/test-window-manager $(SAN_DIR)/test-display-modes $(SAN_DIR)/test-browser-core
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-usb-hid
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-virtio-rng
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-installer-plan
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-installer-io $(BUILD)/installer.payload
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-boot-info
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-acpi
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-pci
@@ -1129,3 +1135,14 @@ $(SAN_DIR)/test-atomic: tests/test_atomic.c include/chos/atomic.h
 # Host targets do not generate compiler dependency files.
 $(BUILD)/test-spinlock $(BUILD)/test-pmm $(BUILD)/test-kheap $(BUILD)/test-pmm-uefi $(BUILD)/test-fdt $(BUILD)/test-gui: include/chos/atomic.h
 $(SAN_DIR)/test-spinlock $(SAN_DIR)/test-pmm $(SAN_DIR)/test-kheap $(SAN_DIR)/test-pmm-uefi $(SAN_DIR)/test-fdt $(SAN_DIR)/test-gui: include/chos/atomic.h
+
+$(BUILD)/installer.payload: $(BUILD)/chos-$(CHOS_VERSION)-installed.img tools/mkinstall_payload.py
+	python3 tools/mkinstall_payload.py --image $< --output $@
+
+$(BUILD)/test-installer-io: tests/test_installer_io.c kernel/core/installer_io.c kernel/core/installer_plan.c kernel/fs/gpt.c kernel/fs/blockdev.c kernel/fs/chfs.c kernel/fs/romfs_core.c kernel/core/process_format.c include/chos/installer_io.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Iinclude $(filter %.c,$^) -o $@
+
+$(SAN_DIR)/test-installer-io: tests/test_installer_io.c kernel/core/installer_io.c kernel/core/installer_plan.c kernel/fs/gpt.c kernel/fs/blockdev.c kernel/fs/chfs.c kernel/fs/romfs_core.c kernel/core/process_format.c include/chos/installer_io.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Iinclude $(filter %.c,$^) -o $@

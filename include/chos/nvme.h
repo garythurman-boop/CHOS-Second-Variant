@@ -30,5 +30,6 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
                    chos_block_device_t *device_out);
 const char *chos_nvme_last_error(void);
 int chos_nvme_ready(void);
+int chos_nvme_snapshot(uint64_t *identity,uint64_t *sectors);
 
 #endif

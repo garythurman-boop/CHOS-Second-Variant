@@ -835,3 +835,5 @@ int main(void) {
     puts("gui: desktop composition, taskbar hover-tooltip delay/fade, vertical start-menu gradient/branding, keyboard navigation, windowing, splash timing, persistent display modes, first-start audio readiness, bounded retries, power-dialog cancellation, and EL0 Console output ownership passed");
     return 0;
 }
+
+int storage_block_ready(void) { return storage_mounted(); }

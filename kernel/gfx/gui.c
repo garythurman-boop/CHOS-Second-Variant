@@ -1,3 +1,5 @@
+#include "chos/installer_io.h"
+#include "chos/scheduler.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/atomic.h"
@@ -53,7 +55,8 @@ typedef struct { const char *name; const gui_embedded_image_t *image; } gui_embe
 #define VIEW_SETTINGS 5
 #define VIEW_FILE_VIEWER 6
 #define VIEW_TRASH 7
-#define GUI_VIEW_COUNT 8u
+#define VIEW_INSTALLER 8
+#define GUI_VIEW_COUNT 9u
 #define GUI_DESKTOP_ICON_CAP (CHOS_CHFS_MAX_FILES + 7u)
 #define GUI_DESKTOP_GRID_COLUMNS 8u
 #define GUI_DESKTOP_GRID_ROWS 6u
@@ -237,6 +240,9 @@ static int caps_lock_down;
 static int terminal_initialized;
 static uint32_t gui_console_pid; /* owned by the EL0 Console launched from the desktop */
 static uint32_t gui_file_manager_pid; /* owned by the EL0 File Manager launched from the desktop */
+extern int scheduler_is_running(void) __attribute__((weak));
+extern int chos_kernel_browser_start(void) __attribute__((weak));
+extern void chos_kernel_browser_poll(void) __attribute__((weak));
 static uint32_t gui_browser_pid; /* owned by the EL0 CHOS Browser launched from the Start menu */
 #define GUI_CONSOLE_OUTPUT_RING_CAPACITY 4096u
 static char gui_console_output_ring[GUI_CONSOLE_OUTPUT_RING_CAPACITY];
@@ -1605,12 +1611,12 @@ static void draw_status_line(const char *left, const char *right) {
     if (right != NULL) text(605, 515, right, C_MUTED);
 }
 
-static const int32_t window_x[GUI_VIEW_COUNT] = {180, 190, 105, 150, 135, 165, 200, 165};
-static const int32_t window_y[GUI_VIEW_COUNT] = {70, 58, 65, 82, 62, 76, 60, 60};
+static const int32_t window_x[GUI_VIEW_COUNT] = {180, 190, 105, 150, 135, 165, 200, 165, 180};
+static const int32_t window_y[GUI_VIEW_COUNT] = {70, 58, 65, 82, 62, 76, 60, 60, 70};
 
 static int window_title_for_view(int id, const char **title, const char **short_title) {
-    static const char *const titles[GUI_VIEW_COUNT] = {"Welcome to CHOS", "Console - CHOS", "File Manager - CHOS", "About CHOS", "CHOS Diagnostics", "Desktop Settings", "Text Viewer - CHOS", "Trash - CHOS"};
-    static const char *const short_titles[GUI_VIEW_COUNT] = {"Home", "Console", "Files", "About", "Diag", "Settings", "Viewer", "Trash"};
+    static const char *const titles[GUI_VIEW_COUNT] = {"Welcome to CHOS", "Console - CHOS", "File Manager - CHOS", "About CHOS", "CHOS Diagnostics", "Desktop Settings", "Text Viewer - CHOS", "Trash - CHOS", "CHOS Setup"};
+    static const char *const short_titles[GUI_VIEW_COUNT] = {"Home", "Console", "Files", "About", "Diag", "Settings", "Viewer", "Trash", "Setup"};
     if (id < VIEW_WELCOME || id >= (int)GUI_VIEW_COUNT) return 0;
     if (title != NULL) *title = titles[id];
     if (short_title != NULL) *short_title = short_titles[id];
@@ -2170,6 +2176,9 @@ static void terminal_run_path(const char *argument) {
     char path[CHOS_CHFS_PATH_MAX]; uint32_t pid = 0u; chos_process_error_t error;
     if (argument == NULL || argument[0] == '\0' || !terminal_resolve_path(argument, path)) { terminal_puts("Usage: run <program.chx>\n"); return; }
     terminal_puts("Launching "); terminal_puts(path); terminal_puts("\n");
+    if ((string_ends_with_fold(path,"/BIN/BROWSER.CHX") && path[16]==0) && chos_kernel_browser_start && (!scheduler_is_running || !scheduler_is_running())) {
+        terminal_puts(chos_kernel_browser_start()?"Browser opened.\n":"Browser could not open.\n"); return;
+    }
     error = process_spawn_path(path, &pid);
     if (error != PROCESS_OK) {
         terminal_puts("Launch failed: "); terminal_puts(process_error_string(error)); terminal_putc('\n');
@@ -2855,6 +2864,74 @@ static void draw_about_content(void) {
     draw_status_line("About CHOS", "AArch64 / EL1");
 }
 
+extern chos_install_job_t *chos_install_runtime(void) __attribute__((weak));
+extern int chos_install_choose_native(void) __attribute__((weak));
+extern int chos_install_start(const char *) __attribute__((weak));
+extern void chos_install_tick(void) __attribute__((weak));
+extern void chos_install_abort(void) __attribute__((weak));
+static int installer_page,installer_ack,installer_focus=1;
+static void installer_action(int button) {
+    chos_install_job_t *j=chos_install_runtime?chos_install_runtime():NULL;
+    if(!j)return;
+    if(button==2){if(chos_install_abort)chos_install_abort();gui_close_window(VIEW_INSTALLER);return;}
+    if(button==0){if(installer_page>0&&installer_page<4){--installer_page;installer_ack=0;}gui_mark_dirty();return;}
+    if(installer_page==0)installer_page=1;
+    else if(installer_page==1){if(j->state==INSTALL_SELECTED)installer_page=2;else if(chos_install_choose_native)(void)chos_install_choose_native();}
+    else if(installer_page==2){installer_page=3;installer_ack=0;}
+    else if(installer_page==3){if(!installer_ack)installer_ack=1;else if(chos_install_start && chos_install_start(CHOS_INSTALLER_CONFIRMATION))installer_page=4;}
+    else if(installer_page==5 && j->state!=INSTALL_DONE){j->state=INSTALL_IDLE;installer_page=1;installer_ack=0;}
+    gui_mark_dirty();
+}
+static void draw_installer_content(void) {
+    chos_install_job_t *j=chos_install_runtime?chos_install_runtime():NULL;
+    draw_window_shell("CHOS Setup",180,70,595,465);
+    text_bold(204,112,"Install CHOS",C_BLUE_DARK);
+    if(!j){text(204,150,"Installer service unavailable.",C_RED);return;}
+    if(j->state==INSTALL_DONE || j->state==INSTALL_FAILED || j->state==INSTALL_CANCELLED)installer_page=5;
+    const char *headings[]={"Welcome to CHOS Setup","Choose a target disk","Review partition plan","Confirm permanent data loss","Installing and verifying","Installation result"};
+    text_bold(204,150,headings[installer_page],C_TEXT);
+    if(installer_page==0){
+        text(204,190,"Setup erases the selected disk and installs CHOS.",C_TEXT);
+        text(204,217,"Creates a bootable ARM64 EFI partition and CHFS data.",C_TEXT);
+        text(204,244,"Back up anything valuable before continuing.",C_RED);
+        text(204,280,"No disk is selected and no writes have been authorized.",C_MUTED);
+    }else if(installer_page>=1 && installer_page<=3){
+        text(204,190,j->state==INSTALL_SELECTED?"Selected target: nvme0n1":"No disk selected. Choose the supported NVMe target.",C_TEXT);
+        if(j->state==INSTALL_SELECTED){
+            text(204,218,"Capacity (MiB):",C_TEXT);draw_number(380,218,(uint32_t)(j->plan.disk_sector_count/2048),C_TEXT);
+            char id[17];const char *digits="0123456789abcdef";for(unsigned i=0;i<16;i++)id[i]=digits[(j->plan.disk_identity>>((15-i)*4))&15];id[16]=0;
+            text(204,246,"Disk identity:",C_TEXT);mono_text(380,246,id,C_TEXT);
+            text(204,274,"Media type: unknown / existing contents will be erased.",C_ORANGE);
+            if(installer_page>=2){text(204,310,"GPT: 1 MiB alignment; FAT32 EFI partition: 64 MiB.",C_TEXT);text(204,338,"CHFS data uses the remaining usable disk space.",C_TEXT);}
+            if(installer_page==3)text_bold(204,375,installer_ack?"Erase acknowledged. Activate Install to begin.":"Activate Acknowledge to accept loss of ALL target data.",C_RED);
+        }else text(204,310,j->error?j->error:"Target unavailable; no writes performed.",C_RED);
+    }else if(installer_page==4){
+        text(204,192,"Target: nvme0n1 - keep the VM powered on.",C_TEXT);
+        text(204,224,j->error,C_TEXT);rect(204,270,530,22,C_PANEL_LIGHT);
+        rect(204,270,(int)(530*j->next_sector/131072),22,C_BLUE);
+        text(204,320,"Writes are flushed and read-back verified in chunks.",C_TEXT);
+        text(204,348,"Cancel leaves an incomplete disk; it does not roll back.",C_ORANGE);
+    }else{
+        text_bold(204,192,j->state==INSTALL_DONE?"Installation completed and verified.":"Installation did not complete.",j->state==INSTALL_DONE?C_GREEN:C_RED);
+        text(204,232,j->error?j->error:"No success was recorded.",C_TEXT);
+        if(j->state==INSTALL_DONE){text(204,280,"Shut down CHOS, detach the ISO, and boot this disk.",C_TEXT);text(204,308,"The installed system starts without the installation ISO.",C_TEXT);}
+        else{text(204,280,"Retry requires selecting the target and confirming again.",C_TEXT);text(204,308,"A failed controller may require a VM restart first.",C_MUTED);}
+    }
+    draw_hline(204,430,530,C_PANEL_DARK);
+    draw_button(410,456,90,26,"Back",installer_page==0||installer_page>=4);
+    const char *label=installer_page==1&&j->state!=INSTALL_SELECTED?"Select NVMe":installer_page==3?(installer_ack?"Install":"Acknowledge"):installer_page==4?"Working...":installer_page==5?(j->state==INSTALL_DONE?"Verified":"Retry"):"Next";
+    draw_button(508,456,112,26,label,installer_page==4||(installer_page==5&&j->state==INSTALL_DONE));
+    draw_button(628,456,106,26,installer_page==5?"Close":"Cancel",0);
+    if(installer_focus>=0&&installer_focus<3)outline(installer_focus==0?410:installer_focus==1?508:628,456,installer_focus==0?90:installer_focus==1?112:106,26,C_BLUE_DARK);
+    draw_status_line("Setup","Tab: focus | Enter: activate | Esc: cancel");
+}
+extern int chos_native_storage_enable_writes(void) __attribute__((weak));
+static int native_writes_ack;
+extern int chos_probe_native_storage(void) __attribute__((weak));
+extern const char *chos_native_storage_status(void) __attribute__((weak));
+static int native_storage_probe_attempted;
+extern unsigned chos_platform_input_capabilities(void) __attribute__((weak));
+extern const char *virtio_gpu_backend_name(void) __attribute__((weak));
 static void draw_diagnostics_content(void) {
     if(driver_report_mode && driver_report_provider) {
         draw_window_shell("Diagnostics - CHOS",180,70,595,465);
@@ -2868,30 +2945,37 @@ static void draw_diagnostics_content(void) {
     draw_window_shell("CHOS Diagnostics", 180, 70, 595, 465);
     text(201, 110, "SERVICE STATUS", C_BLUE_DARK);
     draw_hline(200, 129, 551, C_PANEL_DARK);
-    text(203, 147, "VirtIO-GPU display", C_TEXT);
+    unsigned native_caps=chos_platform_input_capabilities?chos_platform_input_capabilities():0;
+    int input_present=chos_input_device_count()!=0 || native_caps!=0;
+    text(203, 147, "Desktop display", C_TEXT);
     rect(410, 147, 110, 14, C_PANEL_LIGHT);
     rect(410, 147, virtio_gpu_ready() ? 110 : 18, 14, virtio_gpu_ready() ? C_GREEN : C_ORANGE);
     text(532, 148, virtio_gpu_ready() ? "Ready" : "Unavailable", C_TEXT);
-    text(203, 177, "VirtIO input devices", C_TEXT);
+    text(203, 177, "Keyboard / pointer", C_TEXT);
     rect(410, 177, 110, 14, C_PANEL_LIGHT);
-    rect(410, 177, chos_input_device_count() ? 110 : 18, 14, chos_input_device_count() ? C_GREEN : C_ORANGE);
-    text(532, 178, chos_input_device_count() ? "Ready" : "Serial only", C_TEXT);
+    rect(410, 177, input_present ? 110 : 18, 14, input_present ? C_GREEN : C_ORANGE);
+    text(532, 178, input_present ? "Ready" : "Unavailable", C_TEXT);
     text(203, 207, "Persistent storage", C_TEXT);
     rect(410, 207, 110, 14, C_PANEL_LIGHT);
     rect(410, 207, storage_mounted() ? 110 : 18, 14, storage_mounted() ? C_GREEN : C_ORANGE);
-    text(532, 208, storage_mounted() ? "Mounted" : "ROMFS", C_TEXT);
+    text(532, 208, storage_mounted() ? "Mounted" : (storage_block_ready()?"No CHFS":"ROMFS only"), C_TEXT);
     text(203, 250, "Display mode", C_MUTED);
     text(410, 250, display_mode_full_label(virtio_gpu_current_mode_index()), C_TEXT);
     text(203, 276, "Color format", C_MUTED);
     text(410, 276, "BGRA8 / little-endian", C_TEXT);
     text(203, 302, "Input path", C_MUTED);
-    text(410, 302, "VirtIO event queues (polled)", C_TEXT);
+    text(410, 302, native_caps ? "Native USB HID" : "VirtIO event queues", C_TEXT);
     text(203, 328, "Recovery console", C_MUTED);
-    text(410, 328, "PL011 serial / always on", C_TEXT);
+    text(410, 328, "Platform dependent", C_TEXT);
     text(203, 370, "Display driver", C_MUTED);
-    text(203, 388, virtio_gpu_last_error(), C_TEXT);
+    text(203, 388, virtio_gpu_backend_name?virtio_gpu_backend_name():virtio_gpu_last_error(), C_TEXT);
     text(203, 416, "Input driver", C_MUTED);
     text(203, 434, chos_input_last_error(), C_TEXT);
+    if(chos_probe_native_storage)draw_button(480,463,260,24,
+        native_storage_probe_attempted && storage_mounted() ? (native_writes_ack?"Confirm file writes":"Enable CHFS writes..."):"Detect NVMe (read only)",0);
+    if(chos_install_runtime)draw_button(204,463,220,24,"Install CHOS...",0);
+    if(native_storage_probe_attempted && chos_native_storage_status)
+        text(203,448,storage_block_ready()?"Disk detected. File writes require explicit enable/confirm.":chos_native_storage_status(),C_MUTED);
     draw_status_line("Diagnostics", "Read-only view");
 }
 
@@ -2945,8 +3029,8 @@ static void draw_settings_content(void) {
     text(620, 199, "Click to cycle", C_MUTED);
 
     draw_hline(204, 225, 546, C_PANEL_DARK);
-    text_bold(204, 236, "Display resolution", C_BLUE_DARK);
-    text(405, 236, "Available framebuffer modes", C_MUTED);
+    text_bold(204, 236, "Desktop size", C_BLUE_DARK);
+    text(405, 236, "Firmware output uses scaling", C_MUTED);
     for (row = 0u; row < DISPLAY_MODES_PER_PAGE; ++row) {
         size_t index = display_mode_page * DISPLAY_MODES_PER_PAGE + row;
         int y = 261 + (int)row * 28;
@@ -4207,6 +4291,7 @@ static void gui_render(void) {
             case VIEW_FILES: draw_files_content(); break;
             case VIEW_ABOUT: draw_about_content(); break;
             case VIEW_DIAGNOSTICS: draw_diagnostics_content(); break;
+            case VIEW_INSTALLER: draw_installer_content(); break;
             case VIEW_SETTINGS: draw_settings_content(); break;
             case VIEW_FILE_VIEWER: draw_file_viewer_content(); break;
             case VIEW_TRASH: gui_trash_draw_content(); break;
@@ -4237,6 +4322,14 @@ static void gui_render(void) {
 
 static int gui_launch_or_focus_app(uint32_t *pid_slot, const char *path) {
     if (pid_slot == NULL || path == NULL) return 0;
+    if ((string_ends_with_fold(path,"/BIN/BROWSER.CHX") && path[16]==0) && chos_kernel_browser_start && (!scheduler_is_running || !scheduler_is_running())) {
+        if (chos_kernel_browser_start()) {
+            gui_app_client_t *client=gui_app_find_owner(UINT32_MAX);
+            if(client && chos_wm_activate(&window_manager,client->window_id))gui_sync_active_view();
+            return 1;
+        }
+        return 0;
+    }
     if (*pid_slot != 0u) {
         chos_process_state_t state;
         if (process_query_pid(*pid_slot, &state, NULL) == 1) {
@@ -4412,6 +4505,15 @@ static void click_at(int32_t x, int32_t y, int in_window) {
         }
         return;
     }
+    if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=204 && x<424 && y>=463 && y<487 && chos_install_runtime){installer_page=0;installer_ack=0;installer_focus=1;open_view(VIEW_INSTALLER);return;}
+    if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=480 && x<740 && y>=463 && y<487 && chos_probe_native_storage) {
+        if(native_storage_probe_attempted && storage_mounted() && chos_native_storage_enable_writes) {
+            if(!native_writes_ack)native_writes_ack=1;
+            else {(void)chos_native_storage_enable_writes();native_writes_ack=0;}
+        }else{native_storage_probe_attempted=1;(void)chos_probe_native_storage();}
+        gui_mark_dirty();return;
+    }
+    if(view==VIEW_INSTALLER){if(y>=456&&y<482){if(x>=410&&x<500)installer_action(0);else if(x>=508&&x<620)installer_action(1);else if(x>=628&&x<734)installer_action(2);}return;}
     if (view == VIEW_FILES) {
         size_t count = file_manager_entry_count();
         if (y >= 162 && y < 395) {
@@ -4636,6 +4738,8 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         else if (keycode == 28u) gui_confirm_power_action();
         return;
     }
+    if(view==VIEW_INSTALLER && pressed){if(keycode==15u)installer_focus=(installer_focus+1)%3;else if(keycode==28u||keycode==57u)installer_action(installer_focus);else if(keycode==1u)installer_action(2);gui_mark_dirty();return;}
+    if(view==VIEW_WELCOME && pressed && keycode==23u && chos_install_runtime){installer_page=0;installer_ack=0;installer_focus=1;open_view(VIEW_INSTALLER);return;}
     if (prompt_kind != 0) {
         char ch;
         if (!pressed) return;
@@ -5146,6 +5250,11 @@ void chos_gui_pump(void) {
         cursor_move_pending = 0;
         if (!virtio_gpu_cursor_move(mouse_x, mouse_y, !splash_active)) gui_mark_dirty();
     }
+    if(chos_install_runtime && chos_install_tick) {
+        chos_install_job_t *j=chos_install_runtime();
+        if(j->state==INSTALL_WRITING||j->state==INSTALL_FORMATTING||j->state==INSTALL_VERIFYING){chos_install_tick();gui_mark_dirty();}
+    }
+    if(chos_kernel_browser_poll)chos_kernel_browser_poll();
     if (dirty || chos_atomic_load_u64(&dirty_generation)!=presented_generation) {
         gui_render();
         /* If another state change arrives during a drag, redraw the base scene

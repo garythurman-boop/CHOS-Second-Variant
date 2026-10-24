@@ -7,7 +7,7 @@
  * ExitBootServices. Physical addresses in this structure remain valid; UEFI
  * protocol function pointers must not be called from the kernel. */
 #define CHOS_BOOT_INFO_MAGIC UINT64_C(0x43484f53424f4f54) /* CHOSBOOT */
-#define CHOS_BOOT_INFO_VERSION 5u
+#define CHOS_BOOT_INFO_VERSION 6u
 #define CHOS_UEFI_ENTRY_MAGIC UINT64_C(0x43484f5355454631) /* CHOSUEF1 */
 
 #define CHOS_BOOT_FLAG_UEFI        (UINT64_C(1) << 0)
@@ -77,6 +77,8 @@ typedef struct {
     chos_pci_window_t pci_windows[CHOS_BOOT_MAX_PCI_WINDOWS];
     /* Values only: GetTime is called before ExitBootServices, never by the OS. */
     uint64_t clock_unix_seconds,clock_counter,clock_frequency;
+    /* Optional installer payload retained in EFI LoaderData (never PMM-free). */
+    uint64_t installer_payload_address,installer_payload_size;
 } chos_boot_info_t;
 
 typedef struct {

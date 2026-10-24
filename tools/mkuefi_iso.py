@@ -378,6 +378,7 @@ def validate_kernel_elf(kernel: bytes) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--kernel', required=True, type=Path)
+    parser.add_argument('--install-payload', type=Path)
     parser.add_argument('--efi', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--readme', type=Path)
@@ -411,6 +412,7 @@ def main() -> int:
     fat = Fat16Builder()
     fat.add_file('EFI/BOOT/BOOTAA64.EFI', efi)
     fat.add_file('EFI/CHOS/CHOS.ELF', kernel)
+    if args.install_payload: fat.add_file('INSTALL.BIN',args.install_payload.read_bytes())
     readme = args.readme.read_bytes() if args.readme and args.readme.exists() else b'CHOS 0.30.0 experimental UEFI boot image.\r\n'
     fat.add_file('EFI/CHOS/README.TXT', readme)
     esp = fat.build()

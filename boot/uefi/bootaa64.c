@@ -480,14 +480,13 @@ static uintptr_t find_fdt(void) {
     return 0u;
 }
 
-static int read_kernel(EFI_HANDLE image, uint8_t **file_bytes, size_t *file_size) {
+static int read_boot_file(EFI_HANDLE image, CHAR16 *path, uint8_t **file_bytes, size_t *file_size) {
     EFI_LOADED_IMAGE_PROTOCOL *loaded = NULL;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs = NULL;
     EFI_FILE_PROTOCOL *root = NULL, *file = NULL;
     EFI_UINTN info_size = 0u;
     uint8_t *info = NULL, *buffer = NULL;
     uint64_t declared_size;
-    static CHAR16 path[] = {'\\','E','F','I','\\','C','H','O','S','\\','C','H','O','S','.','E','L','F',0};
     EFI_STATUS status;
 
     status = g_st->BootServices->HandleProtocol(image, (EFI_GUID *)&GUID_LOADED_IMAGE, (void **)&loaded);
@@ -903,7 +902,8 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
     g_st = system_table;
     out(relocation_anchor);
     out(msg_open);
-    if (!read_kernel(image_handle, &kernel_file, &kernel_size)) {
+    CHAR16 kernel_path[]={'\\','E','F','I','\\','C','H','O','S','\\','C','H','O','S','.','E','L','F',0};
+    if (!read_boot_file(image_handle, kernel_path, &kernel_file, &kernel_size)) {
         out(msg_kernel_read); return EFI_ERROR_BIT | (uintptr_t)1u;
     }
     if (!load_elf_kernel(kernel_file, kernel_size, &kernel_entry)) {
@@ -922,6 +922,12 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
     boot_info->kernel_physical_base = kernel_physical_base;
     boot_info->kernel_image_size = kernel_image_span;
     boot_info->kernel_entry = kernel_entry;
+    uint8_t *payload=NULL;size_t payload_size=0;
+    CHAR16 payload_path[]={'\\','I','N','S','T','A','L','L','.','B','I','N',0};
+    if(read_boot_file(image_handle,payload_path,&payload,&payload_size)) {
+        boot_info->installer_payload_address=(uintptr_t)payload;
+        boot_info->installer_payload_size=payload_size;
+    }
     capture_firmware_tables(boot_info);
     capture_gop(boot_info);
     capture_pci_windows(boot_info);
