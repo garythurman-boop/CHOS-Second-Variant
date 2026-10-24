@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/atomic.h"
 #include "chos/kheap.h"
 #include "chos/pmm.h"
 #include "chos/spinlock.h"
@@ -43,23 +44,23 @@ static int heap_initialized;
 static volatile uint32_t kheap_bootstrap_mode;
 
 int kheap_is_bootstrap_mode(void) {
-    return __atomic_load_n(&kheap_bootstrap_mode, __ATOMIC_ACQUIRE) != 0u;
+    return chos_atomic_load_u32(&kheap_bootstrap_mode) != 0u;
 }
 
 void kheap_begin_bootstrap(void) {
     /* Caller contract: no prior heap users, with local IRQs masked. Explicitly
      * reset BSS-backed state at the UEFI entry boundary instead of trusting a
      * platform-specific loader to leave every zero-init object pristine. */
-    __atomic_store_n(&kheap_lock.held, 0u, __ATOMIC_RELAXED);
+    chos_atomic_store_u32(&kheap_lock.held, 0u);
     arena_list = NULL;
     heap_initialized = 0;
-    __atomic_store_n(&kheap_bootstrap_mode, 1u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&kheap_bootstrap_mode, 1u);
 }
 
 void kheap_enable_runtime_locking(void) {
     /* Single core and IRQs masked: no concurrent user can hold this lock yet. */
-    __atomic_store_n(&kheap_lock.held, 0u, __ATOMIC_RELAXED);
-    __atomic_store_n(&kheap_bootstrap_mode, 0u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&kheap_lock.held, 0u);
+    chos_atomic_store_u32(&kheap_bootstrap_mode, 0u);
 }
 
 static int add_overflow_size(size_t a, size_t b, size_t *out) {

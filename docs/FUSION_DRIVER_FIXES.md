@@ -1,5 +1,9 @@
 # Fusion timer, clock and input correction
 
+**Latest target evidence:** the user reports that ISO `2ed3e6d` panics repeatedly.
+See the [exact panic diagnosis and correction](FUSION_PANIC_2ED3E6D.md). Earlier
+desktop-entry and QEMU results below do not supersede that failure.
+
 The user confirms that revision 979fa8c boots Fusion to the desktop, but the clock
 and keyboard/pointer do not work. The cloud machine cannot run Fusion. This report
 distinguishes fixes reproduced locally from a target retest.

@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/atomic.h"
 #include "chos/fdt.h"
 #include "chos/pmm.h"
 #include "chos/spinlock.h"
@@ -47,14 +48,14 @@ static chos_spinlock_t pmm_lock = CHOS_SPINLOCK_INITIALIZER;
 static volatile uint32_t pmm_bootstrap_mode;
 
 int pmm_is_bootstrap_mode(void) {
-    return __atomic_load_n(&pmm_bootstrap_mode, __ATOMIC_ACQUIRE) != 0u;
+    return chos_atomic_load_u32(&pmm_bootstrap_mode) != 0u;
 }
 
 void pmm_enable_runtime_locking(void) {
     /* Caller contract: single-core bootstrap, local IRQs still masked, and no
      * runtime PMM users exist yet. Establish a known lock state before publish. */
-    __atomic_store_n(&pmm_lock.held, 0u, __ATOMIC_RELAXED);
-    __atomic_store_n(&pmm_bootstrap_mode, 0u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&pmm_lock.held, 0u);
+    chos_atomic_store_u32(&pmm_bootstrap_mode, 0u);
 }
 
 __attribute__((weak)) void pmm_init_progress(pmm_init_stage_t stage) {
@@ -325,9 +326,9 @@ pmm_error_t pmm_init(const fdt_info_t *tree,
      * bootstrap transaction. This also makes early lock state deterministic on
      * firmware paths and ensures pmm_get_stats() cannot inherit a stale held bit.
      * Never hold the lock while the progress hook emits framebuffer diagnostics. */
-    __atomic_store_n(&pmm_lock.held, 0u, __ATOMIC_RELAXED);
+    chos_atomic_store_u32(&pmm_lock.held, 0u);
     result = pmm_init_unlocked(tree, kernel_start, kernel_end, dtb_start, dtb_size);
-    __atomic_store_n(&pmm_lock.held, 0u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&pmm_lock.held, 0u);
     return result;
 }
 
@@ -395,8 +396,8 @@ pmm_error_t pmm_init_from_uefi(const chos_boot_info_t *info) {
     /* No scheduler/task concurrency exists in this EFI bring-up path. Keep PMM
      * operations lock-free before the first trace callback until the kernel
      * explicitly publishes runtime mode. */
-    __atomic_store_n(&pmm_lock.held, 0u, __ATOMIC_RELAXED);
-    __atomic_store_n(&pmm_bootstrap_mode, 1u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&pmm_lock.held, 0u);
+    chos_atomic_store_u32(&pmm_bootstrap_mode, 1u);
     pmm_init_progress(PMM_INIT_STAGE_UEFI_START);
     zero_bytes(&normalized, sizeof(normalized));
     normalized.valid = 1;

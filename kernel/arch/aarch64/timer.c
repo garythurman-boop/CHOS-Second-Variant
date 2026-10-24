@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "chos/atomic.h"
 #include "chos/timer.h"
 
 #define TIMER_RELOAD_MAX 0x7fffffffu
@@ -63,7 +64,7 @@ int timer_is_ready(void) {
 }
 
 uint64_t timer_ticks(void) {
-    return __atomic_load_n(&tick_count, __ATOMIC_RELAXED);
+    return chos_atomic_load_u64(&tick_count);
 }
 
 uint64_t timer_frequency_hz(void) {
@@ -73,6 +74,6 @@ uint64_t timer_frequency_hz(void) {
 
 void timer_handle_irq(void) {
     if (!ready) return;
-    (void)__atomic_fetch_add(&tick_count, 1u, __ATOMIC_RELAXED);
+    (void)chos_atomic_fetch_add_u64(&tick_count, 1u);
     write_timer_value(reload_value);
 }

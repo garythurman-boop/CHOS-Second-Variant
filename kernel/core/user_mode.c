@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/atomic.h"
 #include "chos/address_space.h"
 #include "chos/pmm.h"
 #include "chos/scheduler.h"
@@ -24,7 +25,7 @@ extern int64_t chos_enter_el0(uint64_t entry, uint64_t user_stack_pointer,
                               uint64_t argc, uint64_t argv, int *faulted_out);
 
 int user_mode_is_active(void) {
-    return __atomic_load_n(&user_mode_session_active, __ATOMIC_ACQUIRE) != 0u;
+    return chos_atomic_load_u32(&user_mode_session_active) != 0u;
 }
 
 int user_mode_get_address_space(address_space_handle_t *out) {
@@ -79,7 +80,7 @@ int user_mode_execute_with_args(address_space_handle_t space, uint64_t entry,
         if (result != AS_OK) return 0;
         activated_here = 1;
         user_mode_space = space;
-        __atomic_store_n(&user_mode_session_active, 1u, __ATOMIC_RELEASE);
+        chos_atomic_store_u32(&user_mode_session_active, 1u);
     }
 
     *faulted_out = 0;
@@ -87,7 +88,7 @@ int user_mode_execute_with_args(address_space_handle_t space, uint64_t entry,
     trampoline_status = chos_enter_el0(entry, user_stack_top, argc, argv, faulted_out);
 
     if (activated_here) {
-        __atomic_store_n(&user_mode_session_active, 0u, __ATOMIC_RELEASE);
+        chos_atomic_store_u32(&user_mode_session_active, 0u);
         if (address_space_deactivate() != AS_OK) {
             uart_puts("[PANIC] user_mode_execute could not restore the kernel address space\n");
             for (;;) __asm__ volatile("wfe");
@@ -112,7 +113,7 @@ void user_mode_request_exit(chos_irq_context_t *frame, int64_t status, int fault
     frame->x[0] = (uint64_t)status;
     frame->x[1] = faulted ? 1u : 0u;
     if (!scheduler_is_running()) {
-        __atomic_store_n(&user_mode_session_active, 0u, __ATOMIC_RELEASE);
+        chos_atomic_store_u32(&user_mode_session_active, 0u);
     }
     frame->elr = (uint64_t)(uintptr_t)chos_user_mode_return;
     frame->spsr = 0x3c5u; /* EL1h with D/A/I/F masked until the caller unwinds. */
@@ -182,11 +183,11 @@ int user_mode_self_test(void) {
     user_mode_space = space;
     if (address_space_activate(space) != AS_OK) goto cleanup;
     activated = 1;
-    __atomic_store_n(&user_mode_session_active, 1u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&user_mode_session_active, 1u);
     uart_puts("[ .. ] Entering EL0 test payload; successful output must come through SYS_WRITE.\n");
     entered = 1;
     exit_status = (int)chos_enter_el0(USER_CODE_VA, USER_STACK_TOP, 0u, 0u, &faulted);
-    __atomic_store_n(&user_mode_session_active, 0u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&user_mode_session_active, 0u);
 
     if (exit_status != 0) {
         uart_puts("[FAIL] EL0 test payload returned status ");
@@ -205,7 +206,7 @@ int user_mode_self_test(void) {
 
 cleanup:
     if (activated) {
-        __atomic_store_n(&user_mode_session_active, 0u, __ATOMIC_RELEASE);
+        chos_atomic_store_u32(&user_mode_session_active, 0u);
         if (address_space_deactivate() == AS_OK) activated = 0;
         else {
             uart_puts("[PANIC] Cannot deactivate failed EL0 test address space; halted\n");

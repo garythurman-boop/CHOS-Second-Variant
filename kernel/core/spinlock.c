@@ -1,3 +1,4 @@
+#include "chos/atomic.h"
 #include "chos/spinlock.h"
 
 #ifdef CHOS_HOST_TEST
@@ -26,7 +27,7 @@ uint64_t chos_spin_lock_irqsave(chos_spinlock_t *lock) {
     uint64_t state;
     if (lock == 0) return 0u;
     state = irq_save();
-    while (__atomic_exchange_n(&lock->held, 1u, __ATOMIC_ACQUIRE) != 0u) {
+    while (chos_atomic_exchange_u32(&lock->held, 1u) != 0u) {
         spin_hint();
     }
     return state;
@@ -34,6 +35,6 @@ uint64_t chos_spin_lock_irqsave(chos_spinlock_t *lock) {
 
 void chos_spin_unlock_irqrestore(chos_spinlock_t *lock, uint64_t irq_state) {
     if (lock == 0) return;
-    __atomic_store_n(&lock->held, 0u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&lock->held, 0u);
     irq_restore(irq_state);
 }

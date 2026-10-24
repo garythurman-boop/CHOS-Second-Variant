@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/atomic.h"
 #include "chos/gui.h"
 #include "../platform/uefi_console.h"
 #include "chos/taskbar_text.h"
@@ -222,7 +223,7 @@ static int wallpaper_alt = 0;
 static int dirty;
 static uint64_t dirty_generation, presented_generation;
 static void gui_mark_dirty(void) {
-    (void)__atomic_fetch_add(&dirty_generation,1u,__ATOMIC_RELAXED);
+    (void)chos_atomic_fetch_add_u64(&dirty_generation, 1u);
     dirty=1;
 }
 static int32_t mouse_x = 400;
@@ -4169,7 +4170,7 @@ static void gui_draw_app_window(int id, const chos_wm_window_t *window) {
 }
 
 static void gui_render(void) {
-    uint64_t frame_generation=__atomic_load_n(&dirty_generation,__ATOMIC_RELAXED);
+    uint64_t frame_generation=chos_atomic_load_u64(&dirty_generation);
     const chos_wm_window_t *window;
     uint32_t z_order = 0u;
     int cursor_move_failed = 0;
@@ -5145,7 +5146,7 @@ void chos_gui_pump(void) {
         cursor_move_pending = 0;
         if (!virtio_gpu_cursor_move(mouse_x, mouse_y, !splash_active)) gui_mark_dirty();
     }
-    if (dirty || __atomic_load_n(&dirty_generation,__ATOMIC_RELAXED)!=presented_generation) {
+    if (dirty || chos_atomic_load_u64(&dirty_generation)!=presented_generation) {
         gui_render();
         /* If another state change arrives during a drag, redraw the base scene
          * once and then restore the lightweight preview over it. */

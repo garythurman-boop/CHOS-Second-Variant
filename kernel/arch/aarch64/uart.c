@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/atomic.h"
 #include "chos/uart.h"
 #include "chos/platform.h"
 #include "chos/spinlock.h"
@@ -27,7 +28,7 @@ static void uart_putc_raw(char c) {
 
 void uart_console_emergency_reset(void) {
     /* CHOS is currently single-core; panic never returns to the faulting context. */
-    __atomic_store_n(&uart_console_lock.held, 0u, __ATOMIC_RELEASE);
+    chos_atomic_store_u32(&uart_console_lock.held, 0u);
 }
 
 void uart_attach_pl011(uintptr_t base) { uart0_base=base; }

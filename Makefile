@@ -483,7 +483,7 @@ $(BUILD)/test-boot-info: tests/test_boot_info.c kernel/platform/boot_info.c incl
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -Wall -Wextra -Werror -std=c11 -Iinclude tests/test_boot_info.c kernel/platform/boot_info.c -o $@
 
-test: $(BUILD)/chos.elf $(UEFI_KERNEL_ELF) $(BUILD)/test-usb-hid $(BUILD)/test-virtio-rng $(BUILD)/test-installer-plan $(BUILD)/test-boot-info $(BUILD)/test-acpi $(BUILD)/test-pci $(BUILD)/test-nvme-parse $(BUILD)/test-gpt $(BUILD)/test-pmm-uefi $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx $(BUILD)/test-browser-core $(BUILD)/test-gpu-damage $(BUILD)/test-net-packet $(BUILD)/test-virtio-net-abi $(BUILD)/test-net-services $(BUILD)/test-net-stack $(BUILD)/test-net-tcp $(BUILD)/test-platform-boot $(BUILD)/test-taskbar-text $(BUILD)/test-gui-protocol $(BUILD)/test-fdt $(BUILD)/test-pmm $(BUILD)/test-kheap $(BUILD)/test-vmm $(BUILD)/test-scheduler $(BUILD)/test-irqctx $(BUILD)/test-spinlock $(BUILD)/test-address-space $(BUILD)/test-process-format $(BUILD)/test-romfs $(BUILD)/test-user-abi $(BUILD)/test-chfs $(BUILD)/test-gfx $(BUILD)/test-gui $(BUILD)/test-window-manager $(BUILD)/test-display-modes $(BUILD)/userland/async_demo.o $(BUILD)/userland/cdemo.chcx $(BUILD)/test-net-tcp-api-compile.o $(BUILD)/test-browser-api-compile.o
+test: $(BUILD)/test-atomic $(BUILD)/chos.elf $(UEFI_KERNEL_ELF) $(BUILD)/test-usb-hid $(BUILD)/test-virtio-rng $(BUILD)/test-installer-plan $(BUILD)/test-boot-info $(BUILD)/test-acpi $(BUILD)/test-pci $(BUILD)/test-nvme-parse $(BUILD)/test-gpt $(BUILD)/test-pmm-uefi $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx $(BUILD)/test-browser-core $(BUILD)/test-gpu-damage $(BUILD)/test-net-packet $(BUILD)/test-virtio-net-abi $(BUILD)/test-net-services $(BUILD)/test-net-stack $(BUILD)/test-net-tcp $(BUILD)/test-platform-boot $(BUILD)/test-taskbar-text $(BUILD)/test-gui-protocol $(BUILD)/test-fdt $(BUILD)/test-pmm $(BUILD)/test-kheap $(BUILD)/test-vmm $(BUILD)/test-scheduler $(BUILD)/test-irqctx $(BUILD)/test-spinlock $(BUILD)/test-address-space $(BUILD)/test-process-format $(BUILD)/test-romfs $(BUILD)/test-user-abi $(BUILD)/test-chfs $(BUILD)/test-gfx $(BUILD)/test-gui $(BUILD)/test-window-manager $(BUILD)/test-display-modes $(BUILD)/userland/async_demo.o $(BUILD)/userland/cdemo.chcx $(BUILD)/test-net-tcp-api-compile.o $(BUILD)/test-browser-api-compile.o
 	./$(BUILD)/test-usb-hid
 	./$(BUILD)/test-virtio-rng
 	./$(BUILD)/test-installer-plan
@@ -512,6 +512,8 @@ test: $(BUILD)/chos.elf $(UEFI_KERNEL_ELF) $(BUILD)/test-usb-hid $(BUILD)/test-v
 	./$(BUILD)/test-irqctx
 	python3 tests/test_irq_sp_el0_contract.py
 	./$(BUILD)/test-spinlock
+	./$(BUILD)/test-atomic
+	python3 tests/test_atomic_contract.py
 	./$(BUILD)/test-address-space
 	./$(BUILD)/test-process-format
 	./$(BUILD)/test-romfs
@@ -597,7 +599,7 @@ $(SAN_DIR)/test-pmm-uefi: tests/test_pmm_uefi.c kernel/mm/pmm.c kernel/platform/
 	@mkdir -p $(dir $@)
 	$(CC_HOST) $(SAN_FLAGS) -pthread -DCHOS_HOST_TEST tests/test_pmm_uefi.c kernel/mm/pmm.c kernel/platform/boot_info.c kernel/core/spinlock.c -o $@
 
-test-sanitize: $(SAN_DIR)/test-usb-hid $(SAN_DIR)/test-virtio-rng $(SAN_DIR)/test-installer-plan $(SAN_DIR)/test-boot-info $(SAN_DIR)/test-acpi $(SAN_DIR)/test-pci $(SAN_DIR)/test-gpt $(SAN_DIR)/test-pmm-uefi $(SAN_DIR)/test-gpu-damage $(SAN_DIR)/test-net-packet $(SAN_DIR)/test-virtio-net-abi $(SAN_DIR)/test-net-services $(SAN_DIR)/test-net-stack $(SAN_DIR)/test-net-tcp $(SAN_DIR)/test-platform-boot $(SAN_DIR)/test-taskbar-text $(SAN_DIR)/test-gui-protocol $(SAN_DIR)/test-fdt $(SAN_DIR)/test-pmm $(SAN_DIR)/test-kheap $(SAN_DIR)/test-vmm $(SAN_DIR)/test-scheduler $(SAN_DIR)/test-irqctx $(SAN_DIR)/test-spinlock $(SAN_DIR)/test-address-space $(SAN_DIR)/test-process-format $(SAN_DIR)/test-romfs $(SAN_DIR)/test-user-abi $(SAN_DIR)/test-chfs $(SAN_DIR)/test-gfx $(SAN_DIR)/test-gui $(SAN_DIR)/test-window-manager $(SAN_DIR)/test-display-modes $(SAN_DIR)/test-browser-core
+test-sanitize: $(SAN_DIR)/test-atomic $(SAN_DIR)/test-usb-hid $(SAN_DIR)/test-virtio-rng $(SAN_DIR)/test-installer-plan $(SAN_DIR)/test-boot-info $(SAN_DIR)/test-acpi $(SAN_DIR)/test-pci $(SAN_DIR)/test-gpt $(SAN_DIR)/test-pmm-uefi $(SAN_DIR)/test-gpu-damage $(SAN_DIR)/test-net-packet $(SAN_DIR)/test-virtio-net-abi $(SAN_DIR)/test-net-services $(SAN_DIR)/test-net-stack $(SAN_DIR)/test-net-tcp $(SAN_DIR)/test-platform-boot $(SAN_DIR)/test-taskbar-text $(SAN_DIR)/test-gui-protocol $(SAN_DIR)/test-fdt $(SAN_DIR)/test-pmm $(SAN_DIR)/test-kheap $(SAN_DIR)/test-vmm $(SAN_DIR)/test-scheduler $(SAN_DIR)/test-irqctx $(SAN_DIR)/test-spinlock $(SAN_DIR)/test-address-space $(SAN_DIR)/test-process-format $(SAN_DIR)/test-romfs $(SAN_DIR)/test-user-abi $(SAN_DIR)/test-chfs $(SAN_DIR)/test-gfx $(SAN_DIR)/test-gui $(SAN_DIR)/test-window-manager $(SAN_DIR)/test-display-modes $(SAN_DIR)/test-browser-core
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-usb-hid
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-virtio-rng
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-installer-plan
@@ -622,6 +624,7 @@ test-sanitize: $(SAN_DIR)/test-usb-hid $(SAN_DIR)/test-virtio-rng $(SAN_DIR)/tes
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-scheduler
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-irqctx
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-spinlock
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-atomic
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-address-space
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-process-format
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-romfs
@@ -1113,3 +1116,15 @@ $(BUILD)/test-driver-report $(SAN_DIR)/test-driver-report: include/chos/drivers.
 test-publish-artifacts:
 	python3 tests/test_publish_artifacts.py
 test: test-publish-artifacts
+
+$(BUILD)/test-atomic: tests/test_atomic.c include/chos/atomic.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< -o $@
+
+$(SAN_DIR)/test-atomic: tests/test_atomic.c include/chos/atomic.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Iinclude $< -o $@
+
+# Host targets do not generate compiler dependency files.
+$(BUILD)/test-spinlock $(BUILD)/test-pmm $(BUILD)/test-kheap $(BUILD)/test-pmm-uefi $(BUILD)/test-fdt $(BUILD)/test-gui: include/chos/atomic.h
+$(SAN_DIR)/test-spinlock $(SAN_DIR)/test-pmm $(SAN_DIR)/test-kheap $(SAN_DIR)/test-pmm-uefi $(SAN_DIR)/test-fdt $(SAN_DIR)/test-gui: include/chos/atomic.h

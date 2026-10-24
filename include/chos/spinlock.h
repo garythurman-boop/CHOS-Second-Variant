@@ -9,9 +9,9 @@
  * Lock acquisition masks local IRQs before taking the atomic lock, preventing
  * a timer-preempted task from being interrupted and then re-entering the same
  * lock on this CPU. Callers MUST NOT yield or sleep while holding a lock.
- * This is safe for the current single-core kernel and is SMP-capable at the
- * atomic-lock level, but it is not a substitute for per-CPU IRQ handling or a
- * complete SMP scheduler design.
+ * With MMU off, uses single-CPU IRQ exclusion without exclusive accesses to
+ * Device-typed RAM. Secondary CPUs MUST remain parked. With MMU on and Normal
+ * kernel RAM, uses atomic locks; a complete SMP scheduler is still absent.
  *
  * CHOS lock order: kheap -> PMM. PMM never calls kheap. UART/console locks
  * are isolated and must not be nested with allocator locks. Never yield, sleep,

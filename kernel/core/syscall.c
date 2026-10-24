@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/atomic.h"
 #include "chos/address_space.h"
 #include "chos/exception.h"
 #include "chos/irq_context.h"
@@ -54,11 +55,11 @@ static uint64_t read_far_el1(void) {
 }
 
 uint64_t user_mode_write_syscalls(void) {
-    return __atomic_load_n(&syscall_write_count, __ATOMIC_RELAXED);
+    return chos_atomic_load_u64(&syscall_write_count);
 }
 
 uint64_t user_mode_rejected_writes(void) {
-    return __atomic_load_n(&syscall_rejected_write_count, __ATOMIC_RELAXED);
+    return chos_atomic_load_u64(&syscall_rejected_write_count);
 }
 
 static void syscall_write(chos_irq_context_t *frame) {
@@ -76,7 +77,7 @@ static void syscall_write(chos_irq_context_t *frame) {
     length = (size_t)length64;
     if (!user_mode_get_address_space(&space) ||
         !address_space_copy_from_user(space, buffer, user_pointer, length)) {
-        (void)__atomic_fetch_add(&syscall_rejected_write_count, 1u, __ATOMIC_RELAXED);
+        (void)chos_atomic_fetch_add_u64(&syscall_rejected_write_count, 1u);
         frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT);
         return;
     }
@@ -88,7 +89,7 @@ static void syscall_write(chos_irq_context_t *frame) {
         for (i = 0u; i < length; ++i) uart_putc_locked((char)buffer[i]);
         uart_write_end(flags);
     }
-    (void)__atomic_fetch_add(&syscall_write_count, 1u, __ATOMIC_RELAXED);
+    (void)chos_atomic_fetch_add_u64(&syscall_write_count, 1u);
     frame->x[0] = (uint64_t)length;
 }
 
