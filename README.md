@@ -2,6 +2,8 @@
 
 Current [Fusion follow-up](docs/STAGE1_FUSION_FOLLOWUP.md) tracks the reported boot/input failure and subsequent fixes.
 
+Current [Fusion fixes](docs/FUSION_DRIVER_FIXES.md) and the [modular driver acceptance guide](docs/DRIVER_ACCEPTANCE.md) cover clock/input corrections and automatic diagnostics.
+
 Stage 1 development changes and current runtime evidence are described in
 [current Stage 1 report](docs/STAGE1_FINAL_REPORT.md), [driver status](docs/DRIVER_STATUS.md)
 and the [hardware support matrix](docs/HARDWARE_SUPPORT.md). See the

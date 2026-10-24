@@ -297,6 +297,11 @@ static int32_t drag_preview_x, drag_preview_y;
 static uint64_t clock_last_minute;
 static uint64_t clock_last_poll_tick;
 static int clock_poll_started;
+static chos_driver_report_fn driver_report_provider;
+static int (*driver_recovery_needed)(void);
+static int driver_report_mode,driver_report_prompted,driver_report_lost;
+static unsigned driver_report_page,driver_report_pages=1;
+static uint64_t driver_report_lost_since,driver_report_last_page,driver_report_last_update;
 static int clock_initialized;
 static unsigned timezone_index = 5u;
 static int32_t cursor_under_x, cursor_under_y;
@@ -400,6 +405,38 @@ static void gui_clock_poll(void) {
 
 static void open_view(int new_view);
 static int gui_open_window(int id);
+void chos_gui_set_driver_report(chos_driver_report_fn report,int (*needs_recovery)(void)) {
+    driver_report_provider=report;driver_recovery_needed=needs_recovery;
+    driver_report_mode=driver_report_prompted=0;driver_report_page=0;driver_report_pages=1;
+    driver_report_lost=needs_recovery?needs_recovery():0;
+    driver_report_lost_since=timer_counter();driver_report_last_update=driver_report_last_page=driver_report_lost_since;
+}
+void chos_gui_show_driver_report(void) {
+    if(!driver_report_provider)return;
+    driver_report_mode=1;driver_report_page=0;driver_report_last_page=timer_counter();
+    (void)gui_open_window(VIEW_DIAGNOSTICS);gui_mark_dirty();
+}
+static void gui_driver_report_tick(void) {
+    if(!driver_report_provider || splash_active)return;
+    uint64_t now=timer_counter(),frequency=timer_frequency_hz();
+    int missing=driver_recovery_needed && driver_recovery_needed();
+    if(!missing){driver_report_lost=0;driver_report_prompted=0;}
+    else {
+        if(!driver_report_lost){driver_report_lost=1;driver_report_lost_since=now;}
+        if(!driver_report_prompted && (!frequency || now-driver_report_lost_since>=5*frequency)) {
+            driver_report_prompted=1;chos_gui_show_driver_report();
+        }
+    }
+    if(driver_report_mode && view==VIEW_DIAGNOSTICS) {
+        if(frequency && now-driver_report_last_page>=3*frequency) {
+            driver_report_page=(driver_report_page+1)%driver_report_pages;driver_report_last_page=now;
+        }
+        if(!frequency || now-driver_report_last_update>=frequency) {
+            driver_report_last_update=now;gui_mark_dirty();
+        }
+    }
+}
+
 static void terminal_initialize(void);
 static void terminal_newline(void);
 static void terminal_puts(const char *value);
@@ -2191,7 +2228,9 @@ static void terminal_execute(char *input) {
     argument = split;
     while (*argument == ' ' || *argument == '\t') ++argument;
     if (gui_strings_equal(command, "help")) {
-        terminal_puts("Commands:\n  help       Show this help\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+        terminal_puts("Commands:\n  help       Show this help\n  drivers    Driver admission report\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+    } else if(gui_strings_equal(command,"drivers")) {
+        chos_gui_show_driver_report();
     } else if(gui_strings_equal(command,"clock")) {
         terminal_puts("Clock source: ");terminal_puts(chos_clock_source());
         terminal_puts("\nUnix seconds: ");terminal_put_uint(platform_rtc_unix_seconds());terminal_putc('\n');
@@ -2816,6 +2855,15 @@ static void draw_about_content(void) {
 }
 
 static void draw_diagnostics_content(void) {
+    if(driver_report_mode && driver_report_provider) {
+        draw_window_shell("Diagnostics - CHOS",180,70,595,465);
+        char lines[CHOS_DRIVER_REPORT_ROWS][CHOS_DRIVER_REPORT_COLS+1];
+        unsigned pages=driver_report_provider(driver_report_page,lines);driver_report_pages=pages?pages:1;
+        text_bold(204,111,"Hardware drivers and input recovery",C_BLUE_DARK);
+        for(unsigned i=0;i<CHOS_DRIVER_REPORT_ROWS;++i)mono_text(204,142+(int)i*17,lines[i],i==0?C_BLUE_DARK:C_TEXT);
+        draw_status_line("Driver diagnostics","Pages rotate automatically");return;
+    }
+
     draw_window_shell("CHOS Diagnostics", 180, 70, 595, 465);
     text(201, 110, "SERVICE STATUS", C_BLUE_DARK);
     draw_hline(200, 129, 551, C_PANEL_DARK);
@@ -4477,6 +4525,7 @@ int chos_gui_init(const chos_surface_t *surface) {
     app_pointer_capture_window_id = CHOS_WM_NO_WINDOW;
     cursor_under_valid = 0;
     cursor_move_pending = 0;
+    chos_gui_set_driver_report(NULL,NULL);
     clock_last_minute = 0u; clock_last_poll_tick = 0u; clock_initialized = 0; clock_poll_started=0;
     selected_icon = 0;
     selected_desktop_icon = -1;
@@ -4548,6 +4597,7 @@ int chos_gui_init(const chos_surface_t *surface) {
 void chos_gui_show(void) {
     if (!gui_active) return;
     gui_clock_poll();
+    gui_driver_report_tick();
     gui_taskbar_tooltip_tick();
     if (splash_active) {
         gui_mark_dirty();
@@ -5012,6 +5062,7 @@ void chos_gui_pump(void) {
     chos_audio_pump();
     if (!gui_active) return;
     gui_clock_poll();
+    gui_driver_report_tick();
     gui_taskbar_tooltip_tick();
     if (splash_active) {
         if (splash_startup_complete && splash_minimum_elapsed()) {

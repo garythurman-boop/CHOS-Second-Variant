@@ -25,8 +25,16 @@ void chos_xhci_mock_write(uintptr_t a,uint32_t v) {
         unsigned slot=type==9?1:commands.trbs[i].control>>24;
         if(simulate_transfers && (type==11 || type==12 || type==13)) {
             usb_device_t *d=&devices[0];uint32_t *input=(void *)(uintptr_t)commands.trbs[i].parameter;
-            if(type==13 && (input[1]&2) && (ctx(d,1)[1]>>16)==64)packet_updated=1;
+            if(type==13 && (input[1]&2)) {
+                assert((ctx(d,1)[0]&7u)==0); /* Input EP context has no endpoint state. */
+                if((ctx(d,1)[1]>>16)==64)packet_updated=1;
+            }
+            if(type==12)assert(ctx(d,0)[3]==0); /* Output slot state/address is reserved in input. */
             for(unsigned c=0;c<32;++c)if(input[1]&(1u<<c))memcpy(d->output+c*context_bytes,ctx(d,c),context_bytes);
+            if(type==11 || type==13) {
+                ((uint32_t *)(void *)d->output)[3]=0x10000001;
+                ((uint32_t *)(void *)(d->output+context_bytes))[0]|=1;
+            }
         }
         events[mock_event_tail++]=(chos_xhci_trb_t){(uintptr_t)&commands.trbs[i],(bad_completion?5u:1u)<<24,TRB(33)|(slot<<24)|1};
     }
@@ -90,8 +98,10 @@ static void composite_transfer_tests(void) {
     fixture();assert(chos_xhci_init(&boot,&acpi,&pci));simulate_transfers=1;
     assert(attach_device(1,1,0,0) && online==1 && prefix_read && packet_updated);
     usb_device_t *d=&devices[0];assert(d->endpoint_count==1 && d->endpoints[0].iface.interface==1);
-    endpoint_t *e=&d->endpoints[0];e->buffer[0]=2;e->buffer[2]=4;
-    events[mock_event_tail++]=(chos_xhci_trb_t){e->pending,1u<<24,TRB(32)|(1u<<24)|((unsigned)e->dci<<16)|1};
+    endpoint_t *e=&d->endpoints[0];
+    for(unsigned i=0;i<INPUT_RECEIVES;++i){assert(e->pending[i]);for(unsigned j=0;j<i;++j)assert(e->pending[i]!=e->pending[j]);}
+    e->buffer[0][0]=2;e->buffer[0][2]=4;
+    events[mock_event_tail++]=(chos_xhci_trb_t){e->pending[0],1u<<24,TRB(32)|(1u<<24)|((unsigned)e->dci<<16)|1};
     /* The synthetic root is connected so polling does not remove its slot. */
     regs[(0x20+0x400)/4]=PORT_CCS|PORT_PED|(1u<<10);chos_xhci_poll();assert(delivered_keys==2);
     for(data_fault=1;data_fault<=3;++data_fault) {
@@ -149,7 +159,7 @@ int main(void) {
     fixture();assert(chos_xhci_init(&boot,&acpi,&pci));
     /* An interrupt endpoint stall releases input and disables only its slot. */
     usb_device_t *d=&devices[0]; d->slot=1;d->port=1;d->active=1;d->endpoint_count=1;online=1;
-    d->endpoints[0].dci=3;d->endpoints[0].pending=0x1230;
+    d->endpoints[0].dci=3;d->endpoints[0].pending[0]=0x1230;
     events[mock_event_tail++]=(chos_xhci_trb_t){0x1230,6u<<24,TRB(32)|(1u<<24)|(3u<<16)|1};
     chos_xhci_poll();assert(!d->slot && !online && running);
     regs[0x24/4]=4;chos_xhci_poll();assert(!running && poisoned);

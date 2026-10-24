@@ -14,6 +14,7 @@ int chos_usb_parse_config(const uint8_t *data, size_t size,
 int chos_usb_parse_hub_config(const uint8_t *data,size_t size,chos_usb_hid_interface_t *out);
 typedef struct {
     uint8_t keys[256][32]; /* per-report-ID bitsets, so split reports cannot release each other */
+    uint8_t suppress_relative,absolute_seen;
     uint8_t buttons[8][32];
 } chos_usb_input_state_t;
 int chos_usb_decode_report(const chos_hid_report_layout_t *layout,

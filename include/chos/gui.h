@@ -5,11 +5,16 @@
 #include <stdint.h>
 #include "chos/gfx.h"
 #include "chos/gui_protocol.h"
+#include "chos/driver_report.h"
 
 int chos_gui_init(const chos_surface_t *surface);
 void chos_gui_show(void);
 /* Signal that device/input initialization finished; splash waits for this and its time floor. */
 void chos_gui_startup_complete(void);
+/* Native hardware reports stay available without input. Recovery is offered
+ * after five seconds without the required input functions, never on a keypress. */
+void chos_gui_set_driver_report(chos_driver_report_fn report,int (*needs_recovery)(void));
+void chos_gui_show_driver_report(void);
 /* Report read-only platform PCI inventory to the Welcome screen. Used by the
  * UEFI path so input bring-up can be debugged even without working input. */
 void chos_gui_set_pci_input_status(uint32_t pci_devices, uint32_t xhci_count,

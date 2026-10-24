@@ -1,5 +1,11 @@
 # Stage 1 final local validation and external gates
 
+For subsequent user-reported Fusion desktop/input/clock results and their source
+corrections, see [current Fusion fixes](FUSION_DRIVER_FIXES.md) and the
+[driver acceptance guide](DRIVER_ACCEPTANCE.md). The local evidence below preserves
+the earlier Stage 1 checkpoint and is not a claim that the later Fusion regression
+passed on real hardware.
+
 The implemented QEMU profiles pass local acceptance. Cross-platform Stage 1 remains
 open until the corrected build is tested on Fusion and the other declared targets.
 The user's previous Fusion screenshot proves a failing EFI/GOP/xHCI path, not a

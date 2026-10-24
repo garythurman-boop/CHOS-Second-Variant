@@ -485,6 +485,13 @@ static void test_el0_gui_service(void) {
     (void)window_id;
 }
 
+static unsigned report_pages_seen;
+static int report_missing=1;
+static int mock_needs_recovery(void){return report_missing;}
+static unsigned mock_driver_report(unsigned page,char lines[CHOS_DRIVER_REPORT_ROWS][CHOS_DRIVER_REPORT_COLS+1]) {
+    memset(lines,0,CHOS_DRIVER_REPORT_ROWS*(CHOS_DRIVER_REPORT_COLS+1));
+    strcpy(lines[0],"Automatic hardware report");report_pages_seen|=1u<<page;return 3;
+}
 int main(void) {
     chos_surface_t surface = { pixels, 800u, 600u, 800u };
     size_t i;
@@ -813,6 +820,18 @@ int main(void) {
     assert(!chos_gui_console_output_enabled());
     allow_user_console_spawn = 0;
 
+    /* Input recovery must need no input or timer IRQ; pages rotate on the
+       architectural counter and must not repeatedly steal Console focus. */
+    mock_ticks=0;mock_timer_ready=0;report_pages_seen=0;report_missing=1;
+    assert(chos_gui_init(&surface));
+    chos_gui_set_driver_report(mock_driver_report,mock_needs_recovery);
+    chos_gui_startup_complete();mock_ticks=300;chos_gui_pump();
+    mock_ticks=600;chos_gui_pump();
+    assert(strcmp(chos_gui_view_name(),"Diagnostics")==0 && (report_pages_seen&1));
+    mock_ticks=950;chos_gui_pump();assert(report_pages_seen&2);
+    chos_gui_input_key(46,1);chos_gui_pump();assert(strcmp(chos_gui_view_name(),"Console")==0);
+    mock_ticks=1300;chos_gui_pump();assert(strcmp(chos_gui_view_name(),"Console")==0);
+    chos_gui_set_driver_report(NULL,NULL);mock_timer_ready=1;
     puts("gui: desktop composition, taskbar hover-tooltip delay/fade, vertical start-menu gradient/branding, keyboard navigation, windowing, splash timing, persistent display modes, first-start audio readiness, bounded retries, power-dialog cancellation, and EL0 Console output ownership passed");
     return 0;
 }

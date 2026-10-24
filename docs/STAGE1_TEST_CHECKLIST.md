@@ -53,13 +53,25 @@ and the documented deliberately unrouted timer build. Normal performance runs om
 state for synchronization, verifies exact window geometry, and captures screenshots;
 it does not inject normalized events into CHOS APIs.
 
+## Driver and clock regressions
+
+See [Fusion fixes](FUSION_DRIVER_FIXES.md) and [driver extension guide](DRIVER_ACCEPTANCE.md).
+Add `--clock-test --rtc-base 2026-10-24T12:34:40` for actual clock advancement and
+visible taskbar minute rollover. Native input tests include 32 fast keypress/release
+pairs. `--xhci-model nec-usb-xhci --usb-pci-bus 10` tests a second controller model
+behind ten PCI bridges; it is QEMU evidence. `--no-usb --pci-virtio` and
+`--empty-usb --pci-virtio` verify automatic input-free diagnostic pages and rotation.
+The documented timer-fault kernel verifies clock/input in the counter fallback;
+its full-CPU polling is expected when no wakeup interrupt is available.
+
 ## Fusion retest
 
 Use one CPU and 2 GiB RAM initially, matching the reported M1 VM. Boot the current
 ISO, wait for the splash to finish, and record the build revision. Open Console with
-`C`. Run `pci` and `bootlog`; retain the controller IDs, USB root/route/VID/PID lines,
+`C`. Run `clock`, `drivers`, `pci` and `bootlog`; retain the controller IDs, USB root/route/VID/PID lines,
 errors and timer-verification message. Missing-device failure must leave the desktop
-usable. With no supported input, capture the visible log and VM configuration.
+usable. With no supported input, wait five seconds for automatic driver reports; capture
+those pages and the VM configuration.
 
 Check typing, Shift/Ctrl/Alt and release, rollover, pointer movement, all buttons,
 wheel, title-bar drag, maximize/restore, desktop icons, menus and dialog cancellation.

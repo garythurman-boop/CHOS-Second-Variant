@@ -61,3 +61,76 @@ Aggregate host tests and sanitizers pass (`iteration1-host.log`,
 `iteration1-sanitize.log`), as does direct serial smoke (`iteration1-smoke.log`).
 `clock-composite-live` verifies UEFI time advancement and visible taskbar minute
 rollover, plus the full nested USB, PCI storage/network/RNG and persistence profile.
+
+## Common registry and diagnostics
+
+The [driver acceptance guide](DRIVER_ACCEPTANCE.md) documents the reusable PCI/FDT
+matching, phased resource/capability admission, priority/clean refusal, failed-owner
+quarantine and runtime polling interfaces. Boot now uses this registry for real
+PCI VirtIO and xHCI selection. A driver module/registration can add another PCI
+backend without changes to the kernel boot loop or GUI. Existing QEMU MMIO remains.
+
+The normal ISO automatically opens rotating driver reports if native keyboard or
+pointer admission remains missing. It needs no input or storage, displays actual
+PCI IDs/refusal reasons and current xHCI enumeration/control progress, and avoids
+logging live input contents. `automatic-no-usb` demonstrates automatic opening and
+page rotation with no USB controller, and low CPU use.
+
+A new strict controller mock sets output endpoint/slot state like real hardware.
+It fails before the reserved-field correction (`reserved-context-before.log`).
+EP0 Evaluate Context now clears output-only Endpoint State; Configure Endpoint
+always clears the output-only slot address/state word, not only on hubs. The
+corrected host/sanitizer tests pass (`reserved-context-after.log`). This fixes a
+specification violation; it is not claimed as a new Fusion measurement.
+
+Eight interrupt-IN receives per endpoint and a bounded 1024-entry event ring now
+cover bursts without leaving the endpoint unarmed until the next GUI poll. USB
+held-state ownership is shared across interfaces, and recent absolute motion from
+a physical device suppresses its duplicate relative stream. `queued-burst-live`
+passes 32 rapid USB keypress/release pairs plus clock rollover, nested hubs,
+reconnects and storage/network/entropy persistence. `direct-clock-live` separately
+passes the preserved direct MMIO profile and visible FDT RTC minute rollover.
+
+The recorded Fusion fixture reproduces the supplied CAP/HCS/HCC/offset fields;
+other controller behavior is a host mock. No QEMU scenario or host fixture is
+relabeled as a Fusion boot. The user has an early `81e3550` candidate while final
+registry/diagnostic validation continues.
+
+## Final local acceptance
+
+Final source passes a clean Clang/LLD direct build, UEFI ISO and prepared-image
+build, aggregate host regressions/sanitizers and direct serial smoke:
+`final-clean-build.log`, `final-host.log`, `final-sanitize.log`, `final-smoke.log`.
+
+| Live case | Result | Evidence |
+|---|---|---|
+| Final native USB + PCI VirtIO + clock, 120 mixed input/storage cycles | PASS; 191.908 s stress; 1.00% idle host CPU after stress; fresh-guest persistence | `final-native-stress/result.json` |
+| Prepared-image PCI boot/CHFS persistence and USB input | PASS | `final-prepared/result.json` |
+| Empty controller with no input | PASS; automatic report opening/rotation; 2.45% observed host CPU | `final-no-input/result.json` |
+| Absent USB controller | PASS; automatic report opening/rotation | `automatic-no-usb/result.json` |
+| Different NEC xHCI model behind ten bridges, actually enumerated on bus 0a | PASS; fast keys, pointer/window operations, hub reconnects and PCI persistence; 0.50% idle host CPU | `nec-bus10/result.json` |
+| Deliberately unrouted timer, wall-clock minute rollover and USB input | PASS through counter/polling fallback; 99.49% host CPU is the documented degraded mode | `timer-fault-clock/result.json` |
+| Preserved direct MMIO + RTC | PASS; visible minute rollover, EL0 entropy and disk/network/input regression | `direct-clock-live/result.json` |
+
+These are shared-cloud QEMU measurements including test delays and observation
+overhead, not Fusion latency/CPU measurements. The NEC/bus-0a case is a QEMU
+compatibility regression, not a VMware test. Failed intermediate host fixtures are
+retained with their corrections; no failed run is counted as passing.
+
+## Fusion validation still required
+
+Use the final revision-labelled ISO in the same Fusion VM: one CPU, 2 GiB RAM.
+Verify the displayed clock advances, type combined Shift+letters, test pointer
+alignment/buttons/wheel, move/maximize/restore windows, then disconnect/reconnect.
+Console `clock` identifies the wall-clock source; `drivers` opens admission reports.
+If keyboard/pointer admission is missing, wait five seconds after startup: the same
+ISO opens reports automatically and rotates them without input. Capture the xHCI
+CAP/HCS/HCC, control requested/received/completion, enumeration stage/failure,
+selected driver, reason and PCI IDs. No serial setup or second ISO is needed.
+
+Fusion compatibility remains the required target gate; only an actual target test
+can confirm it. The source fixes are based on reproduced defects and the user's
+separate tested reference, rather than an assumption that QEMU success closes it.
+NVMe remains disabled in the standard ISO, and no native NIC is claimed without
+current-project adapter inventory. The experimental NVMe path remains an explicit
+opt-in legacy attachment outside the current PCI registry adapters.

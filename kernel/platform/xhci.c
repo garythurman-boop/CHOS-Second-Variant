@@ -17,14 +17,16 @@
 #define PORT_CHANGE (0x7fu<<17)
 #define PORT_PRESERVE ((1u<<9)|(3u<<14)|(7u<<25))
 #define SLOT_BYTES 2048u
+#define INPUT_RECEIVES 8u
+#define EVENT_TRBS 1024u
 
 typedef struct {
     chos_xhci_ring_t ring;
-    uint8_t buffer[CHOS_USB_REPORT_BYTES] __attribute__((aligned(1024)));
+    uint8_t buffer[INPUT_RECEIVES][CHOS_USB_REPORT_BYTES] __attribute__((aligned(1024)));
     chos_hid_report_layout_t layout;
     chos_usb_input_state_t input;
     chos_usb_hid_interface_t iface;
-    uint64_t pending;
+    uint64_t pending[INPUT_RECEIVES];
     unsigned malformed;
     uint8_t dci;
 } endpoint_t;
@@ -38,13 +40,15 @@ typedef struct {
     uint8_t parent, parent_port, depth, hub, hub_ports, tt_think;
     uint16_t vendor,product,received;
     uint32_t route;
+    uint64_t last_absolute;
+    unsigned absolute_valid;
     uint64_t hub_changes, hub_ready, port_ready[32], port_deadline[32];
     uint8_t port_phase[32], hub_status_pending;
     int active;
 } usb_device_t;
 static usb_device_t devices[MAX_SLOTS] __attribute__((aligned(4096)));
 static chos_xhci_ring_t commands __attribute__((aligned(4096)));
-static chos_xhci_trb_t events[256] __attribute__((aligned(4096)));
+static chos_xhci_trb_t events[EVENT_TRBS] __attribute__((aligned(16384)));
 static uint64_t dcbaa[256] __attribute__((aligned(4096)));
 static uint64_t erst[2] __attribute__((aligned(64)));
 static uint64_t scratch_array[16] __attribute__((aligned(4096)));
@@ -75,6 +79,8 @@ static void log_device(usb_device_t *d,const char *status) {
     logger(" PID=");log_number(d->product);logger(" ");logger(status);logger("\n");
 }
 static const char *error="xHCI not probed";
+static chos_xhci_diagnostic_t diagnostic;
+const chos_xhci_diagnostic_t *chos_xhci_diagnostics(void){return &diagnostic;}
 static const chos_boot_info_t *saved_boot;
 static const chos_acpi_info_t *saved_acpi;
 static chos_pci_device_t saved_pci;
@@ -113,7 +119,7 @@ static int wait_reg(uintptr_t a,uint32_t mask,uint32_t value,unsigned ms) {
 }
 static void publish(void) { XHCI_BARRIER(); }
 static void fail(const char *reason) {
-    error=reason; poisoned=1;
+    error=reason; diagnostic.failed_stage=diagnostic.stage;diagnostic.last_failure=reason;poisoned=1;
     chos_xhci_stop();
 }
 static uint32_t *ctx(usb_device_t *d,unsigned index) {
@@ -122,24 +128,25 @@ static uint32_t *ctx(usb_device_t *d,unsigned index) {
 static void context_pointer(uint32_t *c,unsigned off,uint64_t p) { c[off]=(uint32_t)p; c[off+1]=(uint32_t)(p>>32); }
 static void ring_doorbell(unsigned slot,unsigned target) { publish(); wr(doorbells+4u*slot,target); }
 static uint64_t push(chos_xhci_ring_t *r,uint64_t p,uint32_t s,uint32_t c) { return chos_xhci_ring_push(r,p,s,c); }
-static void post_input(usb_device_t *d,endpoint_t *e) {
-    zero(e->buffer,sizeof(e->buffer));
-    e->pending=push(&e->ring,(uintptr_t)e->buffer,e->iface.packet_bytes,TRB(1)|(1u<<5)|(1u<<2)); /* IOC/ISP */
-    if(!e->pending){fail("xHCI invalid input ring state");return;}
+static void post_input(usb_device_t *d,endpoint_t *e,unsigned receive) {
+    zero(e->buffer[receive],sizeof(e->buffer[receive]));
+    e->pending[receive]=push(&e->ring,(uintptr_t)e->buffer[receive],e->iface.packet_bytes,TRB(1)|(1u<<5)|(1u<<2)); /* IOC/ISP */
+    if(!e->pending[receive]){fail("xHCI invalid input ring state");return;}
     ring_doorbell(d->slot,e->dci);
 }
 static void drain(void) {
-    for (unsigned budget=0;budget<256;++budget) {
+    for (unsigned budget=0;budget<EVENT_TRBS;++budget) {
         chos_xhci_trb_t v=events[event_head];
         unsigned type=(v.control>>10)&63, code=v.status>>24;
         publish();
         if ((v.control&1)!=event_cycle) break;
         event_head++;
-        if(event_head==256) { event_head=0; event_cycle^=1; }
+        if(event_head==EVENT_TRBS) { event_head=0; event_cycle^=1; }
         wr64(runtime+0x38,(uintptr_t)&events[event_head]|8u); /* ERDP + EHB */
         if(type==32 && control_data_trb && v.control>>24==control_slot &&
            ((v.control>>16)&31)==1 && (v.parameter&~UINT64_C(15))==control_data_trb) {
             uint32_t residual=v.status&0xffffff;
+            diagnostic.completion=(uint16_t)code;
             control_data_done=1;
             if((code!=SUCCESS && code!=SHORT_PACKET) || residual>control_requested) {
                 control_short=1;completed=awaited;completion_status=v.status;
@@ -154,8 +161,11 @@ static void drain(void) {
                 if(!d->active || d->slot!=slot) continue;
                 for(unsigned j=0;j<d->endpoint_count;++j) {
                     endpoint_t *e=&d->endpoints[j];
-                    if(e->dci!=dci || !e->pending || e->pending!=(v.parameter&~UINT64_C(15))) continue;
-                    e->pending=0;
+                    if(e->dci!=dci)continue;
+                    unsigned receive=0;
+                    while(receive<INPUT_RECEIVES && e->pending[receive]!=(v.parameter&~UINT64_C(15)))++receive;
+                    if(receive==INPUT_RECEIVES)continue;
+                    e->pending[receive]=0;
                     uint32_t residual=v.status&0xffffff;
                     if ((code==SUCCESS || code==SHORT_PACKET) && residual<=e->iface.packet_bytes) {
                         if(d->hub) {
@@ -163,14 +173,19 @@ static void drain(void) {
                             if(bytes<(unsigned)(d->hub_ports+1+7)/8) ++e->malformed;
                             else {
                                 uint64_t bitmap=0;
-                                for(unsigned k=0;k<bytes && k<8;++k)bitmap|=(uint64_t)e->buffer[k]<<(8*k);
+                                for(unsigned k=0;k<bytes && k<8;++k)bitmap|=(uint64_t)e->buffer[receive][k]<<(8*k);
                                 d->hub_changes|=bitmap>>1;
                                 if(bitmap&1)d->hub_status_pending=1;
                                 e->malformed=0;
                             }
-                        } else if (chos_usb_decode_report(&e->layout,&e->input,e->buffer,e->iface.packet_bytes-residual)) e->malformed=0;
-                        else ++e->malformed;
-                        if(e->malformed<8) post_input(d,e);
+                        } else {
+                            e->input.suppress_relative=d->absolute_valid && counter()-d->last_absolute<frequency()/4u;
+                            if(chos_usb_decode_report(&e->layout,&e->input,e->buffer[receive],e->iface.packet_bytes-residual)) {
+                                e->malformed=0;
+                                if(e->input.absolute_seen){d->absolute_valid=1;d->last_absolute=counter();}
+                            } else ++e->malformed;
+                        }
+                        if(e->malformed<8) post_input(d,e,receive);
                         else { chos_usb_release_input(&e->input); d->active=-1; error="USB repeated malformed reports; device quarantined"; }
                     } else {
                         chos_usb_release_input(&e->input); d->active=-1;
@@ -216,6 +231,7 @@ static int control(usb_device_t *d,uint8_t request_type,uint8_t request,uint16_t
     uint64_t status_trb;
     if(length>sizeof(d->data)) return 0;
     zero(d->data,sizeof(d->data));
+    diagnostic.descriptor=value;diagnostic.requested=length;diagnostic.received=0;
     d->received=0;control_data_trb=0;control_short=0;control_data_done=!length;
     control_requested=length;control_received=0;control_slot=d->slot;
     if(!push(&d->control,setup,8,TRB(2)|(1u<<6)|((length?(in?3u:2u):0u)<<16))) {error="USB invalid control ring state";return 0;}
@@ -230,7 +246,7 @@ static int control(usb_device_t *d,uint8_t request_type,uint8_t request,uint16_t
         error="USB control data length/completion mismatch";return 0;
     }
     if((completion_status>>24)!=SUCCESS) { error="USB control transfer failed"; return 0; }
-    d->received=(uint16_t)control_received;
+    d->received=(uint16_t)control_received;diagnostic.received=d->received;
     (void)completion_parameter;
     return 1;
 }
@@ -261,12 +277,14 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
     if(speed<1 || speed>4 || (parent && (parent>MAX_SLOTS || devices[parent-1].depth>=5))) {
         error="USB unsupported speed or topology depth";return 0;
     }
+    diagnostic.stage=11;diagnostic.port=(uint16_t)port;
     zero(d,sizeof(*d));d->port=(uint8_t)port;d->speed=(uint8_t)speed;
     d->parent=(uint8_t)parent;d->parent_port=(uint8_t)downstream;
     if(parent) {
         usb_device_t *h=&devices[parent-1];d->depth=h->depth+1;
         d->route=h->route|((downstream>15?15u:downstream)<<(h->depth*4u));
     }
+    diagnostic.route=d->route;
     if(!command(9,0,0,&slot)) return 0;
     if(!slot || slot>slot_limit) { fail("xHCI invalid allocated slot"); return 0; }
     d->slot=(uint8_t)slot;
@@ -291,21 +309,26 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
     if(speed==4) packet=packet==9?512:0;
     if((speed==1 && packet!=8 && packet!=16 && packet!=32 && packet!=64) ||
        (speed==2 && packet!=8) || (speed==3 && packet!=64) || !packet || packet>512) { error="USB invalid EP0 packet size"; goto bad; }
+    diagnostic.stage=12;
     if(speed==1 && packet!=8) {
         zero(d->input,sizeof(d->input)); icc[1]=2;
         ep=ctx(d,1);
         for(unsigned k=0;k<context_bytes/4;++k)ep[k]=((uint32_t *)(void *)(d->output+context_bytes))[k];
+        ep[0]&=~7u; /* Endpoint State is output-only, reserved in an input context. */
         ep[1]=(ep[1]&0xffffu)|(packet<<16);
         if(!command(13,(uintptr_t)d->input,slot<<24,0)) goto bad;
     }
+    diagnostic.stage=13;
     if(!control(d,0x80,6,0x100,0,18))goto bad;
     if(d->data[0]!=18 || d->data[1]!=1 || !d->data[17]) {error="USB malformed device descriptor";goto bad;}
     d->vendor=(uint16_t)(d->data[8]|(uint16_t)d->data[9]<<8);
     d->product=(uint16_t)(d->data[10]|(uint16_t)d->data[11]<<8);
     d->hub=d->data[4]==9;
+    diagnostic.stage=14;
     if(!control(d,0x80,6,0x200,0,9)) goto bad;
     unsigned config_bytes=d->data[2]|((unsigned)d->data[3]<<8);
     if(config_bytes<9 || config_bytes>sizeof(d->data)) { error="USB configuration length out of bounds"; goto bad; }
+    diagnostic.stage=15;
     if(!control(d,0x80,6,0x200,0,(uint16_t)config_bytes)) goto bad;
     unsigned configuration=d->data[5];
     if(d->hub || !chos_usb_parse_config(d->data,config_bytes,interfaces,&count)) {
@@ -331,17 +354,18 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
      * no endpoint TD is active. Add the slot and interrupt-IN endpoints. */
     zero(d->input,sizeof(d->input)); icc[1]=1;
     for(unsigned i=0;i<context_bytes/4;++i) ctx(d,0)[i]=((uint32_t *)(void *)d->output)[i];
+    ctx(d,0)[3]=0; /* Output-only USB address/Slot State must never enter input contexts. */
     if(d->hub) {
         ctx(d,0)[0]|=1u<<26;
         ctx(d,0)[1]=(ctx(d,0)[1]&0xffffffu)|((uint32_t)d->hub_ports<<24);
         if(speed==3)ctx(d,0)[2]|=(uint32_t)d->tt_think<<16;
-        ctx(d,0)[3]=0; /* input Slot Context reserved/state bits */
     }
     unsigned highest=1,accepted=0;
     for(unsigned i=0;i<count;++i) {
         endpoint_t *e=&d->endpoints[accepted]; e->iface=interfaces[i];
         if(!d->hub) {
             if(e->iface.boot_protocol && !control(d,0x21,11,1,e->iface.interface,0))goto bad;
+            diagnostic.stage=18;
             if(!control(d,0x81,6,0x2200,e->iface.interface,e->iface.report_bytes))goto bad;
             if(chos_hid_parse_report_descriptor(d->data,e->iface.report_bytes,&e->layout)!=CHOS_HID_OK ||
                (!e->layout.has_keyboard && !e->layout.has_pointer && !e->layout.has_mouse)) {
@@ -370,6 +394,7 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
     if(!accepted){error="USB no accepted HID interface";goto bad;}
     count=accepted;
     sc=ctx(d,0); sc[0]=(sc[0]&~(31u<<27))|(highest<<27);
+    diagnostic.stage=19;
     if(!command(12,(uintptr_t)d->input,slot<<24,0)) goto bad;
     d->endpoint_count=(uint8_t)count;d->active=1;
     if(d->hub) {
@@ -377,9 +402,10 @@ static int attach_device(unsigned port,unsigned speed,unsigned parent,unsigned d
         d->hub_changes=d->hub_ports==32?UINT32_MAX:((UINT64_C(1)<<d->hub_ports)-1);
         log_device(d,"hub online");
     } else {++online;log_device(d,"HID online");}
-    for(unsigned i=0;i<count;++i)post_input(d,&d->endpoints[i]);
-    error="xHCI USB topology running";return 1;
+    for(unsigned i=0;i<count;++i)for(unsigned receive=0;receive<INPUT_RECEIVES;++receive)post_input(d,&d->endpoints[i],receive);
+    diagnostic.stage=20;error="xHCI USB topology running";return 1;
 bad:
+    diagnostic.failed_stage=diagnostic.stage;diagnostic.last_failure=error;
     log_device(d,error);(void)remove_device(d);return 0;
 }
 static int enumerate(unsigned port) {
@@ -473,6 +499,7 @@ void chos_xhci_stop(void) {
 }
 int chos_xhci_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,const chos_pci_device_t *pci) {
     uint64_t base,bar_bytes,sctlr;
+    diagnostic.stage=1;
     if(running) return 1;
     if(!acpi || acpi->dma_translation_unverified) { error="xHCI DMA/IOMMU topology unsupported";return 0; }
     if(poisoned) {error="xHCI quarantined until reboot";return 0;}
@@ -488,6 +515,8 @@ int chos_xhci_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,con
     saved_boot=boot; saved_acpi=acpi; saved_pci=*pci; mmio=(uintptr_t)base;
     uint32_t cap=rd(mmio),hcs=rd(mmio+4),hcs2=rd(mmio+8),hcc=rd(mmio+16);
     uint32_t db=rd(mmio+20)&~3u,rt=rd(mmio+24)&~31u;
+    diagnostic.cap=cap;diagnostic.hcs=hcs;diagnostic.hcc=hcc;
+    diagnostic.doorbell=db;diagnostic.runtime=rt;diagnostic.stage=2;
     op=0;
     uint16_t version=chos_xhci_version(pci->vendor_id,pci->device_id,(uint16_t)(cap>>16));
     if((cap&255)<0x20 || (cap&3u) || !version ||
@@ -497,7 +526,7 @@ int chos_xhci_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,con
     op=mmio+(cap&255);
     if(!(rd(op+8)&1u)){fail("xHCI 4 KiB DMA pages unsupported");return 0;}
     if (!(hcc&1u) && ((uintptr_t)(devices+MAX_SLOTS)>UINT32_MAX ||
-            (uintptr_t)(events+256)>UINT32_MAX || (uintptr_t)(scratch+16)>UINT32_MAX)) {
+            (uintptr_t)(events+EVENT_TRBS)>UINT32_MAX || (uintptr_t)(scratch+16)>UINT32_MAX)) {
         fail("xHCI 32-bit DMA cannot address kernel buffers");return 0;
     }
     context_bytes=(hcc&4)?64:32; port_count=hcs>>24;
@@ -506,7 +535,7 @@ int chos_xhci_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,con
     /* Bounded BIOS/OS ownership handoff and validation of extended capability
      * links. Unknown capabilities are skipped only inside the mapped BAR. */
     uint32_t ext=hcc>>16;
-    for(unsigned budget=0;ext && budget<256;++budget) {
+    for(unsigned budget=0;ext && budget<EVENT_TRBS;++budget) {
         if(ext>(bar_bytes-8)/4) {fail("xHCI extended capability outside BAR");return 0;}
         uintptr_t a=mmio+ext*4u; uint32_t v=rd(a);
         if((v&255)==2) {
@@ -525,18 +554,20 @@ int chos_xhci_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,con
         ext+=next;
     }
     if(ext) {fail("xHCI extended capability chain too long");return 0;}
+    diagnostic.stage=3;
     wr(op,rd(op)&~1u);
     if(!wait_reg(op+4,1,1,100)) {fail("xHCI halt timeout");return 0;}
     wr(op,2);
     if(!wait_reg(op,2,0,TIMEOUT_MS) || !wait_reg(op+4,1u<<11,0,TIMEOUT_MS)) {fail("xHCI reset/CNR timeout");return 0;}
     unsigned scratch_count=((hcs2>>27)&31)|((hcs2>>16)&0x3e0);
     if(scratch_count>16) {fail("xHCI scratchpad requirement exceeds bound");return 0;}
+    diagnostic.stage=4;
     zero(devices,sizeof(devices));zero(events,sizeof(events));zero(dcbaa,sizeof(dcbaa));
     zero(scratch,sizeof(scratch));zero(scratch_array,sizeof(scratch_array));zero(port_attempted,sizeof(port_attempted));
     chos_xhci_ring_init(&commands);event_head=0;event_cycle=1;online=0;port_cursor=0;hub_cursor=0;
     for(unsigned i=0;i<scratch_count;++i) scratch_array[i]=(uintptr_t)scratch[i];
     if(scratch_count) dcbaa[0]=(uintptr_t)scratch_array;
-    erst[0]=(uintptr_t)events;erst[1]=256;
+    erst[0]=(uintptr_t)events;erst[1]=EVENT_TRBS;
     wr(op+0x38,slot_limit);wr64(op+0x30,(uintptr_t)dcbaa);wr64(op+0x18,(uintptr_t)commands.trbs|1);
     wr(runtime+0x20,0); /* interrupter disabled: polled event ring */
     wr(runtime+0x28,1);wr64(runtime+0x30,(uintptr_t)erst);wr64(runtime+0x38,(uintptr_t)events);
@@ -567,3 +598,15 @@ void chos_xhci_poll(void) {
 }
 const char *chos_xhci_error(void) {return error;}
 unsigned chos_xhci_device_count(void) {return online;}
+
+int chos_xhci_running(void){return running;}
+unsigned chos_xhci_input_capabilities(void) {
+    unsigned caps=0;
+    for(unsigned i=0;i<MAX_SLOTS;++i)if(devices[i].active>0 && !devices[i].hub)
+        for(unsigned j=0;j<devices[i].endpoint_count;++j) {
+            chos_hid_report_layout_t *l=&devices[i].endpoints[j].layout;
+            if(l->has_keyboard)caps|=1;
+            if(l->has_pointer || l->has_mouse)caps|=2;
+        }
+    return caps;
+}

@@ -18,4 +18,12 @@ void chos_xhci_set_logger(void (*write)(const char *));
 void chos_xhci_stop(void);
 const char *chos_xhci_error(void);
 unsigned chos_xhci_device_count(void);
+unsigned chos_xhci_input_capabilities(void); /* bit 0 keyboard; bit 1 pointer */
+int chos_xhci_running(void);
+typedef struct {
+    uint32_t cap,hcs,hcc,doorbell,runtime,route;
+    uint16_t stage,failed_stage,port,descriptor,requested,received,completion;
+    const char *last_failure;
+} chos_xhci_diagnostic_t;
+const chos_xhci_diagnostic_t *chos_xhci_diagnostics(void);
 #endif

@@ -8,6 +8,8 @@
 #include "chos/interrupt.h"
 #include "chos/timer.h"
 #include "chos/clock.h"
+#include "chos/drivers.h"
+#include "chos/driver_report.h"
 #include "chos/vmm.h"
 #include "chos/scheduler.h"
 #include "chos/storage.h"
@@ -293,12 +295,11 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
 
         int firmware_mmio=uefi_fdt_has_virtio_mmio(boot_info);
         if(firmware_mmio)chos_virtio_use_mmio(platform_virtio_mmio_base());
-        else {
-            unsigned transports=chos_virtio_use_pci(boot_info,&acpi_info,pci_devices,pci_summary.devices_stored);
-            if(console_ready) {
-                uefi_console_write("[PCI] VirtIO transports: ");uefi_console_write_u64(transports);
-                uefi_console_write("; ");uefi_console_write(chos_virtio_transport_error());uefi_console_write("\n");
-            }
+        chos_platform_drivers_discover(boot_info,&acpi_info,pci_devices,pci_summary.devices_stored);
+        chos_platform_drivers_probe(CHOS_DRIVER_TRANSPORT);
+        if(console_ready) {
+            uefi_console_write("[PCI] VirtIO transports: ");uefi_console_write_u64(chos_virtio_pci_count());
+            uefi_console_write("; ");uefi_console_write(chos_virtio_transport_error());uefi_console_write("\n");
         }
         if(chos_virtio_aperture()) {
             if(storage_init()) {
@@ -394,18 +395,14 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         } else if (console_ready) {
             uefi_console_write("[INFO] No usable VirtIO transport; native PCI USB discovery follows.\n");
         }
-        for (uint32_t i=0; i<pci_summary.devices_stored && acpi_result==CHOS_ACPI_OK; ++i) {
-            const chos_pci_device_t *d=&pci_devices[i];
-            if(d->class_code!=12 || d->subclass!=3 || d->programming_interface!=0x30) continue;
-            if(console_ready)chos_xhci_set_logger(uefi_console_write);
-            int ok=chos_xhci_init(boot_info,&acpi_info,d);
-            if(console_ready) {
-                uefi_console_write(ok?"[OK] xHCI controller running: ":"[WARN] xHCI controller unavailable: ");
-                uefi_console_write(chos_xhci_error()); uefi_console_write("; HID devices=");
-                uefi_console_write_u64(chos_xhci_device_count()); uefi_console_write("\n");
-            }
-            break; /* one controller, explicitly bounded */
+        if(console_ready)chos_xhci_set_logger(uefi_console_write);
+        chos_platform_drivers_probe(CHOS_DRIVER_INPUT);
+        if(console_ready) {
+            uefi_console_write(chos_xhci_running()?"[OK] xHCI controller running: ":"[INFO] xHCI unavailable: ");
+            uefi_console_write(chos_xhci_error());uefi_console_write("; HID devices=");
+            uefi_console_write_u64(chos_xhci_device_count());uefi_console_write("\n");
         }
+        chos_gui_set_driver_report(chos_platform_driver_report,chos_platform_needs_input_recovery);
         chos_gui_startup_complete();
         chos_gui_show();
         if (console_ready) uefi_console_write("[OK] Initial CHOS GUI frame rendered.\n");
@@ -427,7 +424,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             uint64_t budget=timer_frequency_hz()/5u;
             unsigned polls;
             for(polls=0;polls<2000000u && timer_ticks()-ticks<2u;++polls) {
-                chos_xhci_poll();chos_gui_pump();
+                chos_platform_drivers_poll();chos_gui_pump();
                 if(!budget || timer_counter()-start>=budget) break;
                 __asm__ volatile("yield" ::: "memory");
             }
@@ -440,7 +437,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         uefi_console_set_graphics_logging(0);
         for (;;) {
-            chos_xhci_poll();chos_net_stack_poll();
+            chos_platform_drivers_poll();chos_net_stack_poll();
             if (input_ready) chos_input_poll();
             else chos_gui_pump();
             if (gic_timer_ready) __asm__ volatile("wfi" ::: "memory");

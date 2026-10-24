@@ -64,14 +64,26 @@ static int transition(uint8_t reports[32],unsigned id,int down) {
     int after=held(reports);
     return before==after?0:(after?1:-1);
 }
+/* A report ID cannot release another ID, and one HID interface/device cannot
+ * release a key/button still held by another USB input source. */
+static uint16_t key_owners[256],button_owners[8];
+static void key_owner(unsigned key,int change) {
+    if(!keycode(key))return;
+    if(change>0) {if(key_owners[key]++==0)chos_input_key(keycode(key),1);}
+    else if(key_owners[key] && --key_owners[key]==0)chos_input_key(keycode(key),0);
+}
+static void button_owner(unsigned button,int change) {
+    if(change>0) {if(button_owners[button]++==0)chos_input_button((uint16_t)(0x110+button),1);}
+    else if(button_owners[button] && --button_owners[button]==0)chos_input_button((uint16_t)(0x110+button),0);
+}
 void chos_usb_release_input(chos_usb_input_state_t *s) {
     if (!s) return;
     for (unsigned k=0;k<256;++k) {
-        if (held(s->keys[k]) && keycode(k)) chos_input_key(keycode(k),0);
+        if (held(s->keys[k])) key_owner(k,-1);
         for(unsigned i=0;i<32;++i) s->keys[k][i]=0;
     }
     for (unsigned k=0;k<8;++k) {
-        if (held(s->buttons[k])) chos_input_button((uint16_t)(0x110+k),0);
+        if (held(s->buttons[k])) button_owner(k,-1);
         for(unsigned i=0;i<32;++i) s->buttons[k][i]=0;
     }
 }
@@ -120,15 +132,16 @@ int chos_usb_decode_report(const chos_hid_report_layout_t *l, chos_usb_input_sta
         for(unsigned pass=0;pass<2;++pass)for(unsigned k=pass?4u:0xe0u;k<(pass?256u:0xe8u);++k) {
             if(pass && k>=0xe0 && k<=0xe7)continue;
             int change=transition(s->keys[k],id,keys[k]);
-            if(change && keycode(k))chos_input_key(keycode(k),change>0);
+            if(change)key_owner(k,change);
         }
     }
     if (pointer) for (unsigned k=0;k<8;++k) {
         int change=transition(s->buttons[k],id,buttons[k]);
-        if(change) chos_input_button((uint16_t)(0x110+k),change>0);
+        if(change)button_owner(k,change);
     }
-    if(absolute_x>=0 || absolute_y>=0) chos_input_absolute(absolute_x,absolute_y);
-    if (x || y) chos_input_relative(x,y);
+    s->absolute_seen=absolute_x>=0 || absolute_y>=0;
+    if(s->absolute_seen)chos_input_absolute(absolute_x,absolute_y);
+    if((x || y) && !s->suppress_relative && !s->absolute_seen)chos_input_relative(x,y);
     if (wheel) chos_input_scroll(wheel);
     return 1;
 }

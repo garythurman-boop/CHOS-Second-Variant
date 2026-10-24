@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../kernel/platform/virtio_transport.c"
 static uint32_t cfg[64];
-static uint8_t bar_mem[4096] __attribute__((aligned(4096)));
+static uint8_t bar_mem[8192] __attribute__((aligned(4096)));
 static unsigned mappings,enables;
 int chos_pci_read_config32(const chos_boot_info_t *b,const chos_acpi_info_t *a,uint16_t s,uint8_t bus,uint8_t dev,uint8_t fn,uint16_t off,uint32_t *v) {
     (void)b;(void)a;(void)s;(void)bus;(void)dev;(void)fn;
@@ -17,7 +17,7 @@ int chos_pci_write_config32(const chos_boot_info_t *b,const chos_acpi_info_t *a,
 }
 int chos_pci_map_bar(const chos_boot_info_t *b,const chos_acpi_info_t *a,const chos_pci_device_t *d,unsigned index,uint64_t *base,uint64_t *size) {
     (void)b;(void)a;(void)d;++mappings;if(index!=4)return 0;
-    *base=(uintptr_t)bar_mem;*size=sizeof(bar_mem);return 1;
+    *base=(uintptr_t)bar_mem+(d->device?4096u:0u);*size=4096;return 1;
 }
 int chos_pci_enable_memory_busmaster(const chos_boot_info_t *b,const chos_acpi_info_t *a,const chos_pci_device_t *d) {
     (void)b;(void)a;(void)d;++enables;return 1;
@@ -57,6 +57,11 @@ int main(void) {
     reset();acpi.dma_translation_unverified=1;assert(!chos_virtio_use_pci(&boot,&acpi,&dev,1) && !mappings);acpi.dma_translation_unverified=0;
     reset();assert(chos_virtio_use_pci(&boot,&acpi,&dev,1)==1);h=aperture;
     w16((uintptr_t)bar_mem+30,16);chos_virtio_write(h,0x50,0);assert(chos_virtio_read(h,0x70)==128);
+    reset();uintptr_t first=chos_virtio_pci_admit(&boot,&acpi,&dev);assert(first);
+    chos_pci_device_t second=dev;second.device=1;
+    assert(chos_virtio_pci_admit(&boot,&acpi,&second)==first+512 && chos_virtio_pci_count()==2);
+    chos_virtio_seal_bindings();assert(chos_virtio_pci_admit(&boot,&acpi,&dev)==first);
+    second.device=2;assert(!chos_virtio_pci_admit(&boot,&acpi,&second) && chos_virtio_pci_count()==2);
     reset();chos_virtio_use_mmio((uintptr_t)bar_mem);h=aperture;
     chos_virtio_write(h,0x70,15);assert(r32(h+0x70)==15 && chos_virtio_read(h,0x70)==15);
     puts("VirtIO transport: modern PCI discovery, bounded caps/config/notify, queue vectors, MMIO preservation and DMA topology rejection passed");

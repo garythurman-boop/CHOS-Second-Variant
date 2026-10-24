@@ -38,7 +38,10 @@ class Guest:
             vars=out/'vars.fd';shutil.copyfile(args.firmware.parent/'AAVMF_VARS.fd',vars)
             cmd+=['-drive',f'if=pflash,format=raw,readonly=on,file={args.firmware}',
                   '-drive',f'if=pflash,format=raw,file={vars}','-device','ramfb']
-            if not args.no_usb:cmd+=['-device','qemu-xhci,id=xhci']
+            if not args.no_usb:
+                for bus in range(1,args.usb_pci_bus+1):
+                    cmd+=['-device',f'pcie-root-port,id=usb-rp{bus},bus=pcie.0,addr={bus:x},chassis={bus},port={bus}']
+                cmd+=['-device',args.xhci_model+',id=xhci'+(',bus=usb-rp'+str(args.usb_pci_bus) if args.usb_pci_bus else '')]
             if args.pci_virtio:
                 disk_backend=str(disk)
                 if args.storage_error:
@@ -98,11 +101,11 @@ class Guest:
     def serial(self,c):
         self.process.stdin.write((c+'\n').encode());self.process.stdin.flush()
     def terminal(self):return self.block('terminal_lines',size=69*29).decode('ascii',errors='replace').replace('\x00','\n')
-    def type(self,command):
+    def type(self,command,enter=True):
         keys={'.':'dot','/':'slash','-':'minus',' ':'spc'}
         for c in command:
             self.hmp('sendkey '+keys.get(c,c));time.sleep(.055)
-        self.hmp('sendkey ret');time.sleep(.1)
+        if enter:self.hmp('sendkey ret');time.sleep(.1)
     def screen(self,name,full=False):
         p=self.out/(name+'.ppm');self.qmp('screendump',filename=str(p));data=p.read_bytes()
         # Compare only canvas, excluding the RTC taskbar clock.
@@ -139,6 +142,8 @@ def main():
     ap.add_argument('--nvme',action='store_true')
     ap.add_argument('--no-usb',action='store_true')
     ap.add_argument('--empty-usb',action='store_true')
+    ap.add_argument('--xhci-model',choices=['qemu-xhci','nec-usb-xhci'],default='qemu-xhci')
+    ap.add_argument('--usb-pci-bus',type=int,choices=range(0,11),default=0)
     ap.add_argument('--storage-error',action='store_true')
     ap.add_argument('--stress',type=int,default=0,help='additional mixed input/storage cycles')
     ap.add_argument('--memory',default='512M')
@@ -168,6 +173,9 @@ def main():
         if args.mode!='direct':
             if not args.no_usb and not args.empty_usb:
                 wait(lambda:g.symbol('online')==2,10,'USB HID enumeration through root/hub topology')
+            if args.usb_pci_bus:
+                assert re.search(r'PCI 0:0x0*'+format(args.usb_pci_bus,'x')+r':.*class 0x0*c:0x0*3',g.text()),'xHCI must actually enumerate on the requested nonzero bus'
+                result['checks']+=['PCI xHCI discovery through bus '+str(args.usb_pci_bus)+' bridges']
             assert 'IRQ delivery enabled after initial desktop frame' in g.text()
             if args.timer_fault: assert 'Timer IRQ delivery did not progress' in g.text()
             else: assert 'Timer IRQ delivery verified' in g.text()
@@ -199,10 +207,15 @@ def main():
             assert g.symbol('online')==0
             before=g.symbol('tick_count');ticks=g.cpu_ticks();started=time.monotonic()
             g.screen('no-input-desktop');time.sleep(3)
+            wait(lambda:g.symbol('view')==4,8,'automatic driver diagnostics without keyboard/pointer')
+            page=g.symbol('driver_report_page');g.screen('automatic-drivers-page1')
+            if g.symbol('driver_report_pages')>1:
+                wait(lambda:g.symbol('driver_report_page')!=page,5,'diagnostic pages rotate without input')
+            g.screen('automatic-drivers-page2')
             assert g.symbol('tick_count')>before,'timer must keep progressing without input devices'
             result['idle_cpu_percent']=round(100*(g.cpu_ticks()-ticks)/os.sysconf('SC_CLK_TCK')/(time.monotonic()-started),2)
             assert result['idle_cpu_percent']<20,'missing input must not introduce a busy loop'
-            result['checks']+=['desktop leaves splash with '+('absent controller' if args.no_usb else 'empty xHCI controller'),'timer progress and low idle CPU without input']
+            result['checks']+=['desktop leaves splash with '+('absent controller' if args.no_usb else 'empty xHCI controller'),'timer progress and low idle CPU without input','automatic rotating diagnostics without input']
             result['status']='PASS';return 0
         def motion(x,y):
             if args.tablet:
@@ -215,11 +228,19 @@ def main():
         before=g.screen('desktop');t=time.monotonic();g.hmp('sendkey c')
         wait(lambda:g.screen('console')!=before,2,'keyboard shortcut visible response')
         result['keyboard_visible_ms']=round((time.monotonic()-t)*1000,2)
+        if args.mode!='direct':
+            g.type('echo ',enter=False)
+            for _ in range(32):
+                g.qmp('input-send-event',events=[{'type':'key','data':{'down':True,'key':{'type':'qcode','data':'b'}}}]);time.sleep(.007)
+                g.qmp('input-send-event',events=[{'type':'key','data':{'down':False,'key':{'type':'qcode','data':'b'}}}]);time.sleep(.007)
+            g.hmp('sendkey ret');wait(lambda:('b'*32) in g.terminal(),3,'32 fast native USB keypress/release pairs')
+            result['checks']+=['32 fast USB keypress/release pairs']
         if args.clock_test:
-            g.type('clock');first=int(re.findall(r'Unix seconds: (\d+)',g.terminal())[-1])
-            time.sleep(2);g.type('clock');second=int(re.findall(r'Unix seconds: (\d+)',g.terminal())[-1])
-            assert second>first>1577836800,'wall clock must advance independently of GUI input'
-            if args.mode!='direct':assert 'UEFI GetTime snapshot' in g.terminal()
+            if args.mode!='direct':
+                g.type('clock');first=int(re.findall(r'Unix seconds: (\d+)',g.terminal())[-1])
+                time.sleep(2);g.type('clock');second=int(re.findall(r'Unix seconds: (\d+)',g.terminal())[-1])
+                assert second>first>1577836800,'wall clock must advance independently of GUI input'
+                assert 'UEFI GetTime snapshot' in g.terminal()
             def taskbar_clock(name):
                 pixels=g.screen(name,full=True)
                 return b''.join(pixels[(row*800+716)*3:(row*800+799)*3] for row in range(574,598))

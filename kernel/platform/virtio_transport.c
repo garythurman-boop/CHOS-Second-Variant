@@ -18,6 +18,8 @@ static struct {pci_transport_t value;uint8_t padding[SLOT_STRIDE-sizeof(pci_tran
 static uintptr_t aperture;
 static int pci_mode;
 static unsigned transport_count;
+static int bindings_sealed;
+static chos_pci_device_t identities[MAX_TRANSPORTS];
 static const char *last_error="VirtIO transport not initialized";
 static void barrier(void) {
 #ifdef __aarch64__
@@ -90,30 +92,44 @@ static int discover(const chos_boot_info_t *b,const chos_acpi_info_t *a,const ch
     }
     return out->common && out->notify;
 }
-unsigned chos_virtio_use_pci(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,const chos_pci_device_t *devices,unsigned count) {
-    if(aperture)return transport_count;
-    if(!boot || !acpi || !acpi->valid || acpi->dma_translation_unverified || !devices || count>CHOS_PCI_MAX_DEVICES) {
+unsigned chos_virtio_pci_count(void){return transport_count;}
+void chos_virtio_seal_bindings(void){bindings_sealed=1;}
+uintptr_t chos_virtio_pci_admit(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,const chos_pci_device_t *d) {
+    if(!boot || !acpi || !acpi->valid || acpi->dma_translation_unverified || !d) {
         last_error="VirtIO PCI firmware/DMA topology unavailable";return 0;
     }
+    if(aperture && !pci_mode){last_error="mixed MMIO/PCI VirtIO transports unsupported";return 0;}
+    for(unsigned i=0;i<transport_count;++i) {
+        const chos_pci_device_t *p=&identities[i];
+        if(p->segment==d->segment && p->bus==d->bus && p->device==d->device && p->function==d->function)
+            return (uintptr_t)&transports[i];
+    }
+    if(!aperture && !transport_count)bindings_sealed=0;
+    if(bindings_sealed || transport_count>=MAX_TRANSPORTS){last_error="VirtIO bindings sealed or capacity reached";return 0;}
 #ifdef __aarch64__
     uint64_t sctlr;__asm__ volatile("mrs %0,sctlr_el1":"=r"(sctlr));
     if(sctlr&5u){last_error="VirtIO PCI currently requires identity DMA with MMU/cache off";return 0;}
 #endif
-    zero(transports,sizeof(transports));
-    for(unsigned i=0;i<count && transport_count<MAX_TRANSPORTS;++i) {
-        const chos_pci_device_t *d=&devices[i];uint32_t type=device_type(d->device_id);
-        if(d->vendor_id!=0x1af4 || !type || (d->header_type&127))continue;
-        pci_transport_t item={0};
-        if(!discover(boot,acpi,d,&item)){last_error="malformed/unmapped VirtIO PCI capabilities";continue;}
-        if(!chos_pci_enable_memory_busmaster(boot,acpi,d))continue;
-        uint32_t command;
-        if(!config_read(boot,acpi,d,4,&command) || !chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,4,(command&0xffffu)|0x400u))continue;
-        /* Polled queues: no legacy INTx or MSI-X vector is requested. */
-        w16(item.common+16,0xffff);item.type=type;
-        transports[transport_count++].value=item;
+    uint32_t type=device_type(d->device_id);
+    if(d->vendor_id!=0x1af4 || !type || (d->header_type&127)){last_error="not a supported VirtIO PCI identity";return 0;}
+    pci_transport_t item={0};
+    if(!discover(boot,acpi,d,&item)){last_error="malformed/unmapped VirtIO PCI capabilities";return 0;}
+    if(!chos_pci_enable_memory_busmaster(boot,acpi,d)){last_error="VirtIO PCI memory/bus-master enable failed";return 0;}
+    uint32_t command;
+    if(!config_read(boot,acpi,d,4,&command) || !chos_pci_write_config32(boot,acpi,d->segment,d->bus,d->device,d->function,4,(command&0xffffu)|0x400u)) {
+        last_error="VirtIO PCI INTx disable failed";return 0;
     }
-    if(transport_count){pci_mode=1;aperture=(uintptr_t)transports;last_error="modern VirtIO PCI transports discovered";}
-    return transport_count;
+    if(!transport_count)zero(transports,sizeof(transports));
+    w16(item.common+16,0xffff);item.type=type;
+    identities[transport_count]=*d;transports[transport_count].value=item;
+    uintptr_t handle=(uintptr_t)&transports[transport_count++];
+    pci_mode=1;aperture=(uintptr_t)transports;last_error="modern VirtIO PCI transport admitted";return handle;
+}
+unsigned chos_virtio_use_pci(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,const chos_pci_device_t *devices,unsigned count) {
+    if(aperture)return transport_count;
+    if(!devices || count>CHOS_PCI_MAX_DEVICES){last_error="invalid VirtIO PCI inventory";return 0;}
+    for(unsigned i=0;i<count;++i)(void)chos_virtio_pci_admit(boot,acpi,&devices[i]);
+    chos_virtio_seal_bindings();return transport_count;
 }
 static uint64_t irq_save(void) {
 #ifdef __aarch64__

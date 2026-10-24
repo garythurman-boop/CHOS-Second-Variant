@@ -42,6 +42,11 @@ int main(void) {
     assert(chos_usb_decode_report(&l,&s,r1,2));assert(chos_usb_decode_report(&l,&s,r2,2));assert(keys==old_keys+1);
     r1[1]=0;assert(chos_usb_decode_report(&l,&s,r1,2));assert(releases==old_releases);
     r2[1]=0;assert(chos_usb_decode_report(&l,&s,r2,2));assert(releases==old_releases+1);
+    /* Independent interfaces/physical keyboards share held-key ownership. */
+    chos_usb_input_state_t other={0};r1[1]=1;old_keys=keys;old_releases=releases;
+    assert(chos_usb_decode_report(&l,&s,r1,2));assert(chos_usb_decode_report(&l,&other,r1,2));
+    assert(keys==old_keys+1);chos_usb_release_input(&s);assert(releases==old_releases);
+    chos_usb_release_input(&other);assert(releases==old_releases+1);
     /* Absolute pointer range scaling, unsigned maxima and atomic rejection. */
     const uint8_t tablet[]={0x05,1,0x09,2,0xa1,1,0x09,0x30,0x09,0x31,0x15,0,0x26,0xff,0x7f,0x75,16,0x95,2,0x81,2,0xc0};
     assert(chos_hid_parse_report_descriptor(tablet,sizeof(tablet),&l)==CHOS_HID_OK);
