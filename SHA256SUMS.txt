@@ -1,0 +1,5 @@
+d9c19e8893fc35ab69bb1585382d1f4b33f91f9a4dfdb3bcd1057f1eeeed4647  prebuilt/CHOS-0.30.0.iso
+6f878bd661cb1764124cd53125a92b58f68304cc0c79decb71793b68ab4c84e0  prebuilt/CHOS-0.30.0-installed.img
+e5d907f5699d4bd00264181a8edfb4c49b6c4df215aa1d6a9a9fffc8b76f0a5f  prebuilt/CHOS-0.30.0-kernel-direct.elf
+99002c23c83944c1defeb38c0abda4f7b6faa7773d8013391655f8bfa411d335  prebuilt/CHOS-0.30.0-kernel-uefi.elf
+d56a5ce59e5894a0bbff50d572521ad9925e6747a9ce0ecb807a2dc76edcf2ca  prebuilt/CHOS-0.30.0-BOOTAA64.EFI
