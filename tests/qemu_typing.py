@@ -42,6 +42,7 @@ try:
  wait(lambda:g.symbol('splash_active')==0,10,'splash')
  key('c');wait(lambda:g.symbol('view')==1,4,'Console')
  for c in 'abcdefghijklmnopqrstuvwxyz':key(c)
+ wait(lambda:len(text('terminal_command'))==26,3,'all typed Console characters before timed hold')
  console_counts=deletion('terminal_command');blink('console')
  state('a',True);time.sleep(.75);state('a',False);time.sleep(.1)
  assert text('terminal_command').endswith(b'aaa'),'printable keys repeat too'
@@ -51,6 +52,9 @@ try:
   key('ctrl-c');g.type('run /bin/browser.chx')
   wait(lambda:g.symbol('kernel_browser_active')==1,5,'browser')
   for c in 'abcdefghijklmnopqrstuvwxyz0123456789':key(c)
+  # The browser consumes an event queue. A busy emulator may still owe the last
+  # character when sendkey returns; do not count it as part of Backspace timing.
+  wait(lambda:len(text('address',512))==36,3,'browser consumes typed address before timed hold')
   browser_counts=deletion('address',512);blink('browser')
   checks+=['Browser address bar held Backspace and visible blinking caret']
   key('esc');key('c')
