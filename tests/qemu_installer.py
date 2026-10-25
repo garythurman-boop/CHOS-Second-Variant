@@ -15,6 +15,8 @@ a=argparse.Namespace(mode='uefi',uefi_kernel=pathlib.Path('build/uefi-kernel/cho
 g=Guest(a,out,disk)
 def key(k):g.hmp('sendkey '+k);time.sleep(.15)
 def click(x,y):
+ window=g.window();scale=max(1,window['width']//595)
+ x=window['x']+(x-180)*scale;y=window['y']+(y-70)*scale
  width=g.symbol('active_surface',8);height=g.symbol('active_surface',16)
  assert 320<=width<=4096 and 200<=height<=4096,(width,height)
  g.qmp('input-send-event',events=[{'type':'abs','data':{'axis':'x','value':round(x*32767/(width-1))}},{'type':'abs','data':{'axis':'y','value':round(y*32767/(height-1))}}]);time.sleep(.12)

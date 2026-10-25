@@ -64,6 +64,18 @@ def verify(directory):
     return manifest
 
 
+def contains_bytes(path, needle):
+    """Find a contiguous boot file without loading a whole prepared disk."""
+    tail = b''
+    with path.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b''):
+            window = tail + chunk
+            if needle in window:
+                return True
+            tail = window[-(len(needle) - 1):] if len(needle) > 1 else b''
+    return False
+
+
 def stage(root, build, source, handoff=None):
     short = source[:7]
     directory = root / 'artifacts' / short
@@ -79,6 +91,8 @@ def stage(root, build, source, handoff=None):
     iso_bytes = iso.read_bytes()
     if loader.read_bytes() not in iso_bytes or uefi.read_bytes() not in iso_bytes:
         raise ValueError('ISO does not contain the staged EFI loader and UEFI kernel')
+    if not contains_bytes(disk, loader.read_bytes()) or not contains_bytes(disk, uefi.read_bytes()):
+        raise ValueError('Prepared disk does not contain the staged EFI loader and UEFI kernel')
     if directory.exists():
         manifest = verify(directory)
         if manifest['source_commit'] != source or manifest['inputs']['iso_sha256'] != digest(iso):
@@ -130,7 +144,7 @@ def stage(root, build, source, handoff=None):
             'Verify downloads with [SHA256SUMS](SHA256SUMS). Decompress `.gz` files before use.\n'
             'The prepared image is a distribution image, not a disk modified by acceptance tests.\n\n'
             'QEMU validation and target limitations are recorded in the source reports and optional handoff bundle. '
-            'Actual Fusion input/clock confirmation remains pending; standard builds keep experimental NVMe disabled.\n')
+            'Actual Fusion validation of this build remains pending. Native NVMe is admitted through explicit read-only discovery or validated installed-boot discovery; destructive installation requires confirmation.\n')
         checksums = [digest(path) + '  ' + path.name for path in sorted(temporary.iterdir())]
         (temporary / 'SHA256SUMS').write_text('\n'.join(checksums) + '\n')
         verify(temporary)
@@ -160,8 +174,9 @@ def write_download_index(root, latest):
         'Source is pushed each iteration. Binary downloads are published every other completed '
         'implementation iteration; the next iteration after this publication is source-only.\n\n'
         'See [publication instructions](../docs/ARTIFACT_PUBLICATION.md) and '
-        '[Fusion status](../docs/FUSION_DRIVER_FIXES.md). Fusion confirmation of this build remains '
-        'pending. Standard builds keep experimental NVMe probing disabled.\n')
+        '[installation guide](../docs/INSTALL_GUIDE.md) and [validation report](../docs/STAGE2_VALIDATION.md). '
+        'Actual Fusion validation of this build remains pending. NVMe discovery is read-only; '
+        'destructive installation requires explicit target selection and confirmation.\n')
 
 
 def run(root, build, source, force=False, handoff=None):

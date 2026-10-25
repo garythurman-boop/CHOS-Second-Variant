@@ -64,6 +64,19 @@ class PublicationTests(unittest.TestCase):
                 publisher.stage(root, build, source)
             self.assertFalse((root / 'artifacts').exists())
 
+    def test_stale_prepared_disk_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp); build = root / 'build'
+            (build / 'uefi-kernel').mkdir(parents=True); (build / 'uefi').mkdir()
+            source = 'a' * 40; kernel = ('[BUILD] ' + source[:12] + '\n\0').encode()
+            (build / 'chos.elf').write_bytes(kernel); (build / 'uefi-kernel/chos.elf').write_bytes(kernel)
+            (build / 'uefi/BOOTAA64.EFI').write_bytes(b'current-EFI')
+            (build / 'chos-0.30.0.iso').write_bytes(b'current-EFI' + kernel)
+            (build / 'chos-0.30.0-installed.img').write_bytes(b'stale prepared disk')
+            with self.assertRaisesRegex(ValueError, 'Prepared disk does not contain'):
+                publisher.stage(root, build, source)
+            self.assertFalse((root / 'artifacts').exists())
+
     def test_checksum_mismatch_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)
