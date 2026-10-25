@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "source_commit": "54b97319a7abb6746eff491f167a82f00c08c08d",
+  "tag": "build-54b9731",
+  "inputs": {
+    "iso_sha256": "04bde1483b9f307152e923036d0142dbe579654564a4cc7a18fadc51fc5dc3fb"
+  },
+  "assets": [
+    {
+      "name": "CHOS-Fusion-54b9731.iso",
+      "sha256": "04bde1483b9f307152e923036d0142dbe579654564a4cc7a18fadc51fc5dc3fb",
+      "bytes": 33603584
+    },
+    {
+      "name": "CHOS-54b9731-prepared.img.gz",
+      "sha256": "4a2ef43d156c3afdb0f6b9900052a28b7d5cd6e068c4857d0aeb5b5ac3debf42",
+      "bytes": 1529220,
+      "uncompressed_sha256": "09537735d640662c5fbd90829bdd3d5018051f1e055a0dfcd30a59799f3fe45b",
+      "uncompressed_bytes": 268435456
+    },
+    {
+      "name": "CHOS-54b9731-kernel-direct.elf.gz",
+      "sha256": "79878c37da6417785bc0667257deb43d09ee4930df553c9e141443389730eb0f",
+      "bytes": 1170967,
+      "uncompressed_sha256": "502a6b97160483d323b9a9e2008728966d8479625e8723bdefd6c7ad46257a5a",
+      "uncompressed_bytes": 5625616
+    },
+    {
+      "name": "CHOS-54b9731-kernel-uefi.elf.gz",
+      "sha256": "e47db40a3137019c98535a9a3322a4b984e0fef99d14f6c64535a3a89cb2f267",
+      "bytes": 1172761,
+      "uncompressed_sha256": "19a8db777acbb0130ff94440abbd563cdc4932329ec90f0c7ba085e4d13d49ae",
+      "uncompressed_bytes": 5634200
+    },
+    {
+      "name": "BOOTAA64.EFI",
+      "sha256": "efc994352d38efa390da5afd7fbec28dd37c4d73e52fe9870a4508adcb90a96a",
+      "bytes": 16384
+    },
+    {
+      "name": "CHOS-54b9731-source.zip",
+      "sha256": "09364ead65323df9aae12ee5ccd3c90cabb4afeaeeabd31c6090033a44f04079",
+      "bytes": 2195274
+    },
+    {
+      "name": "CHOS-Fusion-54b9731-Handoff.zip",
+      "sha256": "a1e75a287e30a7eb4650271c6ce68dff0022016ac299d99f30c61fadd8a74bd7",
+      "bytes": 10266909
+    }
+  ]
+}

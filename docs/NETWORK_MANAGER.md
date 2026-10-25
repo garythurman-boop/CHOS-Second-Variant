@@ -63,3 +63,19 @@ handling and protected credentials remain unimplemented. The modern engine,
 complete isolated UEFI runtime, TLS/trust roots/entropy/time, browser features and
 conformance gates remain open in BROWSER_ENGINE_PORT.md and STAGE3_ARCHITECTURE.md.
 This panel and Ethernet success do not complete the revised Stage 3 definition.
+
+## Validated delivery 54b9731
+
+Clean source `54b97319a7abb6746eff491f167a82f00c08c08d` passes the complete
+13-profile network milestone matrix: e1000e/VMXNET3/VirtIO manager configuration
+and reconnect; HTTP/DNS for all three; actual EL0 status/profile policy; both
+Console runtimes; native USB/storage/input/network; direct regression; real
+graphical installation/persistence/reset/power-off and injected installer write
+error. Aggregate host, ASan/UBSan and smoke checks pass. The install sample took
+20.866 s, maximum step 12.815 ms, shutdown status 5.038 s. These are individual
+shared-cloud measurements. All inputs are hash-recorded in the handoff.
+
+Fusion e1000e traffic still needs an independent Mac test. Modern engine/runtime,
+TLS, Wi-Fi, IPv6 and other revised Stage 3 gates remain incomplete. The local
+engine-prerequisite probe exits nonzero for missing C++/pthread/mmap/poll/WPE
+facilities; it is retained as a dependency failure, not a passing browser test.
