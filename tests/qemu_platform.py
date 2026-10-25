@@ -52,7 +52,7 @@ class Guest:
                     disk_backend='blkdebug:'+str(config)+':'+str(disk)
                 cmd+=['-drive',f'if=none,file={disk_backend},format=raw,id=storage','-device',
                       'nvme,serial=CHOS-DISPOSABLE,drive=storage' if args.nvme else 'virtio-blk-pci,disable-legacy=on,drive=storage',
-                      '-netdev','user,id=net','-device','virtio-net-pci,disable-legacy=on,netdev=net']
+                      '-netdev','user,id=net','-device',('vmxnet3,netdev=net,romfile=' if getattr(args,'net_model','virtio')=='vmxnet3' else 'virtio-net-pci,disable-legacy=on,netdev=net')]
                 if not args.no_rng:cmd+=['-object','rng-random,filename=/dev/urandom,id=rng','-device','virtio-rng-pci,disable-legacy=on,rng=rng']
             else:cmd+=['-net','none']
             self.usb_bus='xhci.0';self.mouse_port=None
@@ -69,6 +69,7 @@ class Guest:
             if args.mode=='uefi': cmd+=['-device','virtio-scsi-device,id=scsi',
                   '-drive',f'if=none,file={iso},format=raw,media=cdrom,id=cd','-device','scsi-cd,drive=cd']
             elif not args.pci_virtio: cmd+=['-drive',f'if=none,file={disk},format=raw,id=disk','-device','virtio-blk-device,drive=disk']
+        if getattr(args,'net_capture',False):cmd+=['-object',f'filter-dump,id=capture,netdev=net,file={out}/network.pcap']
         (out/'command.json').write_text(json.dumps(cmd,indent=2))
         self.started=time.monotonic()
         self.process=subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=self.logfile,stderr=subprocess.STDOUT)
@@ -143,6 +144,7 @@ def main():
     ap.add_argument('--clock-test',action='store_true')
     ap.add_argument('--rtc-base')
     ap.add_argument('--pci-virtio',action='store_true')
+    ap.add_argument('--net-model',choices=['virtio','vmxnet3'],default='virtio')
     ap.add_argument('--trace',action='store_true')
     ap.add_argument('--nvme',action='store_true')
     ap.add_argument('--no-usb',action='store_true')
@@ -179,7 +181,7 @@ def main():
             if not args.no_usb and not args.empty_usb:
                 wait(lambda:g.symbol('online')==2,10,'USB HID enumeration through root/hub topology')
             if args.usb_pci_bus:
-                assert re.search(r'PCI 0:0x0*'+format(args.usb_pci_bus,'x')+r':.*class 0x0*c:0x0*3',g.text()),'xHCI must actually enumerate on the requested nonzero bus'
+                assert re.search(r'PCI 0000:'+format(args.usb_pci_bus,'02x')+r':.*class 0c:03',g.text()),'xHCI must actually enumerate on the requested nonzero bus'
                 result['checks']+=['PCI xHCI discovery through bus '+str(args.usb_pci_bus)+' bridges']
             assert 'IRQ delivery enabled after initial desktop frame' in g.text()
             if args.timer_fault: assert 'Timer IRQ delivery did not progress' in g.text()
@@ -255,7 +257,7 @@ def main():
             wait(minute_changed,65,'visible taskbar clock minute rollover')
             result['checks']+=['UEFI clock snapshot/counter progress and visible minute rollover' if args.mode!='direct' else 'FDT RTC progress and visible minute rollover']
         if args.pci_virtio:
-            wait(lambda:g.symbol('net_state')==3,15,'PCI VirtIO DHCP lease')
+            wait(lambda:g.symbol('net_state')==3,15,'selected Ethernet DHCP lease')
             assert ('[OK] CHFS filesystem mounted on NVMe.' if args.nvme else '[OK] UEFI VirtIO/CHFS mounted.') in g.text()
             g.type('write /stage1.txt pci-persistence')
             if args.storage_error:
@@ -277,7 +279,7 @@ def main():
                 return 'Ping: reply received' in g.terminal()
             wait(gui_ping_replied,10,'PCI VirtIO ARP/ICMP reply')
             (out/'pci-console.txt').write_text(g.terminal());g.screen('pci-diagnostics')
-            result['checks']+=[('NVMe injected write failure and responsive GUI' if args.storage_error else 'NVMe CHFS write/flush/read') if args.nvme else 'PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly','PCI VirtIO DHCP/ARP/ICMP']
+            result['checks']+=[('NVMe injected write failure and responsive GUI' if args.storage_error else 'NVMe CHFS write/flush/read') if args.nvme else 'PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly',('VMXNET3 DHCP/ARP/ICMP' if args.net_model=='vmxnet3' else 'PCI VirtIO DHCP/ARP/ICMP')]
         before=g.screen('pointer-before');t=time.monotonic()
         motion(-200,150)
         wait(lambda:g.screen('pointer-after')!=before,2,'pointer visible response')

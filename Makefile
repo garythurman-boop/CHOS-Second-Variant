@@ -17,7 +17,7 @@ SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/e
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
              kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
-             kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
+             kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/platform/vmxnet3.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
            $(BUILD)/kernel/arch/aarch64/context_switch.o $(BUILD)/kernel/arch/aarch64/register_stress.o $(BUILD)/kernel/arch/aarch64/user_entry.o \
            $(BUILD)/kernel/arch/aarch64/user_demo.o $(BUILD)/kernel/arch/aarch64/user_exit.o $(BUILD)/kernel/arch/aarch64/user_preempt_good.o \
@@ -1164,3 +1164,55 @@ test-power-sanitize: $(SAN_DIR)/test-power
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-power
 test: test-power
 test-sanitize: test-power-sanitize
+
+$(BUILD)/test-vmxnet3: tests/test_vmxnet3.c kernel/platform/vmxnet3.c include/chos/vmxnet3.h include/chos/net_device.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_vmxnet3.c -o $@
+$(SAN_DIR)/test-vmxnet3: tests/test_vmxnet3.c kernel/platform/vmxnet3.c include/chos/vmxnet3.h include/chos/net_device.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_vmxnet3.c -o $@
+test-vmxnet3: $(BUILD)/test-vmxnet3
+	./$(BUILD)/test-vmxnet3
+test-vmxnet3-sanitize: $(SAN_DIR)/test-vmxnet3
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-vmxnet3
+test: test-vmxnet3
+test-sanitize: test-vmxnet3-sanitize
+
+$(BUILD)/test-browser-transport: tests/test_browser_transport.c kernel/core/browser_kernel_api.h
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Wno-unused-function -Iinclude tests/test_browser_transport.c -o $@
+$(SAN_DIR)/test-browser-transport: tests/test_browser_transport.c kernel/core/browser_kernel_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -O2 -Wno-unused-function tests/test_browser_transport.c -o $@
+test-browser-transport: $(BUILD)/test-browser-transport
+	./$(BUILD)/test-browser-transport
+test-browser-transport-sanitize: $(SAN_DIR)/test-browser-transport
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-browser-transport
+test: test-browser-transport
+test-sanitize: test-browser-transport-sanitize
+
+$(BUILD)/userland/console.o $(BUILD)/test-gui $(SAN_DIR)/test-gui: include/chos/scrollback.h
+
+$(BUILD)/test-scrollback: tests/test_scrollback.c include/chos/scrollback.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_scrollback.c -o $@
+$(SAN_DIR)/test-scrollback: tests/test_scrollback.c include/chos/scrollback.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_scrollback.c -o $@
+test-scrollback: $(BUILD)/test-scrollback
+	./$(BUILD)/test-scrollback
+test-scrollback-sanitize: $(SAN_DIR)/test-scrollback
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-scrollback
+test: test-scrollback
+test-sanitize: test-scrollback-sanitize
+
+$(BUILD)/test-net-device: tests/test_net_device.c kernel/net/net_device.c include/chos/net_device.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_net_device.c -o $@
+$(SAN_DIR)/test-net-device: tests/test_net_device.c kernel/net/net_device.c include/chos/net_device.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_net_device.c -o $@
+test-net-device: $(BUILD)/test-net-device
+	./$(BUILD)/test-net-device
+test-net-device-sanitize: $(SAN_DIR)/test-net-device
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-net-device
+test: test-net-device
+test-sanitize: test-net-device-sanitize
+
+.PHONY: test-power test-power-sanitize test-vmxnet3 test-vmxnet3-sanitize test-browser-transport test-browser-transport-sanitize test-scrollback test-scrollback-sanitize test-net-device test-net-device-sanitize

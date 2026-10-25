@@ -1,6 +1,7 @@
 #include "chos/drivers.h"
 #include "chos/virtio_transport.h"
 #include "chos/xhci.h"
+#include "chos/vmxnet3.h"
 static chos_driver_registry_t registry;
 static int initialized,xhci_owned;
 static int match_xhci(const chos_driver_device_t *d) {
@@ -36,7 +37,21 @@ static chos_driver_state_t start_virtio(const chos_driver_context_t *ctx,chos_dr
 static void poll_virtio(chos_driver_binding_t *b) {
     if(chos_virtio_read(b->owner,0x70)&128u) {b->state=CHOS_DEVICE_FAILED;b->reason="VirtIO device queue reported failure";}
 }
+static const chos_net_device_ops_t vmxnet={"VMware VMXNET3",chos_vmxnet3_ready,chos_vmxnet3_get_info,chos_vmxnet3_send,chos_vmxnet3_receive,chos_vmxnet3_error};
+static int match_vmxnet(const chos_driver_device_t *d){return chos_driver_match_pci(d,0x15ad,0x07b0,2,0,CHOS_DRIVER_ANY);}
+static int vmx_claimed;
+static chos_driver_state_t start_vmxnet(const chos_driver_context_t *ctx,chos_driver_binding_t *b){
+    if(vmx_claimed){b->reason="Single Ethernet adapter limit";return CHOS_DEVICE_UNSUPPORTED;}
+    vmx_claimed=1;
+    /* Bind before touching the device: failed ownership remains visible. */
+    if(!chos_net_device_bind(&vmxnet)){b->reason="Ethernet adapter already selected";return CHOS_DEVICE_UNSUPPORTED;}
+    if(!chos_vmxnet3_init(ctx->boot,ctx->acpi,&b->device.id.pci)){b->reason=chos_vmxnet3_error();return CHOS_DEVICE_FAILED;}
+    b->owner=1;b->capabilities=CHOS_DRIVER_CAP_TRANSPORT;b->reason=chos_vmxnet3_error();return CHOS_DEVICE_READY;
+}
+static void poll_vmxnet(chos_driver_binding_t *b){if(!chos_vmxnet3_ready()){b->state=CHOS_DEVICE_FAILED;b->capabilities=0;b->reason=chos_vmxnet3_error();}}
+static void stop_vmxnet(chos_driver_binding_t *b){(void)b;chos_vmxnet3_stop();}
 static const chos_driver_ops_t builtin[]={
+    {"VMware VMXNET3",CHOS_DRIVER_TRANSPORT,100,match_vmxnet,start_vmxnet,poll_vmxnet,stop_vmxnet},
     {"modern VirtIO PCI",CHOS_DRIVER_TRANSPORT,100,match_virtio,start_virtio,poll_virtio,0},
     {"native xHCI HID",CHOS_DRIVER_INPUT,100,match_xhci,start_xhci,poll_xhci,stop_xhci}
 };

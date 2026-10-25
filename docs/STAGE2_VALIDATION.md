@@ -1,5 +1,9 @@
 # Stage 2 graphical installation lifecycle
 
+Later user-confirmed Fusion installation and installed-system corrections are in
+[the follow-up report](FUSION_INSTALLED_FOLLOWUP.md). Earlier read-only policy and
+network exclusions below describe their original snapshots.
+
 The user reports build 816aa55 boots Fusion and can use its desktop, keyboard and
 pointer. Storage remains ROMFS, browser launch fails for lack of scheduled UEFI
 EL0 runtime, and runtime GOP mode switching was unimplemented. The user authorizes

@@ -72,6 +72,8 @@ void chos_net_stack_poll(void);
 void chos_net_stack_get_info(chos_net_stack_info_t *out);
 const char *chos_net_dhcp_state_name(chos_net_dhcp_state_t state);
 /* Start one asynchronous DNS A/IN lookup. Use get_dns_info to poll the result. */
+/* Session-only explicit resolver override; requires bound DHCP and no active query. */
+int chos_net_dns_set_server(uint32_t ipv4);
 int chos_net_dns_lookup_start(const char *hostname);
 void chos_net_dns_get_info(chos_net_dns_info_t *out);
 const char *chos_net_dns_state_name(chos_net_dns_state_t state);

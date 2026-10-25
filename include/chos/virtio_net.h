@@ -4,28 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define CHOS_NET_MAC_BYTES 6u
-#define CHOS_NET_MAX_ETHERNET_FRAME 1518u
-
-typedef struct {
-    uint8_t mac[CHOS_NET_MAC_BYTES];
-    uint16_t device_status;
-    uint64_t rx_frames;
-    uint64_t tx_frames;
-    uint64_t rx_dropped;
-    uint64_t tx_errors;
-    uint16_t rx_queue_size;
-    uint16_t rx_queue_num_readback;
-    uint16_t rx_available_idx;
-    uint16_t rx_device_used_idx;
-    uint16_t rx_consumed_idx;
-    uint32_t rx_queue_ready;
-    uint32_t interrupt_status;
-    uintptr_t mmio_base;
-    int ready;
-    int link_status_known;
-    int link_up;
-} chos_virtio_net_info_t;
+#include "chos/net_device.h"
+typedef chos_net_device_info_t chos_virtio_net_info_t;
 
 /* Polled VirtIO-net backend for QEMU virt. Raw Ethernet only in this milestone;
  * DHCP/IP/TCP sockets are layered on later and are not implied by driver-ready. */

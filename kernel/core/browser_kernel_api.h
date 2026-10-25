@@ -72,9 +72,25 @@ static long chos_gui_poll_event(chos_gui_message_t *m,size_t n) {(void)n;return 
 static void chos_exit(int status) {(void)status;kernel_browser_active=0;chos_tcp_drop_owner(KERNEL_BROWSER_OWNER);chos_gui_process_exited(KERNEL_BROWSER_OWNER);}
 static long chos_net_tcp_open(uint16_t p){return chos_tcp_open_for_owner(KERNEL_BROWSER_OWNER,p);}
 static long chos_net_tcp_connect(int h,uint32_t ip,uint16_t p){return chos_tcp_connect_for_owner(KERNEL_BROWSER_OWNER,h,ip,p)?0:-1;}
-static long chos_net_tcp_send(int h,const void *p,size_t n){return chos_tcp_send_for_owner(KERNEL_BROWSER_OWNER,h,p,n);}
-static long chos_net_tcp_recv(int h,void *p,size_t n){return chos_tcp_recv_for_owner(KERNEL_BROWSER_OWNER,h,p,n);}
-static long chos_net_tcp_close(int h){return chos_tcp_close_for_owner(KERNEL_BROWSER_OWNER,h);}
+static long chos_net_tcp_send(int h,const void *p,size_t n){
+    if(!n)return 0;
+    int result=chos_tcp_send_for_owner(KERNEL_BROWSER_OWNER,h,p,n);
+    return result<0?-CHOS_ERRNO_EBADF:result==0?-CHOS_ERRNO_EAGAIN:result;
+}
+static long chos_net_tcp_recv(int h,void *p,size_t n){
+    chos_tcp_socket_info_t info;
+    if(!chos_tcp_get_info_for_owner(KERNEL_BROWSER_OWNER,h,&info))return -CHOS_ERRNO_EBADF;
+    if(!n)return 0;
+    int result=chos_tcp_recv_for_owner(KERNEL_BROWSER_OWNER,h,p,n);
+    if(result<0)return -CHOS_ERRNO_EBADF;
+    if(result)return result;
+    if(info.state==CHOS_TCP_CLOSE_WAIT || info.state==CHOS_TCP_FIN_WAIT_2 || info.state==CHOS_TCP_TIME_WAIT || info.state==CHOS_TCP_CLOSED)return 0;
+    return info.state==CHOS_TCP_FAILED?-CHOS_ERRNO_EIO:-CHOS_ERRNO_EAGAIN;
+}
+static long chos_net_tcp_close(int h){
+    int result=chos_tcp_close_for_owner(KERNEL_BROWSER_OWNER,h);
+    return result<0?-CHOS_ERRNO_EBADF:result==0?-CHOS_ERRNO_EAGAIN:0;
+}
 static long chos_net_tcp_abort(int h){return chos_tcp_abort_for_owner(KERNEL_BROWSER_OWNER,h);}
 static long chos_net_tcp_status(int h,chos_tcp_socket_info_t *p){return chos_tcp_get_info_for_owner(KERNEL_BROWSER_OWNER,h,p)?0:-1;}
 static long chos_net_dns_lookup(const char *s){return chos_net_dns_lookup_start(s)?0:-1;}

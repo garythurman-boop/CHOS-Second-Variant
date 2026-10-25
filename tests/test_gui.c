@@ -104,6 +104,9 @@ int virtio_gpu_set_mode(size_t mode_index, chos_surface_t *surface) {
 size_t virtio_gpu_current_mode_index(void) { return mock_display_mode_index; }
 const char *virtio_gpu_last_error(void) { return "mock gpu ready"; }
 void uart_puts(const char *message) { (void)message; }
+int chos_net_dns_set_server(uint32_t ip){return ip!=0;}
+const char *chos_net_device_name(void){return "Mock Ethernet";}
+const char *chos_net_device_error(void){return "mock ready";}
 const char *chos_power_execute(chos_power_action_t action) {
     (void)action;
     abort(); /* A host GUI test must not request a real power transition. */
@@ -607,6 +610,25 @@ int main(void) {
     chos_gui_input_key(46u, 1); /* C opens Console */
     assert(strcmp(chos_gui_view_name(), "Console") == 0);
     assert(chos_gui_console_output_enabled());
+    /* Bounded Console history can be read without losing the live prompt. */
+    for(unsigned line=0;line<600;line++){
+        char output[40];int n=snprintf(output,sizeof(output),"console history line %u\n",line);
+        chos_gui_console_write(output,(size_t)n);
+    }
+    chos_gui_pump();
+    uint64_t live_hash=0,older_hash=0,restored_hash=0;
+    for(size_t p=0;p<800u*540u;p+=13)live_hash=live_hash*131u^pixels[p];
+    chos_gui_input_key(104u,1);chos_gui_input_key(104u,0);chos_gui_pump();
+    for(size_t p=0;p<800u*540u;p+=13)older_hash=older_hash*131u^pixels[p];
+    assert(live_hash!=older_hash);
+    chos_gui_input_key(107u,1);chos_gui_input_key(107u,0);chos_gui_pump();
+    for(size_t p=0;p<800u*540u;p+=13)restored_hash=restored_hash*131u^pixels[p];
+    assert(live_hash==restored_hash);
+    chos_gui_input_scroll(-3);chos_gui_pump();older_hash=0;
+    for(size_t p=0;p<800u*540u;p+=13)older_hash=older_hash*131u^pixels[p];
+    assert(live_hash!=older_hash);
+    chos_gui_input_key(107u,1);chos_gui_input_key(107u,0);
+    type_text("clear");chos_gui_input_key(28u,1);chos_gui_input_key(28u,0);chos_gui_pump();
     click_at(747, 71); /* maximize at the rendered middle title-bar control */
     click_at(762, 13); /* restore using the maximized window control geometry */
     click_at(726, 71); /* minimize at the rendered left control */

@@ -4,7 +4,7 @@
 #include "chos/net_packet.h"
 #include "chos/net_services.h"
 #include "chos/net_tcp.h"
-#include "chos/virtio_net.h"
+#include "chos/net_device.h"
 #include "chos/timer.h"
 
 #define DHCP_CLIENT_PORT 68u
@@ -54,6 +54,7 @@ static uint32_t offered_server;
 static uint32_t selected_transaction;
 static uint32_t dns_query_id;
 static uint32_t dns_server_address;
+static uint32_t dns_override;
 static uint32_t dns_next_hop;
 static uint64_t dns_deadline;
 static uint32_t dns_query_attempts;
@@ -134,7 +135,7 @@ static int send_dhcp_payload(const uint8_t *payload, size_t payload_length,
         DHCP_CLIENT_PORT, DHCP_SERVER_PORT, ip_identification++, 64u,
         payload, payload_length);
     if (frame_length == 0u) return 0;
-    return virtio_net_send_frame(tx_frame, frame_length) == 1;
+    return chos_net_device_send(tx_frame, frame_length) == 1;
 }
 
 static uint64_t retry_backoff(void) {
@@ -245,6 +246,7 @@ static void accept_dhcp_reply(const chos_dhcpv4_message_t *reply) {
     else if (net_state.subnet_mask == 0u) net_state.subnet_mask = 0xffffff00u;
     if (reply->has_router) net_state.gateway_address = reply->router_address;
     if (reply->has_dns) net_state.dns_address = reply->dns_address;
+    if(dns_override)net_state.dns_address=dns_override;
     if (reply->has_server_address) net_state.dhcp_server = reply->server_address;
     if (net_state.dhcp_server == 0u) net_state.dhcp_server = offered_server;
     net_state.lease_seconds = lease_seconds;
@@ -359,7 +361,7 @@ static int send_arp_request(uint32_t target_ip) {
     if (arp_requested_address == target_ip && now < arp_request_deadline) return 1;
     frame_length = chos_net_build_arp_ipv4_request(tx_frame, sizeof(tx_frame), net_state.mac,
                                                    net_state.ipv4_address, target_ip);
-    if (frame_length == 0u || virtio_net_send_frame(tx_frame, frame_length) != 1) return 0;
+    if (frame_length == 0u || chos_net_device_send(tx_frame, frame_length) != 1) return 0;
     arp_requested_address = target_ip;
     arp_request_deadline = now + ARP_RETRY_TICKS;
     ++net_state.arp_requests_sent;
@@ -379,7 +381,7 @@ static void send_arp_reply(const uint8_t *request) {
     write_be32(&arp[14], net_state.ipv4_address);
     copy_bytes(&arp[18], &request[22], 6u);
     copy_bytes(&arp[24], &request[28], 4u);
-    (void)virtio_net_send_frame(tx_frame, ethernet_bytes + 28u);
+    (void)chos_net_device_send(tx_frame, ethernet_bytes + 28u);
 }
 
 static void process_arp_frame(const uint8_t *frame, size_t length) {
@@ -431,7 +433,7 @@ static int tcp_emit_callback(uint32_t source_ipv4, uint32_t destination_ipv4,
         source_port, destination_port, sequence, acknowledgement, flags, window,
         ip_identification++, 64u, payload, payload_length);
     if (frame_length == 0u) return -1;
-    return virtio_net_send_frame(tx_frame, frame_length) == 1 ? 1 : 0;
+    return chos_net_device_send(tx_frame, frame_length) == 1 ? 1 : 0;
 }
 
 static int dns_send_attempt(void) {
@@ -455,7 +457,7 @@ static int dns_send_attempt(void) {
     frame_length = chos_net_build_udp_ipv4_frame(tx_frame, sizeof(tx_frame),
         net_state.mac, destination_mac, net_state.ipv4_address, net_state.dns_address,
         DNS_CLIENT_PORT, DNS_SERVER_PORT, ip_identification++, 64u, dns_payload, query_length);
-    if (frame_length == 0u || virtio_net_send_frame(tx_frame, frame_length) != 1) {
+    if (frame_length == 0u || chos_net_device_send(tx_frame, frame_length) != 1) {
         dns_deadline = net_now() + ARP_RETRY_TICKS;
         return 0;
     }
@@ -501,7 +503,7 @@ static int send_ping_attempt(void) {
         destination_mac, net_state.ipv4_address, ping_state.destination_ipv4,
         ip_identification++, 64u, 8u, ping_state.identifier, ping_state.sequence,
         payload, sizeof(payload));
-    if (frame_length == 0u || virtio_net_send_frame(tx_frame, frame_length) != 1) {
+    if (frame_length == 0u || chos_net_device_send(tx_frame, frame_length) != 1) {
         ping_deadline = net_now() + ARP_RETRY_TICKS;
         return 0;
     }
@@ -526,7 +528,7 @@ static void process_icmp_payload(const chos_ipv4_view_t *ip) {
             source_mac, net_state.ipv4_address, ip->source_address,
             ip_identification++, 64u, 0u, echo.identifier, echo.sequence,
             echo.payload, echo.payload_length);
-        if (frame_length != 0u) (void)virtio_net_send_frame(tx_frame, frame_length);
+        if (frame_length != 0u) (void)chos_net_device_send(tx_frame, frame_length);
         return;
     }
     if (echo.type == 0u && ping_state.state == CHOS_NET_PING_PENDING && ping_packet_sent &&
@@ -559,7 +561,7 @@ static void process_ipv4_frame(const uint8_t *frame, size_t length) {
 }
 
 void chos_net_stack_init(void) {
-    chos_virtio_net_info_t driver;
+    chos_net_device_info_t driver;
     size_t i;
     net_state.dhcp_state = CHOS_NET_DHCP_OFFLINE;
     clear_configuration();
@@ -579,14 +581,14 @@ void chos_net_stack_init(void) {
     ping_state.attempts = 0u; ping_state.elapsed_ticks = 0u;
     ping_started_at = 0u; ping_deadline = 0u; ping_arp_attempts = 0u; ping_packet_sent = 0;
     dns_state.ipv4_address = 0u; dns_state.ttl_seconds = 0u; dns_state.query_id = 0u; dns_state.retries = 0u;
-    initialized = 1;
+    initialized = 1;dns_override=0;
     fallback_ticks = 0u;
     retry_interval = DHCP_RETRY_TICKS;
     offered_ipv4 = 0u; offered_server = 0u; selected_transaction = 0u;
     retry_deadline = 0u; dns_query_id = 0u; dns_server_address = 0u;
     dns_next_hop = 0u; dns_deadline = 0u; dns_query_attempts = 0u; dns_arp_attempts = 0u; dns_packet_sent = 0;
-    if (!virtio_net_ready()) return;
-    virtio_net_get_info(&driver);
+    if (!chos_net_device_ready()) return;
+    chos_net_device_get_info(&driver);
     if (!driver.ready) return;
     for (i = 0u; i < sizeof(net_state.mac); ++i) net_state.mac[i] = driver.mac[i];
     net_state.driver_ready = 1;
@@ -599,10 +601,14 @@ void chos_net_stack_poll(void) {
     uint64_t now;
     if (!initialized) return;
     if (!timer_is_ready()) ++fallback_ticks;
-    if (!net_state.driver_ready || !virtio_net_ready()) return;
+    if (!net_state.driver_ready) return;
+    if(!chos_net_device_ready()){
+        net_state.driver_ready=0;net_state.dhcp_state=CHOS_NET_DHCP_OFFLINE;
+        clear_configuration();dns_state.state=CHOS_NET_DNS_FAILED;return;
+    }
     for (received = 0u; received < DHCP_MAX_RX_PER_POLL; ++received) {
         uint16_t ether_type;
-        int result = virtio_net_receive_frame(rx_frame, sizeof(rx_frame), &frame_length);
+        int result = chos_net_device_receive(rx_frame, sizeof(rx_frame), &frame_length);
         if (result <= 0) break;
         if (!chos_net_parse_ethernet(rx_frame, frame_length, &ether_type)) continue;
         if (ether_type == 0x0806u) process_arp_frame(rx_frame, frame_length);
@@ -671,6 +677,13 @@ void chos_net_stack_get_info(chos_net_stack_info_t *out) {
     out->arp_replies_received = net_state.arp_replies_received;
     out->driver_ready = net_state.driver_ready;
     for (i = 0u; i < sizeof(net_state.mac); ++i) out->mac[i] = net_state.mac[i];
+}
+
+int chos_net_dns_set_server(uint32_t ipv4){
+    unsigned first=ipv4>>24;
+    if(!ipv4 || first==0 || first==127 || first>=224 || ipv4==UINT32_MAX ||
+       net_state.dhcp_state!=CHOS_NET_DHCP_BOUND || dns_state.state==CHOS_NET_DNS_PENDING)return 0;
+    dns_override=ipv4;net_state.dns_address=ipv4;dns_state.state=CHOS_NET_DNS_IDLE;return 1;
 }
 
 int chos_net_dns_lookup_start(const char *hostname) {

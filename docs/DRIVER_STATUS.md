@@ -24,7 +24,7 @@ refusal, clock defect and composite-HID changes based on the separate tested pro
 | VirtIO net | MMIO and PCI QEMU DHCP lease, ARP reply and ICMP echo exchange | No VMware networking result; QEMU user networking only |
 | VirtIO RNG | MMIO and PCI guest receives real queue bytes; absent-device run returns unavailable; EL0 pointer/length/guard tests; host feature/bounds/reinitialization tests | No entropy quality/certification claim; no timer/counter fallback; unavailable without supported transport |
 | NVMe | Opt-in QEMU disposable namespace read/write/flush/reboot; injected write error leaves GUI responsive; host/sanitizer reset/completion/allocation faults | Explicit read-only discovery / installed-boot discovery, confirmed graphical installer; identity DMA/MMU/cache off; exactly one controller, namespace 1, 512-byte sectors; new Fusion retest required |
-| VMware vmxnet3 | Not implemented | Actual Fusion PCI inventory is required before selecting/implementing an adapter |
+| VMware VMXNET3 | Native revision-1/UPT1 polled Ethernet; QEMU live DHCP/ARP/ICMP, DNS and browser TCP/HTTP fixtures | PCI 15ad:07b0 only; one adapter; 32-entry rings; standard MTU; identity DMA/MMU/cache off; Fusion retest pending |
 | Audio | Existing bounded VirtIO sound implementation | Optional and untested here; silent profile |
 
 ## Ownership and failure contracts
@@ -74,3 +74,9 @@ USB absolute-tablet and nested full-speed hub paths are implemented and tested i
 HS single-TT and SS hub handling remain build/host coverage pending live target evidence. The declared live USB profile
 includes QEMU `usb-kbd`, `usb-mouse` and `usb-tablet`, directly attached or behind hubs. Devices needing unsupported
 features fail explicitly, without replacing the working VirtIO backend.
+
+Current installed-system work is described in [Fusion follow-up](FUSION_INSTALLED_FOLLOWUP.md).
+The Ethernet stack now consumes `chos_net_device_ops_t`; VirtIO and VMXNET3 share
+DHCP/DNS/ARP/ICMP/TCP/browser logic. Driver failure does not transfer DMA ownership
+to a fallback. Backend errors become offline status. No native IOMMU, Wi-Fi or
+unmatched Ethernet controller support is implied.

@@ -145,6 +145,13 @@ static int uefi_fdt_has_virtio_mmio(const chos_boot_info_t *boot_info) {
     return 0;
 }
 
+static void console_hex_width(uint32_t value,unsigned digits){
+    static const char hex[]="0123456789abcdef";
+    char buffer[9];if(digits>8)digits=8;
+    for(unsigned i=0;i<digits;i++)buffer[i]=hex[(value>>(4*(digits-i-1)))&15];
+    buffer[digits]=0;uefi_console_write(buffer);
+}
+
 /* Optional PMM progress hook. The UEFI console silently ignores writes before
  * GOP has initialized, so this stays harmless in the normal QEMU boot path. */
 void pmm_init_progress(pmm_init_stage_t stage) {
@@ -296,18 +303,18 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
                     uefi_console_write_u64(pci_summary.buses_skipped_unmapped);
                     uefi_console_write("\n");
                     for (uint32_t pci_index = 0u;
-                         pci_index < pci_summary.devices_stored && pci_index < 16u;
+                         pci_index < pci_summary.devices_stored;
                          ++pci_index) {
                         const chos_pci_device_t *device = &pci_devices[pci_index];
                         uefi_console_write("PCI ");
-                        uefi_console_write_u64(device->segment); uefi_console_write(":");
-                        uefi_console_write_hex(device->bus); uefi_console_write(":");
-                        uefi_console_write_hex(device->device); uefi_console_write(".");
-                        uefi_console_write_hex(device->function); uefi_console_write(" id ");
-                        uefi_console_write_hex(device->vendor_id); uefi_console_write(":");
-                        uefi_console_write_hex(device->device_id); uefi_console_write(" class ");
-                        uefi_console_write_hex(device->class_code); uefi_console_write(":");
-                        uefi_console_write_hex(device->subclass); uefi_console_write("\n");
+                        console_hex_width(device->segment,4); uefi_console_write(":");
+                        console_hex_width(device->bus,2); uefi_console_write(":");
+                        console_hex_width(device->device,2); uefi_console_write(".");
+                        console_hex_width(device->function,1); uefi_console_write(" id ");
+                        console_hex_width(device->vendor_id,4); uefi_console_write(":");
+                        console_hex_width(device->device_id,4); uefi_console_write(" class ");
+                        console_hex_width(device->class_code,2); uefi_console_write(":");
+                        console_hex_width(device->subclass,2); uefi_console_write("\n");
                         if (device->class_code == 0x0cu && device->subclass == 0x03u &&
                             device->programming_interface == 0x30u) {
                             uefi_console_write("  xHCI BAR0="); uefi_console_write_hex(device->bars[0]);
@@ -366,11 +373,11 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             if(!(boot_info->flags&CHOS_BOOT_FLAG_BOOT_NVME) && storage_init()) {
                 if(console_ready)uefi_console_write(storage_mounted()?"[OK] UEFI VirtIO/CHFS mounted.\n":"[INFO] UEFI VirtIO block present; filesystem left unchanged.\n");
             } else if(console_ready && !(boot_info->flags&CHOS_BOOT_FLAG_BOOT_NVME)) {uefi_console_write("[INFO] UEFI block unavailable: ");uefi_console_write(storage_error());uefi_console_write("\n");}
-            if(virtio_net_init()) {
-                chos_net_stack_init();
-                if(console_ready)uefi_console_write("[OK] UEFI VirtIO network queues initialized.\n");
-            }
         }
+        if(chos_net_device_init()) {
+            chos_net_stack_init();
+            if(console_ready){uefi_console_write("[OK] UEFI Ethernet ready: ");uefi_console_write(chos_net_device_name());uefi_console_write("\n");}
+        } else if(console_ready){uefi_console_write("[INFO] Ethernet offline: ");uefi_console_write(chos_net_device_error());uefi_console_write("\n");}
         if(boot_info->flags&CHOS_BOOT_FLAG_BOOT_NVME){
             int found=chos_probe_native_storage();
             int writable=found && storage_mounted() && chos_native_storage_enable_writes();
@@ -620,7 +627,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         uart_puts("; embedded ROMFS remains available\n");
     }
 
-    if (virtio_net_init()) {
+    if (chos_net_device_init()) {
         chos_virtio_net_info_t net;
         virtio_net_get_info(&net);
         uart_puts("[ OK ] VirtIO-net Ethernet queues initialized; MAC=");

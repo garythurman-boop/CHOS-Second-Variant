@@ -7,7 +7,7 @@
 #include "chos/net_packet.h"
 #include "chos/net_services.h"
 #include "chos/net_tcp.h"
-#include "chos/virtio_net.h"
+#include "chos/net_device.h"
 #include "chos/timer.h"
 
 static const uint8_t client_mac[6] = {0x52u,0x54u,0x00u,0x12u,0x34u,0x56u};
@@ -35,10 +35,11 @@ int timer_init(void) { return 1; }
 void timer_stop(void) { }
 void timer_handle_irq(void) { }
 
-int virtio_net_ready(void) { return 1; }
-const char *virtio_net_last_error(void) { return "test backend"; }
-int virtio_net_init(void) { return 1; }
-void virtio_net_get_info(chos_virtio_net_info_t *out) {
+static int backend_ready=1;
+int chos_net_device_ready(void) { return backend_ready; }
+const char *chos_net_device_error(void) { return "test backend"; }
+int chos_net_device_init(void) { return 1; }
+void chos_net_device_get_info(chos_net_device_info_t *out) {
     size_t i;
     if (out == NULL) return;
     for (i = 0u; i < 6u; ++i) out->mac[i] = client_mac[i];
@@ -46,11 +47,11 @@ void virtio_net_get_info(chos_virtio_net_info_t *out) {
     out->device_status = 0u; out->rx_frames = 0u; out->tx_frames = tx_count;
     out->rx_dropped = 0u; out->tx_errors = 0u; out->mmio_base = 0u;
 }
-int virtio_net_send_frame(const void *frame, size_t length) {
+int chos_net_device_send(const void *frame, size_t length) {
     if (frame == NULL || length > sizeof(last_tx)) return 0;
     memcpy(last_tx, frame, length); last_tx_length = length; ++tx_count; return 1;
 }
-int virtio_net_receive_frame(void *frame, size_t capacity, size_t *length_out) {
+int chos_net_device_receive(void *frame, size_t capacity, size_t *length_out) {
     if (length_out != NULL) *length_out = 0u;
     if (!rx_pending) return 0;
     if (frame == NULL || length_out == NULL || capacity < queued_rx_length) {
@@ -285,6 +286,11 @@ int main(void) {
         assert(memcmp(tcp.payload, payload, sizeof(payload) - 1u) == 0);
     }
 
+    assert(!chos_net_dns_set_server(0));assert(!chos_net_dns_set_server(0xe0000001));
+    assert(chos_net_dns_set_server(0x0a000202));
+    backend_ready=0;chos_net_stack_poll();
+    chos_net_stack_info_t offline;chos_net_stack_get_info(&offline);
+    assert(!offline.driver_ready && offline.dhcp_state==CHOS_NET_DHCP_OFFLINE && !offline.ipv4_address);
     puts("NET stack: DHCP lease/renewal, ARP, DNS, ICMP and integrated TCP handshake/send passed");
     return 0;
 }

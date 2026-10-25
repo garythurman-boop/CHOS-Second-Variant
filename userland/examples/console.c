@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/user.h"
+#include "chos/scrollback.h"
 
 #define CONSOLE_LINES 11u
 #define CONSOLE_LINE_WIDTH 72u
@@ -14,6 +15,8 @@ static const char app_title[] = "CHOS Console";
 static char output_lines[CONSOLE_LINES][CONSOLE_LINE_WIDTH + 1u];
 static size_t output_count = 1u;
 static size_t output_column;
+static char console_history_lines[256][CONSOLE_LINE_WIDTH+1u];
+static chos_scrollback_t console_history={.lines=&console_history_lines[0][0],.width=CONSOLE_LINE_WIDTH+1u,.capacity=256};
 static char input_line[CONSOLE_INPUT_CAPACITY];
 static size_t input_length;
 static uint32_t window_id;
@@ -34,6 +37,7 @@ static void newline(void) {
     if (output_count < CONSOLE_LINES) {
         ++output_count;
     } else {
+        chos_scrollback_push(&console_history,output_lines[0]);
         for (row = 1u; row < CONSOLE_LINES; ++row)
             chos_memcpy(output_lines[row - 1u], output_lines[row], sizeof(output_lines[row]));
         chos_memset(output_lines[CONSOLE_LINES - 1u], 0, sizeof(output_lines[0]));
@@ -86,8 +90,11 @@ static void redraw(void) {
     message.payload.clear.background_argb = 0xff101820u;
     if (submit(&message) != 0) return;
     (void)draw_text(window_id, 12, 8, "CHOS user-space Console", 0xff80c0ffu);
-    for (i = 0u; i < output_count; ++i)
-        (void)draw_text(window_id, 12, 34 + (int32_t)i * 21, output_lines[i], 0xffe0e0e0u);
+    for (i = 0u; i < output_count; ++i){
+        size_t absolute=console_history.count-console_history.offset+i;
+        const char *line=absolute<console_history.count?chos_scrollback_at(&console_history,absolute):output_lines[absolute-console_history.count];
+        (void)draw_text(window_id, 12, 34 + (int32_t)i * 21, line, 0xffe0e0e0u);
+    }
     {
         char prompt[CONSOLE_INPUT_CAPACITY + 8u];
         size_t n = 0u;
@@ -96,7 +103,7 @@ static void redraw(void) {
         for (i = 0u; i < input_length && n + 1u < sizeof(prompt); ++i) prompt[n++] = input_line[i];
         prompt[n] = '\0';
         (void)draw_text(window_id, 12, 294, prompt, 0xff80ff80u);
-        (void)draw_text(window_id, 12, 322, "help dir mkdir touch write rename rm rmdir sync type run clear exit", 0xffa0a0a0u);
+        (void)draw_text(window_id, 12, 322, "Wheel / PgUp / PgDn: scroll | Home: oldest | End: prompt", 0xffa0a0a0u);
     }
 }
 
@@ -277,7 +284,7 @@ static int execute_command(void) {
             else { write_text("Started "); write_text(path); write_text(" (PID "); write_unsigned((uint64_t)pid); write_text(")"); newline(); }
         }
     } else if (strings_equal(command, "clear") || strings_equal(command, "cls")) {
-        chos_memset(output_lines, 0, sizeof(output_lines)); output_count = 1u; output_column = 0u;
+        chos_memset(output_lines, 0, sizeof(output_lines)); output_count = 1u; output_column = 0u;chos_scrollback_clear(&console_history);
     } else if (strings_equal(command, "exit")) return 1;
     else { write_text("Unknown command. Type 'help'."); newline(); }
     return 0;
@@ -345,9 +352,18 @@ int main(int argc, char **argv) {
         if (result == -(long)CHOS_ERRNO_EAGAIN) { (void)chos_sleep_ticks(1u); continue; }
         if (result < 0) break;
         if (event.header.type == CHOS_GUI_MSG_CLOSE_REQUEST) break;
+        if(event.header.type==CHOS_GUI_MSG_POINTER_EVENT && (event.payload.pointer_event.event_flags&CHOS_GUI_EVENT_POINTER_SCROLL)){
+            int32_t lines=event.payload.pointer_event.delta_y;if(lines>20)lines=20;if(lines< -20)lines= -20;
+            chos_scrollback_move(&console_history,lines<0,(size_t)(lines<0?-lines:lines)*3u);redraw();continue;
+        }
         if (event.header.type != CHOS_GUI_MSG_KEY_EVENT ||
             (event.payload.key_event.event_flags & CHOS_GUI_EVENT_KEY_DOWN) == 0u) continue;
         if (event.payload.key_event.keycode == 1u) break;
+        uint32_t key=event.payload.key_event.keycode;
+        if(key==104u || key==109u){chos_scrollback_move(&console_history,key==104u,CONSOLE_LINES);redraw();continue;}
+        if(key==102u || key==107u){console_history.offset=key==102u?console_history.count:0;redraw();continue;}
+        if(key==42u || key==54u || key==29u || key==97u)continue;
+        console_history.offset=0;
         if (event.payload.key_event.keycode == 14u) {
             if (input_length > 0u) input_line[--input_length] = '\0';
             redraw(); continue;

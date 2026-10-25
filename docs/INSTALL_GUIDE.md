@@ -65,7 +65,11 @@ requires the installed disk.
 The browser opens through the UEFI cooperative runtime and retains HTTP, links,
 redirects and text-layout support. HTTPS remains unavailable until TLS/certificate
 verification exists. Opening the browser does not establish network-adapter
-support; a Fusion adapter still needs a supported native network driver.
+support. Native VMXNET3 (PCI 15ad:07b0) is now implemented and tested in QEMU;
+the new build still requires a Fusion network retest. Other adapter IDs need their
+own backend. Run `pci net` and `netstatus` in Console to inspect adapters, driver
+status, DHCP, IPv4, gateway and DNS. A session resolver override is available as
+`dnsserver A.B.C.D` after DHCP binds; it resets at reboot and does not add TLS.
 
 See [the validation report](STAGE2_VALIDATION.md) for exact commands, results,
 known limits and external target checks. Compare the source build ID and verify
@@ -80,3 +84,11 @@ storage and requests PSCI SYSTEM_OFF. A flush failure or returned/absent firmwar
 service reports an error and keeps the desktop usable. Power actions are refused
 during active installation; cancel Setup first. No UEFI protocol callback is used
 after ExitBootServices.
+
+## Console history
+
+Wheel up/down and Page Up/Page Down scroll retained output. Home selects the oldest
+retained rows; End returns to the live tail. Typing returns to the current prompt,
+and clear removes history. The built-in UEFI Console retains 512 older rows; the
+EL0 Console retains 256 older rows within its existing 16-page image limit. Oldest
+rows are evicted when full. Command history on Up/Down remains separate.

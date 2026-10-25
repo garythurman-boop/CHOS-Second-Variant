@@ -1453,8 +1453,8 @@ static void command_netinfo(void) {
     chos_virtio_net_info_t info;
     static const char hex[] = "0123456789ABCDEF";
     size_t i;
-    virtio_net_get_info(&info);
-    uart_puts("CHOS VirtIO Ethernet status\n");
+    chos_net_device_get_info(&info);
+    uart_puts("CHOS Ethernet status: ");uart_puts(chos_net_device_name());uart_puts("\n");
     uart_puts("Driver: "); uart_puts(info.ready ? "ready\n" : "unavailable\n");
     uart_puts("MAC: ");
     for (i = 0u; i < CHOS_NET_MAC_BYTES; ++i) {
@@ -1471,7 +1471,7 @@ static void command_netinfo(void) {
     uart_puts("; dropped frames: "); print_decimal((size_t)info.rx_dropped); uart_puts("\n");
     uart_puts("Transmitted frames: "); print_decimal((size_t)info.tx_frames);
     uart_puts("; TX errors: "); print_decimal((size_t)info.tx_errors); uart_puts("\n");
-    uart_puts("RX virtqueue: size="); print_decimal((size_t)info.rx_queue_size);
+    uart_puts("RX queue: size="); print_decimal((size_t)info.rx_queue_size);
     uart_puts(" configured, QueueNum readback="); print_decimal((size_t)info.rx_queue_num_readback);
     uart_puts(" ready="); print_decimal((size_t)info.rx_queue_ready);
     uart_puts(" avail_idx="); print_decimal((size_t)info.rx_available_idx);

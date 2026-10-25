@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "chos/atomic.h"
 #include "chos/gui.h"
+#include "chos/scrollback.h"
 #include "../platform/uefi_console.h"
 #include "chos/taskbar_text.h"
 #include "chos/syscall.h"
@@ -21,6 +22,7 @@
 #include "chos/audio.h"
 #include "chos/platform.h"
 #include "chos/net_stack.h"
+#include "chos/net_device.h"
 #include "chos/entropy.h"
 #include "chos/clock.h"
 
@@ -254,6 +256,8 @@ static size_t terminal_history_count;
 static size_t terminal_row;
 static size_t terminal_column;
 static char terminal_lines[TERMINAL_ROWS][TERMINAL_COLUMNS + 1u];
+static char terminal_scrollback_lines[512][TERMINAL_COLUMNS+1u];
+static chos_scrollback_t terminal_scrollback={.lines=&terminal_scrollback_lines[0][0],.width=TERMINAL_COLUMNS+1u,.capacity=512};
 static char terminal_command[TERMINAL_COMMAND_CAPACITY];
 static char terminal_history[TERMINAL_HISTORY_CAPACITY][TERMINAL_COMMAND_CAPACITY];
 static char terminal_cwd[CHOS_CHFS_PATH_MAX] = "/";
@@ -1843,6 +1847,7 @@ static void gui_taskbar_tooltip_tick(void) {
 
 static void terminal_clear_lines(void) {
     size_t row, col;
+    chos_scrollback_clear(&terminal_scrollback);
     for (row = 0u; row < TERMINAL_ROWS; ++row) {
         for (col = 0u; col <= TERMINAL_COLUMNS; ++col) terminal_lines[row][col] = '\0';
     }
@@ -1856,6 +1861,7 @@ static void terminal_newline(void) {
     if (terminal_row + 1u < TERMINAL_ROWS) {
         ++terminal_row;
     } else {
+        chos_scrollback_push(&terminal_scrollback,terminal_lines[0]);
         for (row = 1u; row < TERMINAL_ROWS; ++row) {
             for (col = 0u; col <= TERMINAL_COLUMNS; ++col)
                 terminal_lines[row - 1u][col] = terminal_lines[row][col];
@@ -2243,7 +2249,7 @@ static void terminal_execute(char *input) {
     argument = split;
     while (*argument == ' ' || *argument == '\t') ++argument;
     if (gui_strings_equal(command, "help")) {
-        terminal_puts("Commands:\n  help       Show this help\n  drivers    Driver admission report\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci        PCI device inventory from boot\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+        terminal_puts("Commands:\n  help       Show this help\n  drivers    Driver admission report\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci [net]  PCI inventory (net: adapters only)\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  dnsserver IP  Set session DNS resolver\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
     } else if(gui_strings_equal(command,"drivers")) {
         chos_gui_show_driver_report();
     } else if(gui_strings_equal(command,"clock")) {
@@ -2257,7 +2263,13 @@ static void terminal_execute(char *input) {
             const char *line=log;
             while(*log && *log!='\n')++log;
             if(!only_pci || (line[0]=='P' && line[1]=='C' && line[2]=='I' && line[3]==' ')) {
-                while(line<log)terminal_putc(*line++);
+                int show=1;
+                if(only_pci && gui_strings_equal(argument,"net")){
+                    show=0;
+                    for(const char *p=line;p+9<=log;++p)
+                        if(p[0]=='c'&&p[1]=='l'&&p[2]=='a'&&p[3]=='s'&&p[4]=='s'&&p[5]==' '&&p[6]=='0'&&p[7]=='2'&&p[8]==':')show=1;
+                }
+                if(show)while(line<log)terminal_putc(*line++);
                 terminal_putc('\n');
             }
             if(*log)++log;
@@ -2301,10 +2313,16 @@ static void terminal_execute(char *input) {
     } else if (gui_strings_equal(command,"netstatus")) {
         chos_net_stack_info_t info;chos_net_ping_info_t ping;
         chos_net_stack_get_info(&info);chos_net_ping_get_info(&ping);
-        terminal_puts("DHCP: ");terminal_puts(chos_net_dhcp_state_name(info.dhcp_state));
+        terminal_puts("Adapter: ");terminal_puts(chos_net_device_name());
+        terminal_puts("\nDriver: ");terminal_puts(chos_net_device_error());
+        terminal_puts("\nDHCP: ");terminal_puts(chos_net_dhcp_state_name(info.dhcp_state));
         terminal_puts("\nIPv4: ");terminal_print_ipv4(info.ipv4_address);
         terminal_puts("\nGateway: ");terminal_print_ipv4(info.gateway_address);
+        terminal_puts("\nDNS: ");terminal_print_ipv4(info.dns_address);
         terminal_puts("\nPing: ");terminal_puts(chos_net_ping_state_name(ping.state));terminal_putc('\n');
+    } else if(gui_strings_equal(command,"dnsserver")) {
+        uint32_t ip;
+        terminal_puts(terminal_ipv4(argument,&ip)&&chos_net_dns_set_server(ip)?"Session DNS resolver set.\n":"DNS change refused: use a unicast IPv4 with bound DHCP and no active lookup.\n");
     } else if (gui_strings_equal(command,"ping")) {
         uint32_t ip;
         if(!terminal_ipv4(argument,&ip))terminal_puts("Usage: ping a.b.c.d\n");
@@ -2419,6 +2437,10 @@ static int terminal_handle_key(uint16_t keycode, int pressed) {
     if (keycode == 29u || keycode == 97u) { control_down = pressed; return 1; }
     if (!pressed) return 1;
     if (keycode == 1u) { open_view(VIEW_WELCOME); return 1; }
+    if(keycode==104u || keycode==109u){chos_scrollback_move(&terminal_scrollback,keycode==104u,TERMINAL_ROWS-1u);return 1;}
+    if(keycode==102u){terminal_scrollback.offset=terminal_scrollback.count;return 1;}
+    if(keycode==107u){terminal_scrollback.offset=0;return 1;}
+    terminal_scrollback.offset=0;
     if (keycode == 28u) { terminal_submit(); return 1; }
     if (keycode == 14u) {
         if (terminal_command[0] != '\0' && terminal_column > 6u) {
@@ -2748,10 +2770,12 @@ static void draw_console_content(void) {
     rect(194, 108, 567, 379, C_TERMINAL_BG);
     outline(194, 108, 567, 379, 0xff6c7f90u);
     for (row = 0u; row < TERMINAL_ROWS; ++row) {
-        uint32_t color = (row == terminal_row) ? C_TERMINAL_FG : 0xffd4e0eeu;
-        if (terminal_lines[row][0] != '\0') mono_text(202, 114 + (int)row * 12, terminal_lines[row], color);
+        size_t absolute=terminal_scrollback.count-terminal_scrollback.offset+row;
+        const char *line=absolute<terminal_scrollback.count?chos_scrollback_at(&terminal_scrollback,absolute):terminal_lines[absolute-terminal_scrollback.count];
+        uint32_t color = (!terminal_scrollback.offset && row == terminal_row) ? C_TERMINAL_FG : 0xffd4e0eeu;
+        if (line[0] != '\0') mono_text(202, 114 + (int)row * 12, line, color);
     }
-    draw_status_line("Console", "help  |  dir  |  type PATH  |  run PATH");
+    draw_status_line(terminal_scrollback.offset?"Console - Scrollback":"Console", "Wheel / PgUp / PgDn  |  End: prompt");
 }
 
 static size_t viewer_append_decimal(char *out, size_t pos, size_t capacity, size_t value) {
@@ -4979,7 +5003,20 @@ void chos_gui_input_pointer_absolute(int32_t x, int32_t y) {
 
 void chos_gui_input_scroll(int32_t lines) {
     size_t amount;
-    if (!gui_active || splash_active || lines == 0) return;
+    if (!gui_active || splash_active || lines == 0 || power_confirmation_action || start_menu_open) return;
+    if(lines>20)lines=20;
+    if(lines< -20)lines= -20;
+    if(view>=GUI_APP_WINDOW_BASE && gui_app_find_window(view)!=NULL){
+        gui_app_client_t *client=gui_app_find_window(view);
+        chos_gui_message_t event={0};event.header.version=CHOS_GUI_ABI_VERSION;
+        event.header.type=CHOS_GUI_MSG_POINTER_EVENT;
+        event.header.size_bytes=offsetof(chos_gui_message_t,payload)+sizeof(event.payload.pointer_event);
+        event.payload.pointer_event.window_id=(uint32_t)view;
+        event.payload.pointer_event.delta_y=lines;
+        event.payload.pointer_event.event_flags=CHOS_GUI_EVENT_POINTER_SCROLL;
+        gui_app_queue_message(client,&event);return;
+    }
+    if(view==VIEW_CONSOLE){chos_scrollback_move(&terminal_scrollback,lines<0,(size_t)(lines<0?-lines:lines)*3u);gui_mark_dirty();return;}
     if (view == VIEW_TRASH) {
         size_t count = gui_trash_count();
         if (lines > 20) lines = 20;
