@@ -9,8 +9,12 @@ args=argparse.Namespace(mode=a.mode,kernel=pathlib.Path('build/chos.elf'),uefi_k
 g=Guest(args,out,disk)
 def key(k):g.hmp('sendkey '+k);time.sleep(.15)
 def screenshot(name):
- if g.symbol('terminal_scrollback',40)==0: # pointer, width, capacity, count, start, offset
+ # Clang may split the private scrollback aggregate into scalar symbols.
+ offset=(int.from_bytes(g.block('terminal_scrollback',40,8),'little')
+         if 'terminal_scrollback' in g.symbols else g.symbol('terminal_scrollback.5'))
+ if offset==0:
   wait(lambda:g.symbol('text_caret_visible')==0,2,'caret off for deterministic history comparison')
+  time.sleep(.06) # observe the completed frame, not only the phase assignment
  # Tablet wheel reports can relocate the cursor along the top edge; compare
  # the Console below that edge and above the taskbar clock.
  return g.screen(name)[800*50*3:]
