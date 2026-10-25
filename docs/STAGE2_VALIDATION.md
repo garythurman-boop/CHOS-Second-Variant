@@ -123,3 +123,52 @@ The installer payload requires matching source builds: a previously omitted shar
 browser source file in the source-only push was corrected in c740e1e before binary
 publication. Final delivery is rebuilt from committed source, not those earlier
 working-tree binaries. This report does not convert older failures into passes.
+
+## Final delivery: c4672fb
+
+The committed delivery source is `c4672fb9af49ba221d1c3b16b26cc1a5974ebef1`.
+Both kernels embed its clean build ID. The prepared image and installer payload
+are dependency-tracked; publication also refuses a prepared disk missing the
+exact staged EFI loader or UEFI ELF. Binary publication follows the second
+implementation iteration; source changes were pushed throughout.
+
+All locally testable Stage 2 gates PASS for the declared single-NVMe profile:
+
+| Gate | Final evidence | Result |
+|---|---|---|
+| No writes before explicit selection, acknowledgement and Install | `stage2-release-install`, `stage2-release-fallback` | PASS: disk hashes unchanged before confirmation |
+| Live identity/geometry checked again before writes | host installer I/O tests, actual NVMe Identify snapshots | PASS |
+| Primary/backup GPT, ESP, ARM64 EFI/kernel and CHFS created/verified | guest installer, GPT/FAT/PE/ELF verification, exact installed ELF comparison | PASS |
+| Failed/short I/O, bad CRC/bounds, changed identity, removal, retry | host/ASan/UBSan tests and `stage2-release-error` | PASS; no false success |
+| In-guest installer followed by boot without ISO | `stage2-release-install`, `stage2-release-fallback` | PASS: fresh disk-only AAVMF boot |
+| Installed file creation and persistence | same runs | PASS across a fresh reboot |
+| Keyboard and pointer wizard, responsive progress | keyboard supported-mode run and pointer fallback run | PASS |
+| Cancel before writes, cancel during writes, reselection | `stage2-release-cancel` plus host tests | PASS; no writes after cancellation or during reselection |
+| Boot-volume protection | both installed-system runs | PASS; attempted selection leaves disk unchanged |
+| Physical mode selection / safe unsupported fallback | installed ESP request read before EBS | PASS: 1024×768 selected; 1024×640 request retains safe firmware output |
+| Original direct/USB/clock/storage/network/RNG behavior | `stage2-release-direct`, `stage2-release-native` | PASS |
+| UEFI browser launch, read-only discovery, scaled desktop | `stage2-release-apps` | PASS |
+| Terminal panic and nested-fault containment | `stage2-release-panic/{serial,no-uart}` | PASS |
+
+The exact supported-mode installation measured 20.844 s and a maximum 27.223 ms
+installer step. The pointer/fallback installation measured 20.906 s and a maximum
+11.364 ms step. Deliberate key-send delays are included in recorded UI timing;
+these individual shared-cloud samples are not benchmarks or latency guarantees.
+The aggregate host suite, direct smoke and six publication tests pass. ASan/UBSan
+passes for the same kernel C sources at a89652f; c4672fb changes only the validation
+runner and publication integrity checks. The latter corrects button coordinates
+relative to moved/resized windows. The earlier final-fallback attempt failed that
+runner's last protection click, not the installation or persistence; the corrected
+pointer run above passes the protection check as well.
+
+Runtime evidence, exact artifact hashes and limitations are bundled with
+[the versioned downloads](https://github.com/garythurman-boop/CHOS-Second-Variant/tree/build-c4672fb/artifacts/c4672fb).
+No mutable test disks or firmware-variable files are published. The optional
+prepared distribution image is not used as a substitute for graphical acceptance.
+
+**External gate:** actual Fusion installation, newly implemented storage/display
+and browser checks remain NOT RUN on the user's Mac. Use a disposable NVMe VM
+with one CPU and 2 GiB RAM and follow INSTALL_GUIDE.md. QEMU results do not certify
+Fusion, arbitrary NVMe hardware, Pi 5, laptops, IOMMU ownership, networking or TLS.
+This is locally validated Stage 2 for the declared profile, not universal hardware
+support or closure of every remaining Stage 1 platform gate.

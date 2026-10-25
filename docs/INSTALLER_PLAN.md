@@ -1,4 +1,9 @@
-# CHOS installer groundwork
+# CHOS installer plan and implementation
+
+The historical Stage 1 groundwork below is superseded by the implemented
+[Stage 2 lifecycle and validation](STAGE2_VALIDATION.md) and
+[installation guide](INSTALL_GUIDE.md). The planner remains pure; the separate
+I/O engine and GUI now perform the confirmed installation.
 
 ## What's present
 
