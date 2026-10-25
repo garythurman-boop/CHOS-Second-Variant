@@ -9,6 +9,8 @@ args=argparse.Namespace(mode=a.mode,kernel=pathlib.Path('build/chos.elf'),uefi_k
 g=Guest(args,out,disk)
 def key(k):g.hmp('sendkey '+k);time.sleep(.15)
 def screenshot(name):
+ if g.symbol('terminal_scrollback',40)==0: # pointer, width, capacity, count, start, offset
+  wait(lambda:g.symbol('text_caret_visible')==0,2,'caret off for deterministic history comparison')
  # Tablet wheel reports can relocate the cursor along the top edge; compare
  # the Console below that edge and above the taskbar clock.
  return g.screen(name)[800*50*3:]

@@ -238,7 +238,8 @@ static void handle_event(const input_event_t *event) {
         if (event->code >= INPUT_BTN_LEFT) {
             chos_input_button(event->code, event->value != 0u);
         } else {
-            chos_input_key(event->code, event->value != 0u);
+            /* CHOS owns typematic timing; ignore a host's optional EV_KEY repeat. */
+            if(event->value<=1u)chos_input_key(event->code, event->value != 0u);
         }
     } else if (event->type == INPUT_EV_REL) {
         if (event->code == INPUT_REL_X) chos_input_relative((int32_t)event->value, 0);

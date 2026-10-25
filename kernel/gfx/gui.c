@@ -150,6 +150,7 @@ typedef struct {
     chos_gui_message_t events[CHOS_GUI_EVENT_QUEUE_CAPACITY];
     size_t event_head;
     size_t event_count;
+    chos_gui_caret_t caret;
 } gui_app_client_t;
 static gui_app_client_t gui_app_clients[GUI_APP_MAX_CLIENTS];
 
@@ -242,6 +243,16 @@ static int shift_down;
 static char unicode_key_override;
 static int control_down;
 static int caps_lock_down;
+/* One repeat producer for USB and VirtIO. No timer IRQ renders or injects keys. */
+static uint16_t repeat_key;
+static int repeat_view, repeat_prompt, repeat_dispatch;
+static uint64_t repeat_last_counter, repeat_delay_counter;
+static uint64_t caret_last_counter;
+static int text_caret_visible = 1;
+static void gui_caret_reset(void) {
+    text_caret_visible = 1;
+    caret_last_counter = timer_counter();
+}
 static int terminal_initialized;
 static uint32_t gui_console_pid; /* owned by the EL0 Console launched from the desktop */
 static uint32_t gui_file_manager_pid; /* owned by the EL0 File Manager launched from the desktop */
@@ -1655,6 +1666,8 @@ static int gui_window_open(int id) { return chos_wm_get_const(&window_manager, i
 static void gui_set_active_view(int next_view) {
     int old_view = view;
     if (old_view != next_view) {
+        repeat_key = 0;
+        gui_caret_reset();
         if (gui_app_find_window(old_view) != NULL)
             gui_app_queue_focus(old_view, CHOS_GUI_EVENT_FOCUS_LOST);
         view = next_view;
@@ -2606,6 +2619,7 @@ static size_t viewer_visual_line_count(void) {
         if (viewer_next_wrapped_line(&offset, line, sizeof(line)) == 0u) break;
         ++count;
     }
+    if (viewer_editable && viewer_content_size && viewer_content[viewer_content_size-1u] == '\n') ++count;
     return count;
 }
 
@@ -2779,6 +2793,9 @@ static void draw_console_content(void) {
         uint32_t color = (!terminal_scrollback.offset && row == terminal_row) ? C_TERMINAL_FG : 0xffd4e0eeu;
         if (line[0] != '\0') mono_text(202, 114 + (int)row * 12, line, color);
     }
+    if (drawing_active_window && text_caret_visible && !terminal_scrollback.offset &&
+        !prompt_kind && !start_menu_open && !context_menu_open && !power_confirmation_action)
+        rect(202 + (int)terminal_column * 8, 114 + (int)terminal_row * 12, 1, 12, C_TERMINAL_FG);
     draw_status_line(terminal_scrollback.offset?"Console - Scrollback":"Console", "Wheel / PgUp / PgDn  |  End: prompt");
 }
 
@@ -2819,6 +2836,17 @@ static void draw_file_viewer_content(void) {
         }
         if (viewer_content_size == 0u && !viewer_load_error)
             text(204, 151, viewer_editable ? "Start typing; Ctrl+S saves your document." : "No text to display.", C_MUTED);
+    }
+    if (viewer_editable && drawing_active_window && text_caret_visible && !prompt_kind &&
+        !start_menu_open && !context_menu_open && !power_confirmation_action && offset == viewer_content_size) {
+        size_t caret_line = line;
+        int caret_x = 204;
+        if (viewer_content_size && viewer_content[viewer_content_size-1u] != '\n' && line) {
+            caret_line = line-1u;
+            caret_x += chos_gfx_ui_text_width(output, 0);
+        }
+        if (caret_line < VIEWER_VISIBLE_LINES)
+            rect(caret_x, 145+(int)caret_line*(int)CHOS_GFX_UI_LINE_HEIGHT, 1, CHOS_GFX_UI_LINE_HEIGHT, C_TEXT);
     }
     draw_button(204, 475, 174, 27, "Back to File Manager", 0);
     if (viewer_editable) draw_button(390, 475, 80, 27, "Save", 0);
@@ -3111,6 +3139,9 @@ static void draw_network_content(void){
         text(210,y+5,labels[n],C_TEXT);rect(420,y,260,23,editable?C_WHITE:C_PANEL_LIGHT);
         draw_bevel(420,y,260,23,C_PANEL_DARK,C_WHITE,0);text(426,y+5,network_fields[n],editable?C_TEXT:C_MUTED);
         if(network_focus==n+3)outline(422,y+2,256,19,C_BLUE_DARK);
+        if (network_focus==n+3 && editable && drawing_active_window && text_caret_visible &&
+            !prompt_kind && !start_menu_open && !context_menu_open && !power_confirmation_action)
+            rect(426+chos_gfx_ui_text_width(network_fields[n],0),y+5,1,CHOS_GFX_UI_LINE_HEIGHT,C_TEXT);
     }
     text(204,352,"Wi-Fi: no supported wireless adapter. IPv6 unavailable.",C_MUTED);
     text(204,377,network_error?network_error:i.message,network_error?C_RED:C_TEXT);
@@ -3661,6 +3692,12 @@ static void gui_draw_prompt(void) {
         rect(x + 62 * scale, y + 76 * scale, width - 82 * scale, 28 * scale, C_WHITE);
         draw_bevel(x + 62 * scale, y + 76 * scale, width - 82 * scale, 28 * scale, C_PANEL_DARK, C_WHITE, 0);
         text(x + 68 * scale, y + 83 * scale, prompt_name, C_TEXT);
+        if (text_caret_visible) {
+            int caret_x = x + (68 + chos_gfx_ui_text_width(prompt_name,0)) * scale;
+            int limit = x + width - 24 * scale;
+            if (caret_x > limit) caret_x = limit;
+            rect(caret_x, y+83*scale, scale, CHOS_GFX_UI_LINE_HEIGHT*scale, C_TEXT);
+        }
         if (prompt_error) text(x + 62 * scale, y + 111 * scale, "Invalid name, duplicate item, or storage error.", C_RED);
         else text(x + 62 * scale, y + 111 * scale, "Enter accepts; Esc cancels.", C_MUTED);
     }
@@ -4052,6 +4089,9 @@ static void gui_app_queue_message(gui_app_client_t *client, const chos_gui_messa
     size_t tail;
     if (client == NULL || event == NULL) return;
     if (client->event_count == CHOS_GUI_EVENT_QUEUE_CAPACITY) {
+        /* Synthetic repeats must never evict release/focus/close transitions. */
+        if (event->header.type == CHOS_GUI_MSG_KEY_EVENT &&
+            (event->payload.key_event.event_flags & CHOS_GUI_EVENT_KEY_REPEAT)) return;
         size_t offset;
         if (gui_event_is_pointer_move(event)) {
             /* Pointer movement is replaceable state. Update the newest queued
@@ -4130,6 +4170,7 @@ static void gui_app_queue_key(int window_id, uint32_t keycode, int pressed) {
     event.header.size_bytes = (uint32_t)(offsetof(chos_gui_message_t, payload) + sizeof(event.payload.key_event));
     event.payload.key_event.window_id = (uint32_t)window_id;
     event.payload.key_event.event_flags = pressed ? CHOS_GUI_EVENT_KEY_DOWN : CHOS_GUI_EVENT_KEY_UP;
+    if (repeat_dispatch) event.payload.key_event.event_flags |= CHOS_GUI_EVENT_KEY_REPEAT;
     event.payload.key_event.keycode = keycode;
     event.payload.key_event.modifiers = (shift_down ? 1u : 0u) | (control_down ? 2u : 0u) | (caps_lock_down ? 4u : 0u);
     gui_app_queue_message(client, &event);
@@ -4159,6 +4200,7 @@ static size_t gui_expected_message_size(uint16_t type) {
         case CHOS_GUI_MSG_FILL_RECT: payload_size = sizeof(chos_gui_fill_rect_t); break;
         case CHOS_GUI_MSG_DRAW_TEXT: payload_size = sizeof(chos_gui_draw_text_t); break;
         case CHOS_GUI_MSG_CLEAR: payload_size = sizeof(chos_gui_clear_t); break;
+        case CHOS_GUI_MSG_SET_CARET: payload_size = sizeof(chos_gui_caret_t); break;
         default: return 0u;
     }
     return offsetof(chos_gui_message_t, payload) + payload_size;
@@ -4226,7 +4268,8 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
         message->header.type == CHOS_GUI_MSG_SET_TITLE ||
         message->header.type == CHOS_GUI_MSG_FILL_RECT ||
         message->header.type == CHOS_GUI_MSG_DRAW_TEXT ||
-        message->header.type == CHOS_GUI_MSG_CLEAR) {
+        message->header.type == CHOS_GUI_MSG_CLEAR ||
+        message->header.type == CHOS_GUI_MSG_SET_CARET) {
         uint32_t requested_id;
         switch (message->header.type) {
             case CHOS_GUI_MSG_DESTROY_WINDOW: requested_id = message->payload.window.window_id; break;
@@ -4235,6 +4278,7 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
             case CHOS_GUI_MSG_FILL_RECT: requested_id = message->payload.fill_rect.window_id; break;
             case CHOS_GUI_MSG_DRAW_TEXT: requested_id = message->payload.draw_text.window_id; break;
             case CHOS_GUI_MSG_CLEAR: requested_id = message->payload.clear.window_id; break;
+            case CHOS_GUI_MSG_SET_CARET: requested_id = message->payload.caret.window_id; break;
             default: return -(int64_t)CHOS_ERRNO_EINVAL;
         }
         if (requested_id != (uint32_t)client->window_id) return -(int64_t)CHOS_ERRNO_EPERM;
@@ -4271,6 +4315,25 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
     window = chos_wm_get_const(&window_manager, client->window_id);
     if (window == NULL) return -(int64_t)CHOS_ERRNO_ENOENT;
     scale = gui_scale_factor(); if (scale == 0u) scale = 1u;
+    if (message->header.type == CHOS_GUI_MSG_SET_CARET) {
+        const chos_gui_caret_t *c = &message->payload.caret;
+        int32_t logical_w = window->width / (int32_t)scale - 12;
+        int32_t logical_h = window->height / (int32_t)scale - 40;
+        if (c->text_length >= CHOS_GUI_MAX_TEXT) return -(int64_t)CHOS_ERRNO_EINVAL;
+        char prefix[CHOS_GUI_MAX_TEXT];
+        for (size_t n=0; n<c->text_length; ++n) prefix[n]=c->text[n];
+        prefix[c->text_length]=0;
+        int prefix_width = chos_gfx_ui_text_width(prefix,0);
+        if (c->enabled > 1u || (c->enabled && (c->x < 0 || c->y < 0 ||
+            !c->width || c->width > 4u || !c->height || c->height > 64u ||
+            (int64_t)c->x+prefix_width+c->width > logical_w || (int64_t)c->y+c->height > logical_h)))
+            return -(int64_t)CHOS_ERRNO_EINVAL;
+        client->caret = *c;
+        client->caret.x = c->enabled ? c->x+prefix_width : 0;
+        client->caret.argb |= 0xff000000u;
+        gui_mark_dirty();
+        return 0;
+    }
     if (message->header.type == CHOS_GUI_MSG_CLEAR) {
         client->background_argb = message->payload.clear.background_argb != 0u
             ? message->payload.clear.background_argb : C_PANEL;
@@ -4383,6 +4446,10 @@ static void gui_draw_app_window(int id, const chos_wm_window_t *window) {
                  op->text, op->argb);
         }
     }
+    if (client->caret.enabled && drawing_active_window && text_caret_visible &&
+        !prompt_kind && !start_menu_open && !context_menu_open && !power_confirmation_action)
+        rect(GUI_WINDOW_BASE_X+6+client->caret.x, GUI_WINDOW_BASE_Y+34+client->caret.y,
+             (int)client->caret.width, (int)client->caret.height, client->caret.argb);
     physical_coordinates = old_physical;
 }
 
@@ -4820,6 +4887,7 @@ int chos_gui_init(const chos_surface_t *surface) {
     file_selected_index = 0u;
     file_scroll_offset = 0u;
     shift_down = 0; control_down = 0; caps_lock_down = 0;
+    repeat_key=0; repeat_dispatch=0; gui_caret_reset();
     frames_drawn = 0u;
     viewer_scroll_offset = 0u;
     viewer_load_error = 0;
@@ -4880,8 +4948,30 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
     if (keycode == 42u || keycode == 54u) shift_down = pressed != 0;
     else if (keycode == 29u || keycode == 97u) control_down = pressed != 0;
     else if (keycode == 58u && pressed) caps_lock_down = !caps_lock_down;
+    if (!repeat_dispatch) {
+        if (!pressed && repeat_key==keycode) repeat_key=0;
+        if (pressed && keycode!=42u && keycode!=54u) {
+            char ch=terminal_key_to_ascii(keycode);
+            int target = view==VIEW_CONSOLE || (view==VIEW_FILE_VIEWER && viewer_editable) ||
+                prompt_kind || view==VIEW_NETWORK || gui_app_find_window(view)!=NULL;
+            int allowed = keycode==14u || (ch>=32 && ch<=126) ||
+                (keycode>=102u && keycode<=109u);
+            if (keycode!=repeat_key) repeat_key=0;
+            if (gui_active && !splash_active && target && allowed && !control_down &&
+                !start_menu_open && !context_menu_open && !power_confirmation_action) {
+                if (!repeat_key) {
+                    uint64_t frequency=timer_frequency_hz();
+                    repeat_key=keycode; repeat_view=view; repeat_prompt=prompt_kind;
+                    repeat_last_counter=timer_counter();
+                    repeat_delay_counter=frequency/2u; /* 500 ms initial delay */
+                    if(!repeat_delay_counter)repeat_delay_counter=1;
+                }
+            } else repeat_key=0;
+        }
+    }
     if (!gui_active) return;
     if (splash_active) return; /* Input must not bypass the minimum splash interval. */
+    if (pressed) {gui_caret_reset();gui_mark_dirty();}
     if (power_confirmation_action != 0 && pressed) {
         if (keycode == 1u) { power_confirmation_action = 0; gui_mark_dirty(); }
         else if (keycode == 28u) gui_confirm_power_action();
@@ -5144,6 +5234,7 @@ void chos_gui_input_scroll(int32_t lines) {
 void chos_gui_input_button(uint16_t button, int pressed) {
     int hit;
     if (!gui_active) return;
+    if (pressed) {repeat_key=0;gui_caret_reset();}
     if (button == 0x111u) {
         if (pressed && !splash_active && prompt_kind == 0 && power_confirmation_action == 0 && !start_menu_open && mouse_y < TASKBAR_Y) {
             int right_hit = chos_wm_hit_test(&window_manager, mouse_x, mouse_y);
@@ -5370,6 +5461,29 @@ void chos_gui_pump(void) {
             }
         }
         if (splash_active) return;
+    }
+    {
+        uint64_t counter=timer_counter(),frequency=timer_frequency_hz();
+        if (repeat_key && (repeat_view!=view || repeat_prompt!=prompt_kind || control_down ||
+            start_menu_open || context_menu_open || power_confirmation_action)) repeat_key=0;
+        if (repeat_key && frequency && counter-repeat_last_counter>=repeat_delay_counter) {
+            /* At most one repeat per pump; a slow frame must never cause a burst. */
+            uint16_t key=repeat_key;
+            repeat_last_counter=counter;repeat_delay_counter=frequency/25u;
+            if(!repeat_delay_counter)repeat_delay_counter=1;
+            repeat_dispatch=1;chos_gui_input_key(key,1);repeat_dispatch=0;
+        }
+        gui_app_client_t *client=gui_app_find_window(view);
+        int editable = prompt_kind && prompt_kind<GUI_PROMPT_CONFIRM_DELETE;
+        if (!prompt_kind) editable = (view==VIEW_CONSOLE && !terminal_scrollback.offset) ||
+            (view==VIEW_FILE_VIEWER && viewer_editable) ||
+            (view==VIEW_NETWORK && network_focus>=3 && network_focus<=6 &&
+                (network_draft.mode==CHOS_NET_STATIC || network_focus==6)) ||
+            (client && client->caret.enabled);
+        if (editable && !start_menu_open && !context_menu_open && !power_confirmation_action &&
+            frequency && counter-caret_last_counter>=frequency/2u) {
+            caret_last_counter=counter;text_caret_visible=!text_caret_visible;gui_mark_dirty();
+        }
     }
     if (startup_chime_pending) {
         uint64_t elapsed_ms = 0u;

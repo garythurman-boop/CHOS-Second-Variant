@@ -91,6 +91,8 @@ rings, MAC/link discovery, checked PCI/DMA resources and permanent quarantine on
 uncertain DMA. QEMU e1000e traffic passes DHCP, DNS, browser HTTP/relative redirect
 and native USB/storage regressions (`e1000-http1`, `e1000-native1`). Host/ASan tests
 cover reset, bounds, padding, ring wrap, receive errors, link loss and TX timeout.
-New Fusion e1000e traffic needs a Mac retest; no support for arbitrary Intel NICs
-is implied. The revised Stage 3 request is tracked in STAGE3_REVISED_PROMPT.md and
+The user now confirms Fusion Ethernet and example.com HTTP work after the
+54b9731 delivery. This is user-reported target evidence; no image hash, packet
+capture, reconnect or TLS validation was supplied. Arbitrary Intel NIC support
+is not implied. The revised Stage 3 request is tracked in STAGE3_REVISED_PROMPT.md and
 STAGE3_ARCHITECTURE.md, superseding the Word document's Stage 3 scope.

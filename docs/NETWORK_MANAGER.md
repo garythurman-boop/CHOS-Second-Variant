@@ -75,7 +75,8 @@ error. Aggregate host, ASan/UBSan and smoke checks pass. The install sample took
 20.866 s, maximum step 12.815 ms, shutdown status 5.038 s. These are individual
 shared-cloud measurements. All inputs are hash-recorded in the handoff.
 
-Fusion e1000e traffic still needs an independent Mac test. Modern engine/runtime,
+The user confirms Fusion Ethernet and example.com HTTP work after the 54b9731
+delivery; that report does not certify TLS, reconnect or other adapters. Modern engine/runtime,
 TLS, Wi-Fi, IPv6 and other revised Stage 3 gates remain incomplete. The local
 engine-prerequisite probe exits nonzero for missing C++/pthread/mmap/poll/WPE
 facilities; it is retained as a dependency failure, not a passing browser test.

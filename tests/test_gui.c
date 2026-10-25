@@ -862,6 +862,49 @@ int main(void) {
     chos_gui_input_key(46,1);chos_gui_pump();assert(strcmp(chos_gui_view_name(),"Console")==0);
     mock_ticks=1300;chos_gui_pump();assert(strcmp(chos_gui_view_name(),"Console")==0);
     chos_gui_set_driver_report(NULL,NULL);mock_timer_ready=1;
+    /* Typematic is server-owned, bounded and cancelled by release/focus/control. */
+    {
+        chos_gui_message_t m,e;
+        uint32_t id=test_create_gui_client(93u,"Typing test");
+        while(chos_gui_pop_event(93u,&e)>0){}
+        uint64_t start=mock_ticks;
+        chos_gui_input_key(14u,1);
+        assert(chos_gui_pop_event(93u,&e)>0 && e.payload.key_event.keycode==14u);
+        mock_ticks=start+49;chos_gui_pump();assert(!chos_gui_pop_event(93u,&e));
+        mock_ticks=start+50;chos_gui_pump();
+        assert(chos_gui_pop_event(93u,&e)>0 && (e.payload.key_event.event_flags&CHOS_GUI_EVENT_KEY_REPEAT));
+        mock_ticks+=4;chos_gui_pump();assert(chos_gui_pop_event(93u,&e)>0);
+        mock_ticks+=1000;chos_gui_pump();
+        assert(chos_gui_pop_event(93u,&e)>0 && !chos_gui_pop_event(93u,&e)); /* no catch-up burst */
+        chos_gui_input_key(14u,0);assert(chos_gui_pop_event(93u,&e)>0);
+        mock_ticks+=100;chos_gui_pump();assert(!chos_gui_pop_event(93u,&e));
+        chos_gui_input_key(14u,1);chos_gui_input_key(29u,1);chos_gui_input_key(29u,0);
+        while(chos_gui_pop_event(93u,&e)>0){}
+        mock_ticks+=100;chos_gui_pump();assert(!chos_gui_pop_event(93u,&e));
+        chos_gui_input_key(14u,0);while(chos_gui_pop_event(93u,&e)>0){}
+
+        gui_message_begin(&m,CHOS_GUI_MSG_SET_CARET,sizeof(m.payload.caret));
+        m.payload.caret=(chos_gui_caret_t){.window_id=id,.x=10,.y=10,.width=1,.height=14,.argb=0xff123456u,.enabled=1};
+        assert(chos_gui_submit_message(92u,&m,m.header.size_bytes)==-CHOS_ERRNO_EPERM);
+        m.payload.caret.x=INT32_MAX;assert(chos_gui_submit_message(93u,&m,m.header.size_bytes)==-CHOS_ERRNO_EINVAL);
+        m.payload.caret.x=10;m.payload.caret.text_length=CHOS_GUI_MAX_TEXT;
+        assert(chos_gui_submit_message(93u,&m,m.header.size_bytes)==-CHOS_ERRNO_EINVAL);
+        m.payload.caret.text_length=0;
+        assert(chos_gui_submit_message(93u,&m,m.header.size_bytes-1)==-CHOS_ERRNO_EINVAL);
+        m.payload.caret.enabled=0;m.payload.caret.x=INT32_MAX;m.payload.caret.text_length=1;m.payload.caret.text[0]='W';
+        assert(chos_gui_submit_message(93u,&m,m.header.size_bytes)==0); /* disabled coordinates never overflow */
+        m.payload.caret.enabled=1;m.payload.caret.x=10;m.payload.caret.text_length=0;
+        assert(chos_gui_submit_message(93u,&m,m.header.size_bytes)==0);
+        chos_gui_input_key(42u,1);chos_gui_input_key(42u,0);chos_gui_pump();
+        assert(pixels[174u*800u+166u]==0xff123456u);
+        mock_ticks+=50;chos_gui_pump();assert(pixels[174u*800u+166u]!=0xff123456u);
+        mock_ticks+=50;chos_gui_pump();assert(pixels[174u*800u+166u]==0xff123456u);
+        /* Focus another window: the old caret stays hidden, held key is cancelled. */
+        chos_gui_input_key(14u,1);(void)test_create_gui_client(94u,"Other focus");
+        while(chos_gui_pop_event(94u,&e)>0){}
+        mock_ticks+=100;chos_gui_pump();assert(!chos_gui_pop_event(94u,&e));
+        chos_gui_process_exited(94u);chos_gui_process_exited(93u);
+    }
     puts("gui: desktop composition, taskbar hover-tooltip delay/fade, vertical start-menu gradient/branding, keyboard navigation, windowing, splash timing, persistent display modes, first-start audio readiness, bounded retries, power-dialog cancellation, and EL0 Console output ownership passed");
     return 0;
 }

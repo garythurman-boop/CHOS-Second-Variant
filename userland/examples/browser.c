@@ -573,8 +573,18 @@ static void redraw(void) {
     (void)fill_rect(window_id,140,6,422u,1u,address_focused?0xff000080u:0xff808080u);
     (void)fill_rect(window_id,140,6,1u,28u,address_focused?0xff000080u:0xff808080u);
     chos_strlcpy(shown_url,address,sizeof(shown_url));
-    n=chos_strlen(shown_url); if(n>52u) { shown_url[49]='.';shown_url[50]='.';shown_url[51]='.';shown_url[52]='\0'; }
+    n=chos_strlen(address);
+    if (address_focused && n>30u) chos_strlcpy(shown_url,address+n-30u,sizeof(shown_url));
+    else if(n>52u) { shown_url[49]='.';shown_url[50]='.';shown_url[51]='.';shown_url[52]='\0'; }
     (void)draw_text(window_id,146,14,shown_url,0xff000000u);
+    message_begin(&m,CHOS_GUI_MSG_SET_CARET,sizeof(m.payload.caret));
+    m.payload.caret.window_id=window_id;
+    m.payload.caret.x=147; m.payload.caret.y=15;
+    m.payload.caret.width=1; m.payload.caret.height=14;
+    m.payload.caret.argb=0xff000000u; m.payload.caret.enabled=address_focused!=0;
+    m.payload.caret.text_length=(uint32_t)chos_strlen(shown_url);
+    chos_memcpy(m.payload.caret.text,shown_url,m.payload.caret.text_length);
+    (void)submit_message(&m);
     draw_button(566,6,43,"Go",0); draw_button(613,6,44,"Star",0); draw_button(661,6,91,"Marks",0);
     (void)draw_text(window_id,10,48,status_line,0xff404040u);
     (void)fill_rect(window_id,8,68,BROWSER_WINDOW_W-16u,1u,0xff808080u);
@@ -829,6 +839,7 @@ int main(int argc, char **argv) {
     (void)argc;(void)argv;
     if(!create_window()) chos_exit(2);
     page_set("Welcome to CHOS Web Browser.\n\nEnter a hostname or http:// URL in the address bar and press Enter.\n\nThe browser supports HTTP redirects, clickable HTML links, scrolling, basic semantic text layout, and safe image-alt placeholders. JavaScript, full CSS layout, and image decoding are not available. HTTPS remains blocked until TLS and certificate verification are integrated.");
+    redraw();
     for(;;) {
         long got=chos_gui_poll_event(&event,sizeof(event));
         if(got>0) {
@@ -836,8 +847,10 @@ int main(int argc, char **argv) {
             if(event.header.type==CHOS_GUI_MSG_KEY_EVENT) handle_key(&event);
             else if(event.header.type==CHOS_GUI_MSG_POINTER_EVENT) handle_pointer(&event);
         }
+        browser_phase_t old_phase=phase;
+        size_t old_length=response_length;
         poll_network();
-        redraw();
+        if(got>0 || old_phase!=phase || old_length!=response_length)redraw();
         (void)chos_sleep_ticks(1u);
     }
 }

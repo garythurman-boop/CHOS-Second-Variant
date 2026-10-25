@@ -64,7 +64,7 @@ runtime expansion. No modern-engine performance numbers exist yet.
 |---|---|---|
 | QEMU AArch64 direct | Live MMU/EL0, VirtIO Ethernet/RNG, CHFS, GUI | Retain regressions; add service/TLS/engine/IPv6 fixtures |
 | QEMU AArch64 UEFI | Live native USB/NVMe/GOP, VirtIO/VMXNET3 | e1000e traffic, reconnect, manager, installer/power regression; isolated runtime |
-| Fusion on M1 | User confirms 107ef51 fixes except network; NIC 8086:10d3 | New e1000e driver traffic/reconnect; secure entropy; modern runtime/browser |
+| Fusion on M1 | User confirms prior lifecycle fixes and now Ethernet/example.com after 54b9731; NIC 8086:10d3 | Reconnect/failure tests; secure entropy; modern runtime/browser |
 | Raspberry Pi 5 | Board unavailable | Real boot/IOMMU/DMA, Ethernet and selected Wi-Fi chipset/firmware/authentication |
 | ARM64 laptop | Model/inventory unavailable | Explicit controller/firmware, Wi-Fi, ACPI/DMA, real browser/isolation |
 
@@ -76,3 +76,7 @@ The first network milestone is published as build-54b9731. The next runtime
 source-only iteration adds the bounded EL0 mapping primitive documented in
 USER_MEMORY.md; it does not provide a modern engine or change the full-stage
 completion criteria.
+
+The selected physical wireless target is now the Pi 5 onboard CYW43455 family,
+not a Fusion virtual Ethernet adapter. See PI5_WIRELESS.md for pinned Raspberry Pi
+firmware evidence and the SDIO2/platform/firmware/authentication dependencies.

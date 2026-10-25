@@ -19,6 +19,7 @@
 #define CHOS_GUI_WINDOW_ID_NONE 0u
 #define CHOS_GUI_EVENT_KEY_DOWN       (1u << 0)
 #define CHOS_GUI_EVENT_KEY_UP         (1u << 1)
+#define CHOS_GUI_EVENT_KEY_REPEAT     (1u << 2)
 #define CHOS_GUI_EVENT_POINTER_MOVE   (1u << 0)
 #define CHOS_GUI_EVENT_POINTER_DOWN   (1u << 1)
 #define CHOS_GUI_EVENT_POINTER_UP     (1u << 2)
@@ -36,6 +37,7 @@ typedef enum {
     CHOS_GUI_MSG_DRAW_TEXT = 6,
     CHOS_GUI_MSG_REPLY = 7,
     CHOS_GUI_MSG_CLEAR = 8,
+    CHOS_GUI_MSG_SET_CARET = 9,
     CHOS_GUI_MSG_KEY_EVENT = 16,
     CHOS_GUI_MSG_POINTER_EVENT = 17,
     CHOS_GUI_MSG_CLOSE_REQUEST = 18,
@@ -102,6 +104,16 @@ typedef struct {
     uint32_t background_argb;
 } chos_gui_clear_t;
 
+/* Client coordinates; the server owns focus, blinking, clipping and lifetime. */
+typedef struct {
+    uint32_t window_id;
+    int32_t x, y;
+    uint32_t width, height, argb, enabled;
+    /* Optional UI-font prefix: x is the text origin; server measures glyphs. */
+    uint32_t text_length;
+    char text[CHOS_GUI_MAX_TEXT];
+} chos_gui_caret_t;
+
 typedef struct {
     uint32_t status;
     uint32_t object_id;
@@ -118,6 +130,7 @@ typedef struct {
         chos_gui_key_event_t key_event;
         chos_gui_pointer_event_t pointer_event;
         chos_gui_clear_t clear;
+        chos_gui_caret_t caret;
         chos_gui_reply_t reply;
         struct { uint32_t window_id; uint32_t reserved; } window;
         struct { uint32_t window_id; uint16_t title_length; uint16_t reserved; char title[CHOS_GUI_MAX_TEXT]; } set_title;
@@ -129,7 +142,7 @@ static inline int chos_gui_message_header_valid(const chos_gui_message_header_t 
                                                  size_t supplied_bytes) {
     if (header == NULL || supplied_bytes < sizeof(*header)) return 0;
     if (header->version != CHOS_GUI_ABI_VERSION) return 0;
-    if (!((header->type >= CHOS_GUI_MSG_CREATE_WINDOW && header->type <= CHOS_GUI_MSG_CLEAR) ||
+    if (!((header->type >= CHOS_GUI_MSG_CREATE_WINDOW && header->type <= CHOS_GUI_MSG_SET_CARET) ||
           (header->type >= CHOS_GUI_MSG_KEY_EVENT && header->type <= CHOS_GUI_MSG_FOCUS_EVENT))) return 0;
     if (header->size_bytes < sizeof(*header) ||
         header->size_bytes > CHOS_GUI_MAX_MESSAGE_BYTES ||

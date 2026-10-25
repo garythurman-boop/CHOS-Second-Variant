@@ -76,4 +76,6 @@ recovery functionality, never the revised browser deliverable. Track actual engi
 TLS, isolation, wireless, IPv6 and platform gates in STAGE3_ARCHITECTURE.md and
 BROWSER_ENGINE_PORT.md; do not claim the full stage from Ethernet/manager progress.
 The user confirms 107ef51 power/storage/Console changes work in Fusion, but its
-actual NIC is Intel 8086:10d3. New e1000e traffic needs independent Fusion evidence.
+actual NIC is Intel 8086:10d3. The user now confirms Fusion Ethernet/example.com work after 54b9731. Keep this
+user-reported evidence distinct from automated QEMU tests. The selected wireless
+target is Pi 5 CYW43455 over SDIO; do not regress Ethernet while adding it.
