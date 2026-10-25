@@ -17,6 +17,11 @@
 #include "chos/net_manager.h"
 #include "chos/net6.h"
 #include "chos/entropy.h"
+#include "chos/installer_io.h"
+static int mock_setup_available;
+static chos_install_job_t mock_setup_job;
+int chos_install_available(void){return mock_setup_available;}
+chos_install_job_t *chos_install_runtime(void){return &mock_setup_job;}
 
 static uint32_t pixels[CHOS_DISPLAY_MAX_WIDTH * CHOS_DISPLAY_MAX_HEIGHT];
 static size_t mock_screen_width = 800u;
@@ -525,6 +530,10 @@ int main(void) {
     mock_ticks = 300u;
     chos_gui_pump(); /* splash completes only after the 3 second minimum. */
     assert(pixels[0] == 0xff008080u); /* classic teal desktop */
+    mock_setup_available=1;
+    chos_gui_input_key(23u,1);chos_gui_input_key(23u,0);chos_gui_pump();
+    assert(strcmp(chos_gui_view_name(),"Welcome")==0); /* Plain I never launches Setup. */
+    mock_setup_available=0;
 
     /* A syscall/task may invalidate the scene while the shell presents. That
      * update must not be erased by the old frame's final dirty=0 store. */

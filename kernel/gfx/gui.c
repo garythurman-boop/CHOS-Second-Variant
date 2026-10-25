@@ -5005,7 +5005,6 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         return;
     }
     if(view==VIEW_INSTALLER && pressed){if(keycode==15u)installer_focus=(installer_focus+1)%3;else if(keycode==28u||keycode==57u)installer_action(installer_focus);else if(keycode==1u)installer_action(2);gui_mark_dirty();return;}
-    if(view==VIEW_WELCOME && pressed && keycode==23u && installer_available()){installer_open();return;}
     if (prompt_kind != 0) {
         char ch;
         if (!pressed) return;

@@ -182,6 +182,19 @@ def write_download_index(root, latest):
 def run(root, build, source, force=False, handoff=None):
     state_path = root / 'artifacts' / 'publication.json'
     state = json.loads(state_path.read_text()) if state_path.exists() else {}
+    hold = state.get('release_hold', {})
+    if hold.get('active'):
+        if force:
+            raise ValueError('Binary publication is held: ' + hold.get('reason', 'Stage 3 acceptance required'))
+        if state.get('last_counted_source_commit') == source:
+            return {'status': 'already-recorded', 'source_commit': source, 'release_hold': hold}
+        # Keep the prior cadence checkpoint; count held iterations separately.
+        state['held_source_iterations'] = state.get('held_source_iterations', 0) + 1
+        state['last_counted_source_commit'] = source
+        temporary = state_path.with_suffix('.json.tmp')
+        temporary.write_text(json.dumps(state, indent=2) + '\n')
+        temporary.replace(state_path)
+        return {'status': 'publication-held-source-only', **state}
     due, count, duplicate = publication_due(state, source, force)
     if duplicate:
         return {'status': 'already-recorded', 'source_commit': source}

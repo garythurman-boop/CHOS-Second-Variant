@@ -13,6 +13,6 @@ Publication tag: `build-d91d135`.
 - [Checksums](d91d135/SHA256SUMS?raw=1)
 - [Manifest](d91d135/manifest.json?raw=1)
 
-Source is pushed each iteration. Binary downloads are published every other completed implementation iteration; the next iteration after this publication is source-only.
+New binary publications are held until revised Stage 3 is complete and thoroughly tested. Source pushes and local tests continue; existing downloads remain unchanged.
 
 See [publication instructions](../docs/ARTIFACT_PUBLICATION.md) and [installation guide](../docs/INSTALL_GUIDE.md) and [validation report](../docs/STAGE2_VALIDATION.md). Actual Fusion validation of this build remains pending. NVMe discovery is read-only; destructive installation requires explicit target selection and confirmation.

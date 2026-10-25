@@ -13,6 +13,26 @@ spec.loader.exec_module(publisher)
 
 
 class PublicationTests(unittest.TestCase):
+    def test_stage3_hold_prevents_staging_and_force(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=pathlib.Path(tmp);folder=root/'artifacts';folder.mkdir()
+            path=folder/'publication.json'
+            original={'latest':{'source_commit':'previous'},'iterations_since_artifacts':1,
+                      'release_hold':{'active':True,'reason':'Complete and thoroughly test revised Stage 3'}}
+            path.write_text(json.dumps(original))
+            with mock.patch.object(publisher,'stage',side_effect=AssertionError('must not stage')):
+                for i in range(4):
+                    result=publisher.run(root,root/'build',str(i)*40)
+                    self.assertEqual(result['status'],'publication-held-source-only')
+                    self.assertEqual(result['latest'],original['latest'])
+                self.assertEqual(result['held_source_iterations'],4)
+                before=path.read_bytes()
+                with self.assertRaisesRegex(ValueError,'publication is held'):
+                    publisher.run(root,root/'build','f'*40,force=True)
+                self.assertEqual(path.read_bytes(),before)
+                publisher.run(root,root/'build','3'*40)
+                self.assertEqual(path.read_bytes(),before)
+
     def test_every_other_iteration_and_duplicate(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)

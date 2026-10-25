@@ -40,6 +40,8 @@ checks=[]
 try:
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text() if o.mode=='uefi' else 'chos> ' in g.text(),45,'desktop')
  wait(lambda:g.symbol('splash_active')==0,10,'splash')
+ key('i');time.sleep(.15);assert g.symbol('view')==0,'plain I must not launch Setup'
+ checks+=['plain I on Welcome does not launch Setup']
  key('c');wait(lambda:g.symbol('view')==1,4,'Console')
  for c in 'abcdefghijklmnopqrstuvwxyz':key(c)
  wait(lambda:len(text('terminal_command'))==26,3,'all typed Console characters before timed hold')

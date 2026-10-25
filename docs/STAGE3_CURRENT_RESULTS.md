@@ -38,3 +38,9 @@ The IPv6 follow-up is source-only under the user's alternating artifact cadence.
 The latest downloadable ISO remains d91d135 and contains the typing fixes; it does
 not contain this later IPv6 implementation. See [IPv6 scope](IPV6_CONTROL_PLANE.md),
 [typing behavior](TEXT_INPUT.md) and [Pi 5 wireless evidence](PI5_WIRELESS.md).
+
+The user reports the tested build works without significant issues. Plain I
+opening Setup was identified as an unwanted Welcome-view hotkey and removed.
+This target report does not cover source-only IPv6 or future untested features.
+New build publication is now held until every revised Stage3 gate is met and
+thoroughly tested; this supersedes the earlier alternating binary cadence.

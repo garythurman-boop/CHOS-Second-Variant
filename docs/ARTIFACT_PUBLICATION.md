@@ -1,5 +1,11 @@
 # GitHub build publication
 
+The latest user instruction places new binary publications on hold until revised
+Stage 3 is complete and thoroughly tested. This supersedes the cadence below.
+Source pushes and local build/testing continue. The active release_hold in
+artifacts/publication.json prevents the helper from staging even with --publish-now.
+Do not clear it to publish a partial milestone. Existing downloads remain available.
+
 Source goes to GitHub after every completed iteration. The user's updated preference
 publishes ISO and related binary files after every other future implementation
 iteration. Build `2ed3e6d` was the initial publication. The latest pointer and

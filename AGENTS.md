@@ -18,29 +18,14 @@ The official prepared distribution image may be published compressed.
 
 ### Binary artifact cadence
 
-The user requests ISO files and related downloads on GitHub now and after every
-SECOND future completed implementation iteration. Source still goes to main after
-every iteration. The current publication is the baseline: the next iteration is
-source-only, the following one publishes artifacts, and that alternation continues.
-Do not count bookkeeping commits or individual commits inside one iteration.
-
-Use artifacts/publication.json as the persisted counter and latest-build pointer.
-After committing an implementation iteration, run python3 tools/publish_artifacts.py
---iteration --source-ref <that-source-commit> once; duplicate calls for the same
-source commit do not advance it. On artifact iterations, rebuild the committed
-source cleanly first and validate the applicable build, then run the helper. It
-refuses dirty/mismatched kernels and updates the counter only after staging succeeds.
-The --publish-now option handles an explicit request outside the normal cadence.
-
-Commit the counter and any artifacts as a separate bookkeeping commit and push
-main. When artifacts were staged, tag that publication commit build-<source-sha7>
-and push the new tag without replacing an existing tag. Confirm the remote SHA,
-tag and published files. Staging files locally is not publication. GitHub Releases
-is preferred when its authenticated API is available; the current environment
-blocks that API, so artifacts/<source-sha7>/ contains versioned repository downloads.
-Keep each tracked file below GitHub's size limit; gzip prepared disks and kernels.
-Do not rebuild the kernel merely for publication-only documentation/tool changes.
-See docs/ARTIFACT_PUBLICATION.md for commands and release verification.
+The latest user instruction supersedes the every-other-iteration binary cadence:
+DO NOT publish new ISOs, kernels, prepared images, handoffs or build tags until all
+revised Stage 3 acceptance gates are satisfied and thoroughly tested. Local builds
+and tests remain authorized. Source commits still go to main after each iteration.
+`artifacts/publication.json` persists the release hold; the publisher records held
+source iterations and refuses even --publish-now while the hold is active. Do not
+clear that hold merely to publish a partial milestone. Keep existing downloads
+unchanged. See docs/STAGE3_CURRENT_RESULTS.md for the open acceptance gates.
 
 ## Build and verification
 
