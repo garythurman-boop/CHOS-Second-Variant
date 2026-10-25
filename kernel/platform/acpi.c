@@ -219,6 +219,11 @@ chos_acpi_error_t chos_acpi_parse(const chos_boot_info_t *boot, chos_acpi_info_t
                     if(n==nodes) out->dma_translation_unverified=0;
                 }
             }
+        } else if (sig_is(table, "FACP")) {
+            /* ACPI 5.1+ FADT ARM_BOOT_ARCH, not a firmware function pointer. */
+            if (valid_table(boot,child,"FACP",132u,&length) && table[8]>=5u &&
+                (table[129]&1u) && !(table[129]&~3u) && table[130]==0u)
+                out->psci_conduit=(table[129]&2u)?2u:1u;
         } else if (sig_is(table, "SPCR")) {
             if (valid_table(boot, child, "SPCR", 80u, &length) && table[36]==3u &&
                 table[40]==0u && table[42]==0u && (table[43]==0u || table[43]==3u)) {

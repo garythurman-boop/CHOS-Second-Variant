@@ -2870,6 +2870,8 @@ static void draw_about_content(void) {
 }
 
 extern chos_install_job_t *chos_install_runtime(void) __attribute__((weak));
+extern int chos_install_available(void) __attribute__((weak));
+static int installer_available(void){return chos_install_runtime && chos_install_available && chos_install_available();}
 extern int chos_install_choose_native(void) __attribute__((weak));
 extern int chos_install_start(const char *) __attribute__((weak));
 extern void chos_install_tick(void) __attribute__((weak));
@@ -2888,7 +2890,7 @@ static void installer_action(int button) {
     gui_mark_dirty();
 }
 static void installer_open(void){
-    if(!chos_install_runtime)return;
+    if(!installer_available())return;
     chos_install_job_t *j=chos_install_runtime();
     if(j->state==INSTALL_CANCELLED)j->state=INSTALL_IDLE;
     installer_page=(j->state==INSTALL_WRITING||j->state==INSTALL_FORMATTING||j->state==INSTALL_VERIFYING)?4:0;
@@ -2992,7 +2994,7 @@ static void draw_diagnostics_content(void) {
     text(203, 434, native_caps && chos_xhci_error?chos_xhci_error():chos_input_last_error(), C_TEXT);
     if(chos_probe_native_storage)draw_button(480,463,260,24,
         (chos_native_storage_is_writable&&chos_native_storage_is_writable())?"CHFS writes enabled":(native_storage_probe_attempted || (chos_native_storage_is_present&&chos_native_storage_is_present())) && storage_mounted() ? (native_writes_ack?"Confirm file writes":"Enable CHFS writes..."):"Detect NVMe (read only)",chos_native_storage_is_writable&&chos_native_storage_is_writable());
-    if(chos_install_runtime)draw_button(204,463,220,24,"Install CHOS...",0);
+    if(installer_available())draw_button(204,463,220,24,"Install CHOS...",0);
     if(native_storage_probe_attempted && chos_native_storage_status)
         text(203,448,storage_block_ready()?((chos_native_storage_is_writable&&chos_native_storage_is_writable())?"Disk mounted with file writes enabled.":"Disk detected. File writes require explicit enable/confirm."):chos_native_storage_status(),C_MUTED);
     draw_status_line("Diagnostics", "Read-only view");
@@ -3472,8 +3474,8 @@ static void draw_power_confirmation(void) {
     gui_draw_named_icon(shutdown ? "shutdown" : "restart", x + 18 * scale, y + 43 * scale, 40 * scale, 40 * scale);
     text_bold(x + 70 * scale, y + 45 * scale, shutdown ? "Close CHOS?" : "Restart CHOS?", C_TEXT);
     if (shutdown) {
-        text(x + 70 * scale, y + 69 * scale, "The guest will halt safely.", C_TEXT);
-        text(x + 70 * scale, y + 88 * scale, "Close the QEMU window to exit.", C_TEXT);
+        text(x + 70 * scale, y + 69 * scale, "Files will be saved before power-off.", C_TEXT);
+        text(x + 70 * scale, y + 88 * scale, "The virtual machine will power off.", C_TEXT);
     } else {
         text(x + 70 * scale, y + 69 * scale, "The kernel and devices will restart.", C_TEXT);
         text(x + 70 * scale, y + 88 * scale, "Saved settings will be retained.", C_TEXT);
@@ -4407,13 +4409,16 @@ static void gui_confirm_power_action(void) {
     power_confirmation_action = 0;
     start_menu_open = 0;
     start_menu_selected_item = -1;
-    if (action == CHOS_POWER_RESTART) {
-        gui_render_power_status("Restarting CHOS...", "Please wait while the kernel and devices restart.");
-        uart_puts("[POWER] Restart requested from the graphical desktop.\n");
-        chos_power_execute(CHOS_POWER_RESTART);
+    if(chos_install_runtime) {
+        chos_install_job_t *job=chos_install_runtime();
+        if(job && (job->state==INSTALL_WRITING || job->state==INSTALL_FORMATTING || job->state==INSTALL_VERIFYING)) {
+            gui_desktop_status("Cancel installation before restarting or shutting down.");gui_mark_dirty();return;
+        }
     }
-    gui_render_power_status("CHOS has halted", "Close the QEMU window to exit CHOS.");
-    chos_power_execute(CHOS_POWER_SHUTDOWN);
+    gui_render_power_status(action==CHOS_POWER_RESTART?"Restarting CHOS...":"Shutting down...",
+        action==CHOS_POWER_RESTART?"Saving files and restarting the machine.":"Saving files. The machine will power off shortly.");
+    const char *error=chos_power_execute((chos_power_action_t)action);
+    gui_desktop_status(error?error:"Power service returned unexpectedly.");gui_mark_dirty();
 }
 
 static void gui_handle_power_confirmation_click(int32_t x, int32_t y) {
@@ -4526,7 +4531,7 @@ static void click_at(int32_t x, int32_t y, int in_window) {
         }
         return;
     }
-    if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=204 && x<424 && y>=463 && y<487 && chos_install_runtime){installer_open();return;}
+    if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=204 && x<424 && y>=463 && y<487 && installer_available()){installer_open();return;}
     if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=480 && x<740 && y>=463 && y<487 && chos_probe_native_storage) {
         if((native_storage_probe_attempted || (chos_native_storage_is_present&&chos_native_storage_is_present())) && storage_mounted() && chos_native_storage_enable_writes && !(chos_native_storage_is_writable&&chos_native_storage_is_writable())) {
             if(!native_writes_ack)native_writes_ack=1;
@@ -4760,7 +4765,7 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         return;
     }
     if(view==VIEW_INSTALLER && pressed){if(keycode==15u)installer_focus=(installer_focus+1)%3;else if(keycode==28u||keycode==57u)installer_action(installer_focus);else if(keycode==1u)installer_action(2);gui_mark_dirty();return;}
-    if(view==VIEW_WELCOME && pressed && keycode==23u && chos_install_runtime){installer_open();return;}
+    if(view==VIEW_WELCOME && pressed && keycode==23u && installer_available()){installer_open();return;}
     if (prompt_kind != 0) {
         char ch;
         if (!pressed) return;

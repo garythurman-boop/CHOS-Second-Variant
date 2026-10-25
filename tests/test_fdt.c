@@ -12,9 +12,9 @@
 #define TEST_END 9u
 
 struct tree_writer {
-    uint8_t structure[512];
+    uint8_t structure[1024];
     size_t structure_size;
-    uint8_t strings[128];
+    uint8_t strings[256];
     size_t strings_size;
 };
 
@@ -117,6 +117,11 @@ static size_t make_test_blob(uint8_t *blob, size_t capacity, int empty_reserved_
     prop_reg(&w, 0x09000000u, 0x1000u);
     end_node(&w);
 
+    begin_node(&w,"psci");
+    prop_string(&w,"compatible","arm,psci-0.2");
+    prop_string(&w,"method","hvc");
+    end_node(&w);
+
     begin_node(&w, "reserved-memory");
     prop_u32(&w, "#address-cells", 2u);
     prop_u32(&w, "#size-cells", 2u);
@@ -162,12 +167,13 @@ static size_t make_test_blob(uint8_t *blob, size_t capacity, int empty_reserved_
 }
 
 int main(void) {
-    uint8_t blob[1024];
+    uint8_t blob[2048];
     fdt_info_t info;
     (void)make_test_blob(blob, sizeof(blob), 1, 0);
 
     assert(fdt_parse_blob(blob, &info) == FDT_OK);
     assert(info.valid == 1);
+    assert(info.psci_conduit==2);
     assert(strcmp(info.model, "CHOS test board") == 0);
     assert(strcmp(info.compatible, "chos,test-board") == 0);
     assert(info.memory_count == 1u);

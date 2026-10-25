@@ -104,7 +104,7 @@ int virtio_gpu_set_mode(size_t mode_index, chos_surface_t *surface) {
 size_t virtio_gpu_current_mode_index(void) { return mock_display_mode_index; }
 const char *virtio_gpu_last_error(void) { return "mock gpu ready"; }
 void uart_puts(const char *message) { (void)message; }
-void chos_power_execute(chos_power_action_t action) {
+const char *chos_power_execute(chos_power_action_t action) {
     (void)action;
     abort(); /* A host GUI test must not request a real power transition. */
 }

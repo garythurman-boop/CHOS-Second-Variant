@@ -8,7 +8,7 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]
 class Guest:
     def __init__(self,args,out,disk):
         self.out=out;self.log=out/'serial.log';self.logfile=self.log.open('wb')
-        self.args=args
+        self.args=args;self.events=[]
         original=args.kernel if args.mode=='direct' else args.uefi_kernel
         elf=out/'kernel.elf';shutil.copyfile(original,elf)
         iso=out/'boot.iso'
@@ -25,6 +25,7 @@ class Guest:
              '-cpu','cortex-a72','-m',args.memory,'-display','none','-no-reboot',
              '-global','virtio-mmio.force-legacy=false','-serial','stdio',
              '-qmp',f'unix:{self.sockpath},server=on,wait=off']
+        if getattr(args,'allow_reboot',False):cmd.remove('-no-reboot')
         if args.qemu_data: cmd+=['-L',str(args.qemu_data)]
         if getattr(args,'gdb_socket',None):
             cmd+=['-gdb','unix:'+str(args.gdb_socket)+',server=on,wait=off']
@@ -79,15 +80,17 @@ class Guest:
         self.f.write(json.dumps({'execute':execute,'arguments':args}).encode()+b'\n')
         while True:
             r=json.loads(self.f.readline())
+            if 'event' in r:self.events.append(r)
             if 'error' in r: raise RuntimeError(r)
             if 'return' in r:return r['return']
     def hmp(self,c):return self.qmp('human-monitor-command',**{'command-line':c})
     def block(self,name,offset=0,size=4):
         address=self.symbols[name]+offset
         if self.args.mode!='direct':
-            match=re.search(r'Kernel physical base: (0x[0-9a-f]+)',self.text())
+            matches=re.findall(r'Kernel physical base: (0x[0-9a-f]+)',self.text())
+            match=matches[-1] if matches else None
             if not match: return 1
-            address+=int(match[1],16)-self.symbols['__kernel_start']
+            address+=int(match,16)-self.symbols['__kernel_start']
         target=self.out/'probe.bin'
         result=self.hmp(f'pmemsave {address:#x} {size} "{target}"')
         if result:raise AssertionError(result)

@@ -12,16 +12,18 @@ or larger is recommended). The current installer supports exactly one NVMe
 controller, namespace 1 and 512-byte logical sectors. It refuses ambiguous or
 truncated controller inventories and unverified IOMMU topology. Other storage
 controllers and multiple-target selection are not implemented. Do not attach a
-valuable disk as the installation target. Fusion testing of this new installer
-remains required; automated installation evidence is from QEMU/AAVMF.
+valuable disk as the installation target. The user confirms c4672fb installs and boots disk-only in Fusion. Later power,
+automatic-write and network changes still need a Fusion retest.
 
 ## Existing volumes without installation
 
 Open **Diagnostics** and select **Detect NVMe (read only)**. A valid CHFS volume
 can be read without enabling writes. A blank disk remains blank. To modify an
 existing CHFS volume, select **Enable CHFS writes...**, then **Confirm file writes**.
-Neither action formats the disk. An installed NVMe boot volume is discovered and
-mounted read-only at startup; the same confirmation enables writes.
+Neither action formats the disk. An installed NVMe boot volume is discovered and mounted writable automatically
+after GPT/CHFS mount and live device identity/geometry validation. Failed validation
+leaves recovery available. This never formats a disk. Manual ISO discovery remains
+read-only until explicitly enabled.
 
 ## Installation wizard
 
@@ -41,9 +43,9 @@ mounted read-only at startup; the same confirmation enables writes.
    the target and confirming again; controller quarantine may require reboot.
 7. After **Installation completed and verified**, shut down the VM, detach the
    ISO and boot from the installed NVMe disk alone.
-8. CHFS files are available read-only. Enable and confirm file writes in
-   Diagnostics to save documents and settings. Verify a test file survives a
-   reboot before using this development filesystem for anything important.
+8. CHFS files and settings are writable automatically on installed boots. Verify
+   a test file survives Restart. Setup is hidden on installed boots; use the ISO
+   for reinstall/recovery.
 
 Tab changes focus; Enter/Space activates the focused control; Escape cancels.
 Pointer controls use the same native input path as the desktop. Closing Setup
@@ -53,7 +55,7 @@ The installer owns storage exclusively while writing/formatting/verifying.
 ## Resolution and browser
 
 Settings changes the logical desktop size immediately on firmware framebuffers.
-After installation and explicit write enablement, the same choice saves a checked
+After booting the installed system, the same choice saves a checked
 resolution request in the ESP. Restart to apply a physical GOP mode offered by
 firmware. Unsupported, corrupt or failed requests retain a safe firmware mode;
 Fusion window resizing and arbitrary physical mode changes without reboot are
@@ -68,3 +70,13 @@ support; a Fusion adapter still needs a supported native network driver.
 See [the validation report](STAGE2_VALIDATION.md) for exact commands, results,
 known limits and external target checks. Compare the source build ID and verify
 the published SHA256SUMS before testing a download.
+
+## Restart and shutdown
+
+Restart flushes writable storage and invokes the PSCI SYSTEM_RESET service declared
+by the checksummed ACPI FADT (or direct-boot FDT). It does not jump into the old
+kernel. Shutdown displays “Shutting down...” for at least five seconds, flushes
+storage and requests PSCI SYSTEM_OFF. A flush failure or returned/absent firmware
+service reports an error and keeps the desktop usable. Power actions are refused
+during active installation; cancel Setup first. No UEFI protocol callback is used
+after ExitBootServices.

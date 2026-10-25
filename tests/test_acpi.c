@@ -71,6 +71,20 @@ int main(void) {
     assert(acpi.pci_segment_count==1u && acpi.pci_segments[0].ecam_base==0x40000000u);
     assert(acpi.pci_segments[0].end_bus==255u);
 
+    /* FADT ARM_BOOT_ARCH is consumed only after bounds/revision/checksum checks. */
+    init_sdt(at(0xa00),"FACP",132);at(0xa00)[8]=5;at(0xa00)[129]=3;fix_sdt(at(0xa00),132);
+    put32(at(0x200)+4,68);put64(at(0x200)+60,(uintptr_t)at(0xa00));fix_sdt(at(0x200),68);
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && acpi.psci_conduit==2);
+    at(0xa00)[129]=1;fix_sdt(at(0xa00),132);
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && acpi.psci_conduit==1);
+    at(0xa00)[129]=2;fix_sdt(at(0xa00),132);
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && !acpi.psci_conduit);
+    at(0xa00)[129]=3;fix_sdt(at(0xa00),132);at(0xa00)[9]^=1;
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && !acpi.psci_conduit);
+    put32(at(0xa00)+4,129);fix_sdt(at(0xa00),129);
+    assert(chos_acpi_parse(&boot,&acpi)==CHOS_ACPI_OK && !acpi.psci_conduit);
+    make_fixture(&boot);
+
     /* Optional SPCR must be checksum-valid, PL011, SystemMemory, aligned,
      * and must not alias an EFI RAM descriptor. */
     init_sdt(at(0x800),"SPCR",80);at(0x800)[36]=3;at(0x800)[41]=32;at(0x800)[43]=3;

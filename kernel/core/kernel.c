@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "chos/fdt.h"
 #include "chos/platform.h"
+#include "chos/power.h"
 #include "chos/uart.h"
 #include "chos/shell.h"
 #include "chos/pmm.h"
@@ -86,6 +87,7 @@ int chos_persist_display_request(uint32_t width,uint32_t height){
 }
 int chos_native_storage_is_writable(void){return native_storage_writable;}
 int chos_native_storage_is_present(void){return native_storage_disk.ready;}
+int chos_install_available(void){return native_storage_boot && !(native_storage_boot->flags&CHOS_BOOT_FLAG_BOOT_NVME) && native_storage_boot->installer_payload_size!=0u;}
 static fdt_info_t boot_device_tree;
 extern uint8_t __kernel_start;
 
@@ -243,6 +245,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
 
         acpi_result = chos_acpi_parse(boot_info, &acpi_info);
         native_storage_boot=boot_info;native_storage_acpi=acpi_info;
+        chos_power_set_conduit(acpi_result==CHOS_ACPI_OK?acpi_info.psci_conduit:0u);
         if (acpi_result==CHOS_ACPI_OK && acpi_info.pl011_base) {
             uart_attach_pl011((uintptr_t)acpi_info.pl011_base);
             uefi_console_enable_serial();
@@ -370,7 +373,8 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         if(boot_info->flags&CHOS_BOOT_FLAG_BOOT_NVME){
             int found=chos_probe_native_storage();
-            if(console_ready)uefi_console_write(found&&storage_mounted()?"[OK] Installed NVMe boot volume mounted read only.\n":"[WARN] NVMe boot volume could not be mounted; ROMFS recovery remains available.\n");
+            int writable=found && storage_mounted() && chos_native_storage_enable_writes();
+            if(console_ready)uefi_console_write(writable?"[OK] Installed NVMe boot volume mounted writable.\n":found&&storage_mounted()?"[WARN] Installed volume is read only; write validation failed.\n":"[WARN] NVMe boot volume could not be mounted; ROMFS recovery remains available.\n");
         }
 #ifdef CHOS_ENABLE_EXPERIMENTAL_NVME
         /* UEFI has no VirtIO-MMIO storage assumptions: attach a native PCI NVMe
@@ -524,6 +528,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
 
     fdt_result = fdt_parse_blob((const void *)platform_dtb_address(), &boot_device_tree);
     if (fdt_result == FDT_OK) {
+        chos_power_set_conduit(boot_device_tree.psci_conduit);
         for(size_t i=0;i<boot_device_tree.device_count;++i) {
             const fdt_device_t *d=&boot_device_tree.devices[i];
             static const char pl031[]="arm,pl031";unsigned k=0;

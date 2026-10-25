@@ -172,3 +172,26 @@ with one CPU and 2 GiB RAM and follow INSTALL_GUIDE.md. QEMU results do not cert
 Fusion, arbitrary NVMe hardware, Pi 5, laptops, IOMMU ownership, networking or TLS.
 This is locally validated Stage 2 for the declared profile, not universal hardware
 support or closure of every remaining Stage 1 platform gate.
+
+## Installed-system follow-up
+
+The user confirms c4672fb ISO installation and disk-only boot on Fusion, but reports
+in-system Restart hangs, writes require manual enablement, and DHCP is offline.
+The old power implementation restarted by branching into the kernel and Shutdown
+only halted. Both now use firmware-declared PSCI. Installed boot volumes enable
+writes after live identity/geometry revalidation; Setup controls are hidden there.
+ISO discovery and destructive confirmation safeguards remain.
+
+`lifecycle-install1/result.json` passes actual graphical installation, supported
+1024x768 GOP request, disk-only auto-writable mount, file persistence, hidden Setup,
+a real in-process PSCI reset through firmware and guest power-off after 5.038 s.
+Its source precedes the final idle-wait/second-flush refinement; the final rerun is
+recorded separately. Host FADT/FDT and power-policy tests cover malformed/unsupported
+power metadata, flush refusal and minimum delay. Earlier “reboot” evidence that
+starts a fresh emulator is not evidence for an in-system reset.
+
+`lifecycle-install2/result.json` repeats all lifecycle gates on the final power
+C sources, including timer-idle wait and a second flush before power-off: PASS.
+Installation 20.858 s, maximum step 15.865 ms, visible shutdown 5.039 s. Aggregate
+host and ASan/UBSan suites pass (`lifecycle-full-host.log`, `lifecycle-sanitize.log`);
+final power-policy normal/sanitized tests also pass. Fusion retest remains external.

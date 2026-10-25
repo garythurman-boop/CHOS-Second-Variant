@@ -73,14 +73,14 @@ try:
  # Validate the actual guest-written GPT/ESP/CHFS with the independent host validator.
  assert (out/'kernel.elf').read_bytes() in disk.read_bytes(), 'Installed ESP must contain the exact running kernel'
  boot=out/'disk-only';boot.mkdir()
- a.mode='installed'
+ a.mode='installed';a.allow_reboot=True
  g=Guest(a,boot,disk)
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text(),45,'disk-only boot without ISO')
  wait(lambda:g.symbol('splash_active')==0,10,'installed desktop')
- assert 'Installed NVMe boot volume mounted read only.' in g.text(),'Installed boot volume should be discovered without manual probing'
+ assert 'Installed NVMe boot volume mounted writable.' in g.text(),'Installed boot volume should be discovered without manual probing'
  g.screen('installed-desktop')
  key('esc');key('f1');click(600,475);wait(lambda:g.symbol('fs_ready')==1,5,'installed CHFS mount')
- click(600,475);click(600,475) # Enable file writes, then explicitly confirm.
+ assert g.symbol('native_storage_writable')==1,'Installed storage writes must be automatic'
  key('esc');key('c');g.type('write /stage2.txt installed-persistence')
  wait(lambda:'File written and flushed.' in g.terminal(),5,'installed-system write')
  g.screen('persistent-write')
@@ -103,15 +103,40 @@ try:
  key('esc');key('c');g.type('type /stage2.txt');wait(lambda:'installed-persistence' in g.terminal(),5,'persistent data after reboot')
  g.screen('persistence-after-reboot')
  protected_hash=hashlib.sha256(disk.read_bytes()).hexdigest()
- key('esc');key('i');wait(lambda:g.symbol('view')==8,3,'installed setup safety check')
- main_action();main_action()
- wait(lambda:g.symbol('installer_page')==5,3,'boot-volume protection')
- assert hashlib.sha256(disk.read_bytes()).hexdigest()==protected_hash,'Protected boot volume was modified'
- assert int.from_bytes(g.block('installation',offset=offset,size=4),'little')==6
- g.screen('boot-volume-protected')
- (out/'result.json').write_text(json.dumps({'status':'PASS','install_seconds':round(elapsed,3),'three_key_focus_ms':responsiveness_ms,'max_install_step_ms':max_step_ms,'keyboard_wizard':options.keyboard,'physical_mode_change':options.supported_mode,'checks':['no writes before target selection and final confirmation','guest GPT/FAT32/EFI/CHFS creation and verification','ISO detached: disk-only desktop and native input','installed file write survives a fresh reboot','ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback','keyboard focus remains responsive during installation','installed boot volume cannot be selected for destructive installation']},indent=2))
+ key('esc');key('i');time.sleep(.3)
+ assert g.symbol('view')!=8,'Setup shortcut must be hidden on the installed system'
+ assert hashlib.sha256(disk.read_bytes()).hexdigest()==protected_hash,'Hidden installer modified the disk'
+ g.screen('setup-hidden')
+ # Actual guest reset, not restarting the emulator. Select Start -> Restart.
+ def physical_click(x,y):
+  width=g.symbol('active_surface',8);height=g.symbol('active_surface',16)
+  g.qmp('input-send-event',events=[{'type':'abs','data':{'axis':'x','value':round(x*32767/(width-1))}},{'type':'abs','data':{'axis':'y','value':round(y*32767/(height-1))}}]);time.sleep(.15)
+  for down in [True,False]:g.qmp('input-send-event',events=[{'type':'btn','data':{'button':'left','down':down}}]);time.sleep(.15)
+ width=g.symbol('active_surface',8);height=g.symbol('active_surface',16)
+ boots=g.text().count('Initial CHOS GUI frame rendered')
+ physical_click(40,height-15);physical_click(180,height-60)
+ wait(lambda:g.symbol('power_confirmation_action')==2,3,'restart confirmation')
+ key('ret')
+ wait(lambda:g.text().count('Initial CHOS GUI frame rendered')>boots,55,'actual PSCI restart through firmware')
+ wait(lambda:g.symbol('splash_active')==0,10,'restarted desktop')
+ assert g.symbol('native_storage_writable')==1
+ key('c');g.type('type /stage2.txt');wait(lambda:'installed-persistence' in g.terminal(),5,'data after real reset')
+ g.screen('actual-restart-persistence')
+ width=g.symbol('active_surface',8);height=g.symbol('active_surface',16)
+ physical_click(40,height-15);physical_click(95,height-60)
+ wait(lambda:g.symbol('power_confirmation_action')==1,3,'shutdown confirmation')
+ started_shutdown=time.monotonic();key('ret')
+ time.sleep(1);assert g.process.poll() is None,'Shutdown must hold status for at least five seconds'
+ g.screen('shutting-down')
+ wait(lambda:g.process.poll() is not None,15,'actual guest power off')
+ shutdown_seconds=time.monotonic()-started_shutdown
+ assert shutdown_seconds>=5 and g.process.returncode==0
+ # QMP may contain a shutdown event before closing; serial and process independently show guest path.
+ assert '[POWER] PSCI system off.' in g.text()
+
+ (out/'result.json').write_text(json.dumps({'status':'PASS','install_seconds':round(elapsed,3),'three_key_focus_ms':responsiveness_ms,'max_install_step_ms':max_step_ms,'keyboard_wizard':options.keyboard,'physical_mode_change':options.supported_mode,'shutdown_seconds':round(shutdown_seconds,3),'checks':['no writes before target selection and final confirmation','guest GPT/FAT32/EFI/CHFS creation and verification','ISO detached: disk-only desktop and native input','installed file write survives a fresh reboot','ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback','keyboard focus remains responsive during installation','installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits']},indent=2))
 except Exception:
- if g:g.screen('failure')
+ if g and g.process.poll() is None:g.screen('failure')
  raise
 finally:
  if g:g.close()

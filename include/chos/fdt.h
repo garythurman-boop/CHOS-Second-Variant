@@ -60,6 +60,7 @@ typedef struct {
     fdt_device_t devices[FDT_MAX_DEVICES];
     size_t device_count;
     int devices_truncated;
+    unsigned psci_conduit; /* arm,psci-0.2/1.0 method: 1 SMC, 2 HVC */
 } fdt_info_t;
 
 /* Parse an FDT blob in-place without allocation or libc dependencies. */

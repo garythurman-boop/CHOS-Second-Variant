@@ -19,6 +19,7 @@ typedef struct {
     char name[FDT_NODE_NAME_CAPACITY];
     char compatible[FDT_COMPATIBLE_CAPACITY];
     char device_type[16];
+    char method[4];
     int enabled;
     uint32_t address_cells;
     uint32_t size_cells;
@@ -136,6 +137,9 @@ static fdt_error_t process_node(fdt_info_t *out, const fdt_node_t *node,
     int is_reserved = node->under_reserved_memory;
 
     if (!node->enabled) return FDT_OK;
+    if (text_equal(node->compatible,"arm,psci-0.2") || text_equal(node->compatible,"arm,psci-1.0")) {
+        out->psci_conduit=text_equal(node->method,"smc")?1u:text_equal(node->method,"hvc")?2u:0u;
+    }
     if (is_reserved && (node->reg != NULL || node->has_size) &&
         !node->reserved_context_valid) {
         /* Child `reg` values are physical only when reserved-memory has the
@@ -360,6 +364,8 @@ fdt_error_t fdt_parse_blob(const void *blob, fdt_info_t *out) {
             } else if (text_equal(name, "compatible") && length > 0u) {
                 copy_first_string(node->compatible, sizeof(node->compatible), value, length);
                 if (depth == 0) copy_first_string(out->compatible, sizeof(out->compatible), value, length);
+            } else if (text_equal(name,"method") && length==4u && value[3]==0u) {
+                copy_first_string(node->method,sizeof(node->method),value,length);
             } else if (text_equal(name, "device_type") && length > 0u) {
                 copy_first_string(node->device_type, sizeof(node->device_type), value, length);
             } else if (text_equal(name, "reg")) {

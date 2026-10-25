@@ -28,6 +28,7 @@ typedef struct {
 typedef struct {
     uint64_t pl011_base; /* checksum-validated optional SPCR SystemMemory GAS */
     uint32_t dma_translation_unverified; /* SMMU/unknown IORT nodes: no native IOMMU ownership yet */
+    uint32_t psci_conduit; /* 0 unavailable, 1 SMC, 2 HVC: checked FADT ARM_BOOT_ARCH */
     uint32_t valid;
     uint8_t rsdp_revision;
     uint8_t root_is_xsdt;

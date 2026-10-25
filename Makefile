@@ -1152,3 +1152,15 @@ $(BUILD)/uefi/display_modes.obj: kernel/gfx/display_modes.c include/chos/display
 	@mkdir -p $(dir $@)
 	$(CC) $(UEFI_CCFLAGS) -c $< -o $@
 $(BUILD)/uefi/bootaa64.obj: include/chos/boot_info.h include/chos/display_modes.h
+
+$(BUILD)/test-power: tests/test_power.c kernel/core/power.c include/chos/power.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_power.c kernel/core/power.c -o $@
+$(SAN_DIR)/test-power: tests/test_power.c kernel/core/power.c include/chos/power.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_power.c kernel/core/power.c -o $@
+test-power: $(BUILD)/test-power
+	./$(BUILD)/test-power
+test-power-sanitize: $(SAN_DIR)/test-power
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-power
+test: test-power
+test-sanitize: test-power-sanitize

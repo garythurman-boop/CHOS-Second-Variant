@@ -5,28 +5,25 @@
 chos_arch_halt:
     msr daifset, #0xf
     dsb sy
-1:
-    wfi
+1:  wfi
     b 1b
 .size chos_arch_halt, . - chos_arch_halt
 
+/* C ABI (conduit, PSCI function). No platform guesses or firmware callbacks. */
 .align 4
-.global chos_arch_restart
-.type chos_arch_restart, %function
-chos_arch_restart:
-    /* Stop exceptions before returning to the reset entry path. */
-    msr daifset, #0xf
+.global chos_arch_psci
+.type chos_arch_psci, %function
+chos_arch_psci:
+    mov w4, w0
+    mov w0, w1
+    mov x1, xzr
+    mov x2, xzr
+    mov x3, xzr
     dsb sy
-    /* Keep instruction/data caches intact but disable translation before .bss
-     * (which contains the active page tables) is cleared at _start. */
-    mrs x9, sctlr_el1
-    bic x9, x9, #1
-    msr sctlr_el1, x9
-    dsb sy
-    isb
-    tlbi vmalle1
-    dsb sy
-    isb
-    ldr x9, =_start
-    br x9
-.size chos_arch_restart, . - chos_arch_restart
+    cmp w4, #2
+    b.eq 2f
+    smc #0
+    ret
+2:  hvc #0
+    ret
+.size chos_arch_psci, . - chos_arch_psci
