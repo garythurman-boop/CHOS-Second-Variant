@@ -1,0 +1,94 @@
+{
+  "milestone": "bounded owner-bound TCP6 and AAAA-over-IPv6 prerequisite",
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "source_sha256": {
+    "kernel/net/net6.c": "28ce8c2964acefc879b387b4751b474d7fa6312548907ad46afe5bc8a09b75d0",
+    "kernel/net/net_services.c": "5cc487d43d980bdf68e9e741b12dac9801228001e2106a2e85483433c98bb04b",
+    "include/chos/net_tcp6_api.h": "e89ba5fc97c9c9b1cea95bbe37fcd07d682e5ec7fa454a644c6d8d4fba93d543",
+    "include/chos/net_dns6_api.h": "9394ef4219fdb0c242cf4baed0e24fc5fbcf25ac3863cca1312a593f3e3a82d1",
+    "third_party/lwip-port/include/lwipopts.h": "ccf289bc996b8e8467a020e97f767763f8a6f6f112642e929f4b571d61018479",
+    "third_party/lwip-port/include/arch/cc.h": "9be47f5a8bf7ab298082724761a996fb19c6df67f41ef3be980f7d74bc0f807e",
+    "docs/dependencies/lwip.json": "492d6dd5ad779658d3027445f8ec840d4d53deaa986ea51249cc7a0bf681cd55",
+    "tests/qemu_tcp6.py": "af28d7a57b88ab5f54c2ab94c76ec1cdab48fae5ea5a71bdc4966360b2bea6f0",
+    "tests/qemu_dns6.py": "1bd999a3a25459f78fb139a3eb75850aa4623305679e8d0ae86a11509113218b",
+    "userland/examples/tcp6_test.c": "f8a2d315b36c4935b8aaed21cc7e76d2e23880d01318a94f5d0846cf325c09ba",
+    "userland/examples/dns6_test.c": "0907b45716e329c794745b6a25bb9010f7b87e4cc336d543b6c157c933fb249b"
+  },
+  "host": [
+    {
+      "evidence": "/workspace/chos-evidence/dns6-parser-host1.log",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/workspace/chos-evidence/dns6-parser-sanitize.log",
+      "status": "PASS"
+    },
+    {
+      "evidence": "/workspace/chos-evidence/dns6-final-host-sanitize.log",
+      "status": "PASS"
+    }
+  ],
+  "accepted_final_guest_profiles": [
+    {
+      "name": "tcp6-final3",
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/tcp6-final3/result.json",
+      "snapshot_artifacts": {
+        "kernel_sha256": "e2e792fab18454c8573fb13638327ba118581d10505a36c6d9202fca0006a52f"
+      },
+      "application_sha256": "645bf9a9f11bf2bc35aea7e6dc7c4844929a9721e4ed33f066423db56112409d",
+      "result_sha256": "2fa510db58279f5c9a5ea3afb07c30375a6cf287f7f963e75af20b028904547c"
+    },
+    {
+      "name": "tcp6-final-missing2",
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/tcp6-final-missing2/result.json",
+      "snapshot_artifacts": {
+        "kernel_sha256": "e2e792fab18454c8573fb13638327ba118581d10505a36c6d9202fca0006a52f"
+      },
+      "application_sha256": "645bf9a9f11bf2bc35aea7e6dc7c4844929a9721e4ed33f066423db56112409d",
+      "result_sha256": "58ca4052d0e88c1a06bc0fc45b6a659389ae29bb93975dab8b8ebd2c425151fb"
+    },
+    {
+      "name": "dns6-final2",
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/dns6-final2/result.json",
+      "snapshot_artifacts": {
+        "kernel_sha256": "e2e792fab18454c8573fb13638327ba118581d10505a36c6d9202fca0006a52f"
+      },
+      "application_sha256": "336e3a5a6d6348261fc1ce22f900240ba77217306c81e43c057ff7a496791bc0",
+      "result_sha256": "599b3e98cfb09cebeb3ce6173579e26de44468e9cb7512db7c6061e233ccb612"
+    },
+    {
+      "name": "dns6-final-missing2",
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/dns6-final-missing2/result.json",
+      "snapshot_artifacts": {
+        "kernel_sha256": "e2e792fab18454c8573fb13638327ba118581d10505a36c6d9202fca0006a52f"
+      },
+      "application_sha256": "336e3a5a6d6348261fc1ce22f900240ba77217306c81e43c057ff7a496791bc0",
+      "result_sha256": "97d1a302bc9b3df761aff4080a7ec0c41648ef95cb5bd246a823a81c6e39140a"
+    }
+  ],
+  "earlier_completed_guest_profiles": [
+    "tcp6-live2",
+    "tcp6-missing1",
+    "dns6-live1",
+    "dns6-missing1"
+  ],
+  "retained_failures": [
+    {
+      "name": "tcp6-live1",
+      "status": "FAIL",
+      "diagnosis": "Runner incorrectly awaited a fresh prompt after asynchronous exec; actual guest TCP6 success marker already present. Replaced prompt expectation with actual procinfo active=0/pending-cleanup=0 polling. Subsequent repeated streams and owner reaper pass."
+    }
+  ],
+  "limits": [
+    "No engine, TLS, DNSSEC, browser integration or full Stage3 result",
+    "QEMU direct EL0 evidence only; Fusion/Pi/laptop untested for new transport",
+    "Default QEMU slirp RA supplies no RDNSS; fixture uses a real controlled Ethernet peer without fabricating a guest default DNS server",
+    "TCP6 and DNS6 fail closed without hardware-backed entropy; IPv4 behavior remains unchanged",
+    "DHCPv6/manual IPv6/multiple active interfaces/DNS TCP fallback remain open"
+  ]
+}

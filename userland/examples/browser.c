@@ -841,16 +841,26 @@ int main(int argc, char **argv) {
     page_set("Welcome to CHOS Web Browser.\n\nEnter a hostname or http:// URL in the address bar and press Enter.\n\nThe browser supports HTTP redirects, clickable HTML links, scrolling, basic semantic text layout, and safe image-alt placeholders. JavaScript, full CSS layout, and image decoding are not available. HTTPS remains blocked until TLS and certificate verification are integrated.");
     redraw();
     for(;;) {
-        long got=chos_gui_poll_event(&event,sizeof(event));
-        if(got>0) {
+        int input_changed=0;
+        /* Bound work per frame while draining ordinary key down/up bursts.
+         * Redrawing the full toolbar for every key-up/motion used to make the
+         * isolated application fall behind its 16-event queue and lose typing. */
+        for(unsigned input=0;input<8u;input++) {
+            long got=chos_gui_poll_event(&event,sizeof(event));
+            if(got<=0)break;
             if(event.header.type==CHOS_GUI_MSG_CLOSE_REQUEST) { destroy_window(); chos_exit(0); return 0; }
-            if(event.header.type==CHOS_GUI_MSG_KEY_EVENT) handle_key(&event);
-            else if(event.header.type==CHOS_GUI_MSG_POINTER_EVENT) handle_pointer(&event);
+            if(event.header.type==CHOS_GUI_MSG_KEY_EVENT &&
+               (event.payload.key_event.event_flags&CHOS_GUI_EVENT_KEY_DOWN)) {
+                handle_key(&event);input_changed=1;
+            } else if(event.header.type==CHOS_GUI_MSG_POINTER_EVENT &&
+                (event.payload.pointer_event.event_flags&(CHOS_GUI_EVENT_POINTER_DOWN|CHOS_GUI_EVENT_POINTER_SCROLL))) {
+                handle_pointer(&event);input_changed=1;
+            }
         }
         browser_phase_t old_phase=phase;
         size_t old_length=response_length;
         poll_network();
-        if(got>0 || old_phase!=phase || old_length!=response_length)redraw();
+        if(input_changed || old_phase!=phase || old_length!=response_length)redraw();
         (void)chos_sleep_ticks(1u);
     }
 }

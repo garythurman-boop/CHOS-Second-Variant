@@ -2,6 +2,14 @@
 #define CHOS_DMA_H
 #include <stddef.h>
 #include <stdint.h>
+static inline int chos_dma_identity_ready(void) {
+#if defined(CHOS_HOST_TEST) || !defined(__aarch64__)
+    return 1;
+#else
+    extern int vmm_identity_dma_ready(void);
+    return vmm_identity_dma_ready();
+#endif
+}
 /* Cache ownership helpers for identity DMA on the current single-core target.
  * Callers must use dedicated, cache-line-isolated buffers; these do not map an
  * IOMMU or translate arbitrary virtual addresses. */

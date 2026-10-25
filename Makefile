@@ -16,15 +16,17 @@ LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 
 SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/examples/browser_core.c kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/elf_image.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
-             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/mm/user_memory.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
+             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/uefi_vmm.c kernel/mm/uefi_vmm_boot.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/mm/user_memory.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
              kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/net/net_profile.c kernel/net/net_manager.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
-LWIP_CORE_NAMES := init def mem memp netif pbuf raw stats sys timeouts udp inet_chksum ip
+LWIP_CORE_NAMES := init def mem memp netif pbuf raw stats sys timeouts udp inet_chksum ip tcp tcp_in tcp_out
 LWIP_SOURCES := $(addprefix third_party/lwip/src/core/,$(addsuffix .c,$(LWIP_CORE_NAMES))) $(wildcard third_party/lwip/src/core/ipv6/*.c) third_party/lwip/src/netif/ethernet.c
 SOURCES_C += kernel/net/net6.c $(LWIP_SOURCES)
 LWIP_INCLUDES := -Ithird_party/lwip-port/include -Ithird_party/lwip/src/include
 $(patsubst %.c,$(BUILD)/%.o,kernel/net/net6.c $(LWIP_SOURCES)): CFLAGS += $(LWIP_INCLUDES)
 $(patsubst %.c,$(BUILD)/uefi-kernel/%.o,kernel/net/net6.c $(LWIP_SOURCES)): UEFI_KERNEL_CFLAGS += $(LWIP_INCLUDES)
+
+SOURCES_C += kernel/platform/sdio.c kernel/platform/cyw_sdio.c
 
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
            $(BUILD)/kernel/arch/aarch64/context_switch.o $(BUILD)/kernel/arch/aarch64/register_stress.o $(BUILD)/kernel/arch/aarch64/user_entry.o \
@@ -1295,12 +1297,12 @@ $(BUILD)/userland/memory_test.chcx: $(BUILD)/userland/memory_test.bin $(BUILD)/u
 	python3 tools/mkchcx.py --verify $@
 test-userland test: $(BUILD)/userland/memory_test.chcx
 
-$(BUILD)/test-net6: tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) include/chos/net6.h include/chos/net6_api.h
+$(BUILD)/test-net6: tests/test_net6.c kernel/net/net6.c kernel/net/net_services.c $(LWIP_SOURCES) include/chos/net6.h include/chos/net6_api.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 -Iinclude $(LWIP_INCLUDES) tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) -o $@
-$(SAN_DIR)/test-net6: tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) include/chos/net6.h include/chos/net6_api.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 -Iinclude $(LWIP_INCLUDES) tests/test_net6.c kernel/net/net6.c kernel/net/net_services.c $(LWIP_SOURCES) -o $@
+$(SAN_DIR)/test-net6: tests/test_net6.c kernel/net/net6.c kernel/net/net_services.c $(LWIP_SOURCES) include/chos/net6.h include/chos/net6_api.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) $(SAN_FLAGS) -Wno-misleading-indentation $(LWIP_INCLUDES) tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) -o $@
+	$(CC_HOST) $(SAN_FLAGS) -Wno-misleading-indentation $(LWIP_INCLUDES) tests/test_net6.c kernel/net/net6.c kernel/net/net_services.c $(LWIP_SOURCES) -o $@
 test-net6: $(BUILD)/test-net6
 	./$(BUILD)/test-net6
 test-net6-sanitize: $(SAN_DIR)/test-net6
@@ -1341,3 +1343,69 @@ $(BUILD)/userland/native_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/n
 test-userland test: $(BUILD)/userland/native_test.elf
 
 $(BUILD)/test-process-format $(SAN_DIR)/test-process-format $(BUILD)/test-romfs $(SAN_DIR)/test-romfs $(BUILD)/test-chfs $(SAN_DIR)/test-chfs $(BUILD)/test-installer-io $(SAN_DIR)/test-installer-io: include/chos/elf_image.h
+
+include userland/libc/Makefile.inc
+
+$(BUILD)/userland/tcp6_test.o: userland/examples/tcp6_test.c userland/libchos/include/chos/user.h include/chos/net_tcp6_api.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) -c $< -o $@
+$(BUILD)/userland/tcp6_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/tcp6_test.o userland/user.ld
+	$(LD) -T userland/user.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/tcp6_test.o
+$(BUILD)/userland/tcp6_test.chcx: $(BUILD)/userland/tcp6_test.elf tools/mkchcx.py
+	$(OBJCOPY) -O binary $< $(BUILD)/userland/tcp6_test.bin
+	$(NM) --defined-only --numeric-sort $< > $(BUILD)/userland/tcp6_test.sym
+	python3 tools/mkchcx.py --stack-pages 2 --v2-symbols $(BUILD)/userland/tcp6_test.sym $(BUILD)/userland/tcp6_test.bin $@
+test-userland test: $(BUILD)/userland/tcp6_test.chcx
+$(BUILD)/test-net6 $(SAN_DIR)/test-net6: include/chos/net_tcp6_api.h third_party/lwip-port/include/lwipopts.h third_party/lwip-port/include/arch/cc.h
+
+.PHONY: test-uefi-vmm test-uefi-vmm-sanitize
+test: test-uefi-vmm
+test-sanitize: test-uefi-vmm-sanitize
+$(BUILD)/test-uefi-vmm: tests/test_uefi_vmm.c kernel/mm/uefi_vmm.c kernel/mm/vmm_layout.c include/chos/uefi_vmm.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_uefi_vmm.c kernel/mm/uefi_vmm.c kernel/mm/vmm_layout.c -o $@
+test-uefi-vmm: $(BUILD)/test-uefi-vmm
+	./$(BUILD)/test-uefi-vmm
+$(SAN_DIR)/test-uefi-vmm: tests/test_uefi_vmm.c kernel/mm/uefi_vmm.c kernel/mm/vmm_layout.c include/chos/uefi_vmm.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_uefi_vmm.c kernel/mm/uefi_vmm.c kernel/mm/vmm_layout.c -o $@
+test-uefi-vmm-sanitize: $(SAN_DIR)/test-uefi-vmm
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-uefi-vmm
+
+$(BUILD)/test-net6 $(SAN_DIR)/test-net6: include/chos/net_dns6_api.h
+
+# Independent SDIO/CYW wire implementation; no platform auto-probe until Pi5
+# regulator/pins/clock/host ownership and live radio validation exist.
+
+
+SDIO_TEST_SOURCES := tests/test_sdio.c kernel/platform/sdio.c kernel/platform/cyw_sdio.c
+SDIO_TEST_HEADERS := include/chos/sdio.h include/chos/cyw_sdio.h
+$(BUILD)/test-sdio: $(SDIO_TEST_SOURCES) $(SDIO_TEST_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $(SDIO_TEST_SOURCES) -o $@
+$(SAN_DIR)/test-sdio: $(SDIO_TEST_SOURCES) $(SDIO_TEST_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $(SDIO_TEST_SOURCES) -o $@
+.PHONY: test-sdio test-sdio-sanitize
+test-sdio: $(BUILD)/test-sdio
+	./$(BUILD)/test-sdio
+test-sdio-sanitize: $(SAN_DIR)/test-sdio
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-sdio
+test: test-sdio
+test-sanitize: test-sdio-sanitize
+
+$(BUILD)/userland/dns6_test.o: userland/examples/dns6_test.c userland/libchos/include/chos/user.h include/chos/net_dns6_api.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) -c $< -o $@
+$(BUILD)/userland/dns6_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/dns6_test.o userland/user.ld
+	$(LD) -T userland/user.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/dns6_test.o
+$(BUILD)/userland/dns6_test.chcx: $(BUILD)/userland/dns6_test.elf tools/mkchcx.py
+	$(OBJCOPY) -O binary $< $(BUILD)/userland/dns6_test.bin
+	$(NM) --defined-only --numeric-sort $< > $(BUILD)/userland/dns6_test.sym
+	python3 tools/mkchcx.py --stack-pages 2 --v2-symbols $(BUILD)/userland/dns6_test.sym $(BUILD)/userland/dns6_test.bin $@
+test-userland test: $(BUILD)/userland/dns6_test.chcx
+
+.PHONY: test-guest-iso-artifacts
+test: test-guest-iso-artifacts
+test-guest-iso-artifacts:
+	python3 tests/test_guest_iso_artifacts.py

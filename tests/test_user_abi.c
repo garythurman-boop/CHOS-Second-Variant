@@ -11,6 +11,8 @@ int main(void) {
     assert(CHOS_SYS_WRITE == 1u);
     assert(CHOS_SYS_EXIT == 2u);
     assert(CHOS_SYS_NET6_INFO==37u && CHOS_SYS_NET6_PING==38u);
+    assert(CHOS_SYS_NET6_OPEN==39u && CHOS_SYS_NET6_ABORT==45u);
+    assert(CHOS_SYS_NET6_DNS_START==46u && CHOS_SYS_NET6_DNS_STATUS==47u);
     assert(sizeof(chos_net6_info_t)==128u);
     assert(CHOS_SYS_GETPID == 3u);
     assert(CHOS_SYS_YIELD == 4u);

@@ -92,3 +92,9 @@ sparse mappings; CHCX limits and existing owned-frame quotas remain. This is
 validated direct EL0 support, not a complete modern browser or UEFI user runtime.
 Binary publication is held by the latest user instruction until full Stage3
 completion and thorough testing; source-only work continues.
+
+Current source adds a bounded UEFI CPU/process isolation profile while retaining
+identity DMA with data caching off. See [runtime contract and QEMU evidence](UEFI_PROCESS_RUNTIME.md).
+This does not establish Fusion qualification for these new changes, native IOMMU
+ownership, a modern browser, verified TLS or live wireless support. The binary
+publication hold remains active until the complete revised Stage 3 passes.

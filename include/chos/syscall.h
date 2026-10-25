@@ -41,6 +41,15 @@
 #define CHOS_SYS_UNMAP_MEMORY 36u /* x0=exact mapping base, x1=rounded allocation length */
 #define CHOS_SYS_NET6_INFO 37u /* x0=writable chos_net6_info_t, x1=capacity; read-only control-plane status */
 #define CHOS_SYS_NET6_PING 38u /* x0=NUL-terminated IPv6 literal; one bounded OS-owned echo request */
+#define CHOS_SYS_NET6_OPEN 39u /* x0=local port (0=ephemeral), process-owned nonblocking TCP6 */
+#define CHOS_SYS_NET6_CONNECT 40u /* x0=handle,x1=16 network-order IPv6 bytes,x2=port */
+#define CHOS_SYS_NET6_STATUS 41u /* x0=handle,x1=chos_tcp6_socket_info_t,x2=capacity */
+#define CHOS_SYS_NET6_SEND 42u /* x0=handle,x1=buffer,x2=length<=512 */
+#define CHOS_SYS_NET6_RECV 43u /* x0=handle,x1=writable buffer,x2=capacity<=512 */
+#define CHOS_SYS_NET6_CLOSE 44u /* x0=handle, starts bounded graceful FIN */
+#define CHOS_SYS_NET6_ABORT 45u /* x0=handle, immediate owner-only release */
+#define CHOS_SYS_NET6_DNS_START 46u /* x0=hostname; owner-bound async AAAA over validated RDNSS server */
+#define CHOS_SYS_NET6_DNS_STATUS 47u /* x0=writable chos_dns6_info_t,x1=capacity */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

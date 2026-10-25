@@ -1,0 +1,417 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD by user instruction",
+  "source_manifest": "docs/validation/stage3-runtime-source.sha256",
+  "source_manifest_sha256": "4f454f5b1ae283cc6ed330c4fae514add3ef71e6f68fd8da1424781b6ddf6c29",
+  "compiled_binaries": {
+    "build/chos.elf": "9af673ba06780f5f0078cd31097a466d86a37d4b0b5030dc54ffccaa4e3e1a73",
+    "build/uefi-kernel/chos.elf": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+    "build/chos-0.30.0.iso": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87"
+  },
+  "aggregate_checks": [
+    {
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/stage3-runtime-host9.log"
+    },
+    {
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/stage3-runtime-sanitize9.log"
+    },
+    {
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/stage3-runtime-smoke9.log"
+    },
+    {
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/uefi-vmm-policy.log"
+    },
+    {
+      "status": "PASS",
+      "evidence": "/workspace/chos-evidence/stage3-runtime-release-hold-final.log"
+    }
+  ],
+  "accepted_component_profiles": [
+    {
+      "directory": "/workspace/chos-evidence/stage3-runtime-native9-direct",
+      "result_sha256": "196735792b19f58176623fd668445ab6684939cd078750f390ae21b397c86418",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "91f542b988000f35eb6d4ed9885d44a6660e17b7b5a7adbccd35b2998f3bb288",
+        "free_pages_before": 117709,
+        "free_pages_after": 117709,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9af673ba06780f5f0078cd31097a466d86a37d4b0b5030dc54ffccaa4e3e1a73"
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/stage3-runtime-native9-uefi",
+      "result_sha256": "31bc11d59b1b126b740a7d8c58a429293fbc1b369d4c9aa3051dc4db80e71473",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "91f542b988000f35eb6d4ed9885d44a6660e17b7b5a7adbccd35b2998f3bb288",
+        "free_pages_before": 500570,
+        "free_pages_after": 500570,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/stage3-runtime-high-final",
+      "result_sha256": "62af1d382f195dd67770e8f8d0ffd29e2d1698f245a8a659ac8d2d28087943bb",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "91f542b988000f35eb6d4ed9885d44a6660e17b7b5a7adbccd35b2998f3bb288",
+        "free_pages_before": 502079,
+        "free_pages_after": 502079,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+        "iso_sha256": "f49a8986df0e24c52274861ae606162220de8f4ddf4b4dc00829818590e9be70",
+        "iso_embedded_kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/stage3-runtime-installer-final",
+      "result_sha256": "f2d03c5b0afb61440db4a323010b2b3c61e92353f0f561eb2f237ec624820f14",
+      "result": {
+        "status": "PASS",
+        "install_seconds": 52.598,
+        "three_key_focus_ms": 452.88,
+        "max_install_step_ms": 45.157,
+        "keyboard_wizard": true,
+        "physical_mode_change": true,
+        "shutdown_seconds": 5.081,
+        "checks": [
+          "no writes before target selection and final confirmation",
+          "guest GPT/FAT32/EFI/CHFS creation and verification",
+          "ISO detached: disk-only desktop and native input",
+          "scheduled shell file write survives a fresh reboot; native editor checked separately",
+          "ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback",
+          "keyboard focus remains responsive during installation",
+          "installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+        "iso_sha256": "4ef29de3d862b58910e006d4a7ce44fad02ef9ea5ba94d3a11614c2dabc35a46",
+        "iso_embedded_kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/native-typing-direct3",
+      "result_sha256": "d99517e32ad629a855673d92dc1565a923f73636cfca12399f187b1378bab363",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "60a665fb3c301ba8d558c7ba0d592364de5988bf3e2d39401eb1c35cd6b8d086",
+        "checks": [
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9af673ba06780f5f0078cd31097a466d86a37d4b0b5030dc54ffccaa4e3e1a73"
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/native-typing-final9-uefi",
+      "result_sha256": "c1e621affbc2700c45bf78126c8fbd78c9508249d65ab79d9a15d801569e2eac",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "60a665fb3c301ba8d558c7ba0d592364de5988bf3e2d39401eb1c35cd6b8d086",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/native-libc-final9-direct",
+      "result_sha256": "21e181657355251920b3ecd95697ebd6a5c46d6282e1372a41707ae59672bd84",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "e1fbc40e262e055b30d097d05145c787a9964cf489de0c79aef2b2a4546f05e7",
+        "free_pages_before": 117699,
+        "free_pages_after": 117699,
+        "checks": [
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated synchronous and scheduled launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9af673ba06780f5f0078cd31097a466d86a37d4b0b5030dc54ffccaa4e3e1a73"
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/native-libc-final9-uefi",
+      "result_sha256": "56d975ec903043e6d4d13ebf36479543f3d73393bef490a7389e6e8cb23ca654",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "e1fbc40e262e055b30d097d05145c787a9964cf489de0c79aef2b2a4546f05e7",
+        "free_pages_before": 500560,
+        "free_pages_after": 500560,
+        "checks": [
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated synchronous and scheduled launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/uefi-runtime-network-e1000e-final9",
+      "result_sha256": "7f845f1fa4d2c27157e80c12994d3a18f2b42e983f2c29bbffe105d9c15371c3",
+      "result": {
+        "status": "PASS",
+        "backend": "e1000e",
+        "browser_elf_sha256": "f7dda98dd231cf8202f7f3392158aa7cdc502dab9f5f78a36d1dfcebb5bfa613",
+        "browser_pid": 1,
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page",
+          "/slow",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "isolated EL0 browser window bound to its actual process owner",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS and no plaintext downgrade",
+          "DNS A query and reply over actual adapter",
+          "actual in-flight HTTP failure on link loss releases its process-owned socket",
+          "DHCP reconnect and new HTTP request in the same isolated browser process"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/uefi-runtime-network-vmxnet3-final",
+      "result_sha256": "017b26b6b9fb83e624c65ec111213f06e39cc7018f45127b86f66be4e165f2a8",
+      "result": {
+        "status": "PASS",
+        "backend": "vmxnet3",
+        "browser_elf_sha256": "f7dda98dd231cf8202f7f3392158aa7cdc502dab9f5f78a36d1dfcebb5bfa613",
+        "browser_pid": 2,
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "isolated EL0 browser window bound to its actual process owner",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS and no plaintext downgrade",
+          "DNS A query and reply over actual adapter"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+        "iso_sha256": "4ef29de3d862b58910e006d4a7ce44fad02ef9ea5ba94d3a11614c2dabc35a46",
+        "iso_embedded_kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/uefi-runtime-network-virtio-final9",
+      "result_sha256": "e3a054d87458f644492b36003d9de4ae03f7a249255970aa85019950380c8293",
+      "result": {
+        "status": "PASS",
+        "backend": "virtio",
+        "browser_elf_sha256": "f7dda98dd231cf8202f7f3392158aa7cdc502dab9f5f78a36d1dfcebb5bfa613",
+        "browser_pid": 1,
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "isolated EL0 browser window bound to its actual process owner",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS and no plaintext downgrade",
+          "DNS A query and reply over actual adapter"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "directory": "/workspace/chos-evidence/uefi-runtime-netmanager-e1000e-final",
+      "result_sha256": "50d4ed25c1459174eb89a16da85ec8aea9dd6fc5ee3b00864fc9991f20903587",
+      "result": {
+        "status": "PASS",
+        "backend": "e1000e",
+        "checks": [
+          "automatic DHCP without Console",
+          "functional keyboard/pointer Network Manager",
+          "static address/mask/gateway/DNS apply and explicit save",
+          "invalid mask refused",
+          "link loss clears configuration and sockets; reconnect restores static profile",
+          "unconfirmed trial rolls back after 30 seconds",
+          "actual gateway ARP/ICMP after reconnect",
+          "MAC-bound profile survives installed reboot",
+          "automatic DHCP reconnect and administrative disconnect/revert"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb"
+      }
+    }
+  ],
+  "other_reports": [
+    "docs/validation/stage3-native-c-runtime.json",
+    "docs/validation/stage3-ipv6-transport.json",
+    "docs/validation/stage3-uefi-network.json"
+  ],
+  "retained_failed_runs": [
+    {
+      "directory": "/workspace/chos-evidence/uefi-isolation-typing1",
+      "finding": "obsolete singleton Console expectation after reaching actual isolated application"
+    },
+    {
+      "directory": "/workspace/chos-evidence/uefi-native-elf1",
+      "finding": "fixture missing UEFI argument; corrected runner passes"
+    },
+    {
+      "directory": "/workspace/chos-evidence/network-el0-explore-e1000e",
+      "finding": "ISO/probe kernel mismatch; wrong memory observations; mandatory ISO/ESP identity guard added"
+    },
+    {
+      "directory": "/workspace/chos-evidence/native-typing-final-uefi",
+      "finding": "actual CHCX absolute pointer table in added netstatus faulted isolated Console; fixed inline character table and final live check passes"
+    }
+  ],
+  "input_timing_limit": "10 ms synthetic shortcut pulses lost a modifier release; 50 ms ordinary taps pass; held500ms checks unchanged. This is not full physical keyboard qualification. Measured uncached repeated-key throughput is below25Hz cap.",
+  "hardware_scope": {
+    "QEMU": "component profiles above only; no complete engine/TLS/WiFi qualification",
+    "VMware Fusion": "preceding build user-confirmed; new UEFI isolated runtime NOT RUN independently in Fusion",
+    "Pi5 CYW43455": "wire protocol host/sanitizer/compile only; native host/firmware/auth/scan absent; live NOT RUN",
+    "ARM64 laptops": "NOT RUN"
+  },
+  "open_software_gates": [
+    "genuine maintained modern browser engine integration and conformance",
+    "engine-sized memory, complete C/C++/POSIX, threads/futex, IPC/events/loader and content sandbox",
+    "maintained TLS, certificate/hostname/date/CA policy and supported Fusion entropy",
+    "Pi5 SDIO host/platform ownership, exact firmware startup, auth, real scans/connections/secure profiles",
+    "IPv6 browser integration, DHCPv6 where required, manualsettings, multipleinterfaces/routes",
+    "modern browser feature set, livewebsite/security/resource-pressure/performance evidence"
+  ],
+  "evidence_scope": "Accepted component runs span exact recorded local snapshots; this is not full Stage3 or all-platform qualification."
+}

@@ -5,8 +5,12 @@ sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from qemu_platform import Guest,wait
 ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--out',type=pathlib.Path,required=True);ap.add_argument('--net-model',choices=['e1000e','vmxnet3','virtio'],default='e1000e');o=ap.parse_args()
 out=o.out.resolve();out.mkdir(parents=True,exist_ok=False);disk=out/'disposable.img';shutil.copyfile('build/chos-0.30.0-installed.img',disk)
-a=argparse.Namespace(mode='installed',uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=pathlib.Path('build/chos-0.30.0.iso'),memory='2G',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model=o.net_model,storage_error=False,nvme=True,no_rng=True,hub_depth=0,empty_usb=False,tablet=True)
+assert pathlib.Path('build/uefi-kernel/chos.elf').read_bytes() in disk.read_bytes(), 'Prepared disk must contain the current kernel used for guest symbols'
+a=argparse.Namespace(mode='installed',uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=pathlib.Path('build/chos-0.30.0.iso'),memory='2G',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model=o.net_model,net_capture=True,storage_error=False,nvme=True,no_rng=True,hub_depth=0,empty_usb=False,tablet=True)
 g=Guest(a,out,disk)
+# Reboots must keep the symbols of this exact installed kernel even if another
+# authorized source iteration rebuilds the shared workspace in parallel.
+a.uefi_kernel=out/'kernel.elf'
 def key(k):g.hmp('sendkey '+k+' 10');time.sleep(.04)
 def click(x,y):
  w=g.window();x=w['x']+(x-180);y=w['y']+(y-70)
@@ -46,11 +50,13 @@ try:
  wait(lambda:g.symbol('net_state')==3,15,'trial DHCP configuration')
  wait(lambda:g.symbol('trial')==0 and g.symbol('net_state')==6,35,'30s automatic rollback')
  assert ipv4()==0x0a000219;g.screen('automatic-rollback')
- key('esc');key('c');g.type('ping 10.0.2.2')
+ # IPv4 ICMP diagnostics run in the trusted OS shell. The ordinary isolated
+ # Console consumes read-only network status rather than administrative APIs.
+ g.serial('ping 10.0.2.2')
  def ping_replied():
-  g.type('netstatus');return 'Ping: reply received' in g.terminal()
+  g.serial('netstatus');return 'Ping: reply received' in g.text()
  wait(ping_replied,10,'gateway ping after link recovery')
- g.type('netstatus');g.screen('gateway-reachable')
+ g.screen('gateway-reachable')
  g.close();g=None
  reboot=out/'reboot';reboot.mkdir();g=Guest(a,reboot,disk);ready()
  wait(lambda:g.symbol('net_state')==6 and ipv4()==0x0a000219,5,'persistent static profile after reboot')
@@ -66,7 +72,7 @@ try:
  click(530,443);wait(lambda:g.symbol('net_state')==3,15,'Revert restores automatic configuration')
  g.screen('disconnect-revert')
 
- (out/'result.json').write_text(json.dumps({'status':'PASS','backend':o.net_model,'checks':['automatic DHCP without Console','functional keyboard/pointer Network Manager','static address/mask/gateway/DNS apply and explicit save','invalid mask refused','link loss clears configuration and sockets; reconnect restores static profile','unconfirmed trial rolls back after 30 seconds','actual gateway ARP/ICMP after reconnect','MAC-bound profile survives installed reboot','automatic DHCP reconnect and administrative disconnect/revert']},indent=2))
+ (out/'result.json').write_text(json.dumps({'status':'PASS','backend':o.net_model,'checks':['automatic DHCP without Console','functional keyboard/pointer Network Manager','static address/mask/gateway/DNS apply and explicit save','invalid mask refused','link loss clears configuration; reconnect restores static profile','unconfirmed trial rolls back after 30 seconds','actual gateway ARP/ICMP after reconnect','MAC-bound profile survives installed reboot','automatic DHCP reconnect and administrative disconnect/revert']},indent=2))
 except Exception:
  if g and g.process.poll() is None:g.screen('failure')
  raise

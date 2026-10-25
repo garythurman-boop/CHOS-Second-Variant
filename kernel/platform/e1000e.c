@@ -1,3 +1,4 @@
+#include "chos/dma.h"
 /* Original CHOS Intel 82574L (8086:10d3) backend. Intel legacy descriptor ABI.
  * One polled queue, software checksums, standard MTU; permanent identity DMA.
  * No PHY/firmware writes intended for arbitrary Intel controllers. */
@@ -70,8 +71,7 @@ int chos_e1000e_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,c
  if(!boot||!acpi||!acpi->valid||!device||device->vendor_id!=0x8086||device->device_id!=0x10d3||device->class_code!=2){e_error="Not an Intel 82574L Ethernet device";return 0;}
  if(acpi->dma_translation_unverified){e_error="Intel 82574L requires verified identity DMA topology";return 0;}
 #ifdef __aarch64__
- uint64_t sctlr;__asm__ volatile("mrs %0,sctlr_el1":"=r"(sctlr));
- if(sctlr&5u){e_error="Intel 82574L requires MMU/cache off identity DMA";return 0;}
+ if(!chos_dma_identity_ready()){e_error="Intel 82574L requires verified identity DMA with data cache off";return 0;}
 #endif
  e_attempted=1;e_boot=boot;e_acpi=acpi;e_device=*device;
  uint64_t base,size;uint32_t command;

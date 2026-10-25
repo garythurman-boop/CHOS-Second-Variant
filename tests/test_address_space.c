@@ -69,8 +69,8 @@ static void test_template_sanitization(void) {
     assert(address_space_prepare_l2_templates(device, ram, VMM_L2_ENTRIES));
     assert(device[10] == 0x12345003ull);
     assert(ram[4] == 0x23456003ull);
-    assert(ram[dynamic_first] == 0u);
-    assert(ram[VMM_L2_ENTRIES - 1u] == 0u);
+    assert(ram[dynamic_first] == 0x34567003ull);
+    assert(ram[VMM_L2_ENTRIES - 1u] == 0x45678003ull);
     for (i = CHOS_AS_USER_L2_FIRST; i < CHOS_AS_USER_L2_LIMIT; ++i) assert(device[i] == 0u);
 
     device[CHOS_AS_USER_L2_FIRST] = 0x77777003ull;

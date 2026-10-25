@@ -1,3 +1,4 @@
+#include "chos/dma.h"
 /* Original CHOS polled VMXNET3 revision-1 driver. Wire register/descriptor ABI:
  * VMware VMXNET3/UPT specification; independently encoded, no Linux/QEMU code.
  * Single queue, standard Ethernet, no offloads. Identity DMA only. */
@@ -81,8 +82,7 @@ int chos_vmxnet3_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,
  if(!boot||!acpi||!acpi->valid||!device||device->vendor_id!=0x15ad||device->device_id!=0x07b0||device->class_code!=2){vmx_error="Not a VMXNET3 Ethernet device";return 0;}
  if(acpi->dma_translation_unverified){vmx_error="VMXNET3 IOMMU topology unsupported";return 0;}
 #ifdef __aarch64__
- uint64_t sctlr;__asm__ volatile("mrs %0,sctlr_el1":"=r"(sctlr));
- if(sctlr&5u){vmx_error="VMXNET3 requires identity DMA with MMU/cache off";return 0;}
+ if(!chos_dma_identity_ready()){vmx_error="VMXNET3 requires verified identity DMA with data cache off";return 0;}
 #endif
  attempted=1;platform_boot=boot;platform_acpi=acpi;vmx_pci_function=*device;
  uint64_t address[2],size[2];

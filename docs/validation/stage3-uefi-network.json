@@ -1,0 +1,201 @@
+{
+  "status": "PARTIAL_STAGE_3_VERIFICATION",
+  "stage_3_complete": false,
+  "publication": "Local test inputs only. No ISO, kernel, prepared image, handoff or build tag published; existing release hold remains active.",
+  "scope": "Retain real Ethernet, DHCP/DNS, HTTP preview, Network Manager and request recovery while enabling isolated UEFI application execution. This is not a modern browser or TLS acceptance result.",
+  "source_state": "Working tree based on 9890d0b before this coherent source iteration is committed; guest provenance is identified by exact hashes below.",
+  "evidence_root": "/workspace/chos-evidence",
+  "test_configuration": {
+    "emulator": "QEMU 10.0.13 software emulation",
+    "cpu": "Cortex-A72, one CPU",
+    "memory": "2 GiB",
+    "firmware": "AAVMF 2025.02-8+deb13u1",
+    "network": "QEMU user networking, local deterministic HTTP/UDP-DNS fixtures",
+    "input": "Native qemu-xhci USB keyboard and tablet",
+    "device_ids": {
+      "e1000e": "8086:10d3",
+      "vmxnet3": "15ad:07b0",
+      "virtio": "1af4:1041"
+    }
+  },
+  "artifact_guards": {
+    "status": "PASS",
+    "tests": 7,
+    "test_command": "python3 tests/test_guest_iso_artifacts.py",
+    "unit_evidence": "uefi-runtime-artifact-tests.log",
+    "enforcement": "Guest compares copied ISO embedded kernel or the installed ESP EFI/CHOS/CHOS.ELF against the supplied symbols before QEMU starts. Installed parsing checks GPT CRC/extent, ESP GUID, FAT32 geometry and bounded directory/file chains. Probes remain read-only.",
+    "covered_cases": [
+      "ISO multicluster extraction and exact digest",
+      "one-byte stale-symbol image rejected",
+      "truncated ISO rejected clearly",
+      "actual installed ESP path extracted and compared",
+      "stale supplied kernel present elsewhere on disk is rejected",
+      "corrupt GPT rejected before FAT access"
+    ],
+    "audit_evidence": [
+      "uefi-runtime-artifact-audit.json",
+      "uefi-runtime-installed-artifact-audit.json"
+    ]
+  },
+  "accepted_profiles": [
+    {
+      "name": "uefi-runtime-network-e1000e-final9",
+      "status": "PASS",
+      "scope": "UEFI isolated HTTP preview and in-flight link-loss recovery",
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      },
+      "checks": [
+        "native Ethernet queues and DHCP",
+        "isolated EL0 browser window bound to its actual process owner",
+        "browser TCP HTTP body and relative redirect",
+        "HTTPS blocked without TLS and no plaintext downgrade",
+        "DNS A query and reply over actual adapter",
+        "actual in-flight HTTP failure on link loss releases its process-owned socket",
+        "DHCP reconnect and new HTTP request in the same isolated browser process"
+      ],
+      "evidence_directory": "uefi-runtime-network-e1000e-final9",
+      "backend": "e1000e",
+      "browser_elf_sha256": "f7dda98dd231cf8202f7f3392158aa7cdc502dab9f5f78a36d1dfcebb5bfa613",
+      "browser_pid": 1,
+      "requests": [
+        "/redirect",
+        "/page",
+        "/page",
+        "/slow",
+        "/page"
+      ],
+      "dns_queries": [
+        "0463686f7304746573740000010001"
+      ]
+    },
+    {
+      "name": "uefi-runtime-network-vmxnet3-final9",
+      "status": "PASS",
+      "scope": "UEFI isolated HTTP preview and in-flight link-loss recovery",
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      },
+      "checks": [
+        "native Ethernet queues and DHCP",
+        "isolated EL0 browser window bound to its actual process owner",
+        "browser TCP HTTP body and relative redirect",
+        "HTTPS blocked without TLS and no plaintext downgrade",
+        "DNS A query and reply over actual adapter",
+        "actual in-flight HTTP failure on link loss releases its process-owned socket",
+        "DHCP reconnect and new HTTP request in the same isolated browser process"
+      ],
+      "evidence_directory": "uefi-runtime-network-vmxnet3-final9",
+      "backend": "vmxnet3",
+      "browser_elf_sha256": "f7dda98dd231cf8202f7f3392158aa7cdc502dab9f5f78a36d1dfcebb5bfa613",
+      "browser_pid": 1,
+      "requests": [
+        "/redirect",
+        "/page",
+        "/page",
+        "/slow",
+        "/page"
+      ],
+      "dns_queries": [
+        "0463686f7304746573740000010001"
+      ]
+    },
+    {
+      "name": "uefi-runtime-network-virtio-final9",
+      "status": "PASS",
+      "scope": "UEFI isolated HTTP preview",
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      },
+      "checks": [
+        "native Ethernet queues and DHCP",
+        "isolated EL0 browser window bound to its actual process owner",
+        "browser TCP HTTP body and relative redirect",
+        "HTTPS blocked without TLS and no plaintext downgrade",
+        "DNS A query and reply over actual adapter"
+      ],
+      "evidence_directory": "uefi-runtime-network-virtio-final9",
+      "backend": "virtio",
+      "browser_elf_sha256": "f7dda98dd231cf8202f7f3392158aa7cdc502dab9f5f78a36d1dfcebb5bfa613",
+      "browser_pid": 1,
+      "requests": [
+        "/redirect",
+        "/page",
+        "/page"
+      ],
+      "dns_queries": [
+        "0463686f7304746573740000010001"
+      ]
+    },
+    {
+      "name": "uefi-runtime-netmanager-e1000e-final",
+      "status": "PASS",
+      "scope": "installed Network Manager and profile persistence",
+      "artifacts": {
+        "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb"
+      },
+      "checks": [
+        "automatic DHCP without Console",
+        "functional keyboard/pointer Network Manager",
+        "static address/mask/gateway/DNS apply and explicit save",
+        "invalid mask refused",
+        "link loss clears configuration; reconnect restores static profile",
+        "unconfirmed trial rolls back after 30 seconds",
+        "actual gateway ARP/ICMP after reconnect",
+        "MAC-bound profile survives installed reboot",
+        "automatic DHCP reconnect and administrative disconnect/revert"
+      ],
+      "evidence_directory": "uefi-runtime-netmanager-e1000e-final",
+      "backend": "e1000e",
+      "historical_result_label_correction": "The original result label included sockets although this manager fixture opened none. Its configuration/reconnect checks passed; actual in-flight socket cancellation and same-process browser recovery are independently tested in the final9 network profiles.",
+      "installed_kernel_verification": "Exact EFI/CHOS/CHOS.ELF path was independently extracted through checked GPT/FAT32 after the run and matched root/reboot symbols; see uefi-runtime-installed-artifact-audit.json.",
+      "reboot_artifacts": {
+        "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb"
+      }
+    }
+  ],
+  "earlier_scoped_passes": [
+    {
+      "name": "uefi-runtime-network-e1000e-final",
+      "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+      "scope": "Baseline DHCP/DNS/isolated HTTP preview/HTTPS refusal; superseded for these checks by final9."
+    },
+    {
+      "name": "uefi-runtime-network-vmxnet3-final",
+      "kernel_sha256": "d42d2e9ebaeff3b29a9549aab872a8424a92f61252aa41f89a8d4a69086fd8fb",
+      "scope": "Baseline DHCP/DNS/isolated HTTP preview/HTTPS refusal; superseded for these checks by final9."
+    }
+  ],
+  "retained_failures": [
+    {
+      "names": [
+        "network-el0-explore-e1000e",
+        "network-el0-explore-e1000e2"
+      ],
+      "status": "FAIL, not acceptance evidence",
+      "diagnosis": "The exploratory snapshot paired ISO kernel SHA8a756e0138c3bee3d8826644b273f89e7aa5f3d250a03ee23f85e89de4ff8588 with stale symbol kernel SHA8999af0582b28b962f2321cd863492f6badf36c12e0c30025017ba68cb6b450f. Probes read zeros at wrong offsets and falsely timed out waiting for DHCP. Exact embedded extraction diagnosed the mismatch; mandatory artifact guards now reject it before launch."
+    },
+    {
+      "names": [
+        "network-el0-explore-e1000e3"
+      ],
+      "status": "FAIL, partial exploratory checks only",
+      "diagnosis": "With exact ISO/symbol pair, real DHCP/EL0 HTTP redirect/body and HTTPS refusal worked; the old fixture then sent privileged dnsserver to the newly isolated ordinary Console, which did not expose that setter. Configuration moved to the trusted serial OS command while the actual browser remains EL0. Later complete final9 profiles pass."
+    }
+  ],
+  "limits": [
+    "The tested browser is the existing HTTP preview. HTTPS is correctly refused; no modern HTML/CSS/JavaScript engine, certificate validation or TLS transport is established here.",
+    "Local HTTP fixtures do not establish public internet reachability or standards conformance.",
+    "The final9 UEFI MMU/application profile has QEMU evidence only; the user-confirmed earlier Fusion Ethernet build remains distinct. No independent Fusion retest or physical Pi5/laptop test is claimed.",
+    "Manager configuration/persistence evidence uses its exact build8 installed kernel; final9 network evidence uses the exact newer kernel with trusted built-in Console retention. This is a scoped regression report, not a final release qualification."
+  ]
+}

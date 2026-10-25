@@ -1,0 +1,169 @@
+{
+  "scope": "Native C allocation/string runtime and isolated text application prerequisites; revised Stage3 remains incomplete",
+  "binary_publication": "HELD by user instruction",
+  "accepted_runs": {
+    "allocator_direct": {
+      "evidence_path": "/workspace/chos-evidence/native-libc-final9-direct",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "e1fbc40e262e055b30d097d05145c787a9964cf489de0c79aef2b2a4546f05e7",
+        "free_pages_before": 117699,
+        "free_pages_after": 117699,
+        "checks": [
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated synchronous and scheduled launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9af673ba06780f5f0078cd31097a466d86a37d4b0b5030dc54ffccaa4e3e1a73"
+      }
+    },
+    "allocator_uefi": {
+      "evidence_path": "/workspace/chos-evidence/native-libc-final9-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "e1fbc40e262e055b30d097d05145c787a9964cf489de0c79aef2b2a4546f05e7",
+        "free_pages_before": 500560,
+        "free_pages_after": 500560,
+        "checks": [
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated synchronous and scheduled launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      },
+      "execution_note": "Both exec and spawn launch scheduled EL0 tasks in UEFI; only the direct profile also returns to the boot shell for synchronous execution. The raw earlier runner wording is qualified here."
+    },
+    "typing_direct": {
+      "evidence_path": "/workspace/chos-evidence/native-typing-direct3",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "60a665fb3c301ba8d558c7ba0d592364de5988bf3e2d39401eb1c35cd6b8d086",
+        "checks": [
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9af673ba06780f5f0078cd31097a466d86a37d4b0b5030dc54ffccaa4e3e1a73"
+      }
+    },
+    "typing_uefi": {
+      "evidence_path": "/workspace/chos-evidence/native-typing-final9-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "60a665fb3c301ba8d558c7ba0d592364de5988bf3e2d39401eb1c35cd6b8d086",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "iso_sha256": "608dafa652dffaa299c0ba919433d09a3c69e48fb52e5374bad60f9b65d58f87",
+        "iso_embedded_kernel_sha256": "1c813d79e64ac345a7a509b97ac5bae5047b1be3790f91779f6931161b1dfd8b",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  },
+  "host_evidence": {
+    "path": "/workspace/chos-evidence/native-libc-final-host3.log",
+    "status": "PASS",
+    "tests": [
+      "same allocator core: alignment, overflow, realloc preservation, 16-region exhaustion, coalescing, unmap/corrupt-region quarantine",
+      "12000 deterministic mixed operations with content/non-overlap/accounting checks",
+      "string and byte operations including exhaustive overlapping memmove ranges",
+      "ASan and UBSan for allocator and strings",
+      "native C and C++17 linkage compile and actual EL0 execution"
+    ]
+  },
+  "retained_failures": [
+    {
+      "evidence_path": "/workspace/chos-evidence/native-typing-live1",
+      "diagnosis": "Original wall-clock repeat count assumption too strict for measured uncached software compositor; subsequent fixture retains500ms initial-delay and release checks, requires actual six repeat deletions within3s and records elapsed time."
+    },
+    {
+      "evidence_path": "/workspace/chos-evidence/native-typing-live2",
+      "diagnosis": "Original rapid native browser character burst incomplete; browser now batches at most8 events and skips key-up/motion redraws. Physical10ms pulse loss also observed later, so this failure does not isolate one cause."
+    },
+    {
+      "evidence_path": "/workspace/chos-evidence/native-typing-live4",
+      "diagnosis": "Newline caret capture raced unfinished app/server redraw; fixture now awaits completed caret messages and matching presented/dirty generations."
+    },
+    {
+      "evidence_path": "/workspace/chos-evidence/native-typing-final-uefi",
+      "diagnosis": "Actual new netstatus app fault: CHCX static pointer table held link-at-zero addresses. Fixed inline character state table; accepted direct and UEFI runs execute real netstatus."
+    },
+    {
+      "evidence_path": "/workspace/chos-evidence/native-typing-final-direct",
+      "diagnosis": "Readonly preview did not close after10ms ctrl-S/Escape taps."
+    },
+    {
+      "evidence_path": "/workspace/chos-evidence/native-typing-direct2",
+      "diagnosis": "Diagnostic showed no app event backlog and control_down remained1 after10ms pulses. Accepted50ms taps span multiple device polls; held Backspace uses explicit down/up unchanged."
+    }
+  ],
+  "open_gates": [
+    "Complete libc/C++/POSIX/threading/event/IPC runtime and engine-sized memory",
+    "Actual maintained modern engine and real JavaScript/rendering/conformance",
+    "TLS, certificates, CA updates, supported cryptographic entropy and clock policy",
+    "Pi5 SDIO/radio firmware/authentication and actual Wi-Fi tests",
+    "Remaining system-network capabilities and platform validation",
+    "Complete Stage3 browser performance/security/live-site qualification"
+  ]
+}

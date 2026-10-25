@@ -1,3 +1,4 @@
+#include "chos/dma.h"
 /* Polled xHCI 1.x, identity DMA with MMU/caches off after EFI handoff.
  * Bounded USB root/hub topology with HID endpoints. No firmware services or fixed PCI IDs.
  * DMA storage is permanent: on controller failure never free memory still
@@ -498,17 +499,12 @@ void chos_xhci_stop(void) {
     online=0;
 }
 int chos_xhci_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,const chos_pci_device_t *pci) {
-    uint64_t base,bar_bytes,sctlr;
+    uint64_t base,bar_bytes;
     diagnostic.stage=1;
     if(running) return 1;
     if(!acpi || acpi->dma_translation_unverified) { error="xHCI DMA/IOMMU topology unsupported";return 0; }
     if(poisoned) {error="xHCI quarantined until reboot";return 0;}
-#ifdef CHOS_HOST_TEST
-    sctlr=0;
-#else
-    __asm__ volatile("mrs %0,sctlr_el1":"=r"(sctlr));
-#endif
-    if(sctlr&((1u<<0)|(1u<<2))) { error="xHCI requires EFI identity DMA with MMU and data cache disabled";return 0; }
+    if(!chos_dma_identity_ready()) { error="xHCI requires verified identity DMA with data cache off";return 0; }
     if(!pci || pci->class_code!=12 || pci->subclass!=3 || pci->programming_interface!=0x30 ||
        (pci->header_type&127)!=0 || !chos_pci_map_bar(boot,acpi,pci,0,&base,&bar_bytes) || bar_bytes<0x1000) { error="xHCI BAR lacks validated firmware resource coverage";return 0; }
     if(!chos_pci_enable_memory_busmaster(boot,acpi,pci)) {error="xHCI PCI enable failed";return 0;}

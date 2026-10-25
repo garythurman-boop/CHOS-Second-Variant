@@ -13,7 +13,7 @@ refusal, clock defect and composite-HID changes based on the separate tested pro
 |---|---|---|
 | Direct ARM64 boot / MMU | QEMU serial boot; translation, guard pages, dynamic aliases with 512 MiB RAM | Single CPU; QEMU platform addresses; no universal ARM64 boot claim |
 | Wall clock | UEFI GetTime snapshot + architectural counter; FDT PL031 in direct boot; calendar/counter/absence host tests and visible QEMU minute rollover | Firmware snapshot accuracy/timezone; no runtime firmware calls or NTP |
-| UEFI / GOP | AAVMF ISO and prepared-image boot with QEMU RAMFB | Kernel GUI runs with MMU/cache off; shared browser adapter, scaled desktop and installed-ESP boot-mode requests are implemented; UEFI EL0 remains unavailable |
+| UEFI / GOP | AAVMF ISO and prepared-image boot with QEMU RAMFB | QEMU CPU-isolated UEFI EL0/scheduled profile now available with identity DMA/data cache off; shared browser adapter, scaled desktop and installed-ESP modes retained; new Fusion runtime qualification open |
 | Driver acceptance / reports | PCI/FDT registry host/sanitizer tests; actual phased PCI VirtIO/xHCI binding; automatic input-free diagnostic pages | Current catalogue is PCI; new FDT adapters need enumeration glue; fixed capacity, one xHCI controller, no PCI hotplug |
 | PCI discovery / resources | ACPI MCFG inventory; EFI root-bridge resource snapshot; sized assigned BARs; CPU/bus translation; RAM-overlap rejection | No PCI resource allocator; platform must assign BARs; no native IOMMU ownership |
 | Native xHCI | Bounded ownership/halt/reset/start; no-op command validation; command/event/transfer rings; 32/64-byte contexts; scratchpads; control transfers; root-port HID enumeration; eight queued interrupt-IN reports/endpoint; strict input-context state | One controller, 16 devices, up to 255 root ports, 4 HID endpoints/device, 1024-byte packets, 4096-byte descriptors; standard speed IDs only; bounded hubs/depth; no streams or high-bandwidth burst endpoints |
@@ -35,7 +35,8 @@ refusal, clock defect and composite-HID changes based on the separate tested pro
   BARs/command register. A window must translate the entire BAR unambiguously and
   cannot overlap RAM. SPCR/GIC addresses come from validated ACPI tables; omitted
   EFI device descriptors are permitted only with that independent declaration.
-* Native xHCI currently requires identity DMA with MMU and data cache disabled.
+* Native xHCI requires identity DMA and data cache disabled; translated CPU access
+  is accepted only in the CHOS-owned UEFI identity profile.
   SMMU/unknown IORT DMA topology is rejected until an IOMMU driver exists. A controller
   without 64-bit addressing is rejected if its DMA buffers would exceed 4 GiB.
   This is a deliberately narrow contract, not a general DMA mapping API.
@@ -101,3 +102,9 @@ IPv6 ND/MLD requires multicast reception: Intel82574L and VMXNET3 now receive
 multicast while unicast promiscuous mode stays off. IPv4 owns its existing stack;
 IPv6 uses the shared receive dispatcher and separate bounded lwIP control plane.
 See IPV6_CONTROL_PLANE.md for actual scope and per-backend guest evidence.
+
+Current source adds a bounded UEFI CPU/process isolation profile while retaining
+identity DMA with data caching off. See [runtime contract and QEMU evidence](UEFI_PROCESS_RUNTIME.md).
+This does not establish Fusion qualification for these new changes, native IOMMU
+ownership, a modern browser, verified TLS or live wireless support. The binary
+publication hold remains active until the complete revised Stage 3 passes.

@@ -18,6 +18,15 @@ int main(int argc,char **argv){
     if(argc>1 && chos_strcmp(argv[1],"gap")==0){
         *(volatile uint32_t *)UINT64_C(0x20030000)=1;return fail();
     }
+    if(argc>2 && chos_strcmp(argv[1],"kernel")==0){
+        uint64_t a=0;size_t n=0;
+        for(;argv[2][n];++n){unsigned char c=(unsigned char)argv[2][n];unsigned v;
+            if(c>='0'&&c<='9')v=c-'0';else if(c>='a'&&c<='f')v=c-'a'+10u;else return fail();
+            if(n>=16u)return fail();a=(a<<4)|v;
+        }
+        if(!n || !a)return fail();
+        volatile uint32_t forbidden=*(volatile uint32_t *)(uintptr_t)a;(void)forbidden;return fail();
+    }
     const char *s="[ OK ] native AArch64 ELF RX/R/RW, sparse image, large BSS and arguments passed\n";
     chos_write(s,chos_strlen(s));return 0;
 }

@@ -6,6 +6,8 @@
 #include "chos/syscall.h"
 #include "chos/net_status_api.h"
 #include "chos/net6_api.h"
+#include "chos/net_tcp6_api.h"
+#include "chos/net_dns6_api.h"
 #include "chos/gui_protocol.h"
 #include "chos/file_api.h"
 #include "chos/net_tcp_api.h"
@@ -139,6 +141,17 @@ static inline long chos_net_tcp_close(int handle) {
 static inline long chos_net_tcp_abort(int handle) {
     return chos_syscall1((long)CHOS_SYS_NET_ABORT, (long)handle);
 }
+/* Owner-bound IPv6 sockets. Connect fails closed without actual entropy; this
+ * never changes the existing IPv4 transport or network configuration. */
+static inline long chos_net_tcp6_open(uint16_t port){return chos_syscall1(CHOS_SYS_NET6_OPEN,port);}
+static inline long chos_net_tcp6_connect(int h,const uint8_t peer[16],uint16_t port){return chos_syscall3(CHOS_SYS_NET6_CONNECT,h,(long)(uintptr_t)peer,port);}
+static inline long chos_net_tcp6_status(int h,chos_tcp6_socket_info_t *out){return chos_syscall3(CHOS_SYS_NET6_STATUS,h,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_net_tcp6_send(int h,const void *p,size_t n){return chos_syscall3(CHOS_SYS_NET6_SEND,h,(long)(uintptr_t)p,(long)n);}
+static inline long chos_net_tcp6_recv(int h,void *p,size_t n){return chos_syscall3(CHOS_SYS_NET6_RECV,h,(long)(uintptr_t)p,(long)n);}
+static inline long chos_net_tcp6_close(int h){return chos_syscall1(CHOS_SYS_NET6_CLOSE,h);}
+static inline long chos_net_tcp6_abort(int h){return chos_syscall1(CHOS_SYS_NET6_ABORT,h);}
+static inline long chos_net_dns6_lookup(const char *host){return chos_syscall1(CHOS_SYS_NET6_DNS_START,(long)(uintptr_t)host);}
+static inline long chos_net_dns6_status(chos_dns6_info_t *out){return chos_syscall2(CHOS_SYS_NET6_DNS_STATUS,(long)(uintptr_t)out,sizeof(*out));}
 /* Global asynchronous DNS A-query service; one query may be pending system-wide. */
 static inline long chos_net_dns_lookup(const char *hostname) {
     return chos_syscall1((long)CHOS_SYS_NET_DNS_START, (long)(uintptr_t)hostname);

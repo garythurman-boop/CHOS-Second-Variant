@@ -336,8 +336,7 @@ int chos_nvme_init(const chos_boot_info_t *boot, const chos_acpi_info_t *acpi,
     if(probe_attempted) {last_error="NVMe probe/queue quarantined until reboot";return 0;}
     if(acpi->dma_translation_unverified) {last_error="NVMe IOMMU/DMA topology unsupported";return 0;}
 #ifdef __aarch64__
-    uint64_t sctlr;__asm__ volatile("mrs %0,sctlr_el1":"=r"(sctlr));
-    if(sctlr&5u) {last_error="NVMe requires identity DMA with MMU/cache off";return 0;}
+ if(!chos_dma_identity_ready()) {last_error="NVMe requires verified identity DMA with data cache off";return 0;}
 #endif
     probe_attempted=1;bytes_zero(&nvme,sizeof(nvme));
     if (!find_nvme(boot, acpi, &device)) { last_error = "exactly one NVMe controller required; inventory may be absent, ambiguous or truncated"; return 0; }

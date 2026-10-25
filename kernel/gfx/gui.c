@@ -1,5 +1,6 @@
 #include "chos/installer_io.h"
 #include "chos/scheduler.h"
+#include "chos/vmm.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/atomic.h"
@@ -4582,7 +4583,7 @@ static int gui_launch_or_focus_app(uint32_t *pid_slot, const char *path) {
 
 static void open_view(int new_view) {
     if (new_view < VIEW_WELCOME || new_view >= (int)GUI_VIEW_COUNT) new_view = VIEW_WELCOME;
-    if (new_view == VIEW_CONSOLE && gui_launch_or_focus_app(&gui_console_pid, "/BIN/CONSOLE.CHX")) return;
+    if (new_view == VIEW_CONSOLE && !vmm_uefi_profile() && gui_launch_or_focus_app(&gui_console_pid, "/BIN/CONSOLE.CHX")) return;
     if (new_view == VIEW_FILES && gui_launch_or_focus_app(&gui_file_manager_pid, "/BIN/FILEMAN.CHX")) return;
     (void)gui_open_window(new_view);
 }

@@ -3,6 +3,7 @@
 
 #include "chos/fdt.h"
 
+void shell_run_scheduled(const fdt_info_t *device_tree);
 void shell_run(const fdt_info_t *device_tree);
 
 #endif

@@ -1,3 +1,4 @@
+#include "chos/dma.h"
 /* Modern VirtIO PCI capability transport and existing MMIO transport.
  * PCI regions are discovered and sized through firmware resources; no assigned
  * BAR, bus mastering, cache or IOMMU assumption is inferred from a PCI ID alone.
@@ -107,8 +108,7 @@ uintptr_t chos_virtio_pci_admit(const chos_boot_info_t *boot,const chos_acpi_inf
     if(!aperture && !transport_count)bindings_sealed=0;
     if(bindings_sealed || transport_count>=MAX_TRANSPORTS){last_error="VirtIO bindings sealed or capacity reached";return 0;}
 #ifdef __aarch64__
-    uint64_t sctlr;__asm__ volatile("mrs %0,sctlr_el1":"=r"(sctlr));
-    if(sctlr&5u){last_error="VirtIO PCI currently requires identity DMA with MMU/cache off";return 0;}
+ if(!chos_dma_identity_ready()){last_error="VirtIO PCI currently requires verified identity DMA with data cache off";return 0;}
 #endif
     uint32_t type=device_type(d->device_id);
     if(d->vendor_id!=0x1af4 || !type || (d->header_type&127)){last_error="not a supported VirtIO PCI identity";return 0;}

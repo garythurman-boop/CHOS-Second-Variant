@@ -300,3 +300,69 @@ int chos_net_parse_dns_a_response(const void *payload, size_t length,
     }
     return 0;
 }
+
+/* AAAA parsing is separate from the compatibility A parser. It accepts only the
+ * queried owner or a validated bounded CNAME chain, never an unrelated record.
+ * Return 1 on address, 0 for malformed/mismatched data, negative DNS RCODE for a
+ * matching negative response. There is no implicit A/plaintext fallback. */
+size_t chos_net_build_dns_aaaa_query(void *output,size_t capacity,uint16_t id,const char *host){
+ size_t n=chos_net_build_dns_a_query(output,capacity,id,host,1);
+ if(n)write_be16((uint8_t *)output+n-4u,28u);
+ return n;
+}
+int chos_net_parse_dns_aaaa_response(const void *payload,size_t length,uint16_t id,const char *host,
+                                    uint8_t address[16],uint32_t *ttl_out){
+ const uint8_t *p=payload;char name[256],wanted[256],target[256];size_t offset=12u,answers_start;
+ if(!p || !host || !address || length<12u || length>512u || read_be16(p)!=id)return 0;
+ size_t host_n=0;while(host_n<sizeof(wanted)-1u && host[host_n]){wanted[host_n]=host[host_n];host_n++;}
+ if(host[host_n])return 0;
+ if(host_n && wanted[host_n-1u]=='.')host_n--;
+ wanted[host_n]=0;if(!host_n)return 0;
+ uint16_t flags=read_be16(p+2),answers=read_be16(p+6),authority=read_be16(p+8),additional=read_be16(p+10);
+ if((flags&0x8000u)==0u || (flags&0x7a00u)!=0u || read_be16(p+4)!=1u ||
+    (uint32_t)answers+authority+additional>64u)return 0;
+ if(!dns_name_read(p,length,&offset,name,sizeof(name)) || !dns_names_equal(name,wanted) ||
+    offset>length || length-offset<4u || read_be16(p+offset)!=28u || read_be16(p+offset+2)!=1u)return 0;
+ offset+=4u;answers_start=offset;
+ /* Validate the complete message before making a positive/negative decision. */
+ for(unsigned i=0;i<(unsigned)answers+authority+additional;i++){
+  if(!dns_name_read(p,length,&offset,name,sizeof(name)) || offset>length || length-offset<10u)return 0;
+  uint16_t type=read_be16(p+offset),cls=read_be16(p+offset+2),n=read_be16(p+offset+8);offset+=10u;
+  if(n>length-offset)return 0;
+  if(cls==1u && type==5u){size_t end=offset;if(!dns_name_read(p,length,&end,target,sizeof(target)) || end!=offset+n)return 0;}
+  if(cls==1u && type==28u && n!=16u)return 0;
+  offset+=n;
+ }
+ if(offset!=length)return 0;
+ if(flags&15u)return -(int)(flags&15u);
+ uint32_t minimum_ttl=UINT32_MAX;
+ for(unsigned depth=0;depth<5u;depth++){
+  int got_address=0,got_cname=0;uint8_t result[16];uint32_t result_ttl=0;target[0]=0;offset=answers_start;
+  for(unsigned i=0;i<answers;i++){
+   if(!dns_name_read(p,length,&offset,name,sizeof(name)))return 0;
+   uint16_t type=read_be16(p+offset),cls=read_be16(p+offset+2),n=read_be16(p+offset+8);
+   uint32_t ttl=read_be32(p+offset+4);offset+=10u;
+   if(cls==1u && dns_names_equal(name,wanted)){
+    if(type==28u && !got_address){for(unsigned j=0;j<16;j++)result[j]=p[offset+j];result_ttl=ttl;got_address=1;}
+    if(type==5u){
+     size_t end=offset;if(got_cname || !dns_name_read(p,length,&end,target,sizeof(target)))return 0;
+     if(ttl<minimum_ttl)minimum_ttl=ttl;
+     got_cname=1;
+    }
+   }
+   offset+=n;
+  }
+  if(got_address){
+   if(got_cname)return 0;
+   unsigned any=0;for(unsigned i=0;i<16;i++)any|=result[i];
+   int mapped=1;for(unsigned i=0;i<10;i++)if(result[i])mapped=0;
+   if(!any || result[0]==0xff || (mapped && result[10]==0xff && result[11]==0xff))return 0;
+   for(unsigned i=0;i<16;i++)address[i]=result[i];
+   if(ttl_out)*ttl_out=result_ttl<minimum_ttl?result_ttl:minimum_ttl;
+   return 1;
+  }
+  if(!got_cname)return 0;
+  for(unsigned i=0;i<sizeof(wanted);i++){wanted[i]=target[i];if(!target[i])break;}
+ }
+ return 0;
+}

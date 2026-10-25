@@ -131,15 +131,39 @@ static int strings_equal(const char *a, const char *b) {
     return a[i] == '\0' && b[i] == '\0';
 }
 
+static void write_ipv4(uint32_t address){
+    for(unsigned octet=0;octet<4;octet++){
+        if(octet)put_char('.');write_unsigned((address>>(24u-octet*8u))&255u);
+    }
+}
+static void command_netstatus(void){
+    chos_net_status_t info;
+    /* CHCX is linked at zero without pointer relocations: keep names inline. */
+    static const char states[][12]={"offline","discovering","requesting","bound","renewing","failed","static"};
+    if(chos_network_status(&info)<0||info.version!=CHOS_NET_STATUS_VERSION||info.size_bytes!=sizeof(info)){
+        write_text("Network status service unavailable.");newline();return;
+    }
+    write_text("Adapter: ");write_text(info.flags&CHOS_NET_STATUS_ADAPTER?"Ethernet present":"No supported Ethernet adapter");newline();
+    write_text("Link: ");write_text(!(info.flags&CHOS_NET_STATUS_LINK_KNOWN)?"unknown":info.flags&CHOS_NET_STATUS_LINK_UP?"up":"down");newline();
+    write_text("DHCP: ");write_text(info.state<sizeof(states)/sizeof(states[0])?states[info.state]:"unknown");newline();
+    write_text("IPv4: ");write_ipv4(info.ipv4);newline();
+    write_text("Netmask: ");write_ipv4(info.netmask);newline();
+    write_text("Gateway: ");write_ipv4(info.gateway);newline();
+    write_text("DNS: ");write_ipv4(info.dns);newline();
+    write_text("RX frames: ");write_unsigned(info.rx_frames);write_text(" | TX frames: ");write_unsigned(info.tx_frames);newline();
+    write_text(info.flags&CHOS_NET_STATUS_CONFIGURED?"Interface configured; Internet reachability is unverified.":"Interface has no IPv4 configuration.");newline();
+}
+
 static void command_help(void) {
     write_text("Available commands:"); newline();
     write_text("  help              show this help"); newline();
     write_text("  dir               list merged CHFS/ROMFS files"); newline();
     write_text("  sysinfo            show process/runtime info"); newline();
+    write_text("  netstatus          show OS-owned Ethernet/IPv4 status"); newline();
     write_text("  net6status         show IPv6 addresses and echo status"); newline();
     write_text("  ping6 IPv6         request an OS-owned IPv6 echo"); newline();
     write_text("  type /PATH         display a text file"); newline();
-    write_text("  run /BIN/APP.CHX   launch an embedded application"); newline();
+    write_text("  run /BIN/APP.ELF   launch a CHOS ELF or CHCX application"); newline();
     write_text("  mkdir PATH         create a directory"); newline();
     write_text("  touch PATH         create an empty file"); newline();
     write_text("  write PATH TEXT    create/replace a text file"); newline();
@@ -279,7 +303,8 @@ static int execute_command(void) {
     } else if (strings_equal(command, "sync")) {
         long result = chos_fsync();
         if (result < 0) command_file_error("sync", result); else { write_text("Storage flushed."); newline(); }
-    } else if (strings_equal(command,"net6status")) {
+    } else if(strings_equal(command,"netstatus"))command_netstatus();
+    else if (strings_equal(command,"net6status")) {
         chos_net6_info_t info;char address[40];
         if(chos_network_status6(&info)<0){write_text("IPv6 service unavailable.");newline();}
         else {
@@ -293,7 +318,7 @@ static int execute_command(void) {
     } else if(strings_equal(command,"ping6")) {
         write_text(chos_ping6(input_line+arg_start)==0?"ICMPv6 echo started.":"ICMPv6 request refused.");newline();
     } else if (strings_equal(command, "sysinfo")) {
-        write_text("CHOS 0.15.0-dev | ARM64 | EL0 application"); newline();
+        write_text("CHOS 0.30.0 | ARM64 | isolated EL0 application"); newline();
         write_text("PID: "); write_unsigned((uint64_t)chos_getpid()); newline();
         write_text("GUI ABI: "); write_unsigned(CHOS_GUI_ABI_VERSION); newline();
     } else if (strings_equal(command, "type")) command_type(input_line + arg_start);
@@ -360,7 +385,7 @@ int main(int argc, char **argv) {
     message.payload.set_title.title_length = (uint16_t)(sizeof(app_title) - 1u);
     chos_memcpy(message.payload.set_title.title, app_title, sizeof(app_title) - 1u);
     if (submit(&message) != 0) chos_exit(2);
-    write_text("CHOS 0.15.0-dev user-space Console. Type 'help' for commands."); newline();
+    write_text("CHOS Console 0.30.0. Type 'help' for commands."); newline();
     write_text("This terminal runs as an ordinary EL0 application."); newline();
     message_begin(&message, CHOS_GUI_MSG_SHOW_WINDOW, sizeof(message.payload.window));
     message.payload.window.window_id = window_id;

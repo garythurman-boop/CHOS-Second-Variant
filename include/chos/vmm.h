@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/fdt.h"
+#include "chos/pci.h"
 
 #define VMM_PAGE_SIZE 4096u
 #define VMM_L1_ENTRIES 512u
@@ -101,6 +102,15 @@ vmm_error_t vmm_validate_boot_layout(const fdt_info_t *tree,
 vmm_error_t vmm_prepare(const fdt_info_t *tree,
                         uint64_t kernel_start, uint64_t kernel_end,
                         uint64_t dtb_start, uint64_t dtb_size);
+vmm_error_t vmm_prepare_uefi(const chos_boot_info_t *,const chos_acpi_info_t *,
+                              const chos_pci_device_t *,size_t,uint64_t virtio_mmio);
+/* UEFI uses four-level identity mappings with data caching disabled for DMA. */
+int vmm_uefi_profile(void);
+int vmm_identity_dma_ready(void);
+int vmm_identity_dma_policy(uint64_t sctlr,int owned_uefi_profile,int enabled_by_kernel);
+int vmm_copy_kernel_root_template(uint64_t *entries,size_t count);
+int vmm_copy_kernel_low_l1_template(uint64_t *entries,size_t count);
+int vmm_query_root_mapping(uint64_t root,uint64_t va,vmm_mapping_info_t *);
 int vmm_enable(void);
 int vmm_is_enabled(void);
 /* Copy the active kernel root's L2 template (0=device/low VA, 1=RAM) into a page-aligned buffer. */

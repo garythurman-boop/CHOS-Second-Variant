@@ -214,3 +214,10 @@ vmm_error_t vmm_validate_boot_layout(const fdt_info_t *tree,
        any translation tables can be enabled. */
     return VMM_OK;
 }
+
+/* MMU-off handoff retains its original contract. Translated DMA is accepted
+ * only for the explicit CHOS-owned UEFI identity profile; caching remains off. */
+int vmm_identity_dma_policy(uint64_t sctlr,int owned_uefi_profile,int enabled_by_kernel){
+    if(sctlr&(UINT64_C(1)<<2))return 0;
+    return !(sctlr&1u) || (owned_uefi_profile==1 && enabled_by_kernel==1);
+}

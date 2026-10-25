@@ -4,6 +4,7 @@
 #include "chos/exception.h"
 #include "chos/fdt.h"
 #include "chos/platform.h"
+#include "chos/drivers.h"
 #include "chos/entropy.h"
 #include "chos/uart.h"
 #include "chos/pmm.h"
@@ -1813,7 +1814,7 @@ static void print_help(void) {
     uart_puts("  wait PID   Wait for a scheduled process and return its exit status\n");
     uart_puts("  apps       List packaged read-only CHCX programs\n");
     uart_puts("  diskinfo   Show VirtIO block and CHFS status\n");
-    uart_puts("  netinfo    Show VirtIO Ethernet link, MAC and frame counters\n  netstatus  Show DHCP/IPv4, ARP, DNS and ping state\n  net6status Show IPv6 SLAAC/ND and ping state\n  ping6 IP   Send an ICMPv6 echo\n  dnslookup  Start async DNS A lookup: dnslookup example.com\n  ping       Send ICMP echo: ping 192.168.1.1\n  tcpconnect Connect to IPv4 TCP service: tcpconnect 93.184.216.34 80\n  tcpstatus  Show outbound TCP socket states\n  tcpsend    Send text; use \\r and \\n for line endings\n  tcprecv    Read received TCP data: tcprecv HANDLE\n  tcpclose   Close TCP socket: tcpclose HANDLE\n");
+    uart_puts("  netinfo    Show VirtIO Ethernet link, MAC and frame counters\n  netstatus  Show DHCP/IPv4, ARP, DNS and ping state\n  net6status Show IPv6 SLAAC/ND and ping state\n  ping6 IP   Send an ICMPv6 echo\n  dnsserver Set privileged session DNS resolver: dnsserver 10.0.2.2\n  dnslookup  Start async DNS A lookup: dnslookup example.com\n  ping       Send ICMP echo: ping 192.168.1.1\n  tcpconnect Connect to IPv4 TCP service: tcpconnect 93.184.216.34 80\n  tcpstatus  Show outbound TCP socket states\n  tcpsend    Send text; use \\r and \\n for line endings\n  tcprecv    Read received TCP data: tcprecv HANDLE\n  tcpclose   Close TCP socket: tcpclose HANDLE\n");
     uart_puts("  mount      Mount the persistent CHFS volume\n");
     uart_puts("  mkfs       FORMAT the attached disk as CHFS (destructive)\n");
     uart_puts("  fsls       List files on persistent storage\n");
@@ -2164,11 +2165,15 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         }
         chos_net6_format(v6.router,address,sizeof(address));uart_puts("IPv6 router: ");uart_puts(address);
         uart_puts("\nPing6: ");uart_puts(chos_net6_ping_name(v6.ping_state));uart_puts("\n");
-        uart_puts("IPv6 TCP, DNS and DHCPv6 are not implemented.\n");
+        uart_puts("Bounded TCP6 and RDNSS/AAAA service APIs are available; DHCPv6 remains unavailable.\n");
     } else if (starts_with(line,"ping6 ")) {
         uart_puts(chos_net6_ping(skip_spaces(line+6u))?"ICMPv6 echo started.\n":"ICMPv6 request refused.\n");
     } else if (strings_equal(line, "netstatus")) {
         command_netstatus();
+    } else if (starts_with(line, "dnsserver ")) {
+        uint32_t resolver;
+        uart_puts(parse_ipv4_text(skip_spaces(line+10u),&resolver) && chos_net_dns_set_server(resolver)
+            ? "Session DNS resolver set.\n" : "DNS change refused: use a unicast IPv4 with configured network and no active lookup.\n");
     } else if (starts_with(line, "dnslookup ")) {
         char *hostname = skip_spaces(line + 10u);
         if (*hostname == '\0') {
@@ -2302,6 +2307,7 @@ static void shell_loop(const fdt_info_t *device_tree, int runtime_mode) {
             char c;
             /* The serial shell stays responsive while the graphical input queue is polled. */
             do {
+                chos_platform_drivers_poll();
                 chos_input_poll();
                 chos_net_stack_poll();chos_net_manager_poll();
                 if (runtime_mode) {
@@ -2385,6 +2391,10 @@ static void enter_runtime_session(const fdt_info_t *device_tree) {
         uart_puts("[ OK ] runtime shell and scheduled processes finished; returned to boot shell.\n");
     }
     process_reap_pending();
+}
+
+void shell_run_scheduled(const fdt_info_t *device_tree){
+    if(scheduler_current_is_kernel_task())runtime_shell_task_entry((void *)device_tree);
 }
 
 void shell_run(const fdt_info_t *device_tree) {

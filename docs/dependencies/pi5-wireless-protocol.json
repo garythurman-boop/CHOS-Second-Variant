@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "purpose": "Pinned protocol and Pi5 firmware mapping research; no Linux implementation or firmware binaries vendored",
+  "implementation": "Independent CHOS native SDIO and CYW wire-format implementation",
+  "linux_commit": "5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc",
+  "linux_sources": [
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c",
+      "sha256": "d59df5fc1c9631af0535f99a7e3b85b7ae01ed74882da735272f77f8770efe15",
+      "bytes": 136642,
+      "license": "ISC"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h",
+      "sha256": "91a07150d36880afdfaf8515c42f3a5eeb3306dc24b3fc1ad6a0a72cf76797c9",
+      "bytes": 14922,
+      "license": "ISC"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdiod.c",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdiod.h",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c",
+      "sha256": "24c28512363a3a95995676ff8a87d93a76d7f9e87434905bec0a7495fa8872b2",
+      "bytes": 21570,
+      "license": "ISC"
+    },
+    {
+      "upstream_path": "drivers/mmc/core/sdio_ops.c",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/mmc/core/sdio_ops.c",
+      "sha256": "23e6cd52c802263e69e95eacc4054a9afcd751da746ef6fa53f8312f93a7aa29",
+      "bytes": 4711,
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "upstream_path": "include/linux/mmc/sdio.h",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/include/linux/mmc/sdio.h",
+      "sha256": "c2657f975c3f38c5c1071c63c7638913cc227296794010d3745d15e1fe414cbe",
+      "bytes": 6246,
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.h",
+      "sha256": "166e4115f3d25e27526d94e04322286228e33ae2b6c983985c1d6d2a56c40123",
+      "bytes": 2520,
+      "license": "ISC"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c",
+      "sha256": "b542aa83c06764d8d4414a80e9aa4a3e0fc501b1e50baba453b343e0d362f87f",
+      "bytes": 33359,
+      "license": "ISC"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h",
+      "sha256": "1ee4bd65713ae5cafe4597de2deedb23184f1340ec5d21542110b4a52b0900f7",
+      "bytes": 4013,
+      "license": "ISC"
+    },
+    {
+      "upstream_path": "drivers/net/wireless/broadcom/brcm80211/include/brcmu_wifi.h",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/net/wireless/broadcom/brcm80211/include/brcmu_wifi.h",
+      "sha256": "e768af55936c75aa9e8cc679b9c6c0bd199b3b0e08dad8bd15792f9596517423",
+      "bytes": 7674,
+      "license": "ISC"
+    },
+    {
+      "upstream_path": "include/linux/mmc/sdio_ids.h",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/include/linux/mmc/sdio_ids.h",
+      "sha256": "9d13c45d1692e75587926b3e801dcc2836868b65ece8963641936cc64407a06e",
+      "bytes": 5924,
+      "license": "GPL-2.0"
+    },
+    {
+      "upstream_path": "arch/arm64/boot/dts/broadcom/bcm2712-rpi-5-b.dts",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/arch/arm64/boot/dts/broadcom/bcm2712-rpi-5-b.dts",
+      "sha256": "f27bea575be85d9e0bbef3a1337961f12143cd7487079ee33d92c2f2c4d45df6",
+      "bytes": 14677,
+      "license": "GPL-2.0 OR MIT"
+    },
+    {
+      "upstream_path": "arch/arm64/boot/dts/broadcom/bcm2712-ds.dtsi",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/arch/arm64/boot/dts/broadcom/bcm2712-ds.dtsi",
+      "sha256": "1198e9d8b68497e93f7f0463a39801a269a5b5dc9ef0b4e98579d2ffb65b88a0",
+      "bytes": 10690,
+      "license": "GPL-2.0"
+    },
+    {
+      "upstream_path": "arch/arm64/boot/dts/broadcom/bcm2712.dtsi",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/arch/arm64/boot/dts/broadcom/bcm2712.dtsi",
+      "sha256": "d8b36a2c0efe4a2d23598a07fc10b6268e95f868aa5613676fffb25578eb437e",
+      "bytes": 17708,
+      "license": "GPL-2.0 OR MIT"
+    },
+    {
+      "upstream_path": "drivers/mmc/host/sdhci-brcmstb.c",
+      "url": "https://raw.githubusercontent.com/raspberrypi/linux/5bd564aaa8dc4b1b8ed11733c19ec8ece63a72cc/drivers/mmc/host/sdhci-brcmstb.c",
+      "sha256": "1feb4d7cb34e38cdb9ed4e15c2eb272a2e5d7f771fef34f5b7c0b6599f0eb371",
+      "bytes": 23363,
+      "license": "GPL-2.0-only"
+    }
+  ],
+  "firmware_repository_commit": "3bab0f823f5b53150b76aab77093adef6655b920",
+  "firmware_sources": [
+    {
+      "upstream_path": "debian/added-firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin",
+      "url": "https://github.com/RPi-Distro/firmware-nonfree/blob/3bab0f823f5b53150b76aab77093adef6655b920/debian/added-firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin",
+      "sha256": "e7b5d7d6ec7b3fe78f2510665af29eccee1b0d1997eac47812ca7e58176aa100",
+      "bytes": 31,
+      "license_evidence": "debian/copyright at the same immutable commit; Cypress-specific stanza for debian/added-firmware/*/*43455*"
+    },
+    {
+      "upstream_path": "debian/added-firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.clm_blob",
+      "url": "https://github.com/RPi-Distro/firmware-nonfree/blob/3bab0f823f5b53150b76aab77093adef6655b920/debian/added-firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.clm_blob",
+      "sha256": "dcaa481a0e7db3d1a38a2aac393d30df282ad3336a127cfc14aeaa188d64f3b1",
+      "bytes": 36,
+      "license_evidence": "debian/copyright at the same immutable commit; Cypress-specific stanza for debian/added-firmware/*/*43455*"
+    },
+    {
+      "upstream_path": "debian/added-firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.txt",
+      "url": "https://github.com/RPi-Distro/firmware-nonfree/blob/3bab0f823f5b53150b76aab77093adef6655b920/debian/added-firmware/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.txt",
+      "sha256": "51daeb7f84740960ed4d60257f97e05b688e7476ff578b7ac524d76c14801147",
+      "bytes": 22,
+      "license_evidence": "debian/copyright at the same immutable commit; Cypress-specific stanza for debian/added-firmware/*/*43455*"
+    },
+    {
+      "upstream_path": "debian/added-firmware/brcm/brcmfmac43455-sdio.txt",
+      "url": "https://github.com/RPi-Distro/firmware-nonfree/blob/3bab0f823f5b53150b76aab77093adef6655b920/debian/added-firmware/brcm/brcmfmac43455-sdio.txt",
+      "sha256": "ca709be81a78bdb6932936374f39943acbd7af07fae6151011127599a3ce9e3d",
+      "bytes": 2074,
+      "license_evidence": "debian/copyright at the same immutable commit; Cypress-specific stanza for debian/added-firmware/*/*43455*"
+    },
+    {
+      "upstream_path": "debian/rules",
+      "url": "https://github.com/RPi-Distro/firmware-nonfree/blob/3bab0f823f5b53150b76aab77093adef6655b920/debian/rules",
+      "sha256": "e456bd01943d46cdaf2b5bfbd92ffdf23ead650ebcba5c0153ef00f4b4a047aa",
+      "bytes": 3675,
+      "license_evidence": "debian/copyright at the same immutable commit; Cypress-specific stanza for debian/added-firmware/*/*43455*"
+    },
+    {
+      "upstream_path": "debian/copyright",
+      "url": "https://github.com/RPi-Distro/firmware-nonfree/blob/3bab0f823f5b53150b76aab77093adef6655b920/debian/copyright",
+      "sha256": "07082fd0bb65e32c73af39a2292dd6c83f169be7427d338ba1fe34f9b86c0e30",
+      "bytes": 430523,
+      "license_evidence": "debian/copyright at the same immutable commit; Cypress-specific stanza for debian/added-firmware/*/*43455*"
+    }
+  ],
+  "firmware_policy": [
+    "Pi5 board mappings target Cypress43455 assets",
+    "Generic cyfmac43455-sdio.bin is a Debian update-alternatives target for standard/minimal variants, not a file in this tree",
+    "No asset installed, firmware started or radio enabled by this milestone",
+    "Production selection must record exact binary/CLM hash, revision mapping, country policy and redistribution notices before shipment",
+    "NVRAM template MAC must be replaced with the actual platform-provided MAC; calibration and country values are never invented"
+  ],
+  "runtime_tests": {
+    "qemu": "NOT RUN: QEMU does not expose Pi5 SDIO2/CYW43455",
+    "fusion": "NOT RUN: Fusion does not expose the onboard SDIO radio",
+    "pi5": "NOT RUN: no owned Pi5 host driver/radio runtime yet"
+  },
+  "host_fixture": {
+    "path": "debian/added-firmware/brcm/brcmfmac43455-sdio.txt",
+    "bytes": 2074,
+    "packed_bytes": 1736,
+    "note": "Synthetic fixture MAC only; output remains outside repository and never reaches radio"
+  }
+}

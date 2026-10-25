@@ -28,7 +28,36 @@ static size_t make_dns_response(uint8_t *packet, size_t capacity) {
     return p;
 }
 
+static void test_aaaa(void){
+ uint8_t p[512],out[16],expected[16]={0x20,1,0x0d,0xb8};expected[15]=7;uint32_t ttl=0;
+ size_t q=chos_net_build_dns_aaaa_query(p,sizeof(p),0x2468,"example.com");assert(q==29&&p[q-3]==28);
+ put16(p+2,0x8180);put16(p+6,1);size_t n=q;
+ p[n++]=0xc0;p[n++]=12;put16(p+n,28);put16(p+n+2,1);put32(p+n+4,300);put16(p+n+8,16);n+=10;
+ memcpy(p+n,expected,16);n+=16;
+ assert(chos_net_parse_dns_aaaa_response(p,n,0x2468,"ExAmPlE.Com.",out,&ttl)==1 && !memcmp(out,expected,16)&&ttl==300);
+ for(size_t i=0;i<n;i++)assert(!chos_net_parse_dns_aaaa_response(p,i,0x2468,"example.com",out,&ttl));
+ assert(!chos_net_parse_dns_aaaa_response(p,n,0x2469,"example.com",out,&ttl));
+ assert(!chos_net_parse_dns_aaaa_response(p,n,0x2468,"unrelated.com",out,&ttl));
+ p[q+1]=13;assert(!chos_net_parse_dns_aaaa_response(p,n,0x2468,"example.com",out,&ttl));p[q+1]=12;
+ p[n-16]=0xff;assert(!chos_net_parse_dns_aaaa_response(p,n,0x2468,"example.com",out,&ttl));p[n-16]=0x20;
+ p[2]|=2;assert(!chos_net_parse_dns_aaaa_response(p,n,0x2468,"example.com",out,&ttl));p[2]&=(uint8_t)~2u;
+ /* Complete CNAME chain, compressed name, minimum TTL and malformed targets. */
+ q=chos_net_build_dns_aaaa_query(p,sizeof(p),0x2468,"example.com");put16(p+2,0x8180);put16(p+6,2);n=q;
+ p[n++]=0xc0;p[n++]=12;put16(p+n,5);put16(p+n+2,1);put32(p+n+4,100);put16(p+n+8,8);n+=10;
+ size_t cname=n;p[n++]=5;memcpy(p+n,"alias",5);n+=5;p[n++]=0xc0;p[n++]=12;
+ p[n++]=0xc0;p[n++]=(uint8_t)cname;put16(p+n,28);put16(p+n+2,1);put32(p+n+4,300);put16(p+n+8,16);n+=10;memcpy(p+n,expected,16);n+=16;
+ assert(chos_net_parse_dns_aaaa_response(p,n,0x2468,"example.com",out,&ttl)==1&&!memcmp(out,expected,16)&&ttl==100);
+ p[cname+7]=(uint8_t)cname;assert(!chos_net_parse_dns_aaaa_response(p,n,0x2468,"example.com",out,&ttl));p[cname+7]=12;
+ p[cname-2]=0; /* RDLENGTH low byte originally8 is at cname-1; preserve first byte. */
+ p[cname-1]=7;assert(!chos_net_parse_dns_aaaa_response(p,n,0x2468,"example.com",out,&ttl));
+ q=chos_net_build_dns_aaaa_query(p,sizeof(p),0x2468,"example.com");put16(p+2,0x8183);
+ assert(chos_net_parse_dns_aaaa_response(p,q,0x2468,"example.com",out,&ttl)==-3);
+ p[13]='z';assert(!chos_net_parse_dns_aaaa_response(p,q,0x2468,"example.com",out,&ttl));
+ puts("DNS AAAA: exact question/owner, bounded compressed CNAME chain, minimum TTL, RCODE, invalid/truncated records passed");
+}
+
 int main(void) {
+    test_aaaa();
     const uint8_t mac[6] = {0x52u, 0x54u, 0x00u, 0x12u, 0x34u, 0x56u};
     uint8_t discover[300], request[300], reply[320], dns[128], query[128];
     chos_dhcpv4_message_t dhcp;

@@ -5,6 +5,7 @@
 #include "chos/pmm.h"
 #include "chos/kheap.h"
 #include "chos/net_tcp.h"
+#include "chos/net6.h"
 #include "chos/storage.h"
 #include "chos/process.h"
 #include "chos/gui.h"
@@ -397,6 +398,7 @@ static void process_scheduled_entry(void *argument) {
                                slot->initial_stack_pointer, slot->argument_count, slot->argv_address,
                                &status, &faulted);
     chos_tcp_drop_owner(slot->info.pid);
+    chos_net6_drop_owner(slot->info.pid);
 
     /* This task cannot destroy its own active address space. Mark it pending;
      * scheduler cleanup switches to the kernel root and drops its pin first. */
@@ -443,6 +445,7 @@ chos_process_error_t process_run_image(const char *name, const void *file_bytes,
                                 slot->initial_stack_pointer, slot->argument_count, slot->argv_address,
                                 &exit_status, &faulted);
     chos_tcp_drop_owner(slot->info.pid);
+    chos_net6_drop_owner(slot->info.pid);
     chos_gui_process_exited(slot->info.pid);
     irq_flags = chos_spin_lock_irqsave(&process_lock);
     foreground_process_slot = CHOS_PROCESS_MAX;

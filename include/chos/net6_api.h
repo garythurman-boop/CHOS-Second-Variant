@@ -15,7 +15,8 @@
 #define CHOS_NET6_PING_REPLIED 2u
 #define CHOS_NET6_PING_TIMED_OUT 3u
 #define CHOS_NET6_PING_FAILED 4u
-/* Read-only diagnostic control-plane status; no TCP6/DNS6/DHCP6 claim. */
+/* Read-only diagnostic control-plane status. TCP6/AAAA have separate owner-bound
+ * APIs; DHCPv6 and multiple active interfaces remain unavailable. */
 typedef struct {
  uint32_t version,size_bytes,flags,ping_state;
  uint8_t addresses[3][16];

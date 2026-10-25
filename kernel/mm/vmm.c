@@ -5,6 +5,7 @@
 #include "chos/vmm.h"
 #include "chos/pmm.h"
 #include "chos/task_stack_layout.h"
+#include "chos/uefi_vmm.h"
 
 #define MAIR_ATTR_NORMAL_WBWA 0xffull
 #define MAIR_ATTR_DEVICE_NGNRE 0x04ull
@@ -53,6 +54,12 @@ static uint32_t l3_tables_used;
 static uint32_t mapped_device_pages;
 static uint32_t mapped_ram_pages;
 static int prepared;
+static int uefi_profile;
+extern int vmm_uefi_build(const chos_boot_info_t *,const chos_acpi_info_t *,const chos_pci_device_t *,size_t,uint64_t);
+extern uint64_t vmm_uefi_root(void);
+extern void vmm_uefi_map_stats(uint32_t *,uint32_t *,uint32_t *);
+extern int vmm_uefi_copy_l2(unsigned,uint64_t *);
+extern int vmm_uefi_copy_l1(uint64_t *);
 static int enabled_by_chos;
 static vmm_error_t last_error = VMM_ERR_NOT_PREPARED;
 static volatile uint64_t vmm_probe_word;
@@ -354,6 +361,7 @@ vmm_error_t vmm_prepare(const fdt_info_t *tree,
                         uint64_t dtb_start, uint64_t dtb_size) {
     vmm_error_t result;
     prepared = 0;
+    uefi_profile = 0;
     enabled_by_chos = 0;
     record_last_error(VMM_ERR_NOT_PREPARED);
     if (((uintptr_t)l1_table & (VMM_PAGE_SIZE - 1u)) != 0u ||
@@ -382,9 +390,31 @@ vmm_error_t vmm_prepare(const fdt_info_t *tree,
     return VMM_OK;
 }
 
+vmm_error_t vmm_prepare_uefi(const chos_boot_info_t *b,const chos_acpi_info_t *a,
+                              const chos_pci_device_t *d,size_t n,uint64_t virtio_mmio) {
+    prepared=enabled_by_chos=uefi_profile=0;
+    if(read_sctlr_el1()&(SCTLR_M|SCTLR_C))return VMM_ERR_MMU_ALREADY_ENABLED;
+    uint64_t mmfr0;__asm__ volatile("mrs %0,id_aa64mmfr0_el1":"=r"(mmfr0));
+    if((mmfr0&15u)<2u || ((mmfr0>>28)&15u)==15u)return VMM_ERR_UNSUPPORTED_RAM_LAYOUT;
+    if(!vmm_uefi_build(b,a,d,n,virtio_mmio))return VMM_ERR_TABLE_VALIDATION;
+    vmm_uefi_map_stats(&mapped_ram_pages,&mapped_device_pages,&l3_tables_used);
+    dynamic_mappings=0;uefi_profile=prepared=1;record_last_error(VMM_OK);return VMM_OK;
+}
+int vmm_uefi_profile(void){return uefi_profile;}
+int vmm_identity_dma_ready(void){
+    return vmm_identity_dma_policy(read_sctlr_el1(),uefi_profile,vmm_is_enabled());
+}
+int vmm_copy_kernel_root_template(uint64_t *out,size_t count){
+    if(!out||count<512u||!vmm_is_enabled()||dynamic_mappings)return 0;
+    const uint64_t *source=(const uint64_t *)(uintptr_t)vmm_kernel_root_table_address();
+    for(unsigned i=0;i<512u;++i)out[i]=source[i];return 1;
+}
+int vmm_copy_kernel_low_l1_template(uint64_t *out,size_t count){
+    return uefi_profile && out && count>=512u && vmm_uefi_copy_l1(out);
+}
 int vmm_enable(void) {
     uint64_t sctlr;
-    uintptr_t root = (uintptr_t)l1_table;
+    uintptr_t root = (uintptr_t)vmm_kernel_root_table_address();
     if (!prepared) {
         record_last_error(VMM_ERR_NOT_PREPARED);
         return 0;
@@ -395,7 +425,8 @@ int vmm_enable(void) {
         return 0;
     }
     __asm__ volatile("msr mair_el1, %0" :: "r"((uint64_t)MAIR_EL1_VALUE) : "memory");
-    __asm__ volatile("msr tcr_el1, %0" :: "r"((uint64_t)TCR_EL1_VALUE) : "memory");
+    uint64_t tcr=uefi_profile ? (UINT64_C(16)|TCR_EPD1_DISABLE_TTBR1|TCR_IPS_40BIT|TCR_SH0_INNER) : TCR_EL1_VALUE;
+    __asm__ volatile("msr tcr_el1, %0" :: "r"(tcr) : "memory");
     __asm__ volatile("msr ttbr0_el1, %0" :: "r"((uint64_t)root) : "memory");
     __asm__ volatile(
         "dsb sy\n\t"
@@ -407,7 +438,7 @@ int vmm_enable(void) {
         "isb"
         ::: "memory");
     sctlr = read_sctlr_el1();
-    sctlr |= SCTLR_ENABLE_MASK; /* WXN enforces no execute from writable pages. */
+    sctlr |= uefi_profile ? (SCTLR_M|SCTLR_I|SCTLR_WXN) : SCTLR_ENABLE_MASK; /* WXN enforces no execute from writable pages. */
     __asm__ volatile("msr sctlr_el1, %0\n\tisb" :: "r"(sctlr) : "memory");
     if ((read_sctlr_el1() & SCTLR_M) == 0u) {
         record_last_error(VMM_ERR_TABLE_VALIDATION);
@@ -432,6 +463,8 @@ int vmm_copy_kernel_l2_template(uint32_t l1_index, uint64_t *entries, size_t ent
         restore_daif(daif);
         return 0;
     }
+    if(uefi_profile){int ok=vmm_uefi_copy_l2(l1_index,entries);restore_daif(daif);return ok;}
+    if(dynamic_mappings){restore_daif(daif);return 0;}
     source = (l1_index == 0u) ? l2_device : l2_ram;
     for (i = 0u; i < L2_ENTRIES; ++i) entries[i] = source[i];
     restore_daif(daif);
@@ -439,7 +472,7 @@ int vmm_copy_kernel_l2_template(uint32_t l1_index, uint64_t *entries, size_t ent
 }
 
 uint64_t vmm_kernel_root_table_address(void) {
-    return (uint64_t)(uintptr_t)l1_table;
+    return uefi_profile?vmm_uefi_root():(uint64_t)(uintptr_t)l1_table;
 }
 
 uint64_t vmm_current_root_table_address(void) {
@@ -448,80 +481,46 @@ uint64_t vmm_current_root_table_address(void) {
 }
 
 int vmm_switch_root_table(uint64_t root_table_address) {
-    uint64_t daif, *root_page_entry, descriptor, attr_index, ap;
-    uint64_t *new_root;
-    if (!vmm_is_enabled() || root_table_address == 0u ||
-        (root_table_address & (VMM_PAGE_SIZE - 1u)) != 0u ||
-        root_table_address >= VMM_MAP_LIMIT) return 0;
-
-    daif = save_and_mask_irqs();
-    /* A root must itself be accessible through the canonical kernel map as a
-       normal, writable, privileged-only, execute-never page-table page. */
-    root_page_entry = walk_l3_entry((uint64_t)root_table_address);
-    if (root_page_entry == NULL || ((*root_page_entry & 3u) != 3u) ||
-        ((*root_page_entry & DESC_ADDR_MASK) != root_table_address)) {
-        restore_daif(daif);
-        return 0;
+    vmm_mapping_info_t backing;
+    if(!vmm_is_enabled()||!root_table_address||(root_table_address&4095u)||
+       root_table_address>=CHOS_UVMM_PHYS_LIMIT)return 0;
+    uint64_t daif=save_and_mask_irqs();
+    if(!vmm_query_root_mapping(vmm_kernel_root_table_address(),root_table_address,&backing)||
+       backing.physical_address!=root_table_address || backing.memory_type!=VMM_MEMORY_NORMAL ||
+       !backing.writable || backing.executable_at_el1 || backing.executable_at_el0 || backing.accessible_at_el0){
+        restore_daif(daif);return 0;
     }
-    descriptor = *root_page_entry;
-    attr_index = (descriptor & ATTRIDX_MASK) >> ATTRIDX_SHIFT;
-    ap = (descriptor & AP_MASK) >> AP_SHIFT;
-    if (attr_index != 0u || (ap != 0u && ap != 1u) ||
-        (descriptor & DESC_PXN) == 0u || (descriptor & DESC_UXN) == 0u) {
-        restore_daif(daif);
-        return 0;
-    }
-
-    new_root = (uint64_t *)(uintptr_t)root_table_address;
-    if ((new_root[0] & 3u) != 3u || (new_root[1] & 3u) != 3u) {
-        restore_daif(daif);
-        return 0;
-    }
-    __asm__ volatile(
-        "dsb ishst\n\t"
-        "msr ttbr0_el1, %0\n\t"
-        "isb\n\t"
-        "tlbi vmalle1is\n\t"
-        "dsb ish\n\t"
-        "isb"
-        :: "r"(root_table_address) : "memory");
-    if ((read_ttbr0_el1() & DESC_ADDR_MASK) != root_table_address) {
-        restore_daif(daif);
-        return 0;
-    }
-    restore_daif(daif);
-    return 1;
+    const uint64_t *new_root=(const uint64_t *)(uintptr_t)root_table_address;
+    if((new_root[0]&3u)!=3u || (new_root[1]&3u)!=3u){restore_daif(daif);return 0;}
+    __asm__ volatile("dsb ishst\n\tmsr ttbr0_el1, %0\n\tisb\n\ttlbi vmalle1is\n\tdsb ish\n\tisb"
+                     ::"r"(root_table_address):"memory");
+    int ok=(read_ttbr0_el1()&DESC_ADDR_MASK)==root_table_address;restore_daif(daif);return ok;
 }
 
 void vmm_clean_page_table_range(const void *memory, size_t length) {
     clean_range_to_poc(memory, length);
 }
 
-int vmm_query_mapping(uint64_t virtual_address, vmm_mapping_info_t *out) {
-    uint64_t *entry;
-    uint64_t descriptor, attr_index, ap, daif;
-    if (out == NULL) return 0;
-    daif = save_and_mask_irqs();
-    entry = walk_l3_entry_root(vmm_current_root_table_address(), virtual_address);
-    if (entry == NULL) {
-        restore_daif(daif);
-        return 0;
-    }
-    descriptor = *entry;
-    if ((descriptor & 3u) != 3u) {
-        restore_daif(daif);
-        return 0;
-    }
-    attr_index = (descriptor & ATTRIDX_MASK) >> ATTRIDX_SHIFT;
-    ap = (descriptor & AP_MASK) >> AP_SHIFT;
-    out->physical_address = (descriptor & DESC_ADDR_MASK) | (virtual_address & (VMM_PAGE_SIZE - 1u));
-    out->memory_type = attr_index == 1u ? VMM_MEMORY_DEVICE : VMM_MEMORY_NORMAL;
-    out->writable = (ap == 0u || ap == 1u);
-    out->executable_at_el1 = (descriptor & DESC_PXN) == 0u;
-    out->accessible_at_el0 = (ap == 1u || ap == 3u);
-    out->executable_at_el0 = (descriptor & DESC_UXN) == 0u;
-    restore_daif(daif);
-    return 1;
+/* Walk only trusted CHOS roots. EL0 never supplies a root-table address. */
+int vmm_query_root_mapping(uint64_t root,uint64_t va,vmm_mapping_info_t *out){
+    if(!out || !root || (root&4095u) || root>=CHOS_UVMM_PHYS_LIMIT ||
+       va>=(uefi_profile?CHOS_UVMM_PHYS_LIMIT:VMM_MAP_LIMIT))return 0;
+    const uint64_t *t=(const uint64_t *)(uintptr_t)root;
+    if(uefi_profile){uint64_t d=t[(va>>39)&511u];if((d&3u)!=3u)return 0;t=(const uint64_t *)(uintptr_t)(d&DESC_ADDR_MASK);}
+    uint64_t d=t[(va>>30)&511u];if((d&3u)!=3u)return 0;
+    t=(const uint64_t *)(uintptr_t)(d&DESC_ADDR_MASK);d=t[(va>>21)&511u];uint64_t pa;
+    if((d&3u)==1u)pa=(d&UINT64_C(0x0000ffffffe00000))|(va&UINT64_C(0x1fffff));
+    else if((d&3u)==3u){t=(const uint64_t *)(uintptr_t)(d&DESC_ADDR_MASK);d=t[(va>>12)&511u];
+        if((d&3u)!=3u)return 0;pa=(d&DESC_ADDR_MASK)|(va&4095u);
+    }else return 0;
+    uint64_t ap=(d>>6)&3u;out->physical_address=pa;
+    out->memory_type=((d>>2)&7u)==1?VMM_MEMORY_DEVICE:VMM_MEMORY_NORMAL;
+    out->writable=ap==0||ap==1;out->accessible_at_el0=ap==1||ap==3;
+    out->executable_at_el1=!(d&DESC_PXN);out->executable_at_el0=!(d&DESC_UXN);return 1;
+}
+int vmm_query_mapping(uint64_t va,vmm_mapping_info_t *out){
+    uint64_t daif=save_and_mask_irqs();
+    int ok=vmm_query_root_mapping(vmm_current_root_table_address(),va,out);restore_daif(daif);return ok;
 }
 
 /* Invalidate a single 4 KiB VA for EL1 across the inner-shareable domain. */
@@ -535,7 +534,7 @@ void vmm_tlb_invalidate_page(uint64_t virtual_address) {
 
 int vmm_find_free_dynamic_va(uint64_t *virtual_address) {
     uint64_t daif, candidate;
-    if (virtual_address == NULL || !vmm_is_enabled()) return 0;
+    if (uefi_profile || virtual_address == NULL || !vmm_is_enabled()) return 0;
     daif = save_and_mask_irqs();
     if (vmm_current_root_table_address() != vmm_kernel_root_table_address()) {
         record_last_error(VMM_ERR_KERNEL_ROOT_NOT_ACTIVE);
@@ -560,6 +559,7 @@ vmm_error_t vmm_map_page(uint64_t virtual_address, uint64_t physical_address,
                          vmm_page_permissions_t permissions) {
     vmm_error_t error;
     vmm_mapping_info_t backing, occupied;
+    if(uefi_profile)return VMM_ERR_UNSUPPORTED_RAM_LAYOUT;
     uint32_t l1_index, l2_index, l3_index;
     uint64_t *l3_table, *entry, descriptor, daif;
 
@@ -826,13 +826,13 @@ void vmm_get_stats(vmm_stats_t *out) {
     daif = save_and_mask_irqs();
     out->prepared = prepared;
     out->enabled = vmm_is_enabled();
-    out->root_table_address = (uint64_t)(uintptr_t)l1_table;
+    out->root_table_address = vmm_kernel_root_table_address();
     out->device_map_bytes = (uint64_t)mapped_device_pages * VMM_PAGE_SIZE;
     out->normal_map_bytes = (uint64_t)mapped_ram_pages * VMM_PAGE_SIZE;
     out->guard_page_address = (uint64_t)(uintptr_t)&__stack_guard_start;
     out->task_stack_guard_pages = prepared ? CHOS_SCHED_MAX_TASKS : 0u;
     out->granule_bytes = VMM_PAGE_SIZE;
-    out->va_bits = 39u;
+    out->va_bits = uefi_profile?48u:39u;
     out->l1_table_count = 2u;
     out->l3_tables_used = l3_tables_used;
     out->mapped_device_pages = mapped_device_pages;

@@ -34,6 +34,7 @@ typedef struct {
     uint64_t root_pa;
     uint64_t device_l2_pa;
     uint64_t ram_l2_pa;
+    uint64_t low_l1_pa;
     uint64_t user_l3_pa[CHOS_AS_USER_L2_SLOTS];
     address_space_user_frame_t user_frames[CHOS_AS_MAX_USER_FRAMES];
 } address_space_slot_t;
@@ -185,32 +186,7 @@ static void fill_info(size_t index, const address_space_slot_t *slot, address_sp
 
 static int query_root(const address_space_slot_t *slot, uint64_t virtual_address,
                       vmm_mapping_info_t *out) {
-    uint64_t *root, *l2, *l3;
-    uint64_t l1d, l2d, d, attr_index, ap;
-    uint32_t l1_index, l2_index, l3_index;
-    if (slot == NULL || out == NULL || virtual_address >= VMM_MAP_LIMIT) return 0;
-    l1_index = (uint32_t)(virtual_address >> 30);
-    l2_index = (uint32_t)((virtual_address >> 21) & 0x1ffu);
-    l3_index = (uint32_t)((virtual_address >> 12) & 0x1ffu);
-    if (l1_index >= 2u) return 0;
-    root = (uint64_t *)(uintptr_t)slot->root_pa;
-    l1d = root[l1_index];
-    if ((l1d & DESC_TABLE_PAGE) != DESC_TABLE_PAGE) return 0;
-    l2 = (uint64_t *)(uintptr_t)(l1d & DESC_ADDR_MASK);
-    l2d = l2[l2_index];
-    if ((l2d & DESC_TABLE_PAGE) != DESC_TABLE_PAGE) return 0;
-    l3 = (uint64_t *)(uintptr_t)(l2d & DESC_ADDR_MASK);
-    d = l3[l3_index];
-    if ((d & DESC_TABLE_PAGE) != DESC_TABLE_PAGE) return 0;
-    attr_index = (d & ATTRIDX_MASK) >> ATTRIDX_SHIFT;
-    ap = (d & AP_MASK) >> AP_SHIFT;
-    out->physical_address = (d & DESC_ADDR_MASK) | (virtual_address & (VMM_PAGE_SIZE - 1u));
-    out->memory_type = attr_index == 1u ? VMM_MEMORY_DEVICE : VMM_MEMORY_NORMAL;
-    out->writable = ap == 0u || ap == 1u;
-    out->executable_at_el1 = (d & DESC_PXN) == 0u;
-    out->accessible_at_el0 = ap == 1u || ap == 3u;
-    out->executable_at_el0 = (d & DESC_UXN) == 0u;
-    return 1;
+    return slot && vmm_query_root_mapping(slot->root_pa,virtual_address,out);
 }
 
 static int find_owned_frame(address_space_slot_t *slot, uint64_t physical_address,
@@ -238,7 +214,7 @@ static int backing_page_is_suitable(address_space_slot_t *slot, uint64_t physica
 }
 
 address_space_error_t address_space_create(address_space_handle_t *out) {
-    uint64_t irq_flags, root_pa = 0u, device_pa = 0u, ram_pa = 0u;
+    uint64_t irq_flags, root_pa = 0u, device_pa = 0u, ram_pa = 0u, low_pa = 0u;
     uint64_t *root, *device_l2, *ram_l2;
     size_t index;
     uint32_t generation, id;
@@ -253,7 +229,9 @@ address_space_error_t address_space_create(address_space_handle_t *out) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_CAPACITY;
     }
-    if (!pmm_alloc_page(&root_pa) || !pmm_alloc_page(&device_pa) || !pmm_alloc_page(&ram_pa)) {
+    if (!pmm_alloc_page(&root_pa) || !pmm_alloc_page(&device_pa) || !pmm_alloc_page(&ram_pa) ||
+        (vmm_uefi_profile() && !pmm_alloc_page(&low_pa))) {
+        if (low_pa != 0u) (void)pmm_free_page(low_pa);
         if (ram_pa != 0u) (void)pmm_free_page(ram_pa);
         if (device_pa != 0u) (void)pmm_free_page(device_pa);
         if (root_pa != 0u) (void)pmm_free_page(root_pa);
@@ -267,9 +245,11 @@ address_space_error_t address_space_create(address_space_handle_t *out) {
     zero_bytes(root, VMM_PAGE_SIZE);
     zero_bytes(device_l2, VMM_PAGE_SIZE);
     zero_bytes(ram_l2, VMM_PAGE_SIZE);
-    if (!vmm_copy_kernel_l2_template(0u, device_l2, ADDRESS_L2_COUNT) ||
+    if (!vmm_copy_kernel_root_template(root,512u) ||
+        !vmm_copy_kernel_l2_template(0u, device_l2, ADDRESS_L2_COUNT) ||
         !vmm_copy_kernel_l2_template(1u, ram_l2, ADDRESS_L2_COUNT) ||
         !address_space_prepare_l2_templates(device_l2, ram_l2, ADDRESS_L2_COUNT)) {
+        if (low_pa) (void)pmm_free_page(low_pa);
         (void)pmm_free_page(ram_pa);
         (void)pmm_free_page(device_pa);
         (void)pmm_free_page(root_pa);
@@ -277,15 +257,23 @@ address_space_error_t address_space_create(address_space_handle_t *out) {
         return AS_ERR_KERNEL_TEMPLATE;
     }
 
-    root[0] = vmm_make_table_descriptor(device_pa);
-    root[1] = vmm_make_table_descriptor(ram_pa);
-    if (root[0] == 0u || root[1] == 0u) {
-        (void)pmm_free_page(ram_pa);
-        (void)pmm_free_page(device_pa);
-        (void)pmm_free_page(root_pa);
-        chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
-        return AS_ERR_BAD_DESCRIPTOR;
+    uint64_t *low=root;
+    if(low_pa){
+        low=(uint64_t *)(uintptr_t)low_pa;
+        if(!vmm_copy_kernel_low_l1_template(low,512u)){
+            (void)pmm_free_page(low_pa);(void)pmm_free_page(ram_pa);
+            (void)pmm_free_page(device_pa);(void)pmm_free_page(root_pa);
+            chos_spin_unlock_irqrestore(&address_space_lock,irq_flags);return AS_ERR_KERNEL_TEMPLATE;
+        }
+        root[0]=vmm_make_table_descriptor(low_pa);
     }
+    low[0]=vmm_make_table_descriptor(device_pa);low[1]=vmm_make_table_descriptor(ram_pa);
+    if(!low[0] || !low[1] || !root[0]){
+        if(low_pa)(void)pmm_free_page(low_pa);
+        (void)pmm_free_page(ram_pa);(void)pmm_free_page(device_pa);(void)pmm_free_page(root_pa);
+        chos_spin_unlock_irqrestore(&address_space_lock,irq_flags);return AS_ERR_BAD_DESCRIPTOR;
+    }
+    vmm_clean_page_table_range(low,VMM_PAGE_SIZE);
 
     generation = slot_generations[index] + 1u;
     if (generation == 0u) generation = 1u;
@@ -299,6 +287,7 @@ address_space_error_t address_space_create(address_space_handle_t *out) {
     spaces[index].root_pa = root_pa;
     spaces[index].device_l2_pa = device_pa;
     spaces[index].ram_l2_pa = ram_pa;
+    spaces[index].low_l1_pa = low_pa;
     vmm_clean_page_table_range(root, VMM_PAGE_SIZE);
     vmm_clean_page_table_range(device_l2, VMM_PAGE_SIZE);
     vmm_clean_page_table_range(ram_l2, VMM_PAGE_SIZE);
@@ -508,7 +497,7 @@ address_space_error_t address_space_unmap_user_page(address_space_handle_t handl
 
 address_space_error_t address_space_destroy(address_space_handle_t handle) {
     address_space_slot_t *slot;
-    uint64_t irq_flags, root_pa, device_pa, ram_pa;
+    uint64_t irq_flags, root_pa, device_pa, ram_pa, low_pa;
     size_t i;
     irq_flags = chos_spin_lock_irqsave(&address_space_lock);
     if (!handle_slot(handle, &slot)) {
@@ -531,6 +520,7 @@ address_space_error_t address_space_destroy(address_space_handle_t handle) {
     root_pa = slot->root_pa;
     device_pa = slot->device_l2_pa;
     ram_pa = slot->ram_l2_pa;
+    low_pa = slot->low_l1_pa;
     for (i = 0u; i < CHOS_AS_USER_L2_SLOTS; ++i) {
         if (slot->user_l3_pa[i] != 0u && !pmm_is_allocated_page(slot->user_l3_pa[i])) {
             chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
@@ -545,7 +535,7 @@ address_space_error_t address_space_destroy(address_space_handle_t handle) {
         }
     }
     if (!pmm_is_allocated_page(root_pa) || !pmm_is_allocated_page(device_pa) ||
-        !pmm_is_allocated_page(ram_pa)) {
+        !pmm_is_allocated_page(ram_pa) || (low_pa && !pmm_is_allocated_page(low_pa))) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_BAD_DESCRIPTOR;
     }
@@ -565,10 +555,12 @@ address_space_error_t address_space_destroy(address_space_handle_t handle) {
     slot->root_pa = 0u;
     slot->device_l2_pa = 0u;
     slot->ram_l2_pa = 0u;
+    slot->low_l1_pa = 0u;
     slot->mapped_user_pages = 0u;
     slot->owned_user_frames = 0u;
     zero_bytes(slot->user_l3_pa, sizeof(slot->user_l3_pa));
     zero_bytes(slot->user_frames, sizeof(slot->user_frames));
+    if(low_pa)(void)pmm_free_page(low_pa);
     (void)pmm_free_page(ram_pa);
     (void)pmm_free_page(device_pa);
     (void)pmm_free_page(root_pa);

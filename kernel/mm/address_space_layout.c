@@ -31,7 +31,6 @@ uint32_t address_space_user_l3_index(uint64_t virtual_address) {
 int address_space_prepare_l2_templates(uint64_t *device_l2, uint64_t *ram_l2,
                                        size_t entry_count) {
     size_t i;
-    const uint32_t dynamic_first = (uint32_t)((VMM_DYNAMIC_VA_BASE >> 21) & 0x1ffu);
     if (device_l2 == NULL || ram_l2 == NULL || entry_count < VMM_L2_ENTRIES) return 0;
 
     /* User VA region must be empty in the kernel/device template; fail closed if a
@@ -39,9 +38,9 @@ int address_space_prepare_l2_templates(uint64_t *device_l2, uint64_t *ram_l2,
     for (i = CHOS_AS_USER_L2_FIRST; i < CHOS_AS_USER_L2_LIMIT; ++i) {
         if (device_l2[i] != 0u) return 0;
     }
-    /* Global dynamic aliases are kernel implementation details. They are not inherited
-       by process roots, whose private user mapping area is separate. */
-    for (i = dynamic_first; i < VMM_L2_ENTRIES; ++i) ram_l2[i] = 0u;
+    /* Preserve all privileged identity RAM, including RAM occupying the direct
+       alias candidate window. VMM refuses template copies while owned dynamic
+       aliases exist, and refuses installing aliases away from its kernel root. */
     for (i = CHOS_AS_USER_L2_FIRST; i < CHOS_AS_USER_L2_LIMIT; ++i) device_l2[i] = 0u;
     return 1;
 }

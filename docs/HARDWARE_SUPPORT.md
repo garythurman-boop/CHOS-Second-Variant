@@ -59,3 +59,9 @@ SDIO2, independently identified through RaspberryPiOS firmware mappings. This
 selection is not driver/runtime support; Pi boot, SDIO2, firmware/authentication
 and live wireless tests remain open. See PI5_WIRELESS.md. IPv6 control-plane
 QEMU evidence is distinct from the user-confirmed Fusion IPv4/HTTP result.
+
+Current source adds a bounded UEFI CPU/process isolation profile while retaining
+identity DMA with data caching off. See [runtime contract and QEMU evidence](UEFI_PROCESS_RUNTIME.md).
+This does not establish Fusion qualification for these new changes, native IOMMU
+ownership, a modern browser, verified TLS or live wireless support. The binary
+publication hold remains active until the complete revised Stage 3 passes.

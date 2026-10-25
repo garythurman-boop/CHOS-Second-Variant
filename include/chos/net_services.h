@@ -53,4 +53,8 @@ int chos_net_parse_dns_a_response(const void *payload, size_t length,
                                   uint16_t expected_id, const char *expected_name,
                                   uint32_t *address_out, uint32_t *ttl_out);
 
+/* Bounded AAAA query/response. Result 1=address, 0=malformed/mismatched,
+ * negative=matching DNS RCODE; only expected owner/bounded CNAME chain accepted. */
+size_t chos_net_build_dns_aaaa_query(void *,size_t,uint16_t,const char *);
+int chos_net_parse_dns_aaaa_response(const void *,size_t,uint16_t,const char *,uint8_t[16],uint32_t *);
 #endif

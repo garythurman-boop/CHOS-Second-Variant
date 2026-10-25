@@ -71,6 +71,7 @@ try:
  max_step=int.from_bytes(g.block('installer_max_step_counter_ticks',size=8),'little')
  frequency=int.from_bytes(g.block('counter_frequency',size=8),'little')
  max_step_ms=round(1000*max_step/frequency,3) if frequency else None
+ a.uefi_kernel=out/'kernel.elf' # Pin exact symbols across later build/reboot.
  g.close();g=None
  # Validate the actual guest-written GPT/ESP/CHFS with the independent host validator.
  assert (out/'kernel.elf').read_bytes() in disk.read_bytes(), 'Installed ESP must contain the exact running kernel'
@@ -83,8 +84,8 @@ try:
  g.screen('installed-desktop')
  key('esc');key('f1');click(600,475);wait(lambda:g.symbol('fs_ready')==1,5,'installed CHFS mount')
  assert g.symbol('native_storage_writable')==1,'Installed storage writes must be automatic'
- key('esc');key('c');g.type('write /stage2.txt installed-persistence')
- wait(lambda:'File written and flushed.' in g.terminal(),5,'installed-system write')
+ g.serial('fswrite /stage2.txt installed-persistence')
+ wait(lambda:'file written (directory committed' in g.text(),5,'installed-system write through scheduled shell')
  g.screen('persistent-write')
  key('esc');key('s');wait(lambda:g.symbol('view')==5,3,'installed display settings')
  click(350,330 if options.supported_mode else 300);wait(lambda:g.symbol('display_boot_request_saved')==1,5,'ESP resolution preference write')
@@ -102,7 +103,7 @@ try:
   assert '[DISPLAY] Active width: 0x0000000000000320' in g.text(),'Unsupported mode must retain the safe framebuffer'
  # 1024x640 is absent from RAMFB; 1024x768 exercises an enumerated mode.
  key('esc');key('f1');click(600,475);wait(lambda:g.symbol('fs_ready')==1,5,'reboot CHFS mount')
- key('esc');key('c');g.type('type /stage2.txt');wait(lambda:'installed-persistence' in g.terminal(),5,'persistent data after reboot')
+ g.serial('fsread /stage2.txt');wait(lambda:'installed-persistence' in g.text(),5,'persistent data after reboot')
  g.screen('persistence-after-reboot')
  protected_hash=hashlib.sha256(disk.read_bytes()).hexdigest()
  key('esc');key('i');time.sleep(.3)
@@ -122,7 +123,7 @@ try:
  wait(lambda:g.text().count('Initial CHOS GUI frame rendered')>boots,55,'actual PSCI restart through firmware')
  wait(lambda:g.symbol('splash_active')==0,10,'restarted desktop')
  assert g.symbol('native_storage_writable')==1
- key('c');g.type('type /stage2.txt');wait(lambda:'installed-persistence' in g.terminal(),5,'data after real reset')
+ g.serial('fsread /stage2.txt');wait(lambda:g.text().count('installed-persistence')>=2,5,'data after real reset')
  g.screen('actual-restart-persistence')
  width=g.symbol('active_surface',8);height=g.symbol('active_surface',16)
  physical_click(40,height-15);physical_click(95,height-60)
@@ -136,7 +137,7 @@ try:
  # QMP may contain a shutdown event before closing; serial and process independently show guest path.
  assert '[POWER] PSCI system off.' in g.text()
 
- (out/'result.json').write_text(json.dumps({'status':'PASS','install_seconds':round(elapsed,3),'three_key_focus_ms':responsiveness_ms,'max_install_step_ms':max_step_ms,'keyboard_wizard':options.keyboard,'physical_mode_change':options.supported_mode,'shutdown_seconds':round(shutdown_seconds,3),'checks':['no writes before target selection and final confirmation','guest GPT/FAT32/EFI/CHFS creation and verification','ISO detached: disk-only desktop and native input','installed file write survives a fresh reboot','ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback','keyboard focus remains responsive during installation','installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits']},indent=2))
+ (out/'result.json').write_text(json.dumps({'status':'PASS','install_seconds':round(elapsed,3),'three_key_focus_ms':responsiveness_ms,'max_install_step_ms':max_step_ms,'keyboard_wizard':options.keyboard,'physical_mode_change':options.supported_mode,'shutdown_seconds':round(shutdown_seconds,3),'checks':['no writes before target selection and final confirmation','guest GPT/FAT32/EFI/CHFS creation and verification','ISO detached: disk-only desktop and native input','scheduled shell file write survives a fresh reboot; native editor checked separately','ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback','keyboard focus remains responsive during installation','installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits']},indent=2))
 except Exception:
  if g and g.process.poll() is None:g.screen('failure')
  raise

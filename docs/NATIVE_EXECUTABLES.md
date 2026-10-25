@@ -3,7 +3,8 @@
 The direct-boot EL0 runtime now accepts native ELF64 static executables in addition
 to existing CHCX v1/v2 images. This advances the runtime needed for ported libraries;
 it is not a WebKit port, Linux ABI compatibility, complete C/C++ runtime, dynamic
-linker or isolated UEFI application runtime. The revised Stage 3 remains unfinished.
+linker or full browser isolation. The additional UEFI CPU/process profile is documented
+in UEFI_PROCESS_RUNTIME.md and has QEMU evidence; Fusion validation remains open. The revised Stage 3 remains unfinished.
 
 ## Supported profile
 
@@ -25,8 +26,9 @@ linker or isolated UEFI application runtime. The revised Stage 3 remains unfinis
 
 The four-MiB owned-frame quota and four-process limit remain. Native image span is
 larger than CHCX's preserved 64 KiB bound, but it is still insufficient for WebKit.
-Larger heaps/images, threads/futexes, IPC, events, complete libc/C++ and UEFI memory/
-DMA integration remain separate requirements. No constant increase is represented
+Larger heaps/images, threads/futexes, IPC, events, complete libc/C++ and native IOMMU/device
+isolation remain separate requirements. See NATIVE_C_RUNTIME.md for allocation
+and string primitives already implemented. No constant increase is represented
 as a working browser runtime.
 
 The process reaper uses a bounded 512-bit mapping ledger rather than a 32-bit mask.

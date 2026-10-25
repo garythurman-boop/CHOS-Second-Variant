@@ -4,6 +4,7 @@ Screenshots prove visible changes; QMP injects real emulated input devices.
 No QMP event is injected directly into a CHOS API.
 """
 import argparse,hashlib,json,math,os,pathlib,re,shutil,socket,struct,subprocess,tempfile,time
+from guest_iso_artifacts import verify_iso_kernel,verify_installed_kernel
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 class Guest:
     def __init__(self,args,out,disk):
@@ -14,7 +15,11 @@ class Guest:
         iso=out/'boot.iso'
         if args.mode=='uefi':shutil.copyfile(args.iso,iso)
         artifacts={'kernel_sha256':hashlib.sha256(elf.read_bytes()).hexdigest()}
-        if args.mode=='uefi':artifacts['iso_sha256']=hashlib.sha256(iso.read_bytes()).hexdigest()
+        if args.mode=='uefi':
+            artifacts['iso_sha256']=hashlib.sha256(iso.read_bytes()).hexdigest()
+            artifacts.update(verify_iso_kernel(iso,elf))
+        elif args.mode=='installed':
+            artifacts.update(verify_installed_kernel(disk,elf))
         (out/'artifacts.json').write_text(json.dumps(artifacts,indent=2))
         self.symbols={}
         for line in subprocess.check_output(['nm',str(elf)],text=True).splitlines():
@@ -35,7 +40,7 @@ class Guest:
             cmd+=['-device',f'loader,file={elf},cpu-num=0','-device','virtio-gpu-device',
                   '-device','virtio-keyboard-device','-device','virtio-mouse-device',
                   '-drive',f'if=none,file={disk},format=raw,id=disk','-device','virtio-blk-device,drive=disk',
-                  '-netdev','user,id=net','-device','virtio-net-device,netdev=net']
+                  '-netdev',getattr(args,'netdev','user,id=net'),'-device','virtio-net-device,netdev=net']
             if not args.no_rng: cmd+=['-object','rng-random,filename=/dev/urandom,id=rng','-device','virtio-rng-device,rng=rng']
         else:
             vars=out/'vars.fd';shutil.copyfile(args.firmware.parent/'AAVMF_VARS.fd',vars)
@@ -52,7 +57,7 @@ class Guest:
                     disk_backend='blkdebug:'+str(config)+':'+str(disk)
                 cmd+=['-drive',f'if=none,file={disk_backend},format=raw,id=storage','-device',
                       'nvme,serial=CHOS-DISPOSABLE,drive=storage' if args.nvme else 'virtio-blk-pci,disable-legacy=on,drive=storage',
-                      '-netdev','user,id=net','-device',(getattr(args,'net_model','virtio')+',id=nic,netdev=net,romfile=' if getattr(args,'net_model','virtio') in ['vmxnet3','e1000e'] else 'virtio-net-pci,id=nic,disable-legacy=on,netdev=net')]
+                      '-netdev',getattr(args,'netdev','user,id=net'),'-device',(getattr(args,'net_model','virtio')+',id=nic,netdev=net,romfile=' if getattr(args,'net_model','virtio') in ['vmxnet3','e1000e'] else 'virtio-net-pci,id=nic,disable-legacy=on,netdev=net')]
                 if not args.no_rng:cmd+=['-object','rng-random,filename=/dev/urandom,id=rng','-device','virtio-rng-pci,disable-legacy=on,rng=rng']
             else:cmd+=['-net','none']
             self.usb_bus='xhci.0';self.mouse_port=None

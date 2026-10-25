@@ -923,3 +923,5 @@ int main(void) {
 }
 
 int storage_block_ready(void) { return storage_mounted(); }
+
+int vmm_uefi_profile(void) { return 0; }

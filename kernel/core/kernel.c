@@ -13,6 +13,7 @@
 #include "chos/driver_report.h"
 #include "chos/vmm.h"
 #include "chos/scheduler.h"
+#include "chos/process.h"
 #include "chos/storage.h"
 #include "chos/virtio_gpu.h"
 #include "chos/virtio_input.h"
@@ -207,6 +208,18 @@ static __attribute__((noreturn)) void kernel_halt_safely(void) {
     for (;;) __asm__ volatile("wfe");
 }
 
+static void uefi_desktop_task(void *argument) {
+    int input_ready=*(const int *)argument;
+    shell_run_scheduled(&boot_device_tree);
+    for(;;){
+        chos_platform_drivers_poll();chos_net_stack_poll();chos_net_manager_poll();
+        if(input_ready)chos_input_poll();else chos_gui_pump();
+        (void)process_service_pending_spawn_request();
+        process_reap_pending();
+        scheduler_sleep_ticks(1u);
+    }
+}
+
 void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
     fdt_error_t fdt_result;
     pmm_error_t pmm_result;
@@ -363,6 +376,19 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         if (console_ready) uefi_console_write("[OK] Kernel heap initialized.\n");
 
         int firmware_mmio=uefi_fdt_has_virtio_mmio(boot_info);
+        /* Build translations before starting native DMA. Unsupported metadata
+         * leaves the proven MMU-off recovery desktop available. */
+        if(acpi_result==CHOS_ACPI_OK){
+            vmm_result=vmm_prepare_uefi(boot_info,&acpi_info,pci_devices,pci_summary.devices_stored,
+                                      firmware_mmio?platform_virtio_mmio_base():0u);
+            if(vmm_result==VMM_OK && vmm_enable()){
+                if(console_ready)uefi_console_write("[OK] UEFI CPU isolation active; identity DMA, data cache off.\n");
+            }else if(console_ready){
+                uefi_console_write("[WARN] UEFI application isolation unavailable; using recovery desktop: ");
+                uefi_console_write(vmm_error_string(vmm_result==VMM_OK?vmm_last_error():vmm_result));
+                uefi_console_write("\n");
+            }
+        }
         if(firmware_mmio)chos_virtio_use_mmio(platform_virtio_mmio_base());
         chos_platform_drivers_discover(boot_info,&acpi_info,pci_devices,pci_summary.devices_stored);
         chos_platform_drivers_probe(CHOS_DRIVER_TRANSPORT);
@@ -511,6 +537,15 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             }
         }
         uefi_console_set_graphics_logging(0);
+        if(gic_timer_ready && vmm_is_enabled()){
+            uint32_t desktop_id=0;
+            if(scheduler_set_preemption_enabled(1) &&
+               scheduler_create_task("uefi-desktop",uefi_desktop_task,&input_ready,&desktop_id)){
+                if(console_ready)uefi_console_write("[OK] Scheduled UEFI desktop and isolated application runtime ready.\n");
+                (void)scheduler_run();
+                if(console_ready)uefi_console_write("[FAIL] UEFI scheduler stopped; recovery desktop resumed.\n");
+            }
+        }
         for (;;) {
             chos_platform_drivers_poll();chos_net_stack_poll();chos_net_manager_poll();
             if (input_ready) chos_input_poll();
@@ -645,7 +680,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         uart_puts(net.link_status_known ? (net.link_up ? " link=up\n" : " link=down\n") : " link=unknown\n");
         chos_net_stack_init();
         uart_puts("[ OK ] Non-blocking DHCPv4 client initialized; configuration proceeds in shell poll loop\n");
-        uart_puts("[ OK ] Non-blocking DHCP, DNS A lookup, ARP and ICMP diagnostics initialized; TCP sockets/TLS remain future work\n");
+        uart_puts("[ OK ] Non-blocking DHCP, DNS A, ARP/ICMP and bounded TCP clients initialized; TLS remains unavailable\n");
     } else {
         uart_puts("[ .. ] Optional VirtIO-net unavailable: ");
         uart_puts(virtio_net_last_error());

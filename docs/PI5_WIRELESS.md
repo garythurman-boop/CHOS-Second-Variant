@@ -33,10 +33,17 @@ paths returned 404; the successful paths above were obtained from repository tre
 
 ## Implementation and acceptance boundary
 
+CHOS now has a bounded native SDIO/CYW protocol layer: native command enumeration,
+CCCR/CIS identity, CMD52/53 byte/block/FIFO transfers, CYW backplane windows, actual
+chip-ID decoding, SDPCM framing and board-NVRAM preparation. It has host/sanitizer
+and freestanding AArch64 build evidence. See [the implementation and exact limits](SDIO_CYW_PROTOCOL.md).
+It is not registered as an attached adapter and produces no scan/connection data.
+
 CHOS does not yet have a boot-validated Pi 5 platform, SDIO2 host driver, regulator/
-pin/clock/interrupt ownership, CYW43455 backplane/SDPCM firmware transport, firmware
-loader, asynchronous escan/connect events, supplicant/key management or protected
-wireless credential store. Identifying the chipset does not implement those layers.
+pin/clock/interrupt ownership, complete CYW43455 firmware transport state machine,
+firmware loader/start, asynchronous escan/connect events, supplicant/key management
+or protected wireless credential store. Identifying the chipset and implementing
+the wire formats do not complete those layers.
 The Pi's SDIO radio is not exposed by Fusion and cannot be certified by an Ethernet
 guest. Live Pi 5 wireless, wrong-password, AP loss, WPA2, reconnect and regulatory
 tests remain NOT RUN until the driver and actual board environment are available.

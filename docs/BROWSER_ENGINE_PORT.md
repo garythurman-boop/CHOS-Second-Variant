@@ -30,8 +30,9 @@ re-evaluate Servo/Ladybird using concrete build/render results.
 
 ## Required runtime implementation
 
-The current UEFI kernel GUI cannot safely host an engine or untrusted JavaScript.
-It has no EL0 scheduler/MMU runtime. Direct boot has limited EL0 isolation but only
+The UEFI runtime now has bounded CPU isolation and scheduling with QEMU evidence
+(UEFI_PROCESS_RUNTIME.md), while Fusion runtime validation remains open. It cannot
+yet host the modern engine or a complete untrusted-content sandbox. Both profiles retain only
 four processes, 64 KiB CHCX images, at most 32 KiB stacks, four open files/process,
 a four-MiB address-space frame budget and four TCP sockets. No complete libc/C++
 standard library, mmap, pthread/futex, process IPC/shared-memory/descriptor passing,
@@ -104,5 +105,5 @@ remain. The compiler preflight still correctly fails missing POSIX/WPE headers.
 Native executable progress is recorded in NATIVE_EXECUTABLES.md: strict CHOS-ABI
 static ELF64 with separate RX/R/RW segments, bounded larger sparse images and
 deferred cleanup now has live direct-EL0 evidence. This is not Linux binary
-compatibility, a complete C/C++ runtime or engine integration. UEFI isolation,
-engine-sized memory, threads/IPC and secure transport remain open.
+compatibility, a complete C/C++ runtime or engine integration. UEFI runtime qualification, engine-sized memory, threads/IPC and secure transport
+remain open. Native allocation/string prerequisites are recorded in NATIVE_C_RUNTIME.md.

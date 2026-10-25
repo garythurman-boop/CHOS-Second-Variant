@@ -953,6 +953,75 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 if(!syscall_copy_user_path(fault_space,frame->x[0],literal,sizeof(literal))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
                 frame->x[0]=chos_net6_ping(literal)?0:neg_errno(CHOS_ERRNO_EAGAIN);return frame;
             }
+            case CHOS_SYS_NET6_OPEN: {
+                uint32_t owner=process_pid_for_address_space(fault_space);
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[0]>65535u){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                int handle=chos_tcp6_open(owner,(uint16_t)frame->x[0]);
+                frame->x[0]=handle>0?(uint64_t)handle:neg_errno(CHOS_ERRNO_EMFILE);return frame;
+            }
+            case CHOS_SYS_NET6_CONNECT: {
+                uint32_t owner=process_pid_for_address_space(fault_space);uint8_t remote[16];chos_tcp6_socket_info_t info;
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(!frame->x[2] || frame->x[2]>65535u){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!chos_tcp6_info(owner,(int)frame->x[0],&info)){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
+                if(!address_space_copy_from_user(fault_space,remote,frame->x[1],sizeof(remote))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                frame->x[0]=chos_tcp6_connect(owner,(int)frame->x[0],remote,(uint16_t)frame->x[2])?0:neg_errno(CHOS_ERRNO_EAGAIN);return frame;
+            }
+            case CHOS_SYS_NET6_STATUS: {
+                uint32_t owner=process_pid_for_address_space(fault_space);chos_tcp6_socket_info_t info;
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[2]<sizeof(info)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!chos_tcp6_info(owner,(int)frame->x[0],&info)){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[1],sizeof(info)) ||
+                   !address_space_copy_to_user(fault_space,frame->x[1],&info,sizeof(info))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                frame->x[0]=0;return frame;
+            }
+            case CHOS_SYS_NET6_SEND: {
+                uint32_t owner=process_pid_for_address_space(fault_space);chos_tcp6_socket_info_t info;uint8_t bytes[CHOS_TCP6_MAX_TRANSFER];
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[2]>sizeof(bytes)){frame->x[0]=neg_errno(CHOS_ERRNO_E2BIG);return frame;}
+                if(!chos_tcp6_info(owner,(int)frame->x[0],&info)){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
+                if(!frame->x[2]){frame->x[0]=0;return frame;}
+                if(!address_space_copy_from_user(fault_space,bytes,frame->x[1],(size_t)frame->x[2])){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int n=chos_tcp6_send(owner,(int)frame->x[0],bytes,(size_t)frame->x[2]);
+                frame->x[0]=n<0?neg_errno(CHOS_ERRNO_EBADF):n?(uint64_t)n:neg_errno(info.state==CHOS_TCP_FAILED?CHOS_ERRNO_EIO:CHOS_ERRNO_EAGAIN);return frame;
+            }
+            case CHOS_SYS_NET6_RECV: {
+                uint32_t owner=process_pid_for_address_space(fault_space);chos_tcp6_socket_info_t info;uint8_t bytes[CHOS_TCP6_MAX_TRANSFER];
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[2]>sizeof(bytes)){frame->x[0]=neg_errno(CHOS_ERRNO_E2BIG);return frame;}
+                if(!chos_tcp6_info(owner,(int)frame->x[0],&info)){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
+                if(!frame->x[2]){frame->x[0]=0;return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[1],(size_t)frame->x[2])){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int n=chos_tcp6_recv(owner,(int)frame->x[0],bytes,(size_t)frame->x[2]);
+                if(n<0){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
+                if(!n){frame->x[0]=info.receive_eof || info.state==CHOS_TCP_CLOSED?0:neg_errno(info.state==CHOS_TCP_FAILED?CHOS_ERRNO_EIO:CHOS_ERRNO_EAGAIN);return frame;}
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[1],bytes,(size_t)n)?(uint64_t)n:neg_errno(CHOS_ERRNO_EFAULT);return frame;
+            }
+            case CHOS_SYS_NET6_CLOSE:
+            case CHOS_SYS_NET6_ABORT: {
+                uint32_t owner=process_pid_for_address_space(fault_space);
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                int n=(uint32_t)frame->x[8]==CHOS_SYS_NET6_CLOSE?chos_tcp6_close(owner,(int)frame->x[0]):chos_tcp6_abort(owner,(int)frame->x[0]);
+                frame->x[0]=n<0?neg_errno(CHOS_ERRNO_EBADF):n?0:neg_errno(CHOS_ERRNO_EAGAIN);return frame;
+            }
+            case CHOS_SYS_NET6_DNS_START: {
+                uint32_t owner=process_pid_for_address_space(fault_space);char host[CHOS_DNS6_HOST_MAX];chos_dns6_info_t info;
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(!syscall_copy_user_path(fault_space,frame->x[0],host,sizeof(host))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                chos_net6_dns_info(owner,&info);
+                if(info.state==CHOS_DNS6_PENDING){frame->x[0]=neg_errno(CHOS_ERRNO_EBUSY);return frame;}
+                frame->x[0]=chos_net6_dns_start(owner,host)?0:neg_errno(CHOS_ERRNO_EAGAIN);return frame;
+            }
+            case CHOS_SYS_NET6_DNS_STATUS: {
+                uint32_t owner=process_pid_for_address_space(fault_space);chos_dns6_info_t info;
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[1]<sizeof(info)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[0],sizeof(info))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                chos_net6_dns_info(owner,&info);
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&info,sizeof(info))?0:neg_errno(CHOS_ERRNO_EFAULT);return frame;
+            }
             case CHOS_SYS_RANDOM_BYTES: {
                 uint32_t owner = process_pid_for_address_space(fault_space);
                 uint64_t out_pointer = frame->x[0];
