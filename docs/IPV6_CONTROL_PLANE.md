@@ -6,7 +6,8 @@ support, TCP6 sockets, DNS AAAA/resolution over IPv6, DHCPv6, multiple active
 interfaces, a manual IPv6 configuration utility or revised Stage 3 as a whole.
 
 The upstream lwIP 2.2.1 release is pinned to commit
-`77dcd25a72509eb83f72b033d219b1d40cd8eb95`. Its vendored subset is unmodified;
+`77dcd25a72509eb83f72b033d219b1d40cd8eb95`. Its vendored subset contains only the compiled source/header dependency closure
+and is unmodified;
 `docs/dependencies/lwip.json` records each file hash and `tools/verify_lwip.py`
 checks exact inventory. BSD notices remain in each source and COPYING. CHOS's
 port/configuration and adapter are separate. Builds require no dependency download.
