@@ -92,3 +92,10 @@ retained rows; End returns to the live tail. Typing returns to the current promp
 and clear removes history. The built-in UEFI Console retains 512 older rows; the
 EL0 Console retains 256 older rows within its existing 16-page image limit. Oldest
 rows are evicted when full. Command history on Up/Down remains separate.
+
+## Updating an earlier development installation
+
+There is no automatic installed-system updater. Booting a new ISO does not replace
+the kernel on an older installed disk. Evaluate this build using a fresh virtual
+disk; preserve the existing VM/data if needed. Reinstalling erases the selected
+disk's partitions and CHFS data after the wizard's confirmation.

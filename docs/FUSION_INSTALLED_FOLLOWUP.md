@@ -113,3 +113,16 @@ UEFI Console (`combined-console-uefi2`) and EL0 Console navigation.
 installation, 24.593 ms maximum step, 5.037 s shutdown.
 `combined-install-error` passes injected write failure with no false success and
 responsive UI. Final delivery checks below identify the committed source.
+
+## Final delivery: 107ef51
+
+Clean source `107ef511cb076969bbc45a9fd162ff07db280304` passes all eight final
+profiles in `followup-final-runs.json`: VMXNET3 HTTP/DNS with no usable VirtIO
+transport; VirtIO HTTP/DNS; UEFI and EL0 Console scrollback; keyboard installation
+with physical-mode persistence, automatic writes, real reset and power-off; injected
+NVMe write error; nested USB with VMXNET3/storage/RNG; direct boot regression.
+Final install: 20.969 s, maximum step 13.203 ms, shutdown status 5.034 s. Clean
+aggregate host, ASan/UBSan and direct smoke checks pass. The handoff contains
+`FOLLOWUP_FINAL_RESULTS.json`, immutable input hashes, logs and screenshots.
+Actual Fusion retest of this new build remains pending. The prior user-confirmed
+installation result is preserved separately.

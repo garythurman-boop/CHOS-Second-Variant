@@ -1,17 +1,17 @@
 # Current CHOS build downloads
 
-Tested source: `c4672fb9af49ba221d1c3b16b26cc1a5974ebef1`.
-Publication tag: `build-c4672fb`.
+Tested source: `107ef511cb076969bbc45a9fd162ff07db280304`.
+Publication tag: `build-107ef51`.
 
-- [Bootable ARM64 ISO](c4672fb/CHOS-Fusion-c4672fb.iso?raw=1)
-- [Complete source/build/test handoff](c4672fb/CHOS-Fusion-c4672fb-Handoff.zip?raw=1)
-- [Prepared disk image (gzip)](c4672fb/CHOS-c4672fb-prepared.img.gz?raw=1)
-- [Source archive](c4672fb/CHOS-c4672fb-source.zip?raw=1)
-- [Direct kernel (gzip)](c4672fb/CHOS-c4672fb-kernel-direct.elf.gz?raw=1)
-- [UEFI kernel (gzip)](c4672fb/CHOS-c4672fb-kernel-uefi.elf.gz?raw=1)
-- [EFI loader](c4672fb/BOOTAA64.EFI?raw=1)
-- [Checksums](c4672fb/SHA256SUMS?raw=1)
-- [Manifest](c4672fb/manifest.json?raw=1)
+- [Bootable ARM64 ISO](107ef51/CHOS-Fusion-107ef51.iso?raw=1)
+- [Complete source/build/test handoff](107ef51/CHOS-Fusion-107ef51-Handoff.zip?raw=1)
+- [Prepared disk image (gzip)](107ef51/CHOS-107ef51-prepared.img.gz?raw=1)
+- [Source archive](107ef51/CHOS-107ef51-source.zip?raw=1)
+- [Direct kernel (gzip)](107ef51/CHOS-107ef51-kernel-direct.elf.gz?raw=1)
+- [UEFI kernel (gzip)](107ef51/CHOS-107ef51-kernel-uefi.elf.gz?raw=1)
+- [EFI loader](107ef51/BOOTAA64.EFI?raw=1)
+- [Checksums](107ef51/SHA256SUMS?raw=1)
+- [Manifest](107ef51/manifest.json?raw=1)
 
 Source is pushed each iteration. Binary downloads are published every other completed implementation iteration; the next iteration after this publication is source-only.
 
