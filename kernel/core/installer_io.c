@@ -1,6 +1,7 @@
 #include "chos/installer_io.h"
 #include "chos/chfs.h"
 #include "chos/gpt.h"
+#include "chos/display_modes.h"
 /* One installer owner; permanent scratch never aliases a DMA buffer. */
 static uint8_t expected[65536],actual[65536],entries[16384],header[512],mbr[512];
 static uint32_t get32(const uint8_t *p){return p[0]|(uint32_t)p[1]<<8|(uint32_t)p[2]<<16|(uint32_t)p[3]<<24;}
@@ -114,6 +115,8 @@ static int verify_boot_files(chos_install_job_t *j){
        !fat_find(j,&f,efi,"BOOT       ",&boot,&size,&attr)||!(attr&16)||
        !fat_find(j,&f,boot,"BOOTAA64EFI",&file,&size,&attr)||(attr&16)||size<512)return 0;
     if(!block_read(j->disk,j->plan.esp_first_lba+f.data_start+(uint64_t)(file-2)*f.spc,1,sector)||sector[0]!='M'||sector[1]!='Z')return 0;
+    uint32_t pe=get32(sector+60);
+    if(pe<64||pe>512-94||pe>size-94||sector[pe]!='P'||sector[pe+1]!='E'||sector[pe+2]!=0||sector[pe+3]!=0||get16(sector+pe+4)!=0xaa64||get16(sector+pe+24)!=0x20b||get16(sector+pe+92)!=10)return 0;
     if(!fat_find(j,&f,efi,"CHOS       ",&chos,&size,&attr)||!(attr&16)||
        !fat_find(j,&f,chos,"CHOS    ELF",&file,&size,&attr)||(attr&16)||size<64)return 0;
     if(!block_read(j->disk,j->plan.esp_first_lba+f.data_start+(uint64_t)(file-2)*f.spc,1,sector)||sector[0]!=127||sector[1]!='E'||sector[2]!='L'||sector[3]!='F'||sector[4]!=2||sector[5]!=1||get16(sector+18)!=183)return 0;
@@ -149,3 +152,22 @@ void chos_install_step(chos_install_job_t *j){
     }
 }
 void chos_install_cancel(chos_install_job_t *j){if(j&&j->state!=INSTALL_DONE){j->state=INSTALL_CANCELLED;j->error=j->next_sector?"Cancelled; target is incomplete. Select and confirm again to reinstall.":"Cancelled; no installer sectors were written.";}}
+
+int chos_install_save_display(chos_block_device_t *disk,chos_install_snapshot_fn snapshot,uint64_t selected_identity,uint32_t width,uint32_t height){
+    uint64_t identity,sectors;chos_gpt_partition_t parts[2];size_t count=0;
+    if(chos_display_mode_index(width,height)<0)return 0;
+    if(!disk||!disk->ready||!disk->write||!disk->flush||!snapshot||!snapshot(&identity,&sectors)||identity!=selected_identity||sectors!=disk->sector_count)return 0;
+    if(chos_gpt_read(disk,parts,2,&count)!=CHOS_GPT_OK||count!=2||!chos_gpt_guid_equal(parts[0].type_guid,chos_gpt_efi_system_type_guid)||parts[0].last_lba-parts[0].first_lba+1!=131072)return 0;
+    chos_install_job_t job={.disk=disk};job.plan.esp_first_lba=parts[0].first_lba;job.plan.esp_last_lba=parts[0].last_lba;
+    if(!block_read(disk,parts[0].first_lba,1,actual))return 0;
+    install_fat_t f={get16(actual+14),get32(actual+36),actual[13],0,get32(actual+44),0};
+    if(get16(actual+11)!=512||actual[16]!=2||!f.spc||(f.spc&(f.spc-1))||f.spc>128||!f.reserved||!f.fat_size||f.fat_size>65535||get32(actual+32)!=131072)return 0;
+    f.data_start=f.reserved+2*f.fat_size;if(f.data_start>=131072)return 0;f.clusters=(131072-f.data_start)/f.spc;
+    uint32_t efi,chos,file,size;uint8_t attr;
+    if(!fat_find(&job,&f,f.root,"EFI        ",&efi,&size,&attr)||!(attr&16)||!fat_find(&job,&f,efi,"CHOS       ",&chos,&size,&attr)||!(attr&16)||!fat_find(&job,&f,chos,"DISPLAY CFG",&file,&size,&attr)||(attr&16)||size!=64)return 0;
+    uint64_t lba=parts[0].first_lba+f.data_start+(uint64_t)(file-2)*f.spc;
+    if(lba>parts[0].last_lba||!block_read(disk,lba,1,expected))return 0;
+    zero(expected,64);const char *magic="CHOSDSP1";for(unsigned i=0;i<8;i++)expected[i]=(uint8_t)magic[i];put32(expected+8,width);put32(expected+12,height);put32(expected+16,crc(expected,16));
+    if(!snapshot(&identity,&sectors)||identity!=selected_identity||sectors!=disk->sector_count)return 0;
+    return verified_write(&job,lba,1,expected);
+}

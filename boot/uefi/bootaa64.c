@@ -1,3 +1,4 @@
+#include "chos/display_modes.h"
 /*
  * CHOS AArch64 UEFI development loader (0.30.0).
  *
@@ -134,8 +135,8 @@ typedef struct {
 } EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE;
 
 struct EFI_GRAPHICS_OUTPUT_PROTOCOL {
-    void *QueryMode;
-    void *SetMode;
+    EFI_STATUS (EFIAPI *QueryMode)(EFI_GRAPHICS_OUTPUT_PROTOCOL *,uint32_t,EFI_UINTN *,EFI_GRAPHICS_OUTPUT_MODE_INFORMATION **);
+    EFI_STATUS (EFIAPI *SetMode)(EFI_GRAPHICS_OUTPUT_PROTOCOL *,uint32_t);
     void *Blt;
     EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE *Mode;
 };
@@ -851,6 +852,32 @@ static void capture_pci_windows(chos_boot_info_t *info) {
     g_st->BootServices->FreePool(handles);
 }
 
+static int boot_volume_is_nvme(EFI_HANDLE image){
+    EFI_LOADED_IMAGE_PROTOCOL *loaded=NULL;uint8_t *path=NULL;
+    EFI_GUID device_path={0x09576e91,0x6d3f,0x11d2,{0x8e,0x39,0x00,0xa0,0xc9,0x69,0x72,0x3b}};
+    if(g_st->BootServices->HandleProtocol(image,(EFI_GUID *)&GUID_LOADED_IMAGE,(void **)&loaded)!=EFI_SUCCESS||!loaded)return 0;
+    if(g_st->BootServices->HandleProtocol(loaded->DeviceHandle,&device_path,(void **)&path)!=EFI_SUCCESS||!path)return 0;
+    unsigned nvme=0;
+    for(size_t offset=0;offset+4<=4096;){
+        unsigned length=path[offset+2]|(unsigned)path[offset+3]<<8;
+        if(length<4||length>4096-offset)return 0;
+        if(path[offset]==0x7f)return path[offset+1]==0xff&&length==4&&nvme==1;
+        if(path[offset]==3&&path[offset+1]==0x17){if(length!=16||le32(path+offset+4)!=1)return 0;++nvme;}
+        offset+=length;
+    }
+    return 0;
+}
+static uint32_t requested_width,requested_height;
+static uint32_t display_crc(const uint8_t *p,size_t n){uint32_t c=~0u;for(size_t i=0;i<n;i++){c^=p[i];for(unsigned bit=0;bit<8;bit++)c=(c>>1)^((c&1)?0xedb88320u:0);}return ~c;}
+static void read_display_request(EFI_HANDLE image){
+    CHAR16 path[]={'\\','E','F','I','\\','C','H','O','S','\\','D','I','S','P','L','A','Y','.','C','F','G',0};
+    uint8_t *bytes=NULL;size_t n=0;
+    if(!read_boot_file(image,path,&bytes,&n))return;
+    const char *magic="CHOSDSP1";int valid=n==64;
+    for(unsigned i=0;valid&&i<8;i++)if(bytes[i]!=(uint8_t)magic[i])valid=0;
+    if(valid&&display_crc(bytes,16)==le32(bytes+16)&&chos_display_mode_index(le32(bytes+8),le32(bytes+12))>=0){requested_width=le32(bytes+8);requested_height=le32(bytes+12);}
+    g_st->BootServices->FreePool(bytes);
+}
 static void capture_gop(chos_boot_info_t *info) {
     EFI_GRAPHICS_OUTPUT_PROTOCOL *gop = NULL;
     EFI_STATUS status;
@@ -858,6 +885,31 @@ static void capture_gop(chos_boot_info_t *info) {
         g_st->BootServices->LocateProtocol == NULL) return;
     status = g_st->BootServices->LocateProtocol((EFI_GUID *)&GUID_GOP, NULL, (void **)&gop);
     if (status != EFI_SUCCESS || gop == NULL || gop->Mode == NULL || gop->Mode->Info == NULL) return;
+    /* Only firmware-enumerated modes, before ExitBootServices. */
+    if(requested_width && gop->QueryMode && gop->SetMode && gop->Mode->MaxMode<=256){
+        for(uint32_t i=0;i<gop->Mode->MaxMode;i++){
+            EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *candidate=NULL;EFI_UINTN bytes=0;
+            EFI_STATUS query=gop->QueryMode(gop,i,&bytes,&candidate);
+            int match=query==EFI_SUCCESS&&candidate&&bytes>=sizeof(*candidate)&&candidate->HorizontalResolution==requested_width&&candidate->VerticalResolution==requested_height&&candidate->PixelsPerScanLine>=requested_width&&candidate->PixelFormat<=CHOS_GOP_PIXEL_BITMASK;
+            if(candidate)g_st->BootServices->FreePool(candidate);
+            if(match){
+                uint32_t previous=gop->Mode->Mode;
+                EFI_STATUS changed=gop->SetMode(gop,i);
+                if(changed!=EFI_SUCCESS || !gop->Mode || !gop->Mode->Info || !gop->Mode->FrameBufferBase ||
+                   (uint64_t)gop->Mode->Info->PixelsPerScanLine*4u*requested_height>gop->Mode->FrameBufferSize){
+                    (void)gop->SetMode(gop,previous);
+                }
+                break;
+            }
+        }
+    }
+    if(!gop->Mode || !gop->Mode->Info)return;
+    if(requested_width){
+        out_hex64((CHAR16 *)L"[DISPLAY] Requested width: ",requested_width);
+        out_hex64((CHAR16 *)L"[DISPLAY] Requested height: ",requested_height);
+        out_hex64((CHAR16 *)L"[DISPLAY] Active width: ",gop->Mode->Info->HorizontalResolution);
+        out_hex64((CHAR16 *)L"[DISPLAY] Active height: ",gop->Mode->Info->VerticalResolution);
+    }
     info->framebuffer_base = gop->Mode->FrameBufferBase;
     info->framebuffer_size = gop->Mode->FrameBufferSize;
     info->framebuffer_width = gop->Mode->Info->HorizontalResolution;
@@ -928,7 +980,9 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
         boot_info->installer_payload_address=(uintptr_t)payload;
         boot_info->installer_payload_size=payload_size;
     }
+    if(boot_volume_is_nvme(image_handle))boot_info->flags|=CHOS_BOOT_FLAG_BOOT_NVME;
     capture_firmware_tables(boot_info);
+    read_display_request(image_handle);
     capture_gop(boot_info);
     capture_pci_windows(boot_info);
     CHOS_EFI_RUNTIME_SERVICES *runtime=(CHOS_EFI_RUNTIME_SERVICES *)g_st->RuntimeServices;

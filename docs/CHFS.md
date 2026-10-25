@@ -1,6 +1,6 @@
 # CHOS CHFS v3 — persistent filesystem
 
-CHFS is an experimental filesystem over a raw 512-byte-sector block device. The current platform driver targets VirtIO-MMIO block storage on QEMU `virt`. There is no partition table: CHFS occupies the whole image. Current kernels read legacy v1 and v2 volumes and attempt a guarded migration toward v3.
+CHFS is an experimental filesystem over a raw 512-byte-sector block device. Supported paths include VirtIO-MMIO/PCI and explicitly admitted single-namespace NVMe. CHFS can occupy a raw image or a checked slice inside the CHOS GPT partition. The graphical installer creates GPT, FAT32 ESP and CHFS; blank disks are not automatically formatted. Installed NVMe volumes initially mount read-only until the user enables file writes. Current kernels read legacy v1 and v2 volumes and attempt a guarded migration toward v3.
 
 ## On-disk layout
 

@@ -21,4 +21,8 @@ int chos_install_confirm(chos_install_job_t *job,const char *text);
 void chos_install_step(chos_install_job_t *job);
 /* Cancellation is terminal; a partially written target is not rolled back. */
 void chos_install_cancel(chos_install_job_t *job);
+/* Updates only the existing fixed-size ESP preference file on a revalidated,
+ * explicitly writable installed target. Actual GOP mode selection is pre-EBS. */
+int chos_install_save_display(chos_block_device_t *disk,chos_install_snapshot_fn snapshot,uint64_t selected_identity,uint32_t width,uint32_t height);
+
 #endif

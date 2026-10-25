@@ -32,43 +32,60 @@
 
 /* Native discovery is explicit from the GUI. Probe never formats a disk; the
  * filesystem receives a read-only view until a separate write authorization. */
+static int installation_in_progress(void);
 static const chos_boot_info_t *native_storage_boot;
 static chos_acpi_info_t native_storage_acpi;
 static chos_block_device_t native_storage_disk;
 static uint64_t native_storage_selected_identity;
+static int native_storage_writable;
 int chos_probe_native_storage(void) {
+    if(installation_in_progress())return 0;
     chos_block_device_t read_only;
     if(storage_block_ready())return 1;
     if(!native_storage_boot || !chos_nvme_init(native_storage_boot,&native_storage_acpi,&native_storage_disk))return 0;
     uint64_t sectors;if(!chos_nvme_snapshot(&native_storage_selected_identity,&sectors)||sectors!=native_storage_disk.sector_count)return 0;
     read_only=native_storage_disk;read_only.write=0;read_only.flush=0;
-    return storage_attach_block_device(&read_only);
+    native_storage_writable=0;return storage_attach_block_device(&read_only);
 }
 int chos_native_storage_enable_writes(void){
+    if(installation_in_progress())return 0;
     uint64_t id,n;
     if(!native_storage_disk.ready || !chos_nvme_snapshot(&id,&n) || id!=native_storage_selected_identity || n!=native_storage_disk.sector_count)return 0;
-    return storage_attach_block_device(&native_storage_disk) && storage_mounted();
+    native_storage_writable=storage_attach_block_device(&native_storage_disk) && storage_mounted();
+    return native_storage_writable;
 }
-const char *chos_native_storage_status(void){return chos_nvme_last_error();}
+const char *chos_native_storage_status(void){return installation_in_progress()?"Installer owns the target until completion or cancellation.":chos_nvme_last_error();}
 static chos_install_job_t installation;
+static int installation_in_progress(void){return installation.state==INSTALL_WRITING||installation.state==INSTALL_FORMATTING||installation.state==INSTALL_VERIFYING;}
 chos_install_job_t *chos_install_runtime(void){return &installation;}
 int chos_install_choose_native(void) {
-    if(!native_storage_boot)return 0;
-    if(!native_storage_disk.ready && !chos_nvme_init(native_storage_boot,&native_storage_acpi,&native_storage_disk))return 0;
+    if(installation_in_progress())return 0;
+    if(!native_storage_boot){installation.state=INSTALL_FAILED;installation.error="Installation requires the UEFI installer ISO.";return 0;}
+    if(native_storage_boot->flags&CHOS_BOOT_FLAG_BOOT_NVME){installation.state=INSTALL_FAILED;installation.error="Boot volume is protected. Boot the ISO to select an install target.";return 0;}
+    if(!native_storage_disk.ready && !chos_nvme_init(native_storage_boot,&native_storage_acpi,&native_storage_disk)){installation.state=INSTALL_FAILED;installation.error=chos_nvme_last_error();return 0;}
     uint64_t address=native_storage_boot->installer_payload_address,bytes=native_storage_boot->installer_payload_size;
-    if(!bytes||!chos_boot_info_contains_memory(native_storage_boot,address,bytes))return 0;
+    if(!bytes||!chos_boot_info_contains_memory(native_storage_boot,address,bytes)){installation.state=INSTALL_FAILED;installation.error="Installer payload unavailable; no disk writes performed.";return 0;}
     return chos_install_select(&installation,&native_storage_disk,chos_nvme_snapshot,(const void *)(uintptr_t)address,(size_t)bytes);
 }
 int chos_install_start(const char *text) {
     if(!chos_install_confirm(&installation,text))return 0;
-    storage_detach();return 1;
+    native_storage_writable=0;storage_detach();return 1;
 }
 void chos_install_abort(void){chos_install_cancel(&installation);}
+uint64_t installer_max_step_counter_ticks;
 void chos_install_tick(void){
     chos_install_state_t previous=installation.state;
+    uint64_t before=timer_counter();
     chos_install_step(&installation);
-    if(previous!=INSTALL_DONE && installation.state==INSTALL_DONE)(void)storage_attach_block_device(&native_storage_disk);
+    uint64_t elapsed=timer_counter()-before;if(elapsed>installer_max_step_counter_ticks)installer_max_step_counter_ticks=elapsed;
+    if(previous!=INSTALL_DONE && installation.state==INSTALL_DONE){native_storage_selected_identity=installation.plan.disk_identity;native_storage_writable=storage_attach_block_device(&native_storage_disk) && storage_mounted();}
 }
+int chos_persist_display_request(uint32_t width,uint32_t height){
+    if(!native_storage_writable||installation_in_progress())return 0;
+    return chos_install_save_display(&native_storage_disk,chos_nvme_snapshot,native_storage_selected_identity,width,height);
+}
+int chos_native_storage_is_writable(void){return native_storage_writable;}
+int chos_native_storage_is_present(void){return native_storage_disk.ready;}
 static fdt_info_t boot_device_tree;
 extern uint8_t __kernel_start;
 
@@ -343,13 +360,17 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             uefi_console_write("; ");uefi_console_write(chos_virtio_transport_error());uefi_console_write("\n");
         }
         if(chos_virtio_aperture()) {
-            if(storage_init()) {
+            if(!(boot_info->flags&CHOS_BOOT_FLAG_BOOT_NVME) && storage_init()) {
                 if(console_ready)uefi_console_write(storage_mounted()?"[OK] UEFI VirtIO/CHFS mounted.\n":"[INFO] UEFI VirtIO block present; filesystem left unchanged.\n");
-            } else if(console_ready) {uefi_console_write("[INFO] UEFI block unavailable: ");uefi_console_write(storage_error());uefi_console_write("\n");}
+            } else if(console_ready && !(boot_info->flags&CHOS_BOOT_FLAG_BOOT_NVME)) {uefi_console_write("[INFO] UEFI block unavailable: ");uefi_console_write(storage_error());uefi_console_write("\n");}
             if(virtio_net_init()) {
                 chos_net_stack_init();
                 if(console_ready)uefi_console_write("[OK] UEFI VirtIO network queues initialized.\n");
             }
+        }
+        if(boot_info->flags&CHOS_BOOT_FLAG_BOOT_NVME){
+            int found=chos_probe_native_storage();
+            if(console_ready)uefi_console_write(found&&storage_mounted()?"[OK] Installed NVMe boot volume mounted read only.\n":"[WARN] NVMe boot volume could not be mounted; ROMFS recovery remains available.\n");
         }
 #ifdef CHOS_ENABLE_EXPERIMENTAL_NVME
         /* UEFI has no VirtIO-MMIO storage assumptions: attach a native PCI NVMe

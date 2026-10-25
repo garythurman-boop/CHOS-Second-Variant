@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Encode the prepared ESP as bounded sparse sector runs for the on-device installer."""
-import argparse,struct,zlib
+import argparse,struct,zlib,sys
 from pathlib import Path
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from tools.mkchos_install_disk import open_safe_image_output
 
 def encode(image):
     # The prepared builder uses the same pure planner's fixed 64 MiB ESP.
@@ -18,4 +20,7 @@ def encode(image):
     if len(result)>16*1024*1024:raise ValueError('Installer payload exceeds loader cap')
     return result
 if __name__=='__main__':
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--image',type=Path,required=True);p.add_argument('--output',type=Path,required=True);a=p.parse_args();a.output.write_bytes(encode(a.image))
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('--image',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--force',action='store_true');a=p.parse_args()
+    if a.image.resolve()==a.output.resolve():p.error('Input image and output payload must differ')
+    payload=encode(a.image)
+    with open_safe_image_output(a.output,a.force) as stream:stream.write(payload)

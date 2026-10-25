@@ -234,9 +234,9 @@ $(BUILD)/uefi/bootaa64.obj: boot/uefi/bootaa64.c
 	@mkdir -p $(dir $@)
 	$(CC) $(UEFI_CCFLAGS) -c $< -o $@
 
-$(BUILD)/uefi/BOOTAA64.EFI: $(BUILD)/uefi/bootaa64.obj
+$(BUILD)/uefi/BOOTAA64.EFI: $(BUILD)/uefi/bootaa64.obj $(BUILD)/uefi/display_modes.obj
 	lld-link /machine:arm64 /subsystem:efi_application /entry:efi_main /nodefaultlib \
-	  /out:$@ /base:0x100000 /dynamicbase /filealign:512 $<
+	  /out:$@ /base:0x100000 /dynamicbase /filealign:512 $^
 
 uefi-loader: $(BUILD)/uefi/BOOTAA64.EFI
 
@@ -414,7 +414,8 @@ test-assets:
 test-uefi-iso:
 	python3 tests/test_mkuefi_iso.py
 	python3 -m py_compile tests/qemu_smoke.py
-	python3 -m py_compile tests/qemu_panic.py
+	python3 -m py_compile tests/qemu_panic.py tests/qemu_installer.py tests/qemu_firmware_apps.py
+	python3 tests/test_mkinstall_payload.py
 	python3 tests/test_release_version.py
 	python3 tests/test_mkchos_install_disk.py
 
@@ -1137,12 +1138,17 @@ $(BUILD)/test-spinlock $(BUILD)/test-pmm $(BUILD)/test-kheap $(BUILD)/test-pmm-u
 $(SAN_DIR)/test-spinlock $(SAN_DIR)/test-pmm $(SAN_DIR)/test-kheap $(SAN_DIR)/test-pmm-uefi $(SAN_DIR)/test-fdt $(SAN_DIR)/test-gui: include/chos/atomic.h
 
 $(BUILD)/installer.payload: $(BUILD)/chos-$(CHOS_VERSION)-installed.img tools/mkinstall_payload.py
-	python3 tools/mkinstall_payload.py --image $< --output $@
+	python3 tools/mkinstall_payload.py --image $< --output $@ --force
 
-$(BUILD)/test-installer-io: tests/test_installer_io.c kernel/core/installer_io.c kernel/core/installer_plan.c kernel/fs/gpt.c kernel/fs/blockdev.c kernel/fs/chfs.c kernel/fs/romfs_core.c kernel/core/process_format.c include/chos/installer_io.h
+$(BUILD)/test-installer-io: tests/test_installer_io.c kernel/core/installer_io.c kernel/core/installer_plan.c kernel/fs/gpt.c kernel/fs/blockdev.c kernel/fs/chfs.c kernel/fs/romfs_core.c kernel/core/process_format.c kernel/gfx/display_modes.c include/chos/installer_io.h
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Iinclude $(filter %.c,$^) -o $@
 
-$(SAN_DIR)/test-installer-io: tests/test_installer_io.c kernel/core/installer_io.c kernel/core/installer_plan.c kernel/fs/gpt.c kernel/fs/blockdev.c kernel/fs/chfs.c kernel/fs/romfs_core.c kernel/core/process_format.c include/chos/installer_io.h
+$(SAN_DIR)/test-installer-io: tests/test_installer_io.c kernel/core/installer_io.c kernel/core/installer_plan.c kernel/fs/gpt.c kernel/fs/blockdev.c kernel/fs/chfs.c kernel/fs/romfs_core.c kernel/core/process_format.c kernel/gfx/display_modes.c include/chos/installer_io.h
 	@mkdir -p $(dir $@)
 	$(CC_HOST) $(SAN_FLAGS) -Iinclude $(filter %.c,$^) -o $@
+
+$(BUILD)/uefi/display_modes.obj: kernel/gfx/display_modes.c include/chos/display_modes.h
+	@mkdir -p $(dir $@)
+	$(CC) $(UEFI_CCFLAGS) -c $< -o $@
+$(BUILD)/uefi/bootaa64.obj: include/chos/boot_info.h include/chos/display_modes.h

@@ -56,6 +56,7 @@ typedef struct { const char *name; const gui_embedded_image_t *image; } gui_embe
 #define VIEW_FILE_VIEWER 6
 #define VIEW_TRASH 7
 #define VIEW_INSTALLER 8
+extern void chos_install_abort(void) __attribute__((weak));
 #define GUI_VIEW_COUNT 9u
 #define GUI_DESKTOP_ICON_CAP (CHOS_CHFS_MAX_FILES + 7u)
 #define GUI_DESKTOP_GRID_COLUMNS 8u
@@ -272,6 +273,8 @@ static uint64_t splash_started_counter;
 static uint64_t splash_counter_frequency;
 static int splash_startup_complete;
 static int power_confirmation_action;
+extern int chos_persist_display_request(uint32_t,uint32_t) __attribute__((weak));
+static int display_boot_request_saved;
 static int display_mode_error;
 static size_t display_mode_page;
 static int settings_save_error;
@@ -1692,6 +1695,7 @@ static void gui_close_window(int id) {
         return;
     }
     if (id == VIEW_CONSOLE) terminal_command[0] = '\0';
+    if(id==VIEW_INSTALLER && chos_install_abort)chos_install_abort();
     if (id == VIEW_FILE_VIEWER && viewer_editable && viewer_unsaved && !gui_text_editor_save()) return;
     if (chos_wm_close(&window_manager, id)) gui_sync_active_view();
 }
@@ -1712,6 +1716,7 @@ static int gui_apply_display_mode(size_t mode_index) {
     taskbar_tooltip_window_id = CHOS_WM_NO_WINDOW;
     taskbar_tooltip_fade_step = 0u;
     wallpaper_cache_valid = 0;
+    display_boot_request_saved=chos_persist_display_request?chos_persist_display_request(updated_surface.width,updated_surface.height):0;
     display_mode_page = mode_index / DISPLAY_MODES_PER_PAGE;
     for (i = 0u; i < GUI_VIEW_COUNT; ++i) {
         chos_wm_window_t *window = chos_wm_get(&window_manager, (int)i);
@@ -2882,6 +2887,13 @@ static void installer_action(int button) {
     else if(installer_page==5 && j->state!=INSTALL_DONE){j->state=INSTALL_IDLE;installer_page=1;installer_ack=0;}
     gui_mark_dirty();
 }
+static void installer_open(void){
+    if(!chos_install_runtime)return;
+    chos_install_job_t *j=chos_install_runtime();
+    if(j->state==INSTALL_CANCELLED)j->state=INSTALL_IDLE;
+    installer_page=(j->state==INSTALL_WRITING||j->state==INSTALL_FORMATTING||j->state==INSTALL_VERIFYING)?4:0;
+    installer_ack=0;installer_focus=1;open_view(VIEW_INSTALLER);
+}
 static void draw_installer_content(void) {
     chos_install_job_t *j=chos_install_runtime?chos_install_runtime():NULL;
     draw_window_shell("CHOS Setup",180,70,595,465);
@@ -2896,7 +2908,8 @@ static void draw_installer_content(void) {
         text(204,244,"Back up anything valuable before continuing.",C_RED);
         text(204,280,"No disk is selected and no writes have been authorized.",C_MUTED);
     }else if(installer_page>=1 && installer_page<=3){
-        text(204,190,j->state==INSTALL_SELECTED?"Selected target: nvme0n1":"No disk selected. Choose the supported NVMe target.",C_TEXT);
+        text(204,190,j->state==INSTALL_SELECTED?"Selected target:":"No disk selected. Choose the supported NVMe target.",C_TEXT);
+        if(j->state==INSTALL_SELECTED)text(380,190,j->disk->name?j->disk->name:"Unknown",C_TEXT);
         if(j->state==INSTALL_SELECTED){
             text(204,218,"Capacity (MiB):",C_TEXT);draw_number(380,218,(uint32_t)(j->plan.disk_sector_count/2048),C_TEXT);
             char id[17];const char *digits="0123456789abcdef";for(unsigned i=0;i<16;i++)id[i]=digits[(j->plan.disk_identity>>((15-i)*4))&15];id[16]=0;
@@ -2913,7 +2926,10 @@ static void draw_installer_content(void) {
         text(204,348,"Cancel leaves an incomplete disk; it does not roll back.",C_ORANGE);
     }else{
         text_bold(204,192,j->state==INSTALL_DONE?"Installation completed and verified.":"Installation did not complete.",j->state==INSTALL_DONE?C_GREEN:C_RED);
-        text(204,232,j->error?j->error:"No success was recorded.",C_TEXT);
+        const char *detail=j->error?j->error:"No success was recorded.";
+        for(unsigned row=0;row<3&&*detail;row++){
+            char line[64];unsigned n=0;while(detail[n]&&n<63){line[n]=detail[n];++n;}line[n]=0;detail+=n;mono_text(204,232+(int)row*16,line,C_TEXT);
+        }
         if(j->state==INSTALL_DONE){text(204,280,"Shut down CHOS, detach the ISO, and boot this disk.",C_TEXT);text(204,308,"The installed system starts without the installation ISO.",C_TEXT);}
         else{text(204,280,"Retry requires selecting the target and confirming again.",C_TEXT);text(204,308,"A failed controller may require a VM restart first.",C_MUTED);}
     }
@@ -2925,11 +2941,14 @@ static void draw_installer_content(void) {
     if(installer_focus>=0&&installer_focus<3)outline(installer_focus==0?410:installer_focus==1?508:628,456,installer_focus==0?90:installer_focus==1?112:106,26,C_BLUE_DARK);
     draw_status_line("Setup","Tab: focus | Enter: activate | Esc: cancel");
 }
+extern int chos_native_storage_is_present(void) __attribute__((weak));
+extern int chos_native_storage_is_writable(void) __attribute__((weak));
 extern int chos_native_storage_enable_writes(void) __attribute__((weak));
 static int native_writes_ack;
 extern int chos_probe_native_storage(void) __attribute__((weak));
 extern const char *chos_native_storage_status(void) __attribute__((weak));
 static int native_storage_probe_attempted;
+extern const char *chos_xhci_error(void) __attribute__((weak));
 extern unsigned chos_platform_input_capabilities(void) __attribute__((weak));
 extern const char *virtio_gpu_backend_name(void) __attribute__((weak));
 static void draw_diagnostics_content(void) {
@@ -2970,12 +2989,12 @@ static void draw_diagnostics_content(void) {
     text(203, 370, "Display driver", C_MUTED);
     text(203, 388, virtio_gpu_backend_name?virtio_gpu_backend_name():virtio_gpu_last_error(), C_TEXT);
     text(203, 416, "Input driver", C_MUTED);
-    text(203, 434, chos_input_last_error(), C_TEXT);
+    text(203, 434, native_caps && chos_xhci_error?chos_xhci_error():chos_input_last_error(), C_TEXT);
     if(chos_probe_native_storage)draw_button(480,463,260,24,
-        native_storage_probe_attempted && storage_mounted() ? (native_writes_ack?"Confirm file writes":"Enable CHFS writes..."):"Detect NVMe (read only)",0);
+        (chos_native_storage_is_writable&&chos_native_storage_is_writable())?"CHFS writes enabled":(native_storage_probe_attempted || (chos_native_storage_is_present&&chos_native_storage_is_present())) && storage_mounted() ? (native_writes_ack?"Confirm file writes":"Enable CHFS writes..."):"Detect NVMe (read only)",chos_native_storage_is_writable&&chos_native_storage_is_writable());
     if(chos_install_runtime)draw_button(204,463,220,24,"Install CHOS...",0);
     if(native_storage_probe_attempted && chos_native_storage_status)
-        text(203,448,storage_block_ready()?"Disk detected. File writes require explicit enable/confirm.":chos_native_storage_status(),C_MUTED);
+        text(203,448,storage_block_ready()?((chos_native_storage_is_writable&&chos_native_storage_is_writable())?"Disk mounted with file writes enabled.":"Disk detected. File writes require explicit enable/confirm."):chos_native_storage_status(),C_MUTED);
     draw_status_line("Diagnostics", "Read-only view");
 }
 
@@ -3030,7 +3049,7 @@ static void draw_settings_content(void) {
 
     draw_hline(204, 225, 546, C_PANEL_DARK);
     text_bold(204, 236, "Desktop size", C_BLUE_DARK);
-    text(405, 236, "Firmware output uses scaling", C_MUTED);
+    text(405, 236, (virtio_gpu_backend_name && gui_prefix_equal(virtio_gpu_backend_name(),"Firmware"))?"Scaled desktop / boot request":"Available display modes", C_MUTED);
     for (row = 0u; row < DISPLAY_MODES_PER_PAGE; ++row) {
         size_t index = display_mode_page * DISPLAY_MODES_PER_PAGE + row;
         int y = 261 + (int)row * 28;
@@ -3052,6 +3071,8 @@ static void draw_settings_content(void) {
     }
     if (display_mode_error) {
         text(205, 420, "Mode change failed; previous resolution retained.", C_RED);
+    } else if(display_boot_request_saved){
+        text(205,420,"Resolution saved. Restart to apply supported output mode.",C_TEXT);
     } else if (settings_save_error) {
         text(205, 420, "Settings could not be saved to persistent storage.", C_ORANGE);
     } else {
@@ -4505,9 +4526,9 @@ static void click_at(int32_t x, int32_t y, int in_window) {
         }
         return;
     }
-    if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=204 && x<424 && y>=463 && y<487 && chos_install_runtime){installer_page=0;installer_ack=0;installer_focus=1;open_view(VIEW_INSTALLER);return;}
+    if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=204 && x<424 && y>=463 && y<487 && chos_install_runtime){installer_open();return;}
     if(view==VIEW_DIAGNOSTICS && !driver_report_mode && x>=480 && x<740 && y>=463 && y<487 && chos_probe_native_storage) {
-        if(native_storage_probe_attempted && storage_mounted() && chos_native_storage_enable_writes) {
+        if((native_storage_probe_attempted || (chos_native_storage_is_present&&chos_native_storage_is_present())) && storage_mounted() && chos_native_storage_enable_writes && !(chos_native_storage_is_writable&&chos_native_storage_is_writable())) {
             if(!native_writes_ack)native_writes_ack=1;
             else {(void)chos_native_storage_enable_writes();native_writes_ack=0;}
         }else{native_storage_probe_attempted=1;(void)chos_probe_native_storage();}
@@ -4739,7 +4760,7 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         return;
     }
     if(view==VIEW_INSTALLER && pressed){if(keycode==15u)installer_focus=(installer_focus+1)%3;else if(keycode==28u||keycode==57u)installer_action(installer_focus);else if(keycode==1u)installer_action(2);gui_mark_dirty();return;}
-    if(view==VIEW_WELCOME && pressed && keycode==23u && chos_install_runtime){installer_page=0;installer_ack=0;installer_focus=1;open_view(VIEW_INSTALLER);return;}
+    if(view==VIEW_WELCOME && pressed && keycode==23u && chos_install_runtime){installer_open();return;}
     if (prompt_kind != 0) {
         char ch;
         if (!pressed) return;

@@ -19,7 +19,7 @@ controller or truncated inventory is refused rather than silently choosing a dis
 
 GOP supports scaled logical desktop sizes at runtime while preserving the physical
 firmware scanout. This is labelled desktop sizing; it is not a physical mode switch.
-Persistent pre-ExitBootServices physical mode requests are a subsequent change.
+Persistent pre-ExitBootServices physical mode requests are implemented below.
 
 ## Real installer
 
@@ -86,3 +86,40 @@ keyboard/tablet, NVMe and AAVMF. Disk-only boot uses fresh firmware variables an
 ISO drive. Input is injected into QEMU hardware, not CHOS APIs. Physical Fusion
 installation, clock and resolution retests remain external; QEMU does not certify
 Fusion or complete remaining Pi/laptop/IOMMU/network work.
+
+## Installed-volume discovery and physical resolution requests
+
+The EFI loader records a bounded, validated device-path observation for NVMe
+namespace 1. Only that boot path automatically probes/mounts the single NVMe volume
+read-only; it does not autoformat or enable writes. An installed boot volume is
+protected from destructive target selection. Manual write enablement still requires
+confirmation and a live identity/geometry snapshot. Read-only detection, rebinding,
+and display writes are blocked while the installer owns storage.
+
+The prepared/installed ESP contains a fixed-size DISPLAY.CFG. The GUI updates only
+that existing file's checked sector after explicit volume write enablement, with
+snapshot revalidation, flush and readback. A bounded CRC-protected request is read
+before ExitBootServices. GOP enumeration rejects unsupported formats/stride; failed
+SetMode attempts restore the previous mode. Missing/corrupt/unavailable requests
+leave a usable firmware mode. No firmware pointer is retained or invoked by the OS.
+The kernel retains runtime desktop scaling for the read-only ISO.
+
+`stage2-display-install{1,2}` verifies a preference round trip and unsupported-mode
+fallback. The keyboard wizard run measured 20.913 s installation, three deliberate
+150 ms key intervals totaling 459.06 ms, and a maximum installer step of 51.551 ms.
+These are individual shared-cloud observations, not latency guarantees. A supported
+physical mode and the final clean delivery bytes are verified in the final report
+when their runs complete. The [installation guide](INSTALL_GUIDE.md) distinguishes
+logical desktop sizing, physical mode changes on reboot and remaining target limits.
+
+`stage2-display-supported2/result.json` passes the keyboard installer and real
+1024x768 physical GOP selection after reboot, with automatic read-only CHFS boot
+discovery and preserved file data. That sample measured 20.854 s installation and
+a maximum 10.897 ms installer step. The earlier supported1 attempt used the wrong
+height offset in the runner's pointer normalization; the guest was not clicked.
+The runner now checks surface dimensions and the corrected run passes.
+
+The installer payload requires matching source builds: a previously omitted shared
+browser source file in the source-only push was corrected in c740e1e before binary
+publication. Final delivery is rebuilt from committed source, not those earlier
+working-tree binaries. This report does not convert older failures into passes.

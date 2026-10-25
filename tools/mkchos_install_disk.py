@@ -241,6 +241,9 @@ def main() -> int:
     fat = Fat32Builder(esp_sectors)
     fat.add_file('EFI/BOOT/BOOTAA64.EFI', efi)
     fat.add_file('EFI/CHOS/CHOS.ELF', kernel)
+    display = b'CHOSDSP1' + struct.pack('<II', 0, 0)
+    display += struct.pack('<I', crc32(display)) + bytes(44)
+    fat.add_file('EFI/CHOS/DISPLAY.CFG', display)
     fat.add_file('EFI/CHOS/README.TXT', readme)
     esp = fat.build()
     data_sectors = data_last - data_first + 1

@@ -19,6 +19,8 @@
 #define CHOS_BOOT_FLAG_UEFI_SERVICES_ACTIVE (UINT64_C(1) << 6)
 #define CHOS_BOOT_FLAG_UEFI_ABSOLUTE_POINTER (UINT64_C(1) << 7)
 #define CHOS_BOOT_FLAG_CLOCK (UINT64_C(1) << 8)
+/* Pre-EBS device-path metadata: boot volume is NVMe namespace 1. */
+#define CHOS_BOOT_FLAG_BOOT_NVME (UINT64_C(1) << 9)
 
 /* UEFI EFI_GRAPHICS_PIXEL_FORMAT values. */
 #define CHOS_GOP_PIXEL_RGBX8 0u

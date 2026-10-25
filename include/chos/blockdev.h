@@ -2,6 +2,14 @@
 #define CHOS_BLOCKDEV_H
 
 #include <stdint.h>
+/* This interface admits only 512-byte logical sectors. Other geometries must
+ * be rejected at discovery. LBAs/counts denote whole sectors; caller buffers may
+ * be unaligned because DMA drivers use their own isolated bounce storage.
+ * A callback returns 1 only for a complete transfer, 0 for failure/short I/O.
+ * Ownership is serialized by the caller. Missing flush cannot establish durable
+ * writeback: destructive installation explicitly requires a flush callback.
+ * Installer identity/geometry comes from a separate live snapshot callback, not
+ * the display name or a cached pointer. */
 #define CHOS_BLOCK_SECTOR_SIZE 512u
 
 typedef struct chos_block_device chos_block_device_t;

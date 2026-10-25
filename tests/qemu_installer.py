@@ -4,6 +4,8 @@ from qemu_platform import Guest,wait
 parser=argparse.ArgumentParser(description='UEFI browser, read-only NVMe and scaled GOP acceptance; disposable VM only')
 parser.add_argument('--out',type=pathlib.Path,required=True)
 parser.add_argument('--write-fault',action='store_true')
+parser.add_argument('--keyboard',action='store_true')
+parser.add_argument('--supported-mode',action='store_true')
 options=parser.parse_args()
 out=options.out.resolve();out.mkdir(parents=True,exist_ok=False)
 disk=out/'disposable.img';
@@ -13,26 +15,36 @@ a=argparse.Namespace(mode='uefi',uefi_kernel=pathlib.Path('build/uefi-kernel/cho
 g=Guest(a,out,disk)
 def key(k):g.hmp('sendkey '+k);time.sleep(.15)
 def click(x,y):
- g.qmp('input-send-event',events=[{'type':'abs','data':{'axis':'x','value':round(x*32767/799)}},{'type':'abs','data':{'axis':'y','value':round(y*32767/599)}}]);time.sleep(.12)
+ width=g.symbol('active_surface',8);height=g.symbol('active_surface',16)
+ assert 320<=width<=4096 and 200<=height<=4096,(width,height)
+ g.qmp('input-send-event',events=[{'type':'abs','data':{'axis':'x','value':round(x*32767/(width-1))}},{'type':'abs','data':{'axis':'y','value':round(y*32767/(height-1))}}]);time.sleep(.12)
  for down in [True,False]:g.qmp('input-send-event',events=[{'type':'btn','data':{'button':'left','down':down}}]);time.sleep(.12)
+def main_action():
+ if options.keyboard:key('ret')
+ else:click(560,469)
 try:
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text(),45,'desktop')
  wait(lambda:g.symbol('splash_active')==0,10,'splash')
  key('i');wait(lambda:g.symbol('view')==8,3,'installer welcome')
  g.screen('welcome')
- click(560,469) # Next: no target yet.
+ main_action() # Next: no target yet.
  assert hashlib.sha256(disk.read_bytes()).hexdigest()==before
- click(560,469) # Explicitly select NVMe.
+ main_action() # Explicitly select NVMe.
  g.screen('target')
- click(560,469) # Partition plan.
+ main_action() # Partition plan.
  g.screen('plan')
- click(560,469) # Confirmation.
+ main_action() # Confirmation.
  g.screen('confirmation')
  assert hashlib.sha256(disk.read_bytes()).hexdigest()==before,'Disk changed before confirmation'
- click(560,469) # Explicit acknowledgement.
+ main_action() # Explicit acknowledgement.
  assert hashlib.sha256(disk.read_bytes()).hexdigest()==before,'Acknowledgement alone wrote disk'
  started=time.monotonic()
- click(560,469) # Install.
+ main_action() # Install.
+ focus=g.symbol('installer_focus');input_start=time.monotonic();key('tab')
+ wait(lambda:g.symbol('installer_focus')!=focus,2,'keyboard focus during installation')
+ key('tab');key('tab')
+ responsiveness_ms=round((time.monotonic()-input_start)*1000,2)
+ g.screen('interactive-progress')
  wait(lambda:g.symbol('installer_page')==5,90,'actual install and verification')
  g.screen('finished')
  # Stable state field follows the planner; read its position from a tiny host layout probe.
@@ -52,6 +64,9 @@ try:
   raise SystemExit(0)
  assert state==5,('Installer did not report DONE',state)
  elapsed=time.monotonic()-started
+ max_step=int.from_bytes(g.block('installer_max_step_counter_ticks',size=8),'little')
+ frequency=int.from_bytes(g.block('counter_frequency',size=8),'little')
+ max_step_ms=round(1000*max_step/frequency,3) if frequency else None
  g.close();g=None
  # Validate the actual guest-written GPT/ESP/CHFS with the independent host validator.
  assert (out/'kernel.elf').read_bytes() in disk.read_bytes(), 'Installed ESP must contain the exact running kernel'
@@ -60,19 +75,39 @@ try:
  g=Guest(a,boot,disk)
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text(),45,'disk-only boot without ISO')
  wait(lambda:g.symbol('splash_active')==0,10,'installed desktop')
+ assert 'Installed NVMe boot volume mounted read only.' in g.text(),'Installed boot volume should be discovered without manual probing'
  g.screen('installed-desktop')
  key('esc');key('f1');click(600,475);wait(lambda:g.symbol('fs_ready')==1,5,'installed CHFS mount')
  click(600,475);click(600,475) # Enable file writes, then explicitly confirm.
  key('esc');key('c');g.type('write /stage2.txt installed-persistence')
  wait(lambda:'File written and flushed.' in g.terminal(),5,'installed-system write')
- g.screen('persistent-write');g.close();g=None
+ g.screen('persistent-write')
+ key('esc');key('s');wait(lambda:g.symbol('view')==5,3,'installed display settings')
+ click(350,330 if options.supported_mode else 300);wait(lambda:g.symbol('display_boot_request_saved')==1,5,'ESP resolution preference write')
+ g.screen('boot-resolution-saved')
+ g.close();g=None
  reboot=out/'reboot';reboot.mkdir();g=Guest(a,reboot,disk)
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text(),45,'installed reboot')
  wait(lambda:g.symbol('splash_active')==0,10,'reboot splash')
+ assert '[DISPLAY] Requested width:' in g.text(),'UEFI loader must read the installed ESP request'
+ assert '0x0000000000000400' in g.text(),'Saved request must be 1024 wide'
+ if options.supported_mode:
+  assert '[DISPLAY] Active width: 0x0000000000000400' in g.text(),'Supported GOP mode must actually change scanout width'
+  assert '[DISPLAY] Active height: 0x0000000000000300' in g.text(),'Supported GOP mode must actually change scanout height'
+ else:
+  assert '[DISPLAY] Active width: 0x0000000000000320' in g.text(),'Unsupported mode must retain the safe framebuffer'
+ # 1024x640 is absent from RAMFB; 1024x768 exercises an enumerated mode.
  key('esc');key('f1');click(600,475);wait(lambda:g.symbol('fs_ready')==1,5,'reboot CHFS mount')
  key('esc');key('c');g.type('type /stage2.txt');wait(lambda:'installed-persistence' in g.terminal(),5,'persistent data after reboot')
  g.screen('persistence-after-reboot')
- (out/'result.json').write_text(json.dumps({'status':'PASS','install_seconds':round(elapsed,3),'checks':['no writes before target selection and final confirmation','guest GPT/FAT32/EFI/CHFS creation and verification','ISO detached: disk-only desktop and native input','installed file write survives a fresh reboot']},indent=2))
+ protected_hash=hashlib.sha256(disk.read_bytes()).hexdigest()
+ key('esc');key('i');wait(lambda:g.symbol('view')==8,3,'installed setup safety check')
+ main_action();main_action()
+ wait(lambda:g.symbol('installer_page')==5,3,'boot-volume protection')
+ assert hashlib.sha256(disk.read_bytes()).hexdigest()==protected_hash,'Protected boot volume was modified'
+ assert int.from_bytes(g.block('installation',offset=offset,size=4),'little')==6
+ g.screen('boot-volume-protected')
+ (out/'result.json').write_text(json.dumps({'status':'PASS','install_seconds':round(elapsed,3),'three_key_focus_ms':responsiveness_ms,'max_install_step_ms':max_step_ms,'keyboard_wizard':options.keyboard,'physical_mode_change':options.supported_mode,'checks':['no writes before target selection and final confirmation','guest GPT/FAT32/EFI/CHFS creation and verification','ISO detached: disk-only desktop and native input','installed file write survives a fresh reboot','ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback','keyboard focus remains responsive during installation','installed boot volume cannot be selected for destructive installation']},indent=2))
 except Exception:
  if g:g.screen('failure')
  raise
