@@ -15,7 +15,7 @@ LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 
 SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/examples/browser_core.c kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
-             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
+             kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/mm/user_memory.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
              kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/net/net_profile.c kernel/net/net_manager.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
@@ -1259,3 +1259,30 @@ $(BUILD)/userland/network_policy_test.chcx: $(BUILD)/userland/network_policy_tes
 	python3 tools/mkchcx.py --verify $@
 test-userland: $(BUILD)/userland/network_policy_test.chcx
 test: $(BUILD)/userland/network_policy_test.chcx
+
+$(BUILD)/test-user-memory: tests/test_user_memory.c kernel/mm/user_memory.c include/chos/user_memory.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_user_memory.c -o $@
+$(SAN_DIR)/test-user-memory: tests/test_user_memory.c kernel/mm/user_memory.c include/chos/user_memory.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_user_memory.c -o $@
+test-user-memory: $(BUILD)/test-user-memory
+	./$(BUILD)/test-user-memory
+test-user-memory-sanitize: $(SAN_DIR)/test-user-memory
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-user-memory
+test: test-user-memory
+test-sanitize: test-user-memory-sanitize
+.PHONY: test-user-memory test-user-memory-sanitize
+
+$(BUILD)/userland/memory_test.o: userland/examples/memory_test.c userland/libchos/include/chos/user.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) -c $< -o $@
+$(BUILD)/userland/memory_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/memory_test.o userland/user.ld
+	$(LD) -T userland/user.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/memory_test.o
+$(BUILD)/userland/memory_test.bin: $(BUILD)/userland/memory_test.elf
+	$(OBJCOPY) -O binary $< $@
+$(BUILD)/userland/memory_test.sym: $(BUILD)/userland/memory_test.elf
+	$(NM) --defined-only --numeric-sort $< > $@
+$(BUILD)/userland/memory_test.chcx: $(BUILD)/userland/memory_test.bin $(BUILD)/userland/memory_test.sym tools/mkchcx.py
+	python3 tools/mkchcx.py --stack-pages 2 --v2-symbols $(BUILD)/userland/memory_test.sym $(BUILD)/userland/memory_test.bin $@
+	python3 tools/mkchcx.py --verify $@
+test-userland test: $(BUILD)/userland/memory_test.chcx

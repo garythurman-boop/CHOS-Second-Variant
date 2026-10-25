@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/address_space.h"
+#include "chos/user_memory.h"
 #include "chos/pmm.h"
 #include "chos/kheap.h"
 #include "chos/net_tcp.h"
@@ -168,6 +169,7 @@ static int reap_slot(size_t index) {
     }
     /* All process-reaper work must run under the canonical kernel root. */
     if (vmm_current_root_table_address() != vmm_kernel_root_table_address()) return 0;
+    if(!chos_user_memory_release(slot->space))return 0;
 
     for (i = 0u; i < slot->info.image_pages; ++i) {
         uint32_t bit = UINT32_C(1) << i;

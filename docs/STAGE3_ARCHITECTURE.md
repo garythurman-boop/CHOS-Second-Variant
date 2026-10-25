@@ -71,3 +71,8 @@ runtime expansion. No modern-engine performance numbers exist yet.
 Every completion requirement remains open until backed by working implementation
 and appropriate runtime evidence. Host tests and QEMU Ethernet do not certify
 Fusion, physical wireless or browser standards compliance.
+
+The first network milestone is published as build-54b9731. The next runtime
+source-only iteration adds the bounded EL0 mapping primitive documented in
+USER_MEMORY.md; it does not provide a modern engine or change the full-stage
+completion criteria.

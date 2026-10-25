@@ -31,3 +31,8 @@ Current limits include a 64 KiB maximum virtual image, at most four stack pages,
 up to eight arguments, whitespace-only shell tokenization, no environment variables,
 no relocations at load time, and no dynamically linked applications. The kernel loader
 keeps code RX, read-only data R/XN, and writable data/BSS RW/XN.
+
+Revised Stage 3 now has bounded anonymous private RW/XN page mappings through
+`chos_map_memory`/`chos_unmap_memory`. See [USER_MEMORY.md](../../docs/USER_MEMORY.md)
+for limits, ownership, guard/execute protections and real EL0 tests. These primitives
+do not yet provide POSIX mmap, a complete malloc/libc/C++ runtime or UEFI EL0 support.

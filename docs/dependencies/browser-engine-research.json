@@ -78,5 +78,45 @@
     "downloaded": true,
     "sha256": "275f18944ac7ba41acabbb468387c1c9e8e2f81f7d49e6442dafe37c25ffeea7",
     "file": "ladybird-LICENSE"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/WebKit/WPEPlatform/wpe/WPEView.h",
+    "downloaded": true,
+    "sha256": "b4270da453b4ea8d01583978142ed248ac5e3ab4f77caf37d70c667dd347366c",
+    "file": "webkit-Source-WebKit-WPEPlatform-wpe-WPEView.h"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/WebKit/WPEPlatform/wpe/WPEBufferSHM.h",
+    "downloaded": true,
+    "sha256": "ed1f74935b23e4e03af8c9e214bbacf87f63931527009087ffe6977498a01650",
+    "file": "webkit-Source-WebKit-WPEPlatform-wpe-WPEBufferSHM.h"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/WebKit/WPEPlatform/CMakeLists.txt",
+    "downloaded": true,
+    "sha256": "9155ceb9a7abcac5a567b6f271882e877353f34f695dcdf52b6ce0ef1c2365da",
+    "file": "webkit-Source-WebKit-WPEPlatform-CMakeLists.txt"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/WebCore/LICENSE-APPLE",
+    "downloaded": true,
+    "sha256": "0b5d3a7cc325942567373b0ecd757d07c132e0ebd7c97bfc63f7e1a76094edb4",
+    "file": "webkit-Source-WebCore-LICENSE-APPLE"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/JavaScriptCore/COPYING.LIB",
+    "downloaded": true,
+    "sha256": "5094ecb9c9dcd0eadc34f3c11511d9b5535063032bc150164ecd1a5d5a445547",
+    "file": "webkit-Source-JavaScriptCore-COPYING.LIB"
   }
 ]

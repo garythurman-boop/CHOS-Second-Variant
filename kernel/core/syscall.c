@@ -7,6 +7,7 @@
 #include "chos/syscall.h"
 #include "chos/network_policy.h"
 #include "chos/net_manager.h"
+#include "chos/user_memory.h"
 #include "chos/uart.h"
 #include "chos/user_mode.h"
 #include "chos/process.h"
@@ -917,6 +918,15 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 }
                 frame->x[0] = 0u;
                 return frame;
+            }
+            case CHOS_SYS_MAP_MEMORY: {
+                if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[1]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)chos_user_memory_map(fault_space,(size_t)frame->x[0],0);return frame;
+            }
+            case CHOS_SYS_UNMAP_MEMORY: {
+                if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_user_memory_unmap(fault_space,frame->x[0],(size_t)frame->x[1]);return frame;
             }
             case CHOS_SYS_NET_INFO: {
                 chos_net_status_t status;

@@ -85,3 +85,18 @@ cookies/web storage, forms/downloads, HTTPS, media, WebAssembly or public-site
 compatibility is claimed. These remain mandatory in the revised request, alongside
 real Wi-Fi, IPv6, multiple interfaces, a complete control-panel/network service and
 platform-specific tests. A working Ethernet manager does not close those gates.
+
+## Verified embedding seam and first runtime implementation
+
+Additional immutable-source evidence locates `WPEView::render_buffer` and the
+`WPEBufferSHM` interface at Source/WebKit/WPEPlatform/wpe. The latter explicitly
+provides ARGB8888 memory buffers with GBytes and checked dimensions/stride. This
+supports selecting a native software-buffer port seam; it does not demonstrate
+that the engine currently builds or renders on CHOS. Corrected path lookups and
+WebCore/JavaScriptCore license texts are included in the research manifest.
+
+The next runtime source iteration implements bounded private anonymous RW/XN
+pages, guard protections, partial-failure rollback/quarantine and process-exit
+cleanup. See USER_MEMORY.md for actual live EL0 evidence. This is a real first
+allocation primitive; the complete POSIX/C++/threading/IPC and UEFI isolation gaps
+remain. The compiler preflight still correctly fails missing POSIX/WPE headers.

@@ -1312,7 +1312,7 @@ static void print_process_info(void) {
         }
     }
     uart_puts("Executable formats: CHCX v1 flat RX; v2 page-separated RX/R/RW with zero-filled BSS.\n");
-    uart_puts("Loader source: read-only packaged ROMFS; disk-backed filesystem loading is not implemented yet.\n");
+    uart_puts("Loader sources: packaged ROMFS and checked CHFS executables.\n");
 }
 
 static void print_romfs_files(void) {
