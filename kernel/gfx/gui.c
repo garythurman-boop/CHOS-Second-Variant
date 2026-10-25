@@ -22,6 +22,7 @@
 #include "chos/audio.h"
 #include "chos/platform.h"
 #include "chos/net_stack.h"
+#include "chos/net6.h"
 #include "chos/net_device.h"
 #include "chos/net_manager.h"
 #include "chos/entropy.h"
@@ -243,6 +244,14 @@ static int shift_down;
 static char unicode_key_override;
 static int control_down;
 static int caps_lock_down;
+static chos_net6_info_t network_last_ipv6;
+static void gui_ipv6_poll(void) {
+    chos_net6_info_t current;chos_net6_get_info(&current);
+    const uint8_t *a=(const uint8_t *)&current,*b=(const uint8_t *)&network_last_ipv6;
+    int changed=0;for(size_t i=8;i<96;i++)if(a[i]!=b[i])changed=1;
+    network_last_ipv6=current;
+    if(changed && view==VIEW_NETWORK)gui_mark_dirty();
+}
 /* One repeat producer for USB and VirtIO. No timer IRQ renders or injects keys. */
 static uint16_t repeat_key;
 static int repeat_view, repeat_prompt, repeat_dispatch;
@@ -2266,7 +2275,7 @@ static void terminal_execute(char *input) {
     argument = split;
     while (*argument == ' ' || *argument == '\t') ++argument;
     if (gui_strings_equal(command, "help")) {
-        terminal_puts("Commands:\n  help       Show this help\n  drivers    Driver admission report\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci [net]  PCI inventory (net: adapters only)\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  dnsserver IP  Set session DNS resolver\n  netstatus  DHCP and ping status\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+        terminal_puts("Commands:\n  help       Show this help\n  drivers    Driver admission report\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci [net]  PCI inventory (net: adapters only)\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  dnsserver IP  Set session DNS resolver\n  netstatus  DHCP and ping status\n  net6status IPv6 addresses and echo status\n  ping6 IP   Send an ICMPv6 echo\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
     } else if(gui_strings_equal(command,"drivers")) {
         chos_gui_show_driver_report();
     } else if(gui_strings_equal(command,"clock")) {
@@ -2327,6 +2336,18 @@ static void terminal_execute(char *input) {
         else if(chos_entropy_ready())terminal_puts("Entropy completion pending; repeat rng-test.\n");
         else {terminal_puts("Entropy unavailable: ");terminal_puts(chos_entropy_last_error());terminal_putc('\n');}
         for(size_t j=0;j<sizeof(bytes);++j)((volatile uint8_t *)bytes)[j]=0;
+    } else if (gui_strings_equal(command,"net6status")) {
+        chos_net6_info_t n;char address[46];chos_net6_get_info(&n);
+        terminal_puts("IPv6 SLAAC/ND control plane: ");terminal_puts((n.flags&CHOS_NET6_LINK_UP)?"link up\n":"link down\n");
+        for(unsigned i=0;i<3;i++)if(n.address_states[i]){
+            chos_net6_format(n.addresses[i],address,sizeof(address));terminal_puts(address);
+            terminal_puts(" state=");terminal_putc((char)('0'+n.address_states[i]));terminal_putc('\n');
+        }
+        chos_net6_format(n.router,address,sizeof(address));terminal_puts("Router6: ");terminal_puts(address);
+        terminal_puts("\nPing6: ");terminal_puts(chos_net6_ping_name(n.ping_state));
+        terminal_puts("\nIPv6 TCP, DNS and DHCPv6 unavailable.\n");
+    } else if (gui_strings_equal(command,"ping6")) {
+        terminal_puts(chos_net6_ping(argument)?"ICMPv6 echo started; inspect net6status.\n":"ICMPv6 request refused; inspect net6status.\n");
     } else if (gui_strings_equal(command,"netstatus")) {
         chos_net_stack_info_t info;chos_net_ping_info_t ping;
         chos_net_stack_get_info(&info);chos_net_ping_get_info(&ping);
@@ -3143,8 +3164,14 @@ static void draw_network_content(void){
             !prompt_kind && !start_menu_open && !context_menu_open && !power_confirmation_action)
             rect(426+chos_gfx_ui_text_width(network_fields[n],0),y+5,1,CHOS_GFX_UI_LINE_HEIGHT,C_TEXT);
     }
-    text(204,352,"Wi-Fi: no supported wireless adapter. IPv6 unavailable.",C_MUTED);
-    text(204,377,network_error?network_error:i.message,network_error?C_RED:C_TEXT);
+    text(204,345,"Wi-Fi: no supported wireless adapter attached.",C_MUTED);
+    chos_net6_info_t v6;char address[46];chos_net6_get_info(&v6);
+    text(204,362,"IPv6 SLAAC:",C_MUTED);
+    unsigned selected=0;for(unsigned a=1;a<3;a++)if(v6.address_states[a]==CHOS_NET6_ADDRESS_PREFERRED)selected=a;
+    if(v6.address_states[selected]==CHOS_NET6_ADDRESS_PREFERRED){
+        chos_net6_format(v6.addresses[selected],address,sizeof(address));text(320,362,address,C_TEXT);
+    }else text(320,362,"No usable IPv6 address",C_MUTED);
+    text(204,382,network_error?network_error:i.message,network_error?C_RED:C_TEXT);
     if(i.trial){text(204,400,"Keep changes within",C_TEXT);draw_number(365,400,i.trial_seconds,C_BLUE_DARK);text(390,400,"seconds, or they revert.",C_TEXT);}
     const int x[5]={204,300,396,492,588};const char *actions[5]={"Apply","Cancel","Keep","Revert",network_save?"[x] Save":"[ ] Save"};
     for(int n=0;n<5;n++){draw_button(x[n],433,88,26,actions[n],0);if(network_focus==n+7)outline(x[n]+3,436,82,20,C_BLUE_DARK);}
@@ -5422,6 +5449,7 @@ void chos_gui_pump(void) {
     chos_audio_pump();
     if (!gui_active) return;
     gui_clock_poll();
+    gui_ipv6_poll();
     chos_net_manager_info_t net;chos_net_manager_get_info(&net);
     uint64_t signature=(uint64_t)net.ipv4.ipv4_address ^ ((uint64_t)net.ipv4.dhcp_state<<32) ^
         ((uint64_t)net.link_up<<40)^((uint64_t)net.adapter_ready<<41)^((uint64_t)net.configured.mode<<42)^((uint64_t)net.trial_seconds<<48)^(uintptr_t)net.message;

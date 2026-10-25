@@ -53,3 +53,9 @@ The user now confirms Fusion Ethernet and example.com HTTP work after the
 capture, reconnect or TLS validation was supplied. Arbitrary Intel NIC support
 is not implied. The revised Stage 3 request is tracked in STAGE3_REVISED_PROMPT.md and
 STAGE3_ARCHITECTURE.md, superseding the Word document's Stage 3 scope.
+
+The selected first Wi-Fi device is now the Pi5 onboard CYW43455 family over
+SDIO2, independently identified through RaspberryPiOS firmware mappings. This
+selection is not driver/runtime support; Pi boot, SDIO2, firmware/authentication
+and live wireless tests remain open. See PI5_WIRELESS.md. IPv6 control-plane
+QEMU evidence is distinct from the user-confirmed Fusion IPv4/HTTP result.

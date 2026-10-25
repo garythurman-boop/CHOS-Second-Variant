@@ -1,4 +1,5 @@
 CHOS_VERSION ?= 0.30.0
+.DEFAULT_GOAL := all
 CROSS_COMPILE ?= aarch64-none-elf-
 CC = clang
 LD = ld.lld
@@ -18,6 +19,13 @@ SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/e
              kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/mm/user_memory.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
              kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/net/net_profile.c kernel/net/net_manager.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
+LWIP_CORE_NAMES := init def mem memp netif pbuf raw stats sys timeouts udp inet_chksum ip
+LWIP_SOURCES := $(addprefix third_party/lwip/src/core/,$(addsuffix .c,$(LWIP_CORE_NAMES))) $(wildcard third_party/lwip/src/core/ipv6/*.c) third_party/lwip/src/netif/ethernet.c
+SOURCES_C += kernel/net/net6.c $(LWIP_SOURCES)
+LWIP_INCLUDES := -Ithird_party/lwip-port/include -Ithird_party/lwip/src/include
+$(patsubst %.c,$(BUILD)/%.o,kernel/net/net6.c $(LWIP_SOURCES)): CFLAGS += $(LWIP_INCLUDES)
+$(patsubst %.c,$(BUILD)/uefi-kernel/%.o,kernel/net/net6.c $(LWIP_SOURCES)): UEFI_KERNEL_CFLAGS += $(LWIP_INCLUDES)
+
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
            $(BUILD)/kernel/arch/aarch64/context_switch.o $(BUILD)/kernel/arch/aarch64/register_stress.o $(BUILD)/kernel/arch/aarch64/user_entry.o \
            $(BUILD)/kernel/arch/aarch64/user_demo.o $(BUILD)/kernel/arch/aarch64/user_exit.o $(BUILD)/kernel/arch/aarch64/user_preempt_good.o \
@@ -1286,3 +1294,25 @@ $(BUILD)/userland/memory_test.chcx: $(BUILD)/userland/memory_test.bin $(BUILD)/u
 	python3 tools/mkchcx.py --stack-pages 2 --v2-symbols $(BUILD)/userland/memory_test.sym $(BUILD)/userland/memory_test.bin $@
 	python3 tools/mkchcx.py --verify $@
 test-userland test: $(BUILD)/userland/memory_test.chcx
+
+$(BUILD)/test-net6: tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) include/chos/net6.h include/chos/net6_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 -Iinclude $(LWIP_INCLUDES) tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) -o $@
+$(SAN_DIR)/test-net6: tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) include/chos/net6.h include/chos/net6_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Wno-misleading-indentation $(LWIP_INCLUDES) tests/test_net6.c kernel/net/net6.c $(LWIP_SOURCES) -o $@
+test-net6: $(BUILD)/test-net6
+	./$(BUILD)/test-net6
+test-net6-sanitize: $(SAN_DIR)/test-net6
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-net6
+test: test-net6
+test-sanitize: test-net6-sanitize
+.PHONY: test-net6 test-net6-sanitize
+
+LWIP_HEADERS := $(wildcard third_party/lwip-port/include/*.h third_party/lwip-port/include/arch/*.h third_party/lwip/src/include/lwip/*.h third_party/lwip/src/include/lwip/priv/*.h third_party/lwip/src/include/lwip/prot/*.h)
+$(BUILD)/test-net6 $(SAN_DIR)/test-net6: $(LWIP_HEADERS)
+$(BUILD)/userland/network_policy_test.o $(BUILD)/userland/console.o: include/chos/net6_api.h
+verify-lwip:
+	python3 tools/verify_lwip.py
+test: verify-lwip
+.PHONY: verify-lwip

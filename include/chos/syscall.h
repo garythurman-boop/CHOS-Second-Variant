@@ -39,6 +39,8 @@
 #define CHOS_SYS_NET_INFO 34u /* x0=writable chos_net_status_t, x1=capacity; read-only OS status */
 #define CHOS_SYS_MAP_MEMORY 35u /* x0=bytes (1..128KiB), x1=flags0; zeroed process RW/XN pages */
 #define CHOS_SYS_UNMAP_MEMORY 36u /* x0=exact mapping base, x1=rounded allocation length */
+#define CHOS_SYS_NET6_INFO 37u /* x0=writable chos_net6_info_t, x1=capacity; read-only control-plane status */
+#define CHOS_SYS_NET6_PING 38u /* x0=NUL-terminated IPv6 literal; one bounded OS-owned echo request */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

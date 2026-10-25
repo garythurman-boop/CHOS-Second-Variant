@@ -15,6 +15,7 @@
 #include "chos/power.h"
 #include "chos/net_stack.h"
 #include "chos/net_manager.h"
+#include "chos/net6.h"
 #include "chos/entropy.h"
 
 static uint32_t pixels[CHOS_DISPLAY_MAX_WIDTH * CHOS_DISPLAY_MAX_HEIGHT];
@@ -68,6 +69,9 @@ static const char test_file_contents[] =
 
 static chos_net_config_t mock_network_config;
 static int mock_network_trial;
+void chos_net6_get_info(chos_net6_info_t *n){*n=(chos_net6_info_t){.version=1,.size_bytes=sizeof(*n)};}
+int chos_net6_ping(const char *s){(void)s;return 0;}
+int chos_net6_format(const uint8_t a[16],char *s,size_t n){(void)a;if(n)s[0]=0;return n>0;}
 chos_block_device_t *storage_device(void){return NULL;}
 void chos_net_manager_get_info(chos_net_manager_info_t *out){*out=(chos_net_manager_info_t){.configured=mock_network_config,.adapter="Mock Ethernet",.driver="mock ready",.message="Network test",.adapter_ready=1,.link_known=1,.link_up=1,.trial=mock_network_trial,.trial_seconds=mock_network_trial?30:0};}
 int chos_net_manager_apply(const chos_net_config_t *c){if(chos_net_config_error(c))return 0;mock_network_config=*c;mock_network_trial=1;return 1;}

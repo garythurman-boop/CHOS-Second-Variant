@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "chos/syscall.h"
 #include "chos/net_status_api.h"
+#include "chos/net6_api.h"
 #include "chos/gui_protocol.h"
 #include "chos/file_api.h"
 #include "chos/net_tcp_api.h"
@@ -111,6 +112,8 @@ static inline long chos_rmdir(const char *path) {
 static inline long chos_map_memory(size_t bytes){return chos_syscall2(CHOS_SYS_MAP_MEMORY,(long)bytes,0);}
 static inline long chos_unmap_memory(void *base,size_t bytes){return chos_syscall2(CHOS_SYS_UNMAP_MEMORY,(long)(uintptr_t)base,(long)bytes);}
 static inline long chos_network_status(chos_net_status_t *out){return chos_syscall2(CHOS_SYS_NET_INFO,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_network_status6(chos_net6_info_t *out){return chos_syscall2(CHOS_SYS_NET6_INFO,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_ping6(const char *literal){return chos_syscall1(CHOS_SYS_NET6_PING,(long)(uintptr_t)literal);}
 
 static inline long chos_net_tcp_open(uint16_t local_port) {
     return chos_syscall1((long)CHOS_SYS_NET_OPEN, (long)local_port);

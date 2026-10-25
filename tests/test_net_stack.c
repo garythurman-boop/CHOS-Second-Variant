@@ -8,6 +8,7 @@
 #include "chos/net_services.h"
 #include "chos/net_tcp.h"
 #include "chos/net_device.h"
+#include "chos/net6.h"
 #include "chos/timer.h"
 
 static const uint8_t client_mac[6] = {0x52u,0x54u,0x00u,0x12u,0x34u,0x56u};
@@ -19,6 +20,10 @@ static unsigned tx_count;
 static uint8_t queued_rx[CHOS_NET_MAX_ETHERNET_FRAME];
 static size_t queued_rx_length;
 static int rx_pending;
+/* This fixture isolates the retained IPv4 implementation; net6 has a real-core suite. */
+void chos_net6_init(const uint8_t mac[6]){(void)mac;}
+void chos_net6_poll(int enabled,int link){(void)enabled;(void)link;}
+void chos_net6_receive(const void *p,size_t n){(void)p;(void)n;}
 
 static uint16_t read_be16(const uint8_t *p) { return (uint16_t)(((uint16_t)p[0] << 8) | p[1]); }
 static void put16(uint8_t *p, uint16_t v) { p[0] = (uint8_t)(v >> 8); p[1] = (uint8_t)v; }

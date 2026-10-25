@@ -5,6 +5,7 @@
 #include "chos/net_services.h"
 #include "chos/net_tcp.h"
 #include "chos/net_device.h"
+#include "chos/net6.h"
 #include "chos/timer.h"
 
 #define DHCP_CLIENT_PORT 68u
@@ -617,6 +618,7 @@ void chos_net_stack_init(void) {
     if (!driver.ready) return;
     for (i = 0u; i < sizeof(net_state.mac); ++i) net_state.mac[i] = driver.mac[i];
     net_state.driver_ready = 1;
+    chos_net6_init(driver.mac);
     network_link_down=driver.link_status_known && !driver.link_up;
     if(!network_link_down)activate_config();
 }
@@ -629,11 +631,13 @@ void chos_net_stack_poll(void) {
     if (!timer_is_ready()) ++fallback_ticks;
     if (!net_state.driver_ready) return;
     if(!chos_net_device_ready()){
+        chos_net6_poll(0,0);
         net_state.driver_ready=0;net_state.dhcp_state=CHOS_NET_DHCP_OFFLINE;
         clear_configuration();dns_state.state=CHOS_NET_DNS_FAILED;return;
     }
     chos_net_device_info_t driver;chos_net_device_get_info(&driver);
     int down=driver.link_status_known && !driver.link_up;
+    chos_net6_poll(network_config.mode!=CHOS_NET_DISABLED,!down);
     if(down || network_config.mode==CHOS_NET_DISABLED){
         if(!network_link_down || net_state.ipv4_address){
             clear_configuration();dns_state.state=CHOS_NET_DNS_FAILED;ping_state.state=CHOS_NET_PING_FAILED;
@@ -648,6 +652,7 @@ void chos_net_stack_poll(void) {
         if (!chos_net_parse_ethernet(rx_frame, frame_length, &ether_type)) continue;
         if (ether_type == 0x0806u) process_arp_frame(rx_frame, frame_length);
         else if (ether_type == 0x0800u) process_ipv4_frame(rx_frame, frame_length);
+        else if (ether_type == 0x86ddu) chos_net6_receive(rx_frame,frame_length);
     }
     chos_tcp_poll();
     now = net_now();

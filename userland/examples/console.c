@@ -102,7 +102,15 @@ static void redraw(void) {
         for (i = 0u; i < sizeof(prefix) - 1u; ++i) prompt[n++] = prefix[i];
         for (i = 0u; i < input_length && n + 1u < sizeof(prompt); ++i) prompt[n++] = input_line[i];
         prompt[n] = '\0';
-        (void)draw_text(window_id, 12, 294, prompt, 0xff80ff80u);
+        const char *shown=prompt+(n>40u?n-40u:0u);
+        (void)draw_text(window_id, 12, 294, shown, 0xff80ff80u);
+        message_begin(&message,CHOS_GUI_MSG_SET_CARET,sizeof(message.payload.caret));
+        message.payload.caret.window_id=window_id;message.payload.caret.x=13;message.payload.caret.y=295;
+        message.payload.caret.width=1;message.payload.caret.height=14;message.payload.caret.argb=0xff80ff80u;
+        message.payload.caret.enabled=console_history.offset==0;
+        message.payload.caret.text_length=(uint32_t)chos_strlen(shown);
+        chos_memcpy(message.payload.caret.text,shown,message.payload.caret.text_length);
+        (void)submit(&message);
         (void)draw_text(window_id, 12, 322, "Wheel / PgUp / PgDn: scroll | Home: oldest | End: prompt", 0xffa0a0a0u);
     }
 }
@@ -128,6 +136,8 @@ static void command_help(void) {
     write_text("  help              show this help"); newline();
     write_text("  dir               list merged CHFS/ROMFS files"); newline();
     write_text("  sysinfo            show process/runtime info"); newline();
+    write_text("  net6status         show IPv6 addresses and echo status"); newline();
+    write_text("  ping6 IPv6         request an OS-owned IPv6 echo"); newline();
     write_text("  type /PATH         display a text file"); newline();
     write_text("  run /BIN/APP.CHX   launch an embedded application"); newline();
     write_text("  mkdir PATH         create a directory"); newline();
@@ -269,6 +279,19 @@ static int execute_command(void) {
     } else if (strings_equal(command, "sync")) {
         long result = chos_fsync();
         if (result < 0) command_file_error("sync", result); else { write_text("Storage flushed."); newline(); }
+    } else if (strings_equal(command,"net6status")) {
+        chos_net6_info_t info;char address[40];
+        if(chos_network_status6(&info)<0){write_text("IPv6 service unavailable.");newline();}
+        else {
+            for(unsigned i=0;i<3;i++)if(info.address_states[i]){
+                chos_net6_address_text(info.addresses[i],address);write_text(address);
+                write_text(" state=");write_unsigned(info.address_states[i]);newline();
+            }
+            write_text("Ping6: ");write_text(chos_net6_ping_name(info.ping_state));newline();
+            write_text("IPv6 TCP, DNS and DHCPv6 unavailable.");newline();
+        }
+    } else if(strings_equal(command,"ping6")) {
+        write_text(chos_ping6(input_line+arg_start)==0?"ICMPv6 echo started.":"ICMPv6 request refused.");newline();
     } else if (strings_equal(command, "sysinfo")) {
         write_text("CHOS 0.15.0-dev | ARM64 | EL0 application"); newline();
         write_text("PID: "); write_unsigned((uint64_t)chos_getpid()); newline();

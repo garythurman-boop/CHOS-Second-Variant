@@ -1,2 +1,4 @@
 # Source archives omit versioned binary publications; GitHub retains the assets.
 /artifacts export-ignore
+# Keep the dependency byte-identical to its pinned upstream inventory.
+/third_party/lwip/** -whitespace

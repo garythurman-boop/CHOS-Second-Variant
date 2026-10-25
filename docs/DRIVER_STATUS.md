@@ -96,3 +96,8 @@ The user now confirms Fusion Ethernet and example.com HTTP work after the
 capture, reconnect or TLS validation was supplied. Arbitrary Intel NIC support
 is not implied. The revised Stage 3 request is tracked in STAGE3_REVISED_PROMPT.md and
 STAGE3_ARCHITECTURE.md, superseding the Word document's Stage 3 scope.
+
+IPv6 ND/MLD requires multicast reception: Intel82574L and VMXNET3 now receive
+multicast while unicast promiscuous mode stays off. IPv4 owns its existing stack;
+IPv6 uses the shared receive dispatcher and separate bounded lwIP control plane.
+See IPV6_CONTROL_PLANE.md for actual scope and per-backend guest evidence.

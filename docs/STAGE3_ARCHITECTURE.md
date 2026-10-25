@@ -80,3 +80,8 @@ completion criteria.
 The selected physical wireless target is now the Pi 5 onboard CYW43455 family,
 not a Fusion virtual Ethernet adapter. See PI5_WIRELESS.md for pinned Raspberry Pi
 firmware evidence and the SDIO2/platform/firmware/authentication dependencies.
+
+IPv6 control-plane source progress is documented in IPV6_CONTROL_PLANE.md. It
+preserves the IPv4 stack and adds a pinned lwIP core for actual DAD/SLAAC/ND/MLD/
+ICMPv6. TCP6, DNS6/DHCP6, multi-interface routing and complete IPv6 settings remain
+open; this is not full IPv6 browser support or completion of the revised stage.

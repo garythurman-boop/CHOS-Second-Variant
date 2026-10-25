@@ -109,7 +109,7 @@ int chos_e1000e_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,c
  wr(0x410,0x0060200au);
  if(!chos_pci_enable_memory_busmaster(boot,acpi,device))return fail("Intel 82574L bus mastering refused");
  wr(TCTL,(1u<<1)|(1u<<3)|(15u<<4)|(64u<<12));
- wr(RCTL,(1u<<1)|(1u<<15)|(1u<<26)); /* enable, broadcast, 2048B, strip FCS */
+ wr(RCTL,(1u<<1)|(1u<<4)|(1u<<15)|(1u<<26)); /* enable, IPv6 multicast, broadcast, 2048B, strip FCS */
  e_running=1;e_info.ready=1;e_info.mmio_base=e_bar;e_info.rx_queue_size=E_RING;e_info.rx_queue_ready=1;
  e_error="Intel 82574L e1000e polled Ethernet ready";return 1;
 }

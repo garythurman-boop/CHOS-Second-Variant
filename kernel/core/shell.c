@@ -21,6 +21,7 @@
 #include "chos/virtio_blk.h"
 #include "chos/virtio_net.h"
 #include "chos/net_stack.h"
+#include "chos/net6.h"
 #include "chos/net_manager.h"
 #include "chos/net_tcp.h"
 #include "chos/gui.h"
@@ -1812,7 +1813,7 @@ static void print_help(void) {
     uart_puts("  wait PID   Wait for a scheduled process and return its exit status\n");
     uart_puts("  apps       List packaged read-only CHCX programs\n");
     uart_puts("  diskinfo   Show VirtIO block and CHFS status\n");
-    uart_puts("  netinfo    Show VirtIO Ethernet link, MAC and frame counters\n  netstatus  Show DHCP/IPv4, ARP, DNS and ping state\n  dnslookup  Start async DNS A lookup: dnslookup example.com\n  ping       Send ICMP echo: ping 192.168.1.1\n  tcpconnect Connect to IPv4 TCP service: tcpconnect 93.184.216.34 80\n  tcpstatus  Show outbound TCP socket states\n  tcpsend    Send text; use \\r and \\n for line endings\n  tcprecv    Read received TCP data: tcprecv HANDLE\n  tcpclose   Close TCP socket: tcpclose HANDLE\n");
+    uart_puts("  netinfo    Show VirtIO Ethernet link, MAC and frame counters\n  netstatus  Show DHCP/IPv4, ARP, DNS and ping state\n  net6status Show IPv6 SLAAC/ND and ping state\n  ping6 IP   Send an ICMPv6 echo\n  dnslookup  Start async DNS A lookup: dnslookup example.com\n  ping       Send ICMP echo: ping 192.168.1.1\n  tcpconnect Connect to IPv4 TCP service: tcpconnect 93.184.216.34 80\n  tcpstatus  Show outbound TCP socket states\n  tcpsend    Send text; use \\r and \\n for line endings\n  tcprecv    Read received TCP data: tcprecv HANDLE\n  tcpclose   Close TCP socket: tcpclose HANDLE\n");
     uart_puts("  mount      Mount the persistent CHFS volume\n");
     uart_puts("  mkfs       FORMAT the attached disk as CHFS (destructive)\n");
     uart_puts("  fsls       List files on persistent storage\n");
@@ -2154,6 +2155,18 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         command_diskinfo();
     } else if (strings_equal(line, "netinfo")) {
         command_netinfo();
+    } else if (strings_equal(line, "net6status")) {
+        chos_net6_info_t v6;char address[46];chos_net6_get_info(&v6);
+        uart_puts("IPv6 control plane: ");uart_puts((v6.flags&CHOS_NET6_LINK_UP)?"link up\n":"link down\n");
+        for(unsigned i=0;i<3;i++)if(v6.address_states[i]){
+            chos_net6_format(v6.addresses[i],address,sizeof(address));uart_puts("IPv6 address: ");uart_puts(address);
+            uart_puts(" state=");print_decimal(v6.address_states[i]);uart_puts("\n");
+        }
+        chos_net6_format(v6.router,address,sizeof(address));uart_puts("IPv6 router: ");uart_puts(address);
+        uart_puts("\nPing6: ");uart_puts(chos_net6_ping_name(v6.ping_state));uart_puts("\n");
+        uart_puts("IPv6 TCP, DNS and DHCPv6 are not implemented.\n");
+    } else if (starts_with(line,"ping6 ")) {
+        uart_puts(chos_net6_ping(skip_spaces(line+6u))?"ICMPv6 echo started.\n":"ICMPv6 request refused.\n");
     } else if (strings_equal(line, "netstatus")) {
         command_netstatus();
     } else if (starts_with(line, "dnslookup ")) {

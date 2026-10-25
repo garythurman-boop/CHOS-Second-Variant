@@ -7,6 +7,7 @@
 #include "chos/syscall.h"
 #include "chos/network_policy.h"
 #include "chos/net_manager.h"
+#include "chos/net6.h"
 #include "chos/user_memory.h"
 #include "chos/uart.h"
 #include "chos/user_mode.h"
@@ -936,6 +937,21 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 chos_net_manager_status(&status);
                 frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&status,sizeof(status))?0u:neg_errno(CHOS_ERRNO_EFAULT);
                 return frame;
+            }
+            case CHOS_SYS_NET6_INFO: {
+                chos_net6_info_t status;
+                if(!process_pid_for_address_space(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[1]<sizeof(status)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[0],sizeof(status))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                chos_net6_get_info(&status);
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&status,sizeof(status))?0:neg_errno(CHOS_ERRNO_EFAULT);
+                return frame;
+            }
+            case CHOS_SYS_NET6_PING: {
+                char literal[46];
+                if(!process_pid_for_address_space(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(!syscall_copy_user_path(fault_space,frame->x[0],literal,sizeof(literal))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                frame->x[0]=chos_net6_ping(literal)?0:neg_errno(CHOS_ERRNO_EAGAIN);return frame;
             }
             case CHOS_SYS_RANDOM_BYTES: {
                 uint32_t owner = process_pid_for_address_space(fault_space);

@@ -34,3 +34,36 @@ CHOS 0.30.0 builds on the 0.26.0-dev storage/UEFI foundation. It focuses on impr
 - TLS/HTTPS transport and certificate verification are not implemented; HTTPS is deliberately unavailable. See `docs/HTTPS_TLS_BOUNDARY.md`. JavaScript, complete CSS, image rendering, form processing and downloads also remain unsupported.
 - The native USB xHCI path and VMware keyboard/mouse support are not implemented; HID report parsing alone does not connect devices.
 - QEMU/AAVMF and VMware runtime testing were unavailable in this build environment. The release must not be called a verified VMware-ready release until those tests are performed. See `docs/DRIVER_STATUS.md`, `docs/INSTALLER_PLAN.md`, and `docs/CODEX_HANDOFF_0.30.0.md`.
+
+
+## Third-party notice: lwIP IPv6 control plane
+
+This source includes unmodified lwIP 2.2.1 core/include/Ethernet source, pinned to
+77dcd25a72509eb83f72b033d219b1d40cd8eb95. CHOS IPv4 remains separate; IPv6 DAD,
+SLAAC, ND/MLD and ICMPv6 are the current profile. TCP6/DNS6/DHCPv6 and full revised
+Stage3 remain open. See docs/IPV6_CONTROL_PLANE.md and per-file copyright notices.
+
+Copyright (c) 2001, 2002 Swedish Institute of Computer Science.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
+OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+OF SUCH DAMAGE.

@@ -80,3 +80,7 @@ delivery; that report does not certify TLS, reconnect or other adapters. Modern 
 TLS, Wi-Fi, IPv6 and other revised Stage 3 gates remain incomplete. The local
 engine-prerequisite probe exits nonzero for missing C++/pthread/mmap/poll/WPE
 facilities; it is retained as a dependency failure, not a passing browser test.
+
+The IPv6 follow-up adds a real SLAAC address readout and Console net6status/ping6
+diagnostics. This is control-plane functionality only. IPv6 TCP/DNS/DHCPv6 and
+manual configuration are not advertised as implemented; see IPV6_CONTROL_PLANE.md.

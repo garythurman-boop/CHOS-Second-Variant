@@ -5,10 +5,13 @@
 #include "chos/net.h"
 #include "chos/net_tcp_api.h"
 #include "chos/net_dns_api.h"
+#include "chos/net6_api.h"
 
 int main(void) {
     assert(CHOS_SYS_WRITE == 1u);
     assert(CHOS_SYS_EXIT == 2u);
+    assert(CHOS_SYS_NET6_INFO==37u && CHOS_SYS_NET6_PING==38u);
+    assert(sizeof(chos_net6_info_t)==128u);
     assert(CHOS_SYS_GETPID == 3u);
     assert(CHOS_SYS_YIELD == 4u);
     assert(CHOS_SYS_SLEEP == 5u);

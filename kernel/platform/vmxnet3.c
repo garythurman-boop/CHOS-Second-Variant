@@ -110,7 +110,7 @@ int chos_vmxnet3_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,
  put32(shared+16,1);put32(shared+20,1);put64(shared+40,(uintptr_t)queues);put32(shared+52,sizeof(queues));
  put32(shared+56,1500);shared[60]=1;shared[62]=1;shared[63]=1;
  shared[81]=1;put32(shared+108,1); /* single interrupt, all masked */
- put32(shared+120,5); /* receive own unicast and broadcast; no offloads */
+ put32(shared+120,13); /* own unicast, broadcast, all multicast for IPv6 ND/MLD; no promiscuous unicast/offloads */
  put32(queues+4,1);put64(queues+16,(uintptr_t)tx_ring);put64(queues+24,(uintptr_t)tx_data);put64(queues+32,(uintptr_t)tx_complete);
  put32(queues+56,RING);put32(queues+60,RING);put32(queues+64,RING);
  uint8_t *rx=queues+256;
