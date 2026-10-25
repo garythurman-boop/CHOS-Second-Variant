@@ -85,9 +85,16 @@ int chos_e1000e_init(const chos_boot_info_t *boot,const chos_acpi_info_t *acpi,c
  if(rd(CTRL)&RESET)return fail("Intel 82574L reset timed out");
  wr(IMC,UINT32_MAX);(void)rd(0xc0); /* clear pending causes; all interrupts stay masked */
  zero(e_rx,sizeof(e_rx));zero((void *)e_tx,sizeof(e_tx));zero(&e_info,sizeof(e_info));
- uint32_t low=rd(0x5400),high=rd(0x5404);unsigned any=0;
- for(unsigned i=0;i<6;i++){e_info.mac[i]=(uint8_t)(i<4?low>>(8*i):high>>(8*(i-4)));any|=e_info.mac[i];}
- if(!any||(e_info.mac[0]&1u))return fail("Intel 82574L EEPROM MAC unavailable");
+ /* NVM auto-load can finish after reset clears; never invent a MAC. */
+ uint32_t low=0,high=0;unsigned any=0;
+ start=timer_counter();
+ for(spin=0;spin<E1000_WAIT_SPINS;spin++){
+  low=rd(0x5400);high=rd(0x5404);any=0;
+  for(unsigned i=0;i<6;i++){e_info.mac[i]=(uint8_t)(i<4?low>>(8*i):high>>(8*(i-4)));any|=e_info.mac[i];}
+  if(any && !(e_info.mac[0]&1u))break;
+  if(budget&&timer_counter()-start>=budget)break;
+ }
+ if(!any||(e_info.mac[0]&1u))return fail("Intel 82574L EEPROM MAC auto-load timed out");
  wr(0x5400,low);wr(0x5404,(high&0xffffu)|(1u<<31));
  for(unsigned i=0;i<128;i++)wr(0x5200+4*i,0); /* multicast filter, not fictitious Wi-Fi */
  for(unsigned i=0;i<E_RING;i++){address(e_rx[i],e_rx_buffers[i]);address(e_tx[i],e_tx_buffers[i]);}

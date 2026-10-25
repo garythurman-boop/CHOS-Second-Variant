@@ -10,7 +10,7 @@ an engine port, Wi-Fi or TLS on CHOS.
 Direct boot has an MMU, bounded CHCX v2 EL0 applications and a single-core task
 scheduler. UEFI uses a relocated PIE kernel, native PCI USB/NVMe/GOP and a polled
 GUI with MMU/cache disabled for identity DMA. UEFI EL0 scheduling is unavailable.
-Current CHCX applications have a 64 KiB image limit, 16 KiB maximum stack, bounded
+Current CHCX applications have a 64 KiB image limit, 32 KiB maximum stack, bounded
 argument passing, no dynamic loader, no complete libc, no POSIX threads/futexes,
 no browser-sized user heap or mmap, no general IPC/shared-memory service and no
 modern-engine sandbox. These are implementation dependencies, not external-hardware

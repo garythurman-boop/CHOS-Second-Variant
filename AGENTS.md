@@ -66,3 +66,14 @@ remaining work as blocked solely by unavailable physical hardware.
 QEMU evidence does not establish VMware, Pi 5 or laptop support. Do not enable
 experimental NVMe probing on valuable media. Never disable TLS, signature or artifact
 checksum verification to make setup pass. CHOS is not an acronym.
+
+## Revised Stage 3
+
+The user explicitly supersedes the Word document's Stage 3 with
+`docs/STAGE3_REVISED_PROMPT.md`. Continue the modern browser/network-manager/Wi-Fi
+objective without asking for another approval. The old text-preview browser is
+recovery functionality, never the revised browser deliverable. Track actual engine,
+TLS, isolation, wireless, IPv6 and platform gates in STAGE3_ARCHITECTURE.md and
+BROWSER_ENGINE_PORT.md; do not claim the full stage from Ethernet/manager progress.
+The user confirms 107ef51 power/storage/Console changes work in Fusion, but its
+actual NIC is Intel 8086:10d3. New e1000e traffic needs independent Fusion evidence.

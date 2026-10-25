@@ -36,6 +36,7 @@
 #define CHOS_SYS_NET_DNS_STATUS 31u /* x0=user writable chos_dns_api_info_t output */
 #define CHOS_SYS_NET_ABORT 32u /* x0=handle; aborts and releases a process-owned TCP socket */
 #define CHOS_SYS_RANDOM_BYTES 33u /* x0=user writable buffer, x1=capacity; nonblocking hardware-backed entropy */
+#define CHOS_SYS_NET_INFO 34u /* x0=writable chos_net_status_t, x1=capacity; read-only OS status */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

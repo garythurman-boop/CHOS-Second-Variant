@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/syscall.h"
+#include "chos/net_status_api.h"
 #include "chos/gui_protocol.h"
 #include "chos/file_api.h"
 #include "chos/net_tcp_api.h"
@@ -107,6 +108,8 @@ static inline long chos_rmdir(const char *path) {
 }
 /* Nonblocking, process-owned outbound TCP client. IPv4 addresses use network
  * presentation order in a uint32_t (e.g. 10.0.2.2 == 0x0a000202). */
+static inline long chos_network_status(chos_net_status_t *out){return chos_syscall2(CHOS_SYS_NET_INFO,(long)(uintptr_t)out,sizeof(*out));}
+
 static inline long chos_net_tcp_open(uint16_t local_port) {
     return chos_syscall1((long)CHOS_SYS_NET_OPEN, (long)local_port);
 }

@@ -20,6 +20,7 @@
 #include "chos/audio.h"
 #include "chos/virtio_net.h"
 #include "chos/net_stack.h"
+#include "chos/net_manager.h"
 #include "chos/boot_info.h"
 #include "chos/acpi.h"
 #include "chos/pci.h"
@@ -476,6 +477,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
             uefi_console_write_u64(chos_xhci_device_count());uefi_console_write("\n");
         }
         chos_gui_set_driver_report(chos_platform_driver_report,chos_platform_needs_input_recovery);
+        chos_net_manager_init();
         chos_gui_startup_complete();
         chos_gui_show();
         if (console_ready) uefi_console_write("[OK] Initial CHOS GUI frame rendered.\n");
@@ -510,7 +512,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         uefi_console_set_graphics_logging(0);
         for (;;) {
-            chos_platform_drivers_poll();chos_net_stack_poll();
+            chos_platform_drivers_poll();chos_net_stack_poll();chos_net_manager_poll();
             if (input_ready) chos_input_poll();
             else chos_gui_pump();
             if (gic_timer_ready) __asm__ volatile("wfi" ::: "memory");
@@ -688,6 +690,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
 
     /* The splash may only leave once the minimum presentation interval and the
      * remaining platform/device initialization have both completed. */
+    chos_net_manager_init();
     chos_gui_startup_complete();
 
     uart_puts("\n");

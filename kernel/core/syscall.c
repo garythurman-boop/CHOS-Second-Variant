@@ -5,6 +5,8 @@
 #include "chos/exception.h"
 #include "chos/irq_context.h"
 #include "chos/syscall.h"
+#include "chos/network_policy.h"
+#include "chos/net_manager.h"
 #include "chos/uart.h"
 #include "chos/user_mode.h"
 #include "chos/process.h"
@@ -636,6 +638,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                     !syscall_parent_path(path, parent)) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
+                if(chos_network_profile_reserved(path)){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
                 if (!storage_mounted()) { frame->x[0] = neg_errno(CHOS_ERRNO_EIO); return frame; }
                 if (romfs_path_equal(path, "/")) { frame->x[0] = neg_errno(CHOS_ERRNO_EEXIST); return frame; }
                 if (storage_lookup(path, &existing) || romfs_lookup(path, &embedded) ||
@@ -656,6 +659,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 if (!syscall_copy_user_path(fault_space, frame->x[0], path, sizeof(path))) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
+                if(chos_network_profile_reserved(path)){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
                 if (length64 > CHOS_SYS_MAX_FILE_WRITE) { frame->x[0] = neg_errno(CHOS_ERRNO_E2BIG); return frame; }
                 if (!storage_mounted()) { frame->x[0] = neg_errno(CHOS_ERRNO_EIO); return frame; }
                 if (storage_is_directory(path)) { frame->x[0] = neg_errno(CHOS_ERRNO_EISDIR); return frame; }
@@ -684,6 +688,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 if (!syscall_copy_user_path(fault_space, frame->x[0], path, sizeof(path))) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
+                if(chos_network_profile_reserved(path)){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
                 if (!storage_mounted()) { frame->x[0] = neg_errno(CHOS_ERRNO_EIO); return frame; }
                 if (storage_is_directory(path)) { frame->x[0] = neg_errno(CHOS_ERRNO_EISDIR); return frame; }
                 if (!storage_lookup(path, &entry)) {
@@ -704,6 +709,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                     !syscall_parent_path(new_path, parent)) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
+                if(chos_network_profile_reserved(old_path)||chos_network_profile_reserved(new_path)){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
                 if (!storage_mounted()) { frame->x[0] = neg_errno(CHOS_ERRNO_EIO); return frame; }
                 while (old_path[old_length] != '\0') ++old_length;
                 while (new_path[new_length] != '\0') ++new_length;
@@ -743,6 +749,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 if (!syscall_copy_user_path(fault_space, frame->x[0], path, sizeof(path))) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
+                if(chos_network_profile_reserved(path)){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
                 if (path[0] == '/' && path[1] == '\0') { frame->x[0] = neg_errno(CHOS_ERRNO_EBUSY); return frame; }
                 if (!storage_is_directory(path)) {
                     frame->x[0] = syscall_catalog_has_path(path, 0u) ? neg_errno(CHOS_ERRNO_ENOTDIR) : neg_errno(CHOS_ERRNO_ENOENT);
@@ -909,6 +916,15 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
                 frame->x[0] = 0u;
+                return frame;
+            }
+            case CHOS_SYS_NET_INFO: {
+                chos_net_status_t status;
+                if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[1]<sizeof(status)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[0],sizeof(status))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                chos_net_manager_status(&status);
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&status,sizeof(status))?0u:neg_errno(CHOS_ERRNO_EFAULT);
                 return frame;
             }
             case CHOS_SYS_RANDOM_BYTES: {

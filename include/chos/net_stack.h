@@ -2,6 +2,7 @@
 #define CHOS_NET_STACK_H
 
 #include <stdint.h>
+#include "chos/net_profile.h"
 
 #define CHOS_NET_DNS_HOST_MAX 256u
 
@@ -11,7 +12,8 @@ typedef enum {
     CHOS_NET_DHCP_REQUESTING,
     CHOS_NET_DHCP_BOUND,
     CHOS_NET_DHCP_RENEWING,
-    CHOS_NET_DHCP_FAILED
+    CHOS_NET_DHCP_FAILED,
+    CHOS_NET_DHCP_STATIC
 } chos_net_dhcp_state_t;
 
 typedef enum {
@@ -69,6 +71,7 @@ typedef struct {
 void chos_net_stack_init(void);
 /* Call repeatedly from the shell/runtime poll loop. Never busy-waits. */
 void chos_net_stack_poll(void);
+int chos_net_stack_configure(const chos_net_config_t *);
 void chos_net_stack_get_info(chos_net_stack_info_t *out);
 const char *chos_net_dhcp_state_name(chos_net_dhcp_state_t state);
 /* Start one asynchronous DNS A/IN lookup. Use get_dns_info to poll the result. */

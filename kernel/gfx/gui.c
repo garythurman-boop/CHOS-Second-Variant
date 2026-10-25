@@ -23,6 +23,7 @@
 #include "chos/platform.h"
 #include "chos/net_stack.h"
 #include "chos/net_device.h"
+#include "chos/net_manager.h"
 #include "chos/entropy.h"
 #include "chos/clock.h"
 
@@ -59,7 +60,8 @@ typedef struct { const char *name; const gui_embedded_image_t *image; } gui_embe
 #define VIEW_TRASH 7
 #define VIEW_INSTALLER 8
 extern void chos_install_abort(void) __attribute__((weak));
-#define GUI_VIEW_COUNT 9u
+#define VIEW_NETWORK 9
+#define GUI_VIEW_COUNT 10u
 #define GUI_DESKTOP_ICON_CAP (CHOS_CHFS_MAX_FILES + 7u)
 #define GUI_DESKTOP_GRID_COLUMNS 8u
 #define GUI_DESKTOP_GRID_ROWS 6u
@@ -340,8 +342,9 @@ static void gui_copy_bytes(void *destination, const void *source, size_t length)
 
 
 static const char *const view_names[] = {
-    "Welcome", "Console", "File Manager", "About CHOS", "Diagnostics", "Settings", "Text Viewer", "Trash"
+    "Welcome", "Console", "File Manager", "About CHOS", "Diagnostics", "Settings", "Text Viewer", "Trash", "Installer", "Network"
 };
+_Static_assert(sizeof(view_names)/sizeof(view_names[0])==GUI_VIEW_COUNT,"Every built-in view needs a name");
 static const char *const icon_names[] = {
     "Console", "File Manager", "About CHOS", "Diagnostics", "Settings"
 };
@@ -1618,12 +1621,12 @@ static void draw_status_line(const char *left, const char *right) {
     if (right != NULL) text(605, 515, right, C_MUTED);
 }
 
-static const int32_t window_x[GUI_VIEW_COUNT] = {180, 190, 105, 150, 135, 165, 200, 165, 180};
-static const int32_t window_y[GUI_VIEW_COUNT] = {70, 58, 65, 82, 62, 76, 60, 60, 70};
+static const int32_t window_x[GUI_VIEW_COUNT] = {180, 190, 105, 150, 135, 165, 200, 165, 180, 180};
+static const int32_t window_y[GUI_VIEW_COUNT] = {70, 58, 65, 82, 62, 76, 60, 60, 70, 70};
 
 static int window_title_for_view(int id, const char **title, const char **short_title) {
-    static const char *const titles[GUI_VIEW_COUNT] = {"Welcome to CHOS", "Console - CHOS", "File Manager - CHOS", "About CHOS", "CHOS Diagnostics", "Desktop Settings", "Text Viewer - CHOS", "Trash - CHOS", "CHOS Setup"};
-    static const char *const short_titles[GUI_VIEW_COUNT] = {"Home", "Console", "Files", "About", "Diag", "Settings", "Viewer", "Trash", "Setup"};
+    static const char *const titles[GUI_VIEW_COUNT] = {"Welcome to CHOS", "Console - CHOS", "File Manager - CHOS", "About CHOS", "CHOS Diagnostics", "Desktop Settings", "Text Viewer - CHOS", "Trash - CHOS", "CHOS Setup", "Network Connections"};
+    static const char *const short_titles[GUI_VIEW_COUNT] = {"Home", "Console", "Files", "About", "Diag", "Settings", "Viewer", "Trash", "Setup", "Network"};
     if (id < VIEW_WELCOME || id >= (int)GUI_VIEW_COUNT) return 0;
     if (title != NULL) *title = titles[id];
     if (short_title != NULL) *short_title = short_titles[id];
@@ -1782,7 +1785,7 @@ static int gui_taskbar_tooltip_target_at(int32_t x, int32_t y) {
     size_t task;
     if (!gui_active || splash_active || start_menu_open || power_confirmation_action != 0 || left_button_down)
         return CHOS_WM_NO_WINDOW;
-    if (y < button_y || y >= button_y + button_height || x < 70 * scale || x >= clock_x - 4 * scale)
+    if (y < button_y || y >= button_y + button_height || x < 70 * scale || x >= clock_x - 34 * scale)
         return CHOS_WM_NO_WINDOW;
     relative_x = x - 70 * scale;
     slot_width = TASKBAR_APP_BUTTON_STEP * scale;
@@ -1790,7 +1793,7 @@ static int gui_taskbar_tooltip_target_at(int32_t x, int32_t y) {
     slot_offset = relative_x % slot_width;
     slot_x = 70 * scale + (int)task * slot_width;
     if (slot_offset < 0 || slot_offset >= TASKBAR_APP_BUTTON_WIDTH * scale ||
-        slot_x + TASKBAR_APP_BUTTON_WIDTH * scale > clock_x - 4 * scale)
+        slot_x + TASKBAR_APP_BUTTON_WIDTH * scale > clock_x - 34 * scale)
         return CHOS_WM_NO_WINDOW;
     return gui_taskbar_view_at(task);
 }
@@ -1804,6 +1807,7 @@ static const char *gui_taskbar_full_title(int target) {
         case VIEW_ABOUT: return "About CHOS";
         case VIEW_DIAGNOSTICS: return "Diagnostics";
         case VIEW_SETTINGS: return "Settings";
+        case VIEW_NETWORK: return "Network";
         case VIEW_FILE_VIEWER: return "Text Viewer";
         case VIEW_TRASH: return "Trash";
         default: break;
@@ -3054,10 +3058,87 @@ static const char *display_mode_full_label(size_t mode_index) {
     return mode_index < CHOS_DISPLAY_MODE_COUNT ? labels[mode_index] : "Unknown mode";
 }
 
+static chos_net_config_t network_draft;
+static char network_fields[4][16];
+static int network_focus,network_save;
+static const char *network_error;
+static uint64_t network_last_signature;
+static void network_open(void){
+    chos_net_manager_info_t i;chos_net_manager_get_info(&i);network_draft=i.configured;
+    uint32_t values[4]={i.configured.ipv4?i.configured.ipv4:i.ipv4.ipv4_address,
+        i.configured.netmask?i.configured.netmask:i.ipv4.subnet_mask,
+        i.configured.gateway?i.configured.gateway:i.ipv4.gateway_address,
+        i.configured.dns?i.configured.dns:i.ipv4.dns_address};
+    for(unsigned n=0;n<4;n++)chos_net_ipv4_format(values[n],network_fields[n]);
+    network_error=0;network_focus=0;network_save=storage_mounted()&&storage_device()&&storage_device()->write;
+    open_view(VIEW_NETWORK);
+}
+static void network_action(int action){
+    if(action<3){network_draft.mode=(uint32_t)action;network_focus=action;network_error=0;}
+    else if(action==7){
+        chos_net_config_t c={.mode=network_draft.mode};
+        uint32_t values[4]={0};
+        for(unsigned n=0;n<4;n++){
+            if(n<3&&c.mode!=CHOS_NET_STATIC)continue;
+            if(c.mode==CHOS_NET_DISABLED)continue;
+            if(!chos_net_ipv4_parse(network_fields[n],&values[n])){network_error="Enter dotted-decimal IPv4 values in all active fields.";gui_mark_dirty();return;}
+        }
+        c.ipv4=values[0];c.netmask=values[1];c.gateway=values[2];c.dns=values[3];
+        network_error=chos_net_config_error(&c);
+        if(!network_error)(void)chos_net_manager_apply(&c);
+    } else if(action==8){chos_net_manager_revert();gui_close_window(VIEW_NETWORK);}
+    else if(action==9)(void)chos_net_manager_keep(network_save);
+    else if(action==10)chos_net_manager_revert();
+    else if(action==11)network_save=!network_save;
+    gui_mark_dirty();
+}
+static void draw_network_content(void){
+    chos_net_manager_info_t i;chos_net_manager_get_info(&i);
+    draw_window_shell("Network Connections",180,70,595,465);
+    text_bold(204,112,i.adapter,C_BLUE_DARK);
+    text(204,140,!i.adapter_ready?"Adapter unavailable":i.link_known?(i.link_up?"Ethernet link connected":"Ethernet cable disconnected"):"Ethernet link state unknown",C_TEXT);
+    text(505,140,chos_net_dhcp_state_name(i.ipv4.dhcp_state),C_TEXT);
+    text(204,164,i.adapter_ready?"IPv4 properties":i.driver,i.adapter_ready?C_MUTED:C_RED);
+    const int bx[3]={204,352,500};
+    const char *modes[3]={"Automatic (DHCP)","Static IPv4","Disconnected"};
+    for(int n=0;n<3;n++){
+        draw_button(bx[n],185,140,26,modes[n],network_draft.mode==(uint32_t)n);
+        if(network_focus==n)outline(bx[n]+3,188,134,20,C_BLUE_DARK);
+    }
+    const char *labels[4]={"IPv4 address","Subnet mask","Default gateway","DNS resolver"};
+    for(int n=0;n<4;n++){
+        int y=228+n*29,editable=network_draft.mode==CHOS_NET_STATIC||(n==3&&network_draft.mode==CHOS_NET_DHCP);
+        text(210,y+5,labels[n],C_TEXT);rect(420,y,260,23,editable?C_WHITE:C_PANEL_LIGHT);
+        draw_bevel(420,y,260,23,C_PANEL_DARK,C_WHITE,0);text(426,y+5,network_fields[n],editable?C_TEXT:C_MUTED);
+        if(network_focus==n+3)outline(422,y+2,256,19,C_BLUE_DARK);
+    }
+    text(204,352,"Wi-Fi: no supported wireless adapter. IPv6 unavailable.",C_MUTED);
+    text(204,377,network_error?network_error:i.message,network_error?C_RED:C_TEXT);
+    if(i.trial){text(204,400,"Keep changes within",C_TEXT);draw_number(365,400,i.trial_seconds,C_BLUE_DARK);text(390,400,"seconds, or they revert.",C_TEXT);}
+    const int x[5]={204,300,396,492,588};const char *actions[5]={"Apply","Cancel","Keep","Revert",network_save?"[x] Save":"[ ] Save"};
+    for(int n=0;n<5;n++){draw_button(x[n],433,88,26,actions[n],0);if(network_focus==n+7)outline(x[n]+3,436,82,20,C_BLUE_DARK);}
+    draw_status_line("Network", "Local configuration does not prove internet access.");
+}
+static void network_key(uint16_t key){
+    if(key==15u){network_focus=(network_focus+1)%12;gui_mark_dirty();return;}
+    if(key==1u){network_action(8);return;}
+    if(key==28u||key==57u){if(network_focus<3||network_focus>=7)network_action(network_focus);else network_focus=(network_focus+1)%12;gui_mark_dirty();return;}
+    if(network_focus>=3&&network_focus<=6){
+        unsigned field=(unsigned)network_focus-3;
+        if(network_draft.mode!=CHOS_NET_STATIC && !(field==3&&network_draft.mode==CHOS_NET_DHCP))return;
+        size_t n=0;while(network_fields[field][n])n++;
+        char c=terminal_key_to_ascii(key);
+        if(key==14u){if(n)network_fields[field][n-1]=0;}
+        else if(n<15&&((c>='0'&&c<='9')||c=='.')){network_fields[field][n++]=c;network_fields[field][n]=0;}
+        network_error=0;gui_mark_dirty();
+    }
+}
+
 static void draw_settings_content(void) {
     size_t current_mode = virtio_gpu_current_mode_index();
     size_t row;
     draw_window_shell("Desktop Settings", 180, 70, GUI_WINDOW_BASE_WIDTH, GUI_WINDOW_BASE_HEIGHT);
+    draw_button(640,108,100,24,"Network...",0);
     text_bold(204, 109, "Appearance", C_BLUE_DARK);
     text(204, 132, "Wallpaper", C_TEXT);
     draw_button(205, 151, 138, 43, "Classic Teal", 0);
@@ -3284,7 +3365,7 @@ static void draw_taskbar(void) {
         if (w == NULL) continue;
         (void)window_title_for_view((int)i, NULL, &short_title);
         x = (70 + (int)task * TASKBAR_APP_BUTTON_STEP) * scale;
-        if (x + TASKBAR_APP_BUTTON_WIDTH * scale <= clock_x - 4 * scale) {
+        if (x + TASKBAR_APP_BUTTON_WIDTH * scale <= clock_x - 34 * scale) {
             char taskbar_title[CHOS_GUI_MAX_TEXT];
             (void)chos_taskbar_truncate_title(short_title, taskbar_title, sizeof(taskbar_title),
                                               TASKBAR_APP_BUTTON_WIDTH - TASKBAR_APP_TEXT_PADDING);
@@ -3302,7 +3383,7 @@ static void draw_taskbar(void) {
         w = chos_wm_get_const(&window_manager, client->window_id);
         if (w == NULL) continue;
         x = (70 + (int)task * TASKBAR_APP_BUTTON_STEP) * scale;
-        if (x + TASKBAR_APP_BUTTON_WIDTH * scale <= clock_x - 4 * scale) {
+        if (x + TASKBAR_APP_BUTTON_WIDTH * scale <= clock_x - 34 * scale) {
             char taskbar_title[CHOS_GUI_MAX_TEXT];
             (void)chos_taskbar_truncate_title(client->title, taskbar_title, sizeof(taskbar_title),
                                               TASKBAR_APP_BUTTON_WIDTH - TASKBAR_APP_TEXT_PADDING);
@@ -3312,6 +3393,11 @@ static void draw_taskbar(void) {
         }
         ++task;
     }
+    chos_net_manager_info_t net;chos_net_manager_get_info(&net);
+    draw_button(clock_x-30*scale,button_y,24*scale,button_height,NULL,view==VIEW_NETWORK);
+    gui_draw_named_icon("network",clock_x-27*scale,button_y+2*scale,18*scale,18*scale);
+    rect(clock_x-11*scale,button_y+15*scale,4*scale,4*scale,
+         !net.adapter_ready||net.configured.mode==CHOS_NET_DISABLED?C_PANEL_DARK:net.link_known&&!net.link_up?C_RED:net.ipv4.ipv4_address?0xff008000u:C_ORANGE);
     rect(clock_x, button_y, 78 * scale, button_height, C_PANEL);
     draw_bevel(clock_x, button_y, 78 * scale, button_height, C_PANEL_DARK, C_WHITE, 0);
     gui_format_clock(clock_text);
@@ -4340,6 +4426,7 @@ static void gui_render(void) {
             case VIEW_DIAGNOSTICS: draw_diagnostics_content(); break;
             case VIEW_INSTALLER: draw_installer_content(); break;
             case VIEW_SETTINGS: draw_settings_content(); break;
+            case VIEW_NETWORK: draw_network_content(); break;
             case VIEW_FILE_VIEWER: draw_file_viewer_content(); break;
             case VIEW_TRASH: gui_trash_draw_content(); break;
             default: gui_draw_app_window(current_view, window); break;
@@ -4493,6 +4580,7 @@ static void click_at(int32_t x, int32_t y, int in_window) {
         gui_mark_dirty();
         return;
     }
+    if(!in_window && y>=TASKBAR_Y && y<SCREEN_H && x>=SCREEN_W-112*(int)gui_scale_factor() && x<SCREEN_W-88*(int)gui_scale_factor()) {network_open();return;}
     if (!in_window && y >= TASKBAR_Y && x >= 0 && x < 66 * (int)gui_scale_factor()) {
         start_menu_open = 1;
         context_menu_open = 0;
@@ -4509,7 +4597,7 @@ static void click_at(int32_t x, int32_t y, int in_window) {
         int slot_x = 70 * scale + (int)task * slot_width;
         int clock_x = SCREEN_W - 82 * scale;
         if (slot_offset < TASKBAR_APP_BUTTON_WIDTH * scale &&
-            slot_x + TASKBAR_APP_BUTTON_WIDTH * scale <= clock_x - 4 * scale) {
+            slot_x + TASKBAR_APP_BUTTON_WIDTH * scale <= clock_x - 34 * scale) {
             int target = gui_taskbar_view_at(task);
             if (target != CHOS_WM_NO_WINDOW) {
                 if (target >= GUI_APP_WINDOW_BASE) {
@@ -4580,7 +4668,14 @@ static void click_at(int32_t x, int32_t y, int in_window) {
     }
     if (view == VIEW_FILE_VIEWER && x >= 204 && x < 378 && y >= 475 && y < 503) { open_view(VIEW_FILES); return; }
     if (view == VIEW_FILE_VIEWER && viewer_editable && x >= 390 && x < 470 && y >= 475 && y < 503) { gui_text_editor_save(); return; }
+    if(view==VIEW_NETWORK){
+        if(y>=185&&y<211){for(int n=0;n<3;n++)if(x>=204+n*148&&x<344+n*148)network_action(n);}
+        for(int n=0;n<4;n++)if(y>=228+n*29&&y<251+n*29&&x>=420&&x<680)network_focus=n+3;
+        if(y>=433&&y<459){for(int n=0;n<5;n++)if(x>=204+n*96&&x<292+n*96)network_action(n+7);}
+        gui_mark_dirty();return;
+    }
     if (view == VIEW_SETTINGS) {
+        if(x>=640&&x<740&&y>=108&&y<132){network_open();return;}
         if (y >= 151 && y < 194 && x >= 205 && x < 343) {
             wallpaper_alt = 0; wallpaper_cache_valid = 0; gui_save_settings(); gui_mark_dirty();
         } else if (y >= 151 && y < 194 && x >= 354 && x < 492) {
@@ -4750,6 +4845,10 @@ int chos_gui_init(const chos_surface_t *surface) {
 void chos_gui_show(void) {
     if (!gui_active) return;
     gui_clock_poll();
+    chos_net_manager_info_t net;chos_net_manager_get_info(&net);
+    uint64_t signature=(uint64_t)net.ipv4.ipv4_address ^ ((uint64_t)net.ipv4.dhcp_state<<32) ^
+        ((uint64_t)net.link_up<<40)^((uint64_t)net.adapter_ready<<41)^((uint64_t)net.configured.mode<<42)^((uint64_t)net.trial_seconds<<48)^(uintptr_t)net.message;
+    if(signature!=network_last_signature){network_last_signature=signature;gui_mark_dirty();}
     gui_driver_report_tick();
     gui_taskbar_tooltip_tick();
     if (splash_active) {
@@ -4821,6 +4920,7 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
         gui_app_queue_key(view, keycode, pressed);
         return;
     }
+    if(view==VIEW_NETWORK){if(pressed)network_key(keycode);return;}
     if (view == VIEW_CONSOLE) { (void)terminal_handle_key(keycode, pressed); gui_mark_dirty(); return; }
     if (!pressed) return;
     if (view == VIEW_FILE_VIEWER && viewer_editable) {
@@ -4876,6 +4976,7 @@ void chos_gui_input_key(uint16_t keycode, int pressed) {
     else if (keycode == 33u) open_view(VIEW_FILES);
     else if (keycode == 32u) open_view(VIEW_DIAGNOSTICS);
     else if (keycode == 31u) open_view(VIEW_SETTINGS);
+    else if (keycode == 49u) network_open();
     else if (keycode == 30u) open_view(VIEW_ABOUT);
     else if (keycode == 103u || keycode == 105u) { selected_icon = (selected_icon + 4) % 5; gui_mark_dirty(); }
     else if (keycode == 108u || keycode == 106u) { selected_icon = (selected_icon + 1) % 5; gui_mark_dirty(); }
@@ -5230,6 +5331,10 @@ void chos_gui_pump(void) {
     chos_audio_pump();
     if (!gui_active) return;
     gui_clock_poll();
+    chos_net_manager_info_t net;chos_net_manager_get_info(&net);
+    uint64_t signature=(uint64_t)net.ipv4.ipv4_address ^ ((uint64_t)net.ipv4.dhcp_state<<32) ^
+        ((uint64_t)net.link_up<<40)^((uint64_t)net.adapter_ready<<41)^((uint64_t)net.configured.mode<<42)^((uint64_t)net.trial_seconds<<48)^(uintptr_t)net.message;
+    if(signature!=network_last_signature){network_last_signature=signature;gui_mark_dirty();}
     gui_driver_report_tick();
     gui_taskbar_tooltip_tick();
     if (splash_active) {

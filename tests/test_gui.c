@@ -14,6 +14,7 @@
 #include "chos/timer.h"
 #include "chos/power.h"
 #include "chos/net_stack.h"
+#include "chos/net_manager.h"
 #include "chos/entropy.h"
 
 static uint32_t pixels[CHOS_DISPLAY_MAX_WIDTH * CHOS_DISPLAY_MAX_HEIGHT];
@@ -65,6 +66,13 @@ static const char test_file_contents[] =
     "row 19: viewer scrolling works.\n"
     "row 20: viewer scrolling works.\n";
 
+static chos_net_config_t mock_network_config;
+static int mock_network_trial;
+chos_block_device_t *storage_device(void){return NULL;}
+void chos_net_manager_get_info(chos_net_manager_info_t *out){*out=(chos_net_manager_info_t){.configured=mock_network_config,.adapter="Mock Ethernet",.driver="mock ready",.message="Network test",.adapter_ready=1,.link_known=1,.link_up=1,.trial=mock_network_trial,.trial_seconds=mock_network_trial?30:0};}
+int chos_net_manager_apply(const chos_net_config_t *c){if(chos_net_config_error(c))return 0;mock_network_config=*c;mock_network_trial=1;return 1;}
+int chos_net_manager_keep(int save){(void)save;mock_network_trial=0;return 1;}
+void chos_net_manager_revert(void){mock_network_trial=0;}
 int storage_sync(void) {return 1;}
 const char *storage_error(void) {return "mock storage error";}
 size_t chos_entropy_read(void *p,size_t n) {(void)p;(void)n;return 0;}

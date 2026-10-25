@@ -66,6 +66,8 @@ static uint32_t ping_arp_attempts;
 static int ping_packet_sent;
 static uint16_t ping_next_id = 0x4348u;
 static int initialized;
+static chos_net_config_t network_config;
+static int network_link_down;
 
 static uint32_t read_be32(const uint8_t *p) {
     return ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) |
@@ -560,6 +562,29 @@ static void process_ipv4_frame(const uint8_t *frame, size_t length) {
         process_dns_payload(&ip, &udp);
 }
 
+static int configured(void){return net_state.dhcp_state==CHOS_NET_DHCP_BOUND || net_state.dhcp_state==CHOS_NET_DHCP_RENEWING || net_state.dhcp_state==CHOS_NET_DHCP_STATIC;}
+static void activate_config(void){
+    if(network_config.mode==CHOS_NET_DISABLED){net_state.dhcp_state=CHOS_NET_DHCP_OFFLINE;return;}
+    if(network_config.mode==CHOS_NET_STATIC){
+        net_state.ipv4_address=network_config.ipv4;net_state.subnet_mask=network_config.netmask;
+        net_state.gateway_address=network_config.gateway;net_state.dns_address=network_config.dns;
+        net_state.dhcp_state=CHOS_NET_DHCP_STATIC;chos_tcp_set_local_address(network_config.ipv4);return;
+    }
+    retry_interval=DHCP_RETRY_TICKS;(void)send_discover();
+}
+int chos_net_stack_configure(const chos_net_config_t *c){
+    if(!initialized || chos_net_config_error(c))return 0;
+    network_config=*c;dns_override=c->dns;
+    clear_configuration();dns_state.state=CHOS_NET_DNS_IDLE;dns_packet_sent=0;
+    ping_state.state=CHOS_NET_PING_IDLE;ping_packet_sent=0;
+    net_state.driver_ready=chos_net_device_ready();
+    chos_net_device_info_t d;chos_net_device_get_info(&d);
+    network_link_down=d.link_status_known&&!d.link_up;
+    net_state.dhcp_state=CHOS_NET_DHCP_OFFLINE;
+    if(net_state.driver_ready && !network_link_down)activate_config();
+    return 1;
+}
+
 void chos_net_stack_init(void) {
     chos_net_device_info_t driver;
     size_t i;
@@ -581,7 +606,7 @@ void chos_net_stack_init(void) {
     ping_state.attempts = 0u; ping_state.elapsed_ticks = 0u;
     ping_started_at = 0u; ping_deadline = 0u; ping_arp_attempts = 0u; ping_packet_sent = 0;
     dns_state.ipv4_address = 0u; dns_state.ttl_seconds = 0u; dns_state.query_id = 0u; dns_state.retries = 0u;
-    initialized = 1;dns_override=0;
+    initialized = 1;dns_override=0;network_config=(chos_net_config_t){0};network_link_down=0;
     fallback_ticks = 0u;
     retry_interval = DHCP_RETRY_TICKS;
     offered_ipv4 = 0u; offered_server = 0u; selected_transaction = 0u;
@@ -592,7 +617,8 @@ void chos_net_stack_init(void) {
     if (!driver.ready) return;
     for (i = 0u; i < sizeof(net_state.mac); ++i) net_state.mac[i] = driver.mac[i];
     net_state.driver_ready = 1;
-    (void)send_discover();
+    network_link_down=driver.link_status_known && !driver.link_up;
+    if(!network_link_down)activate_config();
 }
 
 void chos_net_stack_poll(void) {
@@ -606,6 +632,15 @@ void chos_net_stack_poll(void) {
         net_state.driver_ready=0;net_state.dhcp_state=CHOS_NET_DHCP_OFFLINE;
         clear_configuration();dns_state.state=CHOS_NET_DNS_FAILED;return;
     }
+    chos_net_device_info_t driver;chos_net_device_get_info(&driver);
+    int down=driver.link_status_known && !driver.link_up;
+    if(down || network_config.mode==CHOS_NET_DISABLED){
+        if(!network_link_down || net_state.ipv4_address){
+            clear_configuration();dns_state.state=CHOS_NET_DNS_FAILED;ping_state.state=CHOS_NET_PING_FAILED;
+        }
+        network_link_down=down;net_state.dhcp_state=CHOS_NET_DHCP_OFFLINE;return;
+    }
+    if(network_link_down){network_link_down=0;activate_config();}
     for (received = 0u; received < DHCP_MAX_RX_PER_POLL; ++received) {
         uint16_t ether_type;
         int result = chos_net_device_receive(rx_frame, sizeof(rx_frame), &frame_length);
@@ -682,7 +717,7 @@ void chos_net_stack_get_info(chos_net_stack_info_t *out) {
 int chos_net_dns_set_server(uint32_t ipv4){
     unsigned first=ipv4>>24;
     if(!ipv4 || first==0 || first==127 || first>=224 || ipv4==UINT32_MAX ||
-       net_state.dhcp_state!=CHOS_NET_DHCP_BOUND || dns_state.state==CHOS_NET_DNS_PENDING)return 0;
+       !configured() || dns_state.state==CHOS_NET_DNS_PENDING)return 0;
     dns_override=ipv4;net_state.dns_address=ipv4;dns_state.state=CHOS_NET_DNS_IDLE;return 1;
 }
 
@@ -691,7 +726,7 @@ int chos_net_dns_lookup_start(const char *hostname) {
     /* Do not replace an in-flight query: kernel shell and EL0 clients share
      * one bounded resolver slot until a DNS transaction table is implemented. */
     if (dns_state.state == CHOS_NET_DNS_PENDING) return 0;
-    if (hostname == NULL || net_state.dhcp_state != CHOS_NET_DHCP_BOUND || net_state.dns_address == 0u)
+    if (hostname == NULL || !configured() || net_state.dns_address == 0u)
         return 0;
     while (hostname[length] != '\0' && length + 1u < sizeof(dns_state.hostname)) ++length;
     if (length == 0u || hostname[length] != '\0') return 0;
@@ -726,6 +761,7 @@ const char *chos_net_dhcp_state_name(chos_net_dhcp_state_t state) {
         case CHOS_NET_DHCP_DISCOVERING: return "discovering";
         case CHOS_NET_DHCP_REQUESTING: return "requesting";
         case CHOS_NET_DHCP_BOUND: return "bound";
+        case CHOS_NET_DHCP_STATIC: return "static";
         case CHOS_NET_DHCP_RENEWING: return "renewing/rebinding";
         case CHOS_NET_DHCP_FAILED: return "retry pending";
         default: return "unknown";
@@ -745,7 +781,7 @@ const char *chos_net_dns_state_name(chos_net_dns_state_t state) {
 
 int chos_net_ping_start(uint32_t destination_ipv4) {
     if (destination_ipv4 == 0u || destination_ipv4 == 0xffffffffu ||
-        net_state.dhcp_state != CHOS_NET_DHCP_BOUND || net_state.ipv4_address == 0u)
+        !configured() || net_state.ipv4_address == 0u)
         return 0;
     ping_state.state = CHOS_NET_PING_PENDING;
     ping_state.destination_ipv4 = destination_ipv4;

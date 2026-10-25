@@ -17,7 +17,7 @@ SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/e
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
              kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
-             kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
+             kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/net/net_profile.c kernel/net/net_manager.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
            $(BUILD)/kernel/arch/aarch64/context_switch.o $(BUILD)/kernel/arch/aarch64/register_stress.o $(BUILD)/kernel/arch/aarch64/user_entry.o \
            $(BUILD)/kernel/arch/aarch64/user_demo.o $(BUILD)/kernel/arch/aarch64/user_exit.o $(BUILD)/kernel/arch/aarch64/user_preempt_good.o \
@@ -842,13 +842,13 @@ $(SAN_DIR)/test-net-services: tests/test_net_services.c kernel/net/net_services.
 	@mkdir -p $(dir $@)
 	$(CC_HOST) $(SAN_FLAGS) tests/test_net_services.c kernel/net/net_services.c -o $@
 
-$(BUILD)/test-net-stack: tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c include/chos/net_stack.h include/chos/net_tcp.h
+$(BUILD)/test-net-stack: kernel/net/net_profile.c tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c include/chos/net_stack.h include/chos/net_tcp.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c -o $@
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c kernel/net/net_profile.c -o $@
 
-$(SAN_DIR)/test-net-stack: tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c include/chos/net_stack.h include/chos/net_tcp.h
+$(SAN_DIR)/test-net-stack: kernel/net/net_profile.c tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c include/chos/net_stack.h include/chos/net_tcp.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) $(SAN_FLAGS) tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c -o $@
+	$(CC_HOST) $(SAN_FLAGS) tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_tcp.c kernel/net/net_profile.c -o $@
 
 $(BUILD)/test-net-tcp: tests/test_net_tcp.c kernel/net/net_tcp.c include/chos/net_tcp.h include/chos/net_packet.h
 	@mkdir -p $(dir $@)
@@ -917,18 +917,18 @@ $(SAN_DIR)/test-window-manager: tests/test_window_manager.c kernel/gfx/window_ma
 
 $(BUILD)/test-gui: $(ASSET_HEADER) tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c kernel/gfx/font8x12.h kernel/gfx/font_ui_dejavu.h include/chos/gui.h include/chos/window_manager.h include/chos/virtio_gpu.h include/chos/virtio_input.h include/chos/storage.h include/chos/chfs.h include/chos/process.h include/chos/romfs.h include/chos/taskbar_text.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude -Ikernel/gfx tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c -o $@
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude -Ikernel/gfx tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c kernel/net/net_profile.c -o $@
 
 $(SAN_DIR)/test-gui: $(ASSET_HEADER) tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c kernel/gfx/font8x12.h kernel/gfx/font_ui_dejavu.h include/chos/gui.h include/chos/window_manager.h include/chos/virtio_gpu.h include/chos/virtio_input.h include/chos/storage.h include/chos/chfs.h include/chos/process.h include/chos/romfs.h include/chos/taskbar_text.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) $(SAN_FLAGS) -Iinclude -Ikernel/gfx tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c -o $@
+	$(CC_HOST) $(SAN_FLAGS) -Iinclude -Ikernel/gfx tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c kernel/net/net_profile.c -o $@
 
 $(BUILD)/kernel/net/net_tcp.o: include/chos/net_tcp.h include/chos/net_tcp_api.h include/chos/net_packet.h
 $(BUILD)/kernel/net/net_stack.o: include/chos/net_tcp.h include/chos/net_packet.h
 $(BUILD)/kernel/core/syscall.o: include/chos/net_tcp.h include/chos/net_tcp_api.h include/chos/syscall.h
 $(BUILD)/kernel/core/process.o: include/chos/net_tcp.h
 $(BUILD)/test-net-tcp: tests/test_net_tcp.c kernel/net/net_tcp.c include/chos/net_tcp.h include/chos/net_tcp_api.h
-$(BUILD)/test-net-stack: tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_tcp.c include/chos/net_tcp.h include/chos/net_tcp_api.h
+$(BUILD)/test-net-stack: kernel/net/net_profile.c tests/test_net_stack.c kernel/net/net_stack.c kernel/net/net_tcp.c include/chos/net_tcp.h include/chos/net_tcp_api.h
 $(BUILD)/test-user-abi: tests/test_user_abi.c include/chos/syscall.h include/chos/net_tcp_api.h
 $(SAN_DIR)/test-net-tcp: tests/test_net_tcp.c kernel/net/net_tcp.c include/chos/net_tcp.h include/chos/net_tcp_api.h
 
@@ -1229,3 +1229,33 @@ test-e1000e-sanitize: $(SAN_DIR)/test-e1000e
 test: test-e1000e
 test-sanitize: test-e1000e-sanitize
 .PHONY: test-e1000e test-e1000e-sanitize
+
+$(BUILD)/test-gui $(SAN_DIR)/test-gui: kernel/net/net_profile.c include/chos/net_manager.h include/chos/net_profile.h
+
+$(BUILD)/test-net-manager: tests/test_net_manager.c kernel/net/net_manager.c kernel/net/net_profile.c include/chos/net_manager.h include/chos/net_profile.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_net_manager.c kernel/net/net_profile.c -o $@
+$(SAN_DIR)/test-net-manager: tests/test_net_manager.c kernel/net/net_manager.c kernel/net/net_profile.c include/chos/net_manager.h include/chos/net_profile.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_net_manager.c kernel/net/net_profile.c -o $@
+test-net-manager: $(BUILD)/test-net-manager
+	./$(BUILD)/test-net-manager
+test-net-manager-sanitize: $(SAN_DIR)/test-net-manager
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-net-manager
+test: test-net-manager
+test-sanitize: test-net-manager-sanitize
+.PHONY: test-net-manager test-net-manager-sanitize
+
+$(BUILD)/userland/network_policy_test.o: userland/examples/network_policy_test.c userland/libchos/include/chos/user.h include/chos/net_status_api.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) -c $< -o $@
+$(BUILD)/userland/network_policy_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/network_policy_test.o userland/user.ld
+	$(LD) -T userland/user.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/network_policy_test.o
+$(BUILD)/userland/network_policy_test.bin: $(BUILD)/userland/network_policy_test.elf
+	$(OBJCOPY) -O binary $< $@
+$(BUILD)/userland/network_policy_test.sym: $(BUILD)/userland/network_policy_test.elf
+	$(NM) --defined-only --numeric-sort $< > $@
+$(BUILD)/userland/network_policy_test.chcx: $(BUILD)/userland/network_policy_test.bin $(BUILD)/userland/network_policy_test.sym tools/mkchcx.py
+	python3 tools/mkchcx.py --stack-pages 2 --v2-symbols $(BUILD)/userland/network_policy_test.sym $(BUILD)/userland/network_policy_test.bin $@
+	python3 tools/mkchcx.py --verify $@
+test-userland: $(BUILD)/userland/network_policy_test.chcx
+test: $(BUILD)/userland/network_policy_test.chcx

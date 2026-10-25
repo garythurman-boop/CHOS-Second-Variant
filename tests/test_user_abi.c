@@ -41,6 +41,7 @@ int main(void) {
     assert(CHOS_SYS_NET_DNS_STATUS == 31u);
     assert(CHOS_SYS_NET_ABORT == 32u);
     assert(CHOS_SYS_RANDOM_BYTES == 33u);
+    assert(CHOS_SYS_NET_INFO == 34u);
     assert(CHOS_SYS_MAX_RANDOM_BYTES == 256u);
     assert(CHOS_NET_DNS_API_HOST_MAX == 256u);
     assert(sizeof(chos_dns_api_info_t) == 276u);

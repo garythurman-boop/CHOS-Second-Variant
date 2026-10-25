@@ -21,6 +21,7 @@
 #include "chos/virtio_blk.h"
 #include "chos/virtio_net.h"
 #include "chos/net_stack.h"
+#include "chos/net_manager.h"
 #include "chos/net_tcp.h"
 #include "chos/gui.h"
 #include "chos/virtio_input.h"
@@ -2289,7 +2290,7 @@ static void shell_loop(const fdt_info_t *device_tree, int runtime_mode) {
             /* The serial shell stays responsive while the graphical input queue is polled. */
             do {
                 chos_input_poll();
-                chos_net_stack_poll();
+                chos_net_stack_poll();chos_net_manager_poll();
                 if (runtime_mode) {
                     (void)process_service_pending_spawn_request();
                     if ((++idle_polls & 255u) == 0u) process_reap_pending();

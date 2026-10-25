@@ -1,0 +1,82 @@
+[
+  {
+    "project": "Servo",
+    "commit": "958f66877626ecb6ecd4bdbfd636d2517e6760b3",
+    "url": "https://raw.githubusercontent.com/servo/servo/958f66877626ecb6ecd4bdbfd636d2517e6760b3/README.md",
+    "downloaded": true,
+    "sha256": "e5f8868937112b71af8abe1e56ff7cf0eaa4ee2c8eae2e07067250999c8fd9c9",
+    "file": "servo-README.md"
+  },
+  {
+    "project": "Servo",
+    "commit": "958f66877626ecb6ecd4bdbfd636d2517e6760b3",
+    "url": "https://raw.githubusercontent.com/servo/servo/958f66877626ecb6ecd4bdbfd636d2517e6760b3/Cargo.toml",
+    "downloaded": true,
+    "sha256": "d20ad45bb4825257e63174cbccfc4dcc2adb0e4e5ab5bcb48facb4b2bfa0a2f6",
+    "file": "servo-Cargo.toml"
+  },
+  {
+    "project": "Servo",
+    "commit": "958f66877626ecb6ecd4bdbfd636d2517e6760b3",
+    "url": "https://raw.githubusercontent.com/servo/servo/958f66877626ecb6ecd4bdbfd636d2517e6760b3/LICENSE",
+    "downloaded": true,
+    "sha256": "1af2d2b02d9c86030d29ed77117ca7a1b0e4b6ff35bcf8eeb124867d0f5cb59e",
+    "file": "servo-LICENSE"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/cmake/OptionsWPE.cmake",
+    "downloaded": true,
+    "sha256": "9f8f48a7f81b8fdd72b83e6148aaa56ecb6ea105ce2474e5b1808110d123f78b",
+    "file": "webkit-Source-cmake-OptionsWPE.cmake"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/WPEPlatform/wpe/WPEView.h",
+    "downloaded": false,
+    "sha256": null,
+    "file": "webkit-Source-WPEPlatform-wpe-WPEView.h"
+  },
+  {
+    "project": "WebKit",
+    "commit": "931e840055223f1f1400f09e1bad1334ca0b92f7",
+    "url": "https://raw.githubusercontent.com/WebKit/WebKit/931e840055223f1f1400f09e1bad1334ca0b92f7/Source/JavaScriptCore/CMakeLists.txt",
+    "downloaded": true,
+    "sha256": "bc5427f3ea47be20afa974b9fa98a698140ac495fe84eafac0dcb9030431e1aa",
+    "file": "webkit-Source-JavaScriptCore-CMakeLists.txt"
+  },
+  {
+    "project": "Chromium",
+    "commit": "5bb1d4519dcc361c4e75771c736e75b650ec6630",
+    "url": "https://raw.githubusercontent.com/chromium/chromium/5bb1d4519dcc361c4e75771c736e75b650ec6630/docs/linux/build_instructions.md",
+    "downloaded": true,
+    "sha256": "e626e291dd5a9f0648ac12a54324ad5cf7a215ec13dee45f7570da8d7338fdc6",
+    "file": "chromium-docs-linux-build_instructions.md"
+  },
+  {
+    "project": "Chromium",
+    "commit": "5bb1d4519dcc361c4e75771c736e75b650ec6630",
+    "url": "https://raw.githubusercontent.com/chromium/chromium/5bb1d4519dcc361c4e75771c736e75b650ec6630/LICENSE",
+    "downloaded": true,
+    "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b",
+    "file": "chromium-LICENSE"
+  },
+  {
+    "project": "Ladybird",
+    "commit": "bf35424e41a23f7e9ee7fc215f396942af57a79b",
+    "url": "https://raw.githubusercontent.com/LadybirdBrowser/ladybird/bf35424e41a23f7e9ee7fc215f396942af57a79b/Documentation/BuildInstructions.md",
+    "downloaded": false,
+    "sha256": null,
+    "file": "ladybird-Documentation-BuildInstructions.md"
+  },
+  {
+    "project": "Ladybird",
+    "commit": "bf35424e41a23f7e9ee7fc215f396942af57a79b",
+    "url": "https://raw.githubusercontent.com/LadybirdBrowser/ladybird/bf35424e41a23f7e9ee7fc215f396942af57a79b/LICENSE",
+    "downloaded": true,
+    "sha256": "275f18944ac7ba41acabbb468387c1c9e8e2f81f7d49e6442dafe37c25ffeea7",
+    "file": "ladybird-LICENSE"
+  }
+]

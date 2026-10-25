@@ -35,7 +35,7 @@ int timer_init(void) { return 1; }
 void timer_stop(void) { }
 void timer_handle_irq(void) { }
 
-static int backend_ready=1;
+static int backend_ready=1,backend_link=1;
 int chos_net_device_ready(void) { return backend_ready; }
 const char *chos_net_device_error(void) { return "test backend"; }
 int chos_net_device_init(void) { return 1; }
@@ -43,7 +43,7 @@ void chos_net_device_get_info(chos_net_device_info_t *out) {
     size_t i;
     if (out == NULL) return;
     for (i = 0u; i < 6u; ++i) out->mac[i] = client_mac[i];
-    out->ready = 1; out->link_status_known = 1; out->link_up = 1;
+    out->ready = backend_ready; out->link_status_known = 1; out->link_up = backend_link;
     out->device_status = 0u; out->rx_frames = 0u; out->tx_frames = tx_count;
     out->rx_dropped = 0u; out->tx_errors = 0u; out->mmio_base = 0u;
 }
@@ -291,6 +291,19 @@ int main(void) {
     backend_ready=0;chos_net_stack_poll();
     chos_net_stack_info_t offline;chos_net_stack_get_info(&offline);
     assert(!offline.driver_ready && offline.dhcp_state==CHOS_NET_DHCP_OFFLINE && !offline.ipv4_address);
+    backend_ready=1;
+    chos_net_config_t cfg={.mode=CHOS_NET_STATIC,.ipv4=0x0a000219,.netmask=0xffffff00,.gateway=0x0a000202,.dns=0x0a000203};
+    assert(chos_net_stack_configure(&cfg));chos_net_stack_get_info(&offline);
+    assert(offline.dhcp_state==CHOS_NET_DHCP_STATIC&&offline.ipv4_address==cfg.ipv4);
+    assert(chos_net_dns_lookup_start("static.test"));
+    backend_link=0;chos_net_stack_poll();chos_net_stack_get_info(&offline);
+    assert(offline.dhcp_state==CHOS_NET_DHCP_OFFLINE&&!offline.ipv4_address);
+    backend_link=1;chos_net_stack_poll();chos_net_stack_get_info(&offline);
+    assert(offline.dhcp_state==CHOS_NET_DHCP_STATIC&&offline.ipv4_address==cfg.ipv4);
+    cfg=(chos_net_config_t){.mode=CHOS_NET_DISABLED};assert(chos_net_stack_configure(&cfg));
+    unsigned transmissions=tx_count;chos_net_stack_poll();assert(tx_count==transmissions);
+    cfg=(chos_net_config_t){0};assert(chos_net_stack_configure(&cfg));
+    chos_net_stack_get_info(&offline);assert(offline.dhcp_state==CHOS_NET_DHCP_DISCOVERING);
     puts("NET stack: DHCP lease/renewal, ARP, DNS, ICMP and integrated TCP handshake/send passed");
     return 0;
 }
