@@ -36,6 +36,7 @@ static void clear_info(chos_exec_image_info_t *out) {
     out->rodata_offset = 0u; out->rodata_size = 0u; out->data_offset = 0u;
     out->data_size = 0u; out->bss_offset = 0u; out->bss_size = 0u;
     out->virtual_size = 0u; out->image_offset = 0u;
+    out->elf=(chos_elf_image_t){0};
 }
 
 int process_image_validate(const void *file_bytes, size_t file_size,
@@ -46,7 +47,14 @@ int process_image_validate(const void *file_bytes, size_t file_size,
     size_t total_size;
 
     if (out != NULL) clear_info(out);
-    if (bytes == NULL || out == NULL || file_size < CHOS_EXEC_V1_HEADER_SIZE) return 0;
+    if (bytes == NULL || out == NULL) return 0;
+    if(file_size>=4 && bytes[0]==0x7f && bytes[1]=='E' && bytes[2]=='L' && bytes[3]=='F'){
+        if(!chos_elf_validate(bytes,file_size,&out->elf))return 0;
+        out->version=CHOS_EXEC_VERSION_ELF;out->image_size=(uint32_t)file_size;
+        out->entry_offset=out->elf.entry_offset;out->virtual_size=out->elf.virtual_size;
+        out->stack_pages=CHOS_EXEC_MAX_STACK_PAGES;return 1;
+    }
+    if(file_size < CHOS_EXEC_V1_HEADER_SIZE)return 0;
     if (bytes[0] != CHOS_EXEC_MAGIC_0 || bytes[1] != CHOS_EXEC_MAGIC_1 ||
         bytes[2] != CHOS_EXEC_MAGIC_2 || bytes[3] != CHOS_EXEC_MAGIC_3) return 0;
     version = read_le16(bytes + 4u);

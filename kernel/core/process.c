@@ -20,6 +20,9 @@
 #define PROCESS_PAGE_SIZE 4096u
 #define PROCESS_CODE_VA CHOS_AS_USER_VA_BASE
 #define PROCESS_NAME_DEFAULT "process"
+_Static_assert((CHOS_ELF_MAX_SPAN % PROCESS_PAGE_SIZE)==0u,"Native span must be page aligned");
+_Static_assert(PROCESS_CODE_VA+CHOS_ELF_MAX_SPAN<CHOS_USER_MAP_BASE,"Native images must not overlap anonymous memory");
+_Static_assert(CHOS_PROCESS_IMAGE_PAGES>=CHOS_EXEC_MAX_IMAGE_PAGES,"CHCX images must fit the mapping ledger");
 
 typedef struct {
     const uint8_t *data;
@@ -33,7 +36,7 @@ typedef struct {
     chos_process_info_t info;
     address_space_handle_t space;
     process_file_handle_t open_files[CHOS_PROCESS_MAX_OPEN_FILES];
-    uint32_t code_mapped_mask;
+    uint64_t code_mapped_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
     uint32_t stack_mapped_mask;
     uint32_t sequence;
     uint64_t stack_base_va;
@@ -172,11 +175,11 @@ static int reap_slot(size_t index) {
     if(!chos_user_memory_release(slot->space))return 0;
 
     for (i = 0u; i < slot->info.image_pages; ++i) {
-        uint32_t bit = UINT32_C(1) << i;
-        if ((slot->code_mapped_mask & bit) != 0u) {
+        uint64_t bit = UINT64_C(1) << (i%64u);
+        if ((slot->code_mapped_mask[i/64u] & bit) != 0u) {
             uint64_t va = PROCESS_CODE_VA + (uint64_t)i * PROCESS_PAGE_SIZE;
             if (address_space_unmap_user_page(slot->space, va, NULL) == AS_OK)
-                slot->code_mapped_mask &= ~bit;
+                slot->code_mapped_mask[i/64u] &= ~bit;
         }
     }
     for (i = 0u; i < slot->info.stack_pages; ++i) {
@@ -187,7 +190,9 @@ static int reap_slot(size_t index) {
                 slot->stack_mapped_mask &= ~bit;
         }
     }
-    if (slot->code_mapped_mask == 0u && slot->stack_mapped_mask == 0u) {
+    uint64_t image_mapped=0;
+    for(i=0;i<(CHOS_PROCESS_IMAGE_PAGES+63u)/64u;i++)image_mapped|=slot->code_mapped_mask[i];
+    if (image_mapped == 0u && slot->stack_mapped_mask == 0u) {
         if (address_space_destroy(slot->space) == AS_OK) {
             slot->address_space_live = 0;
             slot->space = (address_space_handle_t){0u, 0u, 0u};
@@ -235,7 +240,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
     chos_exec_image_info_t image;
     process_slot_t *slot;
     address_space_info_t as_info;
-    size_t index, i, code_pages;
+    size_t index, i, code_pages, mapped_image_pages=0u;
     uint64_t stack_base;
     const char *default_argv[1];
     const char *const *argv = argv_in;
@@ -245,8 +250,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
     if (file_bytes == NULL || index_out == NULL || before_out == NULL ||
         argc_in > CHOS_PROCESS_MAX_ARGS || (argc_in != 0u && argv_in == NULL))
         return PROCESS_ERR_ARGUMENT;
-    if (!process_image_validate(file_bytes, file_size, &image) ||
-        image.image_size > CHOS_EXEC_MAX_IMAGE_SIZE) return PROCESS_ERR_FORMAT;
+    if (!process_image_validate(file_bytes, file_size, &image)) return PROCESS_ERR_FORMAT;
     if (!vmm_is_enabled() || user_mode_is_active() ||
         vmm_current_root_table_address() != vmm_kernel_root_table_address() ||
         (scheduler_is_running() && !scheduler_current_is_kernel_task()))
@@ -297,15 +301,20 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
         uint64_t va = PROCESS_CODE_VA + (uint64_t)i * PROCESS_PAGE_SIZE;
         size_t offset = i * PROCESS_PAGE_SIZE;
         size_t chunk = 0u;
+        size_t source_offset=image.image_offset+offset;
         address_space_user_permissions_t permissions = AS_PERM_USER_RX;
-        if (offset < image.image_size) {
+        if(image.version==CHOS_EXEC_VERSION_ELF){
+            chos_elf_page_t page;
+            if(!chos_elf_page(&image.elf,(uint32_t)offset,&page))continue;
+            source_offset=page.file_offset;chunk=page.file_bytes;permissions=page.permissions;
+        }else if (offset < image.image_size) {
             chunk = image.image_size - offset;
             if (chunk > PROCESS_PAGE_SIZE) chunk = PROCESS_PAGE_SIZE;
         }
         if (address_space_alloc_user_page(slot->space, &physical) != AS_OK)
             return fail_and_cleanup(index, PROCESS_ERR_OUT_OF_MEMORY);
         if (chunk != 0u) {
-            copy_bytes((uint8_t *)(uintptr_t)physical, file + image.image_offset + offset, chunk);
+            copy_bytes((uint8_t *)(uintptr_t)physical, file + source_offset, chunk);
             vmm_clean_page_table_range((const void *)(uintptr_t)physical, chunk);
             __asm__ volatile("dsb sy" ::: "memory");
         }
@@ -315,7 +324,8 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
         }
         if (address_space_map_user_page(slot->space, va, physical, permissions) != AS_OK)
             return fail_and_cleanup(index, PROCESS_ERR_MAPPING);
-        slot->code_mapped_mask |= UINT32_C(1) << i;
+        slot->code_mapped_mask[i/64u] |= UINT64_C(1) << (i%64u);
+        ++mapped_image_pages;
     }
 
     for (i = 0u; i < image.stack_pages; ++i) {
@@ -359,7 +369,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
     }
 
     if (!address_space_get_info(slot->space, &as_info) ||
-        as_info.mapped_user_pages != code_pages + image.stack_pages) {
+        as_info.mapped_user_pages != mapped_image_pages + image.stack_pages) {
         return fail_and_cleanup(index, PROCESS_ERR_MAPPING);
     }
     return PROCESS_OK;
@@ -613,6 +623,7 @@ static int resolve_program_file(const char *path, chos_romfs_file_t *file, void 
     void *buffer;
     if (owned_data != NULL) *owned_data = NULL;
     if (storage_lookup(path, &entry)) {
+        if(entry.size_bytes>CHOS_ELF_MAX_FILE)return -1;
         buffer = kheap_alloc(entry.size_bytes == 0u ? 1u : entry.size_bytes);
         if (buffer == NULL) return -2;
         if (!storage_read_file(path, buffer, entry.size_bytes, &bytes_read) || bytes_read != entry.size_bytes) {
@@ -1361,7 +1372,7 @@ const char *process_error_string(chos_process_error_t error) {
     switch (error) {
         case PROCESS_OK: return "success";
         case PROCESS_ERR_ARGUMENT: return "invalid argument";
-        case PROCESS_ERR_FORMAT: return "invalid CHCX executable format";
+        case PROCESS_ERR_FORMAT: return "invalid CHOS executable format";
         case PROCESS_ERR_CONTEXT: return "requires a timer and canonical kernel-root task context";
         case PROCESS_ERR_CAPACITY: return "process table full or cleanup pending";
         case PROCESS_ERR_ADDRESS_SPACE: return "could not create process address space";

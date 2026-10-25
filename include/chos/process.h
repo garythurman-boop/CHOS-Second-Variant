@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/address_space.h"
+#include "chos/elf_image.h"
 
 #define CHOS_PROCESS_MAX 4u
 #define CHOS_PROCESS_NAME_CAPACITY 16u
@@ -16,6 +17,8 @@
 #define CHOS_EXEC_HEADER_SIZE CHOS_EXEC_V1_HEADER_SIZE
 #define CHOS_EXEC_VERSION 1u
 #define CHOS_EXEC_VERSION_SEGMENTS 2u
+#define CHOS_EXEC_VERSION_ELF 0x10000u
+#define CHOS_PROCESS_IMAGE_PAGES (CHOS_ELF_MAX_SPAN / 4096u)
 #define CHOS_EXEC_MAX_IMAGE_PAGES 16u
 #define CHOS_EXEC_MAX_IMAGE_SIZE (CHOS_EXEC_MAX_IMAGE_PAGES * 4096u)
 #define CHOS_EXEC_MAX_STACK_PAGES 8u
@@ -38,6 +41,7 @@ typedef struct {
     uint32_t bss_size;
     uint32_t virtual_size;     /* page-rounded v2 image address span */
     size_t image_offset;
+    chos_elf_image_t elf;
 } chos_exec_image_info_t;
 
 int process_image_validate(const void *file_bytes, size_t file_size,
@@ -114,7 +118,7 @@ typedef struct {
     size_t pending_cleanup;
 } chos_process_table_stats_t;
 
-/* Loads a validated flat CHCX image from kernel memory and runs it synchronously
+/* Loads a validated CHCX/native CHOS ELF image from kernel memory and runs it synchronously
  * in EL0. The image buffer is copied into private pages before execution. */
 chos_process_error_t process_run_image(const char *name, const void *file_bytes,
                                        size_t file_size, chos_process_result_t *result);

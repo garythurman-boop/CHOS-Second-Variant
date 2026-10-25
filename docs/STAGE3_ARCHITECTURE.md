@@ -85,3 +85,10 @@ IPv6 control-plane source progress is documented in IPV6_CONTROL_PLANE.md. It
 preserves the IPv4 stack and adds a pinned lwIP core for actual DAD/SLAAC/ND/MLD/
 ICMPv6. TCP6, DNS6/DHCP6, multi-interface routing and complete IPv6 settings remain
 open; this is not full IPv6 browser support or completion of the revised stage.
+
+The next runtime prerequisite is implemented in NATIVE_EXECUTABLES.md. Native
+static CHOS-ABI ELF64 images can span up to2MiB with separate permissions and
+sparse mappings; CHCX limits and existing owned-frame quotas remain. This is
+validated direct EL0 support, not a complete modern browser or UEFI user runtime.
+Binary publication is held by the latest user instruction until full Stage3
+completion and thorough testing; source-only work continues.

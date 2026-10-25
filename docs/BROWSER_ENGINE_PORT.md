@@ -100,3 +100,9 @@ pages, guard protections, partial-failure rollback/quarantine and process-exit
 cleanup. See USER_MEMORY.md for actual live EL0 evidence. This is a real first
 allocation primitive; the complete POSIX/C++/threading/IPC and UEFI isolation gaps
 remain. The compiler preflight still correctly fails missing POSIX/WPE headers.
+
+Native executable progress is recorded in NATIVE_EXECUTABLES.md: strict CHOS-ABI
+static ELF64 with separate RX/R/RW segments, bounded larger sparse images and
+deferred cleanup now has live direct-EL0 evidence. This is not Linux binary
+compatibility, a complete C/C++ runtime or engine integration. UEFI isolation,
+engine-sized memory, threads/IPC and secure transport remain open.

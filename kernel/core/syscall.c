@@ -159,7 +159,7 @@ static int syscall_is_protected_root_directory(const char *path) {
 
 static uint32_t syscall_file_flags(const char *path, int persistent) {
     uint32_t flags = persistent ? CHOS_FILE_FLAG_PERSISTENT : CHOS_FILE_FLAG_READ_ONLY;
-    if (syscall_path_ends_with(path, ".CHX")) flags |= CHOS_FILE_FLAG_EXECUTABLE;
+    if (syscall_path_ends_with(path, ".CHX") || syscall_path_ends_with(path, ".ELF")) flags |= CHOS_FILE_FLAG_EXECUTABLE;
     else if (syscall_path_ends_with(path, ".TXT") || syscall_path_ends_with(path, ".MD") ||
              syscall_path_ends_with(path, ".LOG")) flags |= CHOS_FILE_FLAG_TEXT;
     return flags;

@@ -2523,7 +2523,7 @@ static int terminal_handle_key(uint16_t keycode, int pressed) {
     return 1;
 }
 
-static int file_is_program(const char *path) { return string_ends_with_fold(path, ".CHX"); }
+static int file_is_program(const char *path) { return string_ends_with_fold(path, ".CHX") || string_ends_with_fold(path, ".ELF"); }
 
 static void viewer_set_message(const char *message, int is_error) {
     size_t i = 0u;

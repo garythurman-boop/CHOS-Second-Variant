@@ -27,7 +27,7 @@ read-only until explicitly enabled.
 
 ## Installation wizard
 
-1. Open **Diagnostics → Install CHOS...**, or press **I** on the desktop.
+1. Open **Diagnostics → Install CHOS...**. Plain-letter installer shortcuts have been removed.
 2. Read Welcome and choose Next. No target has been selected and no disk writes
    have been authorized.
 3. Explicitly select the NVMe target. Check its capacity, opaque device identity

@@ -1,0 +1,251 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD by user instruction; no new ISO/kernel/image/handoff/tag uploaded",
+  "implemented_scope": "Plain I Setup binding removed; bounded CHOS-native static ELF64 loading and process cleanup",
+  "host_suite": "PASS",
+  "configured_sanitizers": "PASS",
+  "direct_smoke": "PASS",
+  "publisher_hold_tests": "PASS 7 tests including forced-publication refusal",
+  "accepted_local_guest_profiles": {
+    "native-elf-final": {
+      "result": {
+        "status": "PASS",
+        "application_sha256": "c6dc2665e74d1028a68ea52c012a22096fc4ab0db811c2244484e00f18de89f5",
+        "free_pages_before": 117997,
+        "free_pages_after": 117997,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "429fb15fbc9e17777e6edf592cd9a8244a9777240cb27c3c88d21adab050ada4"
+        }
+      ]
+    },
+    "native-final-platform": {
+      "result": {
+        "mode": "direct",
+        "checks": [
+          "EL0 RNG invalid pointers, length bound, guard bytes and hardware receipt",
+          "CHFS write/flush/read",
+          "DHCP/ARP/ICMP",
+          "MMU permissions, guard pages and dynamic aliases with 512 MiB RAM",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 0.147,
+        "desktop_ready_seconds": 3.233,
+        "keyboard_visible_ms": 75.01,
+        "pointer_visible_ms": 45.3,
+        "maximize_visible_ms": 203.96,
+        "drag_visible_ms": 243.18,
+        "idle_cpu_percent": 3.5,
+        "status": "PASS"
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "b9fc32a6a1803c02e006894b51b694cd98ade8929d2e03700a378af31cda97bb"
+        },
+        {
+          "kernel_sha256": "b9fc32a6a1803c02e006894b51b694cd98ade8929d2e03700a378af31cda97bb"
+        }
+      ]
+    },
+    "native-final-memory": {
+      "result": {
+        "status": "PASS",
+        "application_sha256": "f93d600b081714ad56eb07ee4cdb6f32ff7e23682d8d1fa537d9b1d6853a9247",
+        "free_pages_before": 117999,
+        "free_pages_after": 117999,
+        "checks": [
+          "real EL0 anonymous zeroed RW/XN mappings",
+          "invalid/overflow sizes and nonzero high flags refused",
+          "exact unmap and double-unmap rejection",
+          "guard-page data abort contained to process",
+          "execute-never instruction abort contained to process",
+          "normal/fault/scheduled exit cleans abandoned mappings; no physical-page leak"
+        ]
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "b9fc32a6a1803c02e006894b51b694cd98ade8929d2e03700a378af31cda97bb"
+        }
+      ]
+    },
+    "native-typing-recheck": {
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "console_lengths": [
+          26,
+          15
+        ],
+        "document_lengths": [
+          36,
+          25
+        ],
+        "browser_lengths": [
+          36,
+          25
+        ],
+        "checks": [
+          "plain I on Welcome does not launch Setup",
+          "Console 500ms delay then repeated Backspace and letters; key-up stops",
+          "Console visible blinking caret",
+          "Browser address bar held Backspace and visible blinking caret",
+          "Text document held Backspace; no deletion across focus change",
+          "Text caret follows append/newline and visibly blinks",
+          "USB keyboard removal releases held key"
+        ]
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "e97a484265fed0d10f2a8c1934d15ae2caf14236467c73cec75660a5c27b80f5",
+          "iso_sha256": "6a2f41cae29c845e2b284730e5d87a0f2eb221a905839ac6dfd92c9b3ff11722"
+        }
+      ]
+    },
+    "native-final-http": {
+      "result": {
+        "status": "PASS",
+        "backend": "e1000e",
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS",
+          "DNS A query and reply over actual adapter"
+        ]
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "e97a484265fed0d10f2a8c1934d15ae2caf14236467c73cec75660a5c27b80f5",
+          "iso_sha256": "6a2f41cae29c845e2b284730e5d87a0f2eb221a905839ac6dfd92c9b3ff11722"
+        }
+      ]
+    },
+    "native-final-ipv6": {
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "backend": "e1000e",
+        "icmp6_wire_types": [
+          128,
+          129,
+          133,
+          134,
+          135,
+          136
+        ],
+        "checks": [
+          "real DAD, router solicitation/advertisement and preferred SLAAC address",
+          "ICMPv6 echo to the emulated router over selected real Ethernet queues",
+          "IPv4 DHCP and ICMP remain working",
+          "link loss invalidates IPv6 state; reconnect performs SLAAC/DAD again"
+        ],
+        "limits": [
+          "IPv6 control plane only; TCP6/DNS6/DHCPv6 unavailable",
+          "QEMU router fixture, not a public Internet or Fusion IPv6 certification"
+        ]
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "e97a484265fed0d10f2a8c1934d15ae2caf14236467c73cec75660a5c27b80f5",
+          "iso_sha256": "6a2f41cae29c845e2b284730e5d87a0f2eb221a905839ac6dfd92c9b3ff11722"
+        }
+      ]
+    },
+    "native-install-explicit": {
+      "result": {
+        "status": "PASS",
+        "install_seconds": 21.203,
+        "three_key_focus_ms": 452.81,
+        "max_install_step_ms": 13.571,
+        "keyboard_wizard": true,
+        "physical_mode_change": true,
+        "shutdown_seconds": 5.036,
+        "checks": [
+          "no writes before target selection and final confirmation",
+          "guest GPT/FAT32/EFI/CHFS creation and verification",
+          "ISO detached: disk-only desktop and native input",
+          "installed file write survives a fresh reboot",
+          "ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback",
+          "keyboard focus remains responsive during installation",
+          "installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits"
+        ]
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "e97a484265fed0d10f2a8c1934d15ae2caf14236467c73cec75660a5c27b80f5",
+          "iso_sha256": "6a2f41cae29c845e2b284730e5d87a0f2eb221a905839ac6dfd92c9b3ff11722"
+        },
+        {
+          "kernel_sha256": "e97a484265fed0d10f2a8c1934d15ae2caf14236467c73cec75660a5c27b80f5"
+        },
+        {
+          "kernel_sha256": "e97a484265fed0d10f2a8c1934d15ae2caf14236467c73cec75660a5c27b80f5"
+        }
+      ]
+    },
+    "native-final-policy": {
+      "result": {
+        "status": "PASS",
+        "application_sha256": "597da0890b120196d63488f7d391049004f512d5bb0f53e9afc76bdcd8511c50",
+        "ipv6_live_echo": "PASS",
+        "checks": [
+          "actual EL0 IPv4/IPv6 read-only network status ABIs",
+          "null/readonly/short status buffers and invalid IPv6 request rejected",
+          "ordinary process cannot write, unlink, mkdir, rmdir or rename service profile/parent"
+        ]
+      },
+      "inputs": [
+        {
+          "kernel_sha256": "b9fc32a6a1803c02e006894b51b694cd98ade8929d2e03700a378af31cda97bb"
+        }
+      ]
+    }
+  },
+  "retained_failures": [
+    {
+      "run": "native-elf-live1",
+      "reason": "Sparse image span incorrectly used as the expected count of actually mapped pages",
+      "resolution": "Count actual mapped pages; live2 and subsequent ABI-note tests pass with complete reaping"
+    },
+    {
+      "run": "native-final-install",
+      "reason": "Fixture used the deliberately removed I binding",
+      "resolution": "Explicit Diagnostics -> Install CHOS button; native-install-explicit passes installation, reboot and shutdown"
+    },
+    {
+      "run": "native-final-typing",
+      "reason": "45-second desktop timeout; firmware banner only, no kernel entry in serial log",
+      "resolution": "Standalone native-typing-recheck passes; exact pre-kernel stall cause remains unresolved and this original run is NOT PASS"
+    }
+  ],
+  "remaining_requirements": [
+    "Integrated modern WebKit browser and conformance, tabs/storage/permissions/downloads",
+    "Full C/C++/threading/IPC/event runtime and isolated UEFI execution",
+    "TLS/certificate/trust/hostname/time/entropy integration",
+    "Pi5 SDIO2 CYW43455 firmware/radio/authentication/profiles and real Wi-Fi tests",
+    "Full IPv6 application stack and interface configuration/routing",
+    "Platform/security/performance qualification, including retained pre-kernel timeout investigation"
+  ]
+}

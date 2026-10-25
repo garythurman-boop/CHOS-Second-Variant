@@ -44,3 +44,15 @@ opening Setup was identified as an unwanted Welcome-view hotkey and removed.
 This target report does not cover source-only IPv6 or future untested features.
 New build publication is now held until every revised Stage3 gate is met and
 thoroughly tested; this supersedes the earlier alternating binary cadence.
+
+Native executable runtime progress is now documented in NATIVE_EXECUTABLES.md.
+Actual direct-boot ELF applications exercise sparse RX/R/RW mappings,256KiB BSS,
+arguments and user-only faults with complete reaping. Modern engine/runtime,
+verified TLS, real Pi5 Wi-Fi and the other full-stage gates remain open.
+
+See validation/stage3-native-runtime.json for local native-runtime evidence and
+retained failures. Sparse-page accounting and the obsolete installer fixture are
+corrected. One parallel UEFI typing run timed out at the firmware banner before
+kernel entry; the standalone rerun passes, but that original failure remains
+NOT PASS and its exact pre-kernel cause is unresolved. Full qualification is not
+claimed. Release-hold tests reject forced publication; all binaries remain held.

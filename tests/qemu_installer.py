@@ -27,7 +27,9 @@ def main_action():
 try:
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text(),45,'desktop')
  wait(lambda:g.symbol('splash_active')==0,10,'splash')
- key('i');wait(lambda:g.symbol('view')==8,3,'installer welcome')
+ key('i');time.sleep(.1);assert g.symbol('view')!=8,'plain I must not launch Setup'
+ key('f1');wait(lambda:g.symbol('view')==4,3,'Diagnostics')
+ click(300,475);wait(lambda:g.symbol('view')==8,3,'explicit Setup button')
  g.screen('welcome')
  main_action() # Next: no target yet.
  assert hashlib.sha256(disk.read_bytes()).hexdigest()==before
@@ -104,7 +106,7 @@ try:
  g.screen('persistence-after-reboot')
  protected_hash=hashlib.sha256(disk.read_bytes()).hexdigest()
  key('esc');key('i');time.sleep(.3)
- assert g.symbol('view')!=8,'Setup shortcut must be hidden on the installed system'
+ assert g.symbol('view')!=8,'Typing I must not launch Setup on the installed system'
  assert hashlib.sha256(disk.read_bytes()).hexdigest()==protected_hash,'Hidden installer modified the disk'
  g.screen('setup-hidden')
  # Actual guest reset, not restarting the emulator. Select Start -> Restart.
