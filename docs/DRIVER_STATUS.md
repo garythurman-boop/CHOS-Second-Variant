@@ -80,3 +80,17 @@ The Ethernet stack now consumes `chos_net_device_ops_t`; VirtIO and VMXNET3 shar
 DHCP/DNS/ARP/ICMP/TCP/browser logic. Driver failure does not transfer DMA ownership
 to a fallback. Backend errors become offline status. No native IOMMU, Wi-Fi or
 unmatched Ethernet controller support is implied.
+
+## User-confirmed 107ef51 and Intel controller correction
+
+The user confirms restart, power-off, automatic writable storage, hidden installed
+Setup and Console history work in Fusion 107ef51. Networking remains offline. The
+new screenshot identifies PCI 8086:10d3 class02:00: Intel 82574L/e1000e, not VMXNET3.
+A new exact-ID backend is implemented with bounded reset/TX, legacy descriptor
+rings, MAC/link discovery, checked PCI/DMA resources and permanent quarantine on
+uncertain DMA. QEMU e1000e traffic passes DHCP, DNS, browser HTTP/relative redirect
+and native USB/storage regressions (`e1000-http1`, `e1000-native1`). Host/ASan tests
+cover reset, bounds, padding, ring wrap, receive errors, link loss and TX timeout.
+New Fusion e1000e traffic needs a Mac retest; no support for arbitrary Intel NICs
+is implied. The revised Stage 3 request is tracked in STAGE3_REVISED_PROMPT.md and
+STAGE3_ARCHITECTURE.md, superseding the Word document's Stage 3 scope.

@@ -52,7 +52,7 @@ class Guest:
                     disk_backend='blkdebug:'+str(config)+':'+str(disk)
                 cmd+=['-drive',f'if=none,file={disk_backend},format=raw,id=storage','-device',
                       'nvme,serial=CHOS-DISPOSABLE,drive=storage' if args.nvme else 'virtio-blk-pci,disable-legacy=on,drive=storage',
-                      '-netdev','user,id=net','-device',('vmxnet3,netdev=net,romfile=' if getattr(args,'net_model','virtio')=='vmxnet3' else 'virtio-net-pci,disable-legacy=on,netdev=net')]
+                      '-netdev','user,id=net','-device',(getattr(args,'net_model','virtio')+',id=nic,netdev=net,romfile=' if getattr(args,'net_model','virtio') in ['vmxnet3','e1000e'] else 'virtio-net-pci,id=nic,disable-legacy=on,netdev=net')]
                 if not args.no_rng:cmd+=['-object','rng-random,filename=/dev/urandom,id=rng','-device','virtio-rng-pci,disable-legacy=on,rng=rng']
             else:cmd+=['-net','none']
             self.usb_bus='xhci.0';self.mouse_port=None
@@ -144,7 +144,7 @@ def main():
     ap.add_argument('--clock-test',action='store_true')
     ap.add_argument('--rtc-base')
     ap.add_argument('--pci-virtio',action='store_true')
-    ap.add_argument('--net-model',choices=['virtio','vmxnet3'],default='virtio')
+    ap.add_argument('--net-model',choices=['virtio','vmxnet3','e1000e'],default='virtio')
     ap.add_argument('--trace',action='store_true')
     ap.add_argument('--nvme',action='store_true')
     ap.add_argument('--no-usb',action='store_true')
@@ -279,7 +279,7 @@ def main():
                 return 'Ping: reply received' in g.terminal()
             wait(gui_ping_replied,10,'PCI VirtIO ARP/ICMP reply')
             (out/'pci-console.txt').write_text(g.terminal());g.screen('pci-diagnostics')
-            result['checks']+=[('NVMe injected write failure and responsive GUI' if args.storage_error else 'NVMe CHFS write/flush/read') if args.nvme else 'PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly',('VMXNET3 DHCP/ARP/ICMP' if args.net_model=='vmxnet3' else 'PCI VirtIO DHCP/ARP/ICMP')]
+            result['checks']+=[('NVMe injected write failure and responsive GUI' if args.storage_error else 'NVMe CHFS write/flush/read') if args.nvme else 'PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly',({'vmxnet3':'VMXNET3','e1000e':'82574L e1000e','virtio':'PCI VirtIO'}[args.net_model]+' DHCP/ARP/ICMP')]
         before=g.screen('pointer-before');t=time.monotonic()
         motion(-200,150)
         wait(lambda:g.screen('pointer-after')!=before,2,'pointer visible response')

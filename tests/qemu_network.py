@@ -5,7 +5,7 @@ sys.path.insert(0,str(pathlib.Path(__file__).parent))
 from qemu_platform import Guest,wait
 ap=argparse.ArgumentParser(description=__doc__)
 ap.add_argument('--out',required=True,type=pathlib.Path)
-ap.add_argument('--net-model',choices=['virtio','vmxnet3'],default='vmxnet3')
+ap.add_argument('--net-model',choices=['virtio','vmxnet3','e1000e'],default='vmxnet3')
 a=ap.parse_args();out=a.out.resolve();out.mkdir(parents=True,exist_ok=False)
 dns_queries=[]
 dns_socket=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
@@ -36,7 +36,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
  def log_message(self,*args):pass
 server=http.server.HTTPServer(('0.0.0.0',0),Handler);threading.Thread(target=server.serve_forever,daemon=True).start()
 disk=out/'disposable.img';shutil.copyfile('build/qemu-smoke-disk.img',disk)
-args=argparse.Namespace(mode='uefi',uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=pathlib.Path('build/chos-0.30.0.iso'),memory='2G',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model=a.net_model,net_capture=True,storage_error=False,nvme=(a.net_model=='vmxnet3'),no_rng=(a.net_model=='vmxnet3'),hub_depth=0,empty_usb=False,tablet=True)
+args=argparse.Namespace(mode='uefi',uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=pathlib.Path('build/chos-0.30.0.iso'),memory='2G',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model=a.net_model,net_capture=True,storage_error=False,nvme=(a.net_model!='virtio'),no_rng=(a.net_model!='virtio'),hub_depth=0,empty_usb=False,tablet=True)
 g=Guest(args,out,disk)
 def key(k):g.hmp('sendkey '+k);time.sleep(.07)
 def type_text(t):
@@ -46,7 +46,7 @@ try:
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text(),45,'desktop')
  wait(lambda:g.symbol('splash_active')==0,10,'splash')
  wait(lambda:g.symbol('net_state')==3,20,'DHCP lease')
- if a.net_model=='vmxnet3':assert 'No usable VirtIO transport' in g.text(),'VMXNET3 must operate independently of VirtIO'
+ if a.net_model!='virtio':assert 'No usable VirtIO transport' in g.text(),'VMXNET3 must operate independently of VirtIO'
  key('c');type_text('run /bin/browser.chx');wait(lambda:g.symbol('kernel_browser_active')==1,5,'browser')
  type_text(f'http://10.0.2.2:{server.server_port}/redirect')
  wait(lambda:b'chos-network-fixture-ok' in g.block('page',size=4096),12,'browser over selected real Ethernet driver')

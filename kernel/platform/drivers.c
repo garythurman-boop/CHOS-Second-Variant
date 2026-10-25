@@ -2,6 +2,7 @@
 #include "chos/virtio_transport.h"
 #include "chos/xhci.h"
 #include "chos/vmxnet3.h"
+#include "chos/e1000e.h"
 static chos_driver_registry_t registry;
 static int initialized,xhci_owned;
 static int match_xhci(const chos_driver_device_t *d) {
@@ -50,7 +51,19 @@ static chos_driver_state_t start_vmxnet(const chos_driver_context_t *ctx,chos_dr
 }
 static void poll_vmxnet(chos_driver_binding_t *b){if(!chos_vmxnet3_ready()){b->state=CHOS_DEVICE_FAILED;b->capabilities=0;b->reason=chos_vmxnet3_error();}}
 static void stop_vmxnet(chos_driver_binding_t *b){(void)b;chos_vmxnet3_stop();}
+static const chos_net_device_ops_t intel_net={"Intel 82574L (e1000e)",chos_e1000e_ready,chos_e1000e_get_info,chos_e1000e_send,chos_e1000e_receive,chos_e1000e_error};
+static int intel_claimed;
+static int match_intel(const chos_driver_device_t *d){return chos_driver_match_pci(d,0x8086,0x10d3,2,0,CHOS_DRIVER_ANY);}
+static chos_driver_state_t start_intel(const chos_driver_context_t *ctx,chos_driver_binding_t *b){
+    if(intel_claimed || !chos_net_device_bind(&intel_net)){b->reason="Single selected Ethernet adapter limit";return CHOS_DEVICE_UNSUPPORTED;}
+    intel_claimed=1;
+    if(!chos_e1000e_init(ctx->boot,ctx->acpi,&b->device.id.pci)){b->reason=chos_e1000e_error();return CHOS_DEVICE_FAILED;}
+    b->owner=1;b->capabilities=CHOS_DRIVER_CAP_TRANSPORT;b->reason=chos_e1000e_error();return CHOS_DEVICE_READY;
+}
+static void poll_intel(chos_driver_binding_t *b){if(!chos_e1000e_ready()){b->state=CHOS_DEVICE_FAILED;b->capabilities=0;b->reason=chos_e1000e_error();}}
+static void stop_intel(chos_driver_binding_t *b){(void)b;chos_e1000e_stop();}
 static const chos_driver_ops_t builtin[]={
+    {"Intel 82574L e1000e",CHOS_DRIVER_TRANSPORT,100,match_intel,start_intel,poll_intel,stop_intel},
     {"VMware VMXNET3",CHOS_DRIVER_TRANSPORT,100,match_vmxnet,start_vmxnet,poll_vmxnet,stop_vmxnet},
     {"modern VirtIO PCI",CHOS_DRIVER_TRANSPORT,100,match_virtio,start_virtio,poll_virtio,0},
     {"native xHCI HID",CHOS_DRIVER_INPUT,100,match_xhci,start_xhci,poll_xhci,stop_xhci}
@@ -64,6 +77,7 @@ void chos_platform_drivers_discover(const chos_boot_info_t *boot,const chos_acpi
     for(unsigned i=0;i<count;++i) {
         chos_driver_device_t d={.bus=CHOS_BUS_PCI,.id.pci=devices[i]};
         (void)chos_driver_add(&registry,&d);
+        if(devices[i].class_code==2)chos_net_device_note_unclaimed("No driver claims the discovered Ethernet adapter; inspect pci net.");
     }
 }
 void chos_platform_drivers_probe(unsigned phase) {

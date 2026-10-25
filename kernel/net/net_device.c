@@ -1,6 +1,8 @@
 #include "chos/net_device.h"
 #include "chos/virtio_net.h"
 static const chos_net_device_ops_t *selected;
+static const char *unclaimed;
+void chos_net_device_note_unclaimed(const char *reason){unclaimed=reason;}
 static const chos_net_device_ops_t virtio={"VirtIO Ethernet",virtio_net_ready,virtio_net_get_info,virtio_net_send_frame,virtio_net_receive_frame,virtio_net_last_error};
 int chos_net_device_bind(const chos_net_device_ops_t *ops){
  if(selected)return selected==ops;
@@ -14,7 +16,7 @@ int chos_net_device_init(void){
 }
 int chos_net_device_ready(void){return selected && selected->ready();}
 const char *chos_net_device_name(void){return selected?selected->name:"No supported Ethernet adapter";}
-const char *chos_net_device_error(void){return selected?selected->error():virtio_net_last_error();}
+const char *chos_net_device_error(void){return selected?selected->error():unclaimed?unclaimed:virtio_net_last_error();}
 void chos_net_device_get_info(chos_net_device_info_t *out){
  if(!out)return;
  if(selected)selected->get_info(out);

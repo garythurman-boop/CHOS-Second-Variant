@@ -17,7 +17,7 @@ SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/e
              kernel/core/exception.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
              kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
-             kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/platform/vmxnet3.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
+             kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
            $(BUILD)/kernel/arch/aarch64/context_switch.o $(BUILD)/kernel/arch/aarch64/register_stress.o $(BUILD)/kernel/arch/aarch64/user_entry.o \
            $(BUILD)/kernel/arch/aarch64/user_demo.o $(BUILD)/kernel/arch/aarch64/user_exit.o $(BUILD)/kernel/arch/aarch64/user_preempt_good.o \
@@ -1216,3 +1216,16 @@ test: test-net-device
 test-sanitize: test-net-device-sanitize
 
 .PHONY: test-power test-power-sanitize test-vmxnet3 test-vmxnet3-sanitize test-browser-transport test-browser-transport-sanitize test-scrollback test-scrollback-sanitize test-net-device test-net-device-sanitize
+
+$(BUILD)/test-e1000e: tests/test_e1000e.c kernel/platform/e1000e.c include/chos/e1000e.h
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_e1000e.c -o $@
+$(SAN_DIR)/test-e1000e: tests/test_e1000e.c kernel/platform/e1000e.c include/chos/e1000e.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_e1000e.c -o $@
+test-e1000e: $(BUILD)/test-e1000e
+	./$(BUILD)/test-e1000e
+test-e1000e-sanitize: $(SAN_DIR)/test-e1000e
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-e1000e
+test: test-e1000e
+test-sanitize: test-e1000e-sanitize
+.PHONY: test-e1000e test-e1000e-sanitize

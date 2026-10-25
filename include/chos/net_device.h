@@ -38,6 +38,7 @@ typedef struct {
 } chos_net_device_ops_t;
 int chos_net_device_bind(const chos_net_device_ops_t *ops);
 int chos_net_device_init(void);
+void chos_net_device_note_unclaimed(const char *reason);
 int chos_net_device_ready(void);
 const char *chos_net_device_name(void);
 const char *chos_net_device_error(void);
