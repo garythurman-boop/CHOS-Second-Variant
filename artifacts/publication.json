@@ -1,11 +1,11 @@
 {
   "latest": {
-    "source_commit": "54b97319a7abb6746eff491f167a82f00c08c08d",
-    "directory": "artifacts/54b9731",
-    "tag": "build-54b9731"
+    "source_commit": "d91d135f4e5b14078384b954ccb10cdec590cc53",
+    "directory": "artifacts/d91d135",
+    "tag": "build-d91d135"
   },
   "schema": 1,
   "artifact_interval": 2,
-  "iterations_since_artifacts": 1,
-  "last_counted_source_commit": "ca524564a45719ad8f5c861473d2ca0b7ba5b6dd"
+  "iterations_since_artifacts": 0,
+  "last_counted_source_commit": "d91d135f4e5b14078384b954ccb10cdec590cc53"
 }

@@ -1,17 +1,17 @@
 # Current CHOS build downloads
 
-Tested source: `54b97319a7abb6746eff491f167a82f00c08c08d`.
-Publication tag: `build-54b9731`.
+Tested source: `d91d135f4e5b14078384b954ccb10cdec590cc53`.
+Publication tag: `build-d91d135`.
 
-- [Bootable ARM64 ISO](54b9731/CHOS-Fusion-54b9731.iso?raw=1)
-- [Complete source/build/test handoff](54b9731/CHOS-Fusion-54b9731-Handoff.zip?raw=1)
-- [Prepared disk image (gzip)](54b9731/CHOS-54b9731-prepared.img.gz?raw=1)
-- [Source archive](54b9731/CHOS-54b9731-source.zip?raw=1)
-- [Direct kernel (gzip)](54b9731/CHOS-54b9731-kernel-direct.elf.gz?raw=1)
-- [UEFI kernel (gzip)](54b9731/CHOS-54b9731-kernel-uefi.elf.gz?raw=1)
-- [EFI loader](54b9731/BOOTAA64.EFI?raw=1)
-- [Checksums](54b9731/SHA256SUMS?raw=1)
-- [Manifest](54b9731/manifest.json?raw=1)
+- [Bootable ARM64 ISO](d91d135/CHOS-Fusion-d91d135.iso?raw=1)
+- [Complete source/build/test handoff](d91d135/CHOS-Fusion-d91d135-Handoff.zip?raw=1)
+- [Prepared disk image (gzip)](d91d135/CHOS-d91d135-prepared.img.gz?raw=1)
+- [Source archive](d91d135/CHOS-d91d135-source.zip?raw=1)
+- [Direct kernel (gzip)](d91d135/CHOS-d91d135-kernel-direct.elf.gz?raw=1)
+- [UEFI kernel (gzip)](d91d135/CHOS-d91d135-kernel-uefi.elf.gz?raw=1)
+- [EFI loader](d91d135/BOOTAA64.EFI?raw=1)
+- [Checksums](d91d135/SHA256SUMS?raw=1)
+- [Manifest](d91d135/manifest.json?raw=1)
 
 Source is pushed each iteration. Binary downloads are published every other completed implementation iteration; the next iteration after this publication is source-only.
 
