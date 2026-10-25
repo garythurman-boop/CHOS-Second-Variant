@@ -1,0 +1,344 @@
+{
+  "acceptance": "PASS for the listed implemented scopes",
+  "stage3_complete": false,
+  "compiled_kernel_source": "54bc0f5979e2cbdb12296d302f360af2a947064d",
+  "final_fixture_source": "e1bb871bf9dc8fc20eb0054dfec0a21390077294",
+  "kernel_userland_dependency_diff_between_these_sources": "none",
+  "published_typing_build": "build-d91d135",
+  "published_typing_iso_sha256": "c5195fc775b7e1d88708670c07191894f77497951413ee134204a6cdd3c13197",
+  "binary_cadence": "IPv6 follow-up source-only; published ISO remains d91d135",
+  "host_suite": "PASS",
+  "configured_sanitizers": "PASS",
+  "direct_smoke": "PASS",
+  "original_parallel_run_exit_code": 1,
+  "retained_failure": {
+    "profile": "net6-release-typing-uefi",
+    "reason": "Timed hold sampled browser address before the final queued character was consumed: before35, early35. Fixture now waits for exactly36 typed characters before measuring Backspace.",
+    "corrected_profile": "net6-typing-uefi-fixed",
+    "corrected_result": "PASS"
+  },
+  "profiles": {
+    "net6-release-e1000": {
+      "accepted_evidence": "net6-release-e1000",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "backend": "e1000e",
+        "icmp6_wire_types": [
+          128,
+          129,
+          133,
+          134,
+          135,
+          136
+        ],
+        "checks": [
+          "real DAD, router solicitation/advertisement and preferred SLAAC address",
+          "ICMPv6 echo to the emulated router over selected real Ethernet queues",
+          "IPv4 DHCP and ICMP remain working",
+          "link loss invalidates IPv6 state; reconnect performs SLAAC/DAD again"
+        ],
+        "limits": [
+          "IPv6 control plane only; TCP6/DNS6/DHCPv6 unavailable",
+          "QEMU router fixture, not a public Internet or Fusion IPv6 certification"
+        ]
+      }
+    },
+    "net6-release-vmx": {
+      "accepted_evidence": "net6-release-vmx",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "backend": "vmxnet3",
+        "icmp6_wire_types": [
+          128,
+          129,
+          133,
+          134,
+          135,
+          136
+        ],
+        "checks": [
+          "real DAD, router solicitation/advertisement and preferred SLAAC address",
+          "ICMPv6 echo to the emulated router over selected real Ethernet queues",
+          "IPv4 DHCP and ICMP remain working",
+          "link loss invalidates IPv6 state; reconnect performs SLAAC/DAD again"
+        ],
+        "limits": [
+          "IPv6 control plane only; TCP6/DNS6/DHCPv6 unavailable",
+          "QEMU router fixture, not a public Internet or Fusion IPv6 certification"
+        ]
+      }
+    },
+    "net6-release-virtio": {
+      "accepted_evidence": "net6-release-virtio",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "backend": "virtio",
+        "icmp6_wire_types": [
+          128,
+          129,
+          133,
+          134,
+          135,
+          136
+        ],
+        "checks": [
+          "real DAD, router solicitation/advertisement and preferred SLAAC address",
+          "ICMPv6 echo to the emulated router over selected real Ethernet queues",
+          "IPv4 DHCP and ICMP remain working",
+          "link loss invalidates IPv6 state; reconnect performs SLAAC/DAD again"
+        ],
+        "limits": [
+          "IPv6 control plane only; TCP6/DNS6/DHCPv6 unavailable",
+          "QEMU router fixture, not a public Internet or Fusion IPv6 certification"
+        ]
+      }
+    },
+    "net6-release-direct": {
+      "accepted_evidence": "net6-release-direct",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "backend": "virtio-mmio",
+        "icmp6_wire_types": [
+          128,
+          129,
+          133,
+          134,
+          135,
+          136
+        ],
+        "checks": [
+          "real DAD, router solicitation/advertisement and preferred SLAAC address",
+          "ICMPv6 echo to the emulated router over selected real Ethernet queues",
+          "IPv4 DHCP and ICMP remain working",
+          "direct VirtIO backend preserves shared RX ownership"
+        ],
+        "limits": [
+          "IPv6 control plane only; TCP6/DNS6/DHCPv6 unavailable",
+          "QEMU router fixture, not a public Internet or Fusion IPv6 certification"
+        ]
+      }
+    },
+    "net6-release-http-e1000": {
+      "accepted_evidence": "net6-release-http-e1000",
+      "result": {
+        "status": "PASS",
+        "backend": "e1000e",
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS",
+          "DNS A query and reply over actual adapter"
+        ]
+      }
+    },
+    "net6-release-http-vmx": {
+      "accepted_evidence": "net6-release-http-vmx",
+      "result": {
+        "status": "PASS",
+        "backend": "vmxnet3",
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS",
+          "DNS A query and reply over actual adapter"
+        ]
+      }
+    },
+    "net6-release-http-virtio": {
+      "accepted_evidence": "net6-release-http-virtio",
+      "result": {
+        "status": "PASS",
+        "backend": "virtio",
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS",
+          "DNS A query and reply over actual adapter"
+        ]
+      }
+    },
+    "net6-release-manager": {
+      "accepted_evidence": "net6-release-manager",
+      "result": {
+        "status": "PASS",
+        "backend": "e1000e",
+        "checks": [
+          "automatic DHCP without Console",
+          "functional keyboard/pointer Network Manager",
+          "static address/mask/gateway/DNS apply and explicit save",
+          "invalid mask refused",
+          "link loss clears configuration and sockets; reconnect restores static profile",
+          "unconfirmed trial rolls back after 30 seconds",
+          "actual gateway ARP/ICMP after reconnect",
+          "MAC-bound profile survives installed reboot",
+          "automatic DHCP reconnect and administrative disconnect/revert"
+        ]
+      }
+    },
+    "net6-release-typing-uefi": {
+      "accepted_evidence": "net6-typing-uefi-fixed",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "console_lengths": [
+          26,
+          15
+        ],
+        "document_lengths": [
+          36,
+          25
+        ],
+        "browser_lengths": [
+          36,
+          25
+        ],
+        "checks": [
+          "Console 500ms delay then repeated Backspace and letters; key-up stops",
+          "Console visible blinking caret",
+          "Browser address bar held Backspace and visible blinking caret",
+          "Text document held Backspace; no deletion across focus change",
+          "Text caret follows append/newline and visibly blinks",
+          "USB keyboard removal releases held key"
+        ]
+      }
+    },
+    "net6-release-typing-direct": {
+      "accepted_evidence": "net6-release-typing-direct",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "console_lengths": [
+          26,
+          15
+        ],
+        "document_lengths": [
+          36,
+          25
+        ],
+        "browser_lengths": null,
+        "checks": [
+          "Console 500ms delay then repeated Backspace and letters; key-up stops",
+          "Console visible blinking caret",
+          "Text document held Backspace; no deletion across focus change",
+          "Text caret follows append/newline and visibly blinks"
+        ]
+      }
+    },
+    "net6-release-memory": {
+      "accepted_evidence": "net6-release-memory",
+      "result": {
+        "status": "PASS",
+        "application_sha256": "f93d600b081714ad56eb07ee4cdb6f32ff7e23682d8d1fa537d9b1d6853a9247",
+        "free_pages_before": 117999,
+        "free_pages_after": 117999,
+        "checks": [
+          "real EL0 anonymous zeroed RW/XN mappings",
+          "invalid/overflow sizes and nonzero high flags refused",
+          "exact unmap and double-unmap rejection",
+          "guard-page data abort contained to process",
+          "execute-never instruction abort contained to process",
+          "normal/fault/scheduled exit cleans abandoned mappings; no physical-page leak"
+        ]
+      }
+    },
+    "net6-release-policy": {
+      "accepted_evidence": "net6-release-policy",
+      "result": {
+        "status": "PASS",
+        "application_sha256": "597da0890b120196d63488f7d391049004f512d5bb0f53e9afc76bdcd8511c50",
+        "ipv6_live_echo": "PASS",
+        "checks": [
+          "actual EL0 IPv4/IPv6 read-only network status ABIs",
+          "null/readonly/short status buffers and invalid IPv6 request rejected",
+          "ordinary process cannot write, unlink, mkdir, rmdir or rename service profile/parent"
+        ]
+      }
+    },
+    "net6-release-install": {
+      "accepted_evidence": "net6-release-install",
+      "result": {
+        "status": "PASS",
+        "install_seconds": 20.926,
+        "three_key_focus_ms": 452.77,
+        "max_install_step_ms": 18.508,
+        "keyboard_wizard": true,
+        "physical_mode_change": true,
+        "shutdown_seconds": 5.035,
+        "checks": [
+          "no writes before target selection and final confirmation",
+          "guest GPT/FAT32/EFI/CHFS creation and verification",
+          "ISO detached: disk-only desktop and native input",
+          "installed file write survives a fresh reboot",
+          "ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback",
+          "keyboard focus remains responsive during installation",
+          "installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits"
+        ]
+      }
+    },
+    "net6-release-platform": {
+      "accepted_evidence": "net6-release-platform",
+      "result": {
+        "mode": "direct",
+        "checks": [
+          "EL0 RNG invalid pointers, length bound, guard bytes and hardware receipt",
+          "CHFS write/flush/read",
+          "DHCP/ARP/ICMP",
+          "MMU permissions, guard pages and dynamic aliases with 512 MiB RAM",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 0.149,
+        "desktop_ready_seconds": 3.232,
+        "keyboard_visible_ms": 49.25,
+        "pointer_visible_ms": 43.59,
+        "maximize_visible_ms": 182.9,
+        "drag_visible_ms": 228.6,
+        "idle_cpu_percent": 3.5,
+        "status": "PASS"
+      }
+    }
+  },
+  "fusion": "User confirms Ethernet/example.com following54b9731; typing/IPv6 changes require separate target evidence",
+  "pi5_wifi": "CYW43455 family independently confirmed by Pi5 firmware mappings; SDIO2/radio/firmware/authentication implementation and live board tests remain open",
+  "remaining_stage3": [
+    "Modern browser engine and HTML/CSS/JavaScript conformance",
+    "Complete isolated UEFI user runtime and browser-sized C/C++/threads/IPC services",
+    "TLS/certificate/hostname/date/trust validation and secure entropy",
+    "Pi5 CYW43455 bus/firmware/radio/authentication/credential service and hardware validation",
+    "IPv6 TCP/DNS/DHCPv6/manual configuration and multiple active interfaces/routes",
+    "Contemporary website tests, browser security permissions/persistence/tabs and required performance evidence"
+  ]
+}
