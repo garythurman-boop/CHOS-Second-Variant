@@ -9,8 +9,11 @@ LIBCPP_FLAGS := $(filter-out -std=c11 -mgeneral-regs-only,$(USER_CFLAGS)) -std=c
 LIBCPP_SOURCES := $(LIBCPP_ROOT)/src/new.cpp $(LIBCPP_ROOT)/src/new_handler.cpp $(LIBCPP_ROOT)/src/new_helpers.cpp $(LIBCPP_ROOT)/src/algorithm.cpp userland/libcxx/string_instantiations.cpp userland/libcxx/verbose_abort.cpp
 LIBCPP_OBJECTS := $(addprefix $(BUILD)/userland/libcxx/,$(addsuffix .o,$(basename $(LIBCPP_SOURCES))))
 LIBCPP_ARCHIVE := $(BUILD)/userland/libcxx/libchos-c++.a
-$(LIBCPP_CONFIG) &: tools/configure_libcxx.py $(LIBCPP_ROOT)/include/__config_site.in $(LIBCPP_ROOT)/vendor/llvm/default_assertion_handler.in
+$(LIBCPP_GENERATED)/__config_site: tools/configure_libcxx.py $(LIBCPP_ROOT)/include/__config_site.in $(LIBCPP_ROOT)/vendor/llvm/default_assertion_handler.in
 	python3 tools/configure_libcxx.py --out $(LIBCPP_GENERATED)
+$(LIBCPP_GENERATED)/__assertion_handler: $(LIBCPP_GENERATED)/__config_site $(LIBCPP_ROOT)/vendor/llvm/default_assertion_handler.in
+	@mkdir -p $(dir $@)
+	cp $(LIBCPP_ROOT)/vendor/llvm/default_assertion_handler.in $@
 $(BUILD)/userland/libcxx/%.o: %.cpp $(LIBCPP_HEADERS) $(LIBCPP_CONFIG) $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
 	@mkdir -p $(dir $@)
 	$(CC) $(LIBCPP_FLAGS) -MMD -MP -c $< -o $@

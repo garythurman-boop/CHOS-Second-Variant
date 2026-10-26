@@ -4,7 +4,7 @@
   "scope": "same bounded static libc++ allocation/container subset compiled and executed as C++23; exact JSC integer128 type/alignment compile probe,not full C++23 conformance/ABI or engine",
   "source_sha256": {
     "docs/dependencies/libcxx-native.json": "64c101693e234dbb2931dffc3a2ded570543f29eaaf3d1ded4e3dec07d249667",
-    "userland/libcxx/Makefile.inc": "4429714cd3940a4b35922a381b4c0f80ab37370d4d26508789cc5d039a7962d6",
+    "userland/libcxx/Makefile.inc": "d939d9ff37f5a98e97f7ca963f33f041138910b0ea15669a657b5a6d12dcd14b",
     "userland/examples/cxx_test.cpp": "a5de09aa6f7cb89d5f085c481acce15e3ba4fe7b5a79e573565c1111ef73f21c",
     "tests/qemu_cxx.py": "88a189eca8b3bf18d47fa604bcbcb2d895ef2f488ec6c536f3866a9a737b495e"
   },
@@ -126,5 +126,16 @@
       "cxx23-cxx20-regression"
     ],
     "reason": "Remove an obsolete runner limit saying static guards are absent. Native guard runtime and ELF match the independently accepted guard evidence. Raw guest JSON/logs remain unchanged; test criteria/status/observed measurements are unchanged."
+  },
+  "header_regeneration": {
+    "log": "cxx-header-regeneration.log",
+    "status": "PASS",
+    "sha256": "fdb621b38a136934d94195056dc9cee727b8678683526ea7f1e5c2b3c98a5667",
+    "checks": [
+      "both generated headers missing: parallel native build succeeds",
+      "assertion handler alone missing: parallel native build succeeds",
+      "ordinary dependent targets avoid requiring GNU make grouped-target syntax",
+      "C++20,C++23 and guard ELFs byte-identical to guest-qualified versions"
+    ]
   }
 }
