@@ -39,6 +39,8 @@ enter_el1:
     mov x9, #3
     msr cnthctl_el2, x9           // Permit EL1 access to physical counter/timer.
     msr cntvoff_el2, xzr
+    mov x9, #0x33ff
+    msr cptr_el2, x9              // Permit base FP/SIMD; keep SVE trapped.
     adr x9, el1_entry
     msr elr_el2, x9
     mov x9, #0x3c5                // EL1h, mask D/A/I/F.
@@ -55,6 +57,22 @@ el1_entry:
     mrs x9, sctlr_el1
     bic x9, x9, #2              // SCTLR_EL1.A = 0: disable alignment checking.
     msr sctlr_el1, x9
+    isb
+
+    /* The supported application profile requires base FP and Advanced SIMD.
+     * Refuse absent units before installing vectors that preserve their state. */
+    mrs x9, id_aa64pfr0_el1
+    ubfx x10, x9, #16, #4
+    cmp x10, #15
+    b.eq hang
+    ubfx x10, x9, #20, #4
+    cmp x10, #15
+    b.eq hang
+    mrs x9, cpacr_el1
+    bic x9, x9, #(3 << 16)        // SVE remains trapped; no SVE context ABI.
+    bic x9, x9, #(3 << 24)        // SME remains trapped too.
+    orr x9, x9, #(3 << 20)        // FPEN: EL0 and EL1 base FP/SIMD.
+    msr cpacr_el1, x9
     isb
 
     ldr x9, =__stack_top

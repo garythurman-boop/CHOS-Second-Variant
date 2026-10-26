@@ -154,6 +154,8 @@ static void initialize_task_irq_frame(size_t slot) {
     frame->esr = 0u;
     frame->sp_el0 = 0u;
     frame->reserved = 0u;
+    for(i=0;i<32u;++i)frame->q[i][0]=frame->q[i][1]=0u;
+    frame->fpcr=frame->fpsr=0u;
     tasks[slot].irq_frame = frame;
 }
 
@@ -179,6 +181,8 @@ static void prepare_preemptive_contexts(void) {
     preemptive_idle_initial_frame->esr = 0u;
     preemptive_idle_initial_frame->sp_el0 = 0u;
     preemptive_idle_initial_frame->reserved = 0u;
+    for(i=0;i<32u;++i)preemptive_idle_initial_frame->q[i][0]=preemptive_idle_initial_frame->q[i][1]=0u;
+    preemptive_idle_initial_frame->fpcr=preemptive_idle_initial_frame->fpsr=0u;
 }
 
 /* Called with IRQs masked. The timer ISR updates only its own tick counter. */

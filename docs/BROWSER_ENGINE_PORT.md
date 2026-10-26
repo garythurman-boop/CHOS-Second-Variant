@@ -111,3 +111,9 @@ remain open. Native allocation/string prerequisites are recorded in NATIVE_C_RUN
 PROCESS_IPC.md records a further nonblocking, owner-bound mutual-process message
 primitive with real EL0 tests. WPE process integration, POSIX stream/descriptor
 semantics, shared buffers, threads and full engine-sized runtime remain open.
+
+[NATIVE_FLOATING_POINT.md](NATIVE_FLOATING_POINT.md) records full base FP/SIMD
+exception state, fresh-process zeroing and live concurrent EL0 arithmetic/context
+tests in direct and UEFI QEMU. This closes another runtime prerequisite, while
+engine-sized memory, threads/POSIX, actual engine integration, TLS and live Wi-Fi
+remain open. Binary publication remains held.

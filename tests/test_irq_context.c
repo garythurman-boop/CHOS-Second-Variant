@@ -18,7 +18,13 @@ static void test_frame_layout(void) {
     assert(offsetof(chos_irq_context_t, esr) == 33u * sizeof(uint64_t));
     assert(offsetof(chos_irq_context_t, sp_el0) == 34u * sizeof(uint64_t));
     assert(offsetof(chos_irq_context_t, reserved) == 35u * sizeof(uint64_t));
-    assert(sizeof(frame) == 36u * sizeof(uint64_t));
+    assert(sizeof(frame) == 816u);
+    assert(offsetof(chos_irq_context_t,q)==288u&&offsetof(chos_irq_context_t,fpcr)==800u&&offsetof(chos_irq_context_t,fpsr)==808u);
+    for(i=0;i<32;i++){frame.q[i][0]=i;frame.q[i][1]=~(uint64_t)i;}
+    frame.fpcr=0x400000u;frame.fpsr=0x11;
+    chos_irq_context_t copy=frame;
+    for(i=0;i<32;i++)assert(copy.q[i][0]==i&&copy.q[i][1]==~(uint64_t)i);
+    assert(copy.fpcr==frame.fpcr&&copy.fpsr==frame.fpsr);
     assert((sizeof(frame) & 15u) == 0u);
     assert(frame.x[0] == 0x100u && frame.x[30] == 0x11eu);
     assert(frame.elr == UINT64_C(0x40201234));

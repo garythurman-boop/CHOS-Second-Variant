@@ -1487,3 +1487,14 @@ test-sanitize: test-process-caps-sanitize
 
 $(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi: include/chos/process_caps.h include/chos/syscall.h include/chos/ipc.h
 $(BUILD)/userland/libc-cpp-api.o: userland/libchos/include/chos/user.h include/chos/process_caps.h
+
+# FP-enabled native profile: use the real AArch64 floating-point ABI.
+$(BUILD)/userland/fpu_test.o: userland/examples/fpu_test.c userland/libchos/include/chos/user.h
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) -c $< -o $@
+$(BUILD)/userland/fpu_probe.o: userland/examples/fpu_probe.S
+	@mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+$(BUILD)/userland/fpu_test.elf: $(BUILD)/userland/fpu_probe.o $(BUILD)/userland/fpu_test.o $(BUILD)/userland/native_abi.o userland/native.ld
+	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/fpu_probe.o $(BUILD)/userland/fpu_test.o $(BUILD)/userland/native_abi.o
+test test-userland: $(BUILD)/userland/fpu_test.elf

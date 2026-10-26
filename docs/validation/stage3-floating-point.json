@@ -1,0 +1,152 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "completion_version_reserved": "0.50.0",
+  "source_sha256": {
+    "boot/aarch64/start.S": "1f7643a356a9100c0b0a6e5382572411509869cfdd57170291dd707e98f4f59c",
+    "include/chos/irq_context.h": "35bcc013b850a6a486f352f3c88584feeca5a4308e7aa5b4b1d0dcb0cbe64cc0",
+    "kernel/arch/aarch64/vectors.S": "83bfe79176c58f59cdb8eb7ba84bf0a5a380cf2e035210b0bc5ec5453236e20f",
+    "kernel/arch/aarch64/user_entry.S": "3d8831140e3e5a1c04d5ac18e32786b11da4ef05d3785c0cf96ba8c6559fce85",
+    "kernel/core/scheduler.c": "74a9455b8e7edbc6ad0fdebc2c7e93776751423da8e2eff7047e04b68e69a5cb",
+    "userland/examples/fpu_test.c": "8e03dc7145da8ed91a6940996c73db18378f2a8886988ab9fec96a677c187d4d",
+    "userland/examples/fpu_probe.S": "c7a1e59f523267af54f59af8d0886948da343e7da10a7215334d2a54b035b92a",
+    "tests/qemu_fpu.py": "0111905b4de78821fae4c4636ce0322c16733b723e036e5e5ad5ef65320747dc"
+  },
+  "host_and_sanitizer": [
+    "fp-host1.log",
+    "fp-sanitize1.log",
+    "fp-smoke1.log"
+  ],
+  "guest_profiles": [
+    {
+      "evidence": "/workspace/chos-evidence/fp-direct1/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "e9807570dabb2a78f04f376855880f000239f0f9e8eb15955f46d50a129d1f9d",
+        "cold_free_pages": 117703,
+        "free_pages_before": 117698,
+        "free_pages_after": 117698,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 466,
+        "checks": [
+          "all 32 full128-bit SIMD registers and FPCR/FPSR zero before C entry",
+          "two simultaneous worker processes use distinct patterns/control modes",
+          "all64 SIMD lanes and controls preserved across timer IRQ, YIELD and SLEEP",
+          "actual volatile double arithmetic compiled with FP ABI",
+          "three parent lifecycles; stable physical pages after first heap warmup"
+        ],
+        "limits": [
+          "base FP/AdvancedSIMD only; SVE/SME intentionally trapped",
+          "kernel C must retain -mgeneral-regs-only",
+          "QEMU evidence; Fusion and physical hardware NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "c6e6bd478e7fe5f011e505f7241db622ebdb8b7ff676206fe1d81ab121c96cad"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/fp-uefi1/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "e9807570dabb2a78f04f376855880f000239f0f9e8eb15955f46d50a129d1f9d",
+        "cold_free_pages": 500541,
+        "free_pages_before": 500536,
+        "free_pages_after": 500536,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 468,
+        "checks": [
+          "all 32 full128-bit SIMD registers and FPCR/FPSR zero before C entry",
+          "two simultaneous worker processes use distinct patterns/control modes",
+          "all64 SIMD lanes and controls preserved across timer IRQ, YIELD and SLEEP",
+          "actual volatile double arithmetic compiled with FP ABI",
+          "three parent lifecycles; stable physical pages after first heap warmup"
+        ],
+        "limits": [
+          "base FP/AdvancedSIMD only; SVE/SME intentionally trapped",
+          "kernel C must retain -mgeneral-regs-only",
+          "QEMU evidence; Fusion and physical hardware NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "5431cfe6ea47b08f4ce0b965551e83ee359a2b5f33a0f43c299da40ae7bcf690",
+        "iso_sha256": "d1e29c2841c392fd09ac8c1e944f7e07ec9a1f2f470da30ea7e65451000aa019",
+        "iso_embedded_kernel_sha256": "5431cfe6ea47b08f4ce0b965551e83ee359a2b5f33a0f43c299da40ae7bcf690",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/fp-native-uefi1/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "ccc49707dd34bed2e510e0ffcd48226f2f1da16d9323b9ce4d80e447adca960b",
+        "free_pages_before": 500535,
+        "free_pages_after": 500535,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "5431cfe6ea47b08f4ce0b965551e83ee359a2b5f33a0f43c299da40ae7bcf690",
+        "iso_sha256": "d1e29c2841c392fd09ac8c1e944f7e07ec9a1f2f470da30ea7e65451000aa019",
+        "iso_embedded_kernel_sha256": "5431cfe6ea47b08f4ce0b965551e83ee359a2b5f33a0f43c299da40ae7bcf690",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/fp-network1/result.json",
+      "result": {
+        "status": "PASS",
+        "backend": "e1000e",
+        "browser_elf_sha256": "dbd17fd219c398f2e8a90952c5e5b9015c132ec17b0566fff6496d885520bfaf",
+        "browser_pid": 1,
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page",
+          "/slow",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "isolated EL0 browser window bound to its actual process owner",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS and no plaintext downgrade",
+          "DNS A query and reply over actual adapter",
+          "actual in-flight HTTP failure on link loss releases its process-owned socket",
+          "DHCP reconnect and new HTTP request in the same isolated browser process"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "5431cfe6ea47b08f4ce0b965551e83ee359a2b5f33a0f43c299da40ae7bcf690",
+        "iso_sha256": "d1e29c2841c392fd09ac8c1e944f7e07ec9a1f2f470da30ea7e65451000aa019",
+        "iso_embedded_kernel_sha256": "5431cfe6ea47b08f4ce0b965551e83ee359a2b5f33a0f43c299da40ae7bcf690",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "retained_failures": [
+    {
+      "evidence": "fp-build1.log",
+      "diagnosis": "incorrect make target test-irqctx; corrected to build/test-irqctx; subsequent build and aggregate tests pass"
+    }
+  ],
+  "limits": [
+    "base FP/AdvancedSIMD only; SVE/SME trapped",
+    "kernel remains integer-register-only",
+    "not modernengine/TLS/WiFi completion",
+    "new Fusion/Pi/laptop support NOT RUN"
+  ]
+}

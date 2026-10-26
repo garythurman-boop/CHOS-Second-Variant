@@ -38,6 +38,67 @@ exception_vectors:
     VECTOR_ENTRY exception_serror_entry
 .size exception_vectors, . - exception_vectors
 
+.macro SAVE_FP
+    /* Preserve the established MMU-off recovery path without vector stores
+     * into Device-typed RAM. It cannot execute isolated user applications. */
+    mrs x9, sctlr_el1
+    tbz x9, #0, 90f
+    stp q0, q1, [sp, #288]
+    stp q2, q3, [sp, #320]
+    stp q4, q5, [sp, #352]
+    stp q6, q7, [sp, #384]
+    stp q8, q9, [sp, #416]
+    stp q10, q11, [sp, #448]
+    stp q12, q13, [sp, #480]
+    stp q14, q15, [sp, #512]
+    stp q16, q17, [sp, #544]
+    stp q18, q19, [sp, #576]
+    stp q20, q21, [sp, #608]
+    stp q22, q23, [sp, #640]
+    stp q24, q25, [sp, #672]
+    stp q26, q27, [sp, #704]
+    stp q28, q29, [sp, #736]
+    stp q30, q31, [sp, #768]
+    mrs x9, fpcr
+    str x9, [sp, #800]
+    mrs x9, fpsr
+    str x9, [sp, #808]
+    b 91f
+90:
+    add x9, sp, #288
+    .rept 32
+    stp xzr, xzr, [x9], #16
+    .endr
+    str xzr, [sp, #800]
+    str xzr, [sp, #808]
+91:
+.endm
+.macro RESTORE_FP
+    mrs x9, sctlr_el1
+    tbz x9, #0, 92f
+    ldp q0, q1, [sp, #288]
+    ldp q2, q3, [sp, #320]
+    ldp q4, q5, [sp, #352]
+    ldp q6, q7, [sp, #384]
+    ldp q8, q9, [sp, #416]
+    ldp q10, q11, [sp, #448]
+    ldp q12, q13, [sp, #480]
+    ldp q14, q15, [sp, #512]
+    ldp q16, q17, [sp, #544]
+    ldp q18, q19, [sp, #576]
+    ldp q20, q21, [sp, #608]
+    ldp q22, q23, [sp, #640]
+    ldp q24, q25, [sp, #672]
+    ldp q26, q27, [sp, #704]
+    ldp q28, q29, [sp, #736]
+    ldp q30, q31, [sp, #768]
+    ldr x9, [sp, #800]
+    msr fpcr, x9
+    ldr x9, [sp, #808]
+    msr fpsr, x9
+92:
+.endm
+
 /* Sync/FIQ/SError report panic details; IRQs save context and return normally. */
 .type exception_sync_entry, %function
 exception_sync_entry:
@@ -48,12 +109,12 @@ exception_irq_entry:
     /*
      * Full, preemption-ready exception frame. Frame layout in
      * include/chos/irq_context.h: x0..x30, ELR_EL1, SPSR_EL1, ESR_EL1, SP_EL0.
-     * 288 bytes preserves 16-byte SP alignment. Saving SP_EL0 is required for
+     * 816 bytes preserves 16-byte SP alignment. Saving SP_EL0 is required for
      * correct restoration when preempting and switching between EL0 processes.
      * the development scheduler may return a different saved task frame; normal
      * builds stay cooperative by default.
      */
-    sub sp, sp, #288
+    sub sp, sp, #816
     stp x0,  x1,  [sp, #0]
     stp x2,  x3,  [sp, #16]
     stp x4,  x5,  [sp, #32]
@@ -79,6 +140,7 @@ exception_irq_entry:
     mrs x0, sp_el0
     str x0, [sp, #272]
     str xzr, [sp, #280]
+    SAVE_FP
 
     mov x0, sp
     bl interrupt_irq_dispatch
@@ -92,7 +154,7 @@ exception_irq_entry:
  * to the EL1 return trampoline for SYS_EXIT or an EL0 fault. */
 .type exception_lower_sync_entry, %function
 exception_lower_sync_entry:
-    sub sp, sp, #288
+    sub sp, sp, #816
     stp x0,  x1,  [sp, #0]
     stp x2,  x3,  [sp, #16]
     stp x4,  x5,  [sp, #32]
@@ -118,6 +180,7 @@ exception_lower_sync_entry:
     mrs x0, sp_el0
     str x0, [sp, #272]
     str xzr, [sp, #280]
+    SAVE_FP
     mov x0, sp
     bl exception_lower_sync_dispatch
     mov sp, x0
@@ -139,6 +202,7 @@ exception_irq_restore:
     /* Restore the selected task's user stack before ERET. */
     ldr x16, [sp, #272]
     msr sp_el0, x16
+    RESTORE_FP
     ldp x0,  x1,  [sp, #0]
     ldp x2,  x3,  [sp, #16]
     ldp x4,  x5,  [sp, #32]
@@ -155,7 +219,7 @@ exception_irq_restore:
     ldp x26, x27, [sp, #208]
     ldp x28, x29, [sp, #224]
     ldr x30, [sp, #240]
-    add sp, sp, #288
+    add sp, sp, #816
     eret
 .type exception_fiq_entry, %function
 exception_fiq_entry:

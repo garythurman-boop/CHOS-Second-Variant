@@ -1920,13 +1920,13 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         uart_puts("\n");
     } else if (strings_equal(line, "irqinfo")) {
         uart_puts("AArch64 IRQ context diagnostics\n");
-        uart_puts("Frame size: 288 bytes (x0-x30, ELR_EL1, SPSR_EL1, ESR_EL1, SP_EL0)\n");
+        uart_puts("Frame size: 816 bytes (GPRs, ELR/SPSR/ESR, SP_EL0, Q0-Q31, FPCR/FPSR)\n");
         uart_puts("Frames captured: "); print_decimal((size_t)interrupt_context_frame_count()); uart_puts("\n");
         uart_puts("Last interrupted PC (ELR_EL1): "); print_hex64(interrupt_context_last_elr()); uart_puts("\n");
         uart_puts("Last saved PSTATE (SPSR_EL1): "); print_hex64(interrupt_context_last_spsr()); uart_puts("\n");
-        uart_puts("Dispatcher policy: returns interrupted context unchanged\n");
-        uart_puts("IRQ-time scheduler mutation: disabled; timer handler updates tick only\n");
-        uart_puts("Preemptive task switching: not enabled in 0.5.0\n");
+        uart_puts("Dispatcher policy: scheduler selects the saved return context\n");
+        uart_puts("IRQ-time scheduler mutation: enabled in scheduled runtime\n");
+        uart_puts("FP/SIMD: base 128-bit state; SVE/SME remain trapped\n");
     } else if (strings_equal(line, "tick-test")) {
         uint64_t start_ticks = timer_ticks();
         uint64_t start_counter = timer_counter();

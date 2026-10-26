@@ -142,3 +142,9 @@ before first execution, and ordinary child launches cannot restore omitted
 rights. Actual nested EL0 tests deny filesystem/network/GUI/entropy access.
 Browser roles, site/path policy and complete content sandbox integration remain
 open, along with the engine, TLS, wireless and other mandatory gates.
+
+[NATIVE_FLOATING_POINT.md](NATIVE_FLOATING_POINT.md) records full base FP/SIMD
+exception state, fresh-process zeroing and live concurrent EL0 arithmetic/context
+tests in direct and UEFI QEMU. This closes another runtime prerequisite, while
+engine-sized memory, threads/POSIX, actual engine integration, TLS and live Wi-Fi
+remain open. Binary publication remains held.
