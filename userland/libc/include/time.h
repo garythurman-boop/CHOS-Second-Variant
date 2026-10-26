@@ -1,0 +1,19 @@
+#ifndef CHOS_LIBC_TIME_H
+#define CHOS_LIBC_TIME_H
+#include <stdint.h>
+typedef int64_t time_t;
+typedef int clockid_t;
+#define CLOCK_REALTIME 0
+#define CLOCK_MONOTONIC 1
+struct timespec { time_t tv_sec; long tv_nsec; };
+struct tm { int tm_sec,tm_min,tm_hour,tm_mday,tm_mon,tm_year,tm_wday,tm_yday,tm_isdst; };
+#ifdef __cplusplus
+extern "C" {
+#endif
+int clock_gettime(clockid_t,struct timespec *);
+time_t time(time_t *);
+struct tm *gmtime_r(const time_t *,struct tm *);
+#ifdef __cplusplus
+}
+#endif
+#endif

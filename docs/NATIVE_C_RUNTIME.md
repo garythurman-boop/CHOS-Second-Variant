@@ -73,3 +73,7 @@ from a different compile. See `validation/stage3-native-c-runtime.json`.
 QEMU results do not prove Fusion, Pi 5, browser-engine or full revised Stage 3
 acceptance. All binary
 publication remains held under the user's Stage 3 completion instruction.
+
+See [native clocks](NATIVE_CLOCK_API.md) for the subsequent read-only clock API
+and limited C/C++ time conversion implementation. Full POSIX/timezone/thread
+support remains separate.

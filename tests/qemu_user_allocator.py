@@ -6,12 +6,13 @@ from qemu_platform import Guest,wait
 ap=argparse.ArgumentParser(description=__doc__)
 ap.add_argument('--out',type=pathlib.Path,required=True)
 ap.add_argument('--mode',choices=['direct','uefi'],default='direct')
+ap.add_argument('--rtc-base')
 ap.add_argument('--iso',type=pathlib.Path,default=pathlib.Path('build/chos-0.30.0.iso'))
 o=ap.parse_args();out=o.out.resolve();out.mkdir(parents=True,exist_ok=False)
 disk=out/'disposable.img';shutil.copyfile('build/qemu-smoke-disk.img',disk)
 app=pathlib.Path('build/userland/runtime_test.elf')
 subprocess.run(['python3','tools/mkchfs.py','put',str(disk),'/BIN/CRTTEST.ELF',str(app)],check=True)
-a=argparse.Namespace(mode=o.mode,kernel=pathlib.Path('build/chos.elf'),uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=o.iso,memory='2G' if o.mode=='uefi' else '512M',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model='e1000e',storage_error=False,nvme=False,no_rng=False,hub_depth=0,empty_usb=False,tablet=True)
+a=argparse.Namespace(mode=o.mode,kernel=pathlib.Path('build/chos.elf'),uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=o.iso,memory='2G' if o.mode=='uefi' else '512M',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=o.rtc_base,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model='e1000e',storage_error=False,nvme=False,no_rng=False,hub_depth=0,empty_usb=False,tablet=True)
 g=Guest(a,out,disk)
 normal='[ OK ] native C malloc/calloc/realloc/alignment, strings and heap reclamation passed'
 abandon='[ OK ] native C abandoned private heap exits for process reaper'
@@ -19,6 +20,7 @@ def launch(mode=''):
  marker=abandon if mode else normal
  before=g.text().count(marker);g.serial('exec /BIN/CRTTEST.ELF'+(' '+mode if mode else ''))
  wait(lambda:g.text().count(marker)>before or '[FAIL] native C' in g.text(),12,'actual EL0 libc '+(mode or 'runtime'))
+ assert '[ OK ] native clock API pointer bounds, monotonic progress and UTC conversion passed' in g.text()
  assert '[FAIL] native C' not in g.text() and '[FATAL]' not in g.text(),g.text()
 def free_pages():
  end=time.monotonic()+8
@@ -41,11 +43,12 @@ try:
  for _ in range(4):
   before=g.text().count(normal);g.serial('spawn /BIN/CRTTEST.ELF')
   wait(lambda:g.text().count(normal)>before or '[FAIL] native C' in g.text(),12,'scheduled EL0 libc')
-  assert '[FAIL] native C' not in g.text()
+  assert '[ OK ] native clock API pointer bounds, monotonic progress and UTC conversion passed' in g.text()
+ assert '[FAIL] native C' not in g.text()
  if o.mode=='direct':
   g.serial('runtime-exit');wait(lambda:'runtime shell and scheduled processes finished; returned to boot shell.' in g.text(),8,'runtime cleanup')
  launch();after=free_pages();assert baseline==after,('heap process pages leaked',baseline,after)
- (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'free_pages_before':baseline,'free_pages_after':after,'checks':['native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0','MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations','all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives','mixed live allocation patterns, string overlap and complete region release','abandoned mappings are reclaimed by actual process reaper','repeated exec/spawn launches preserve free physical pages']},indent=2))
+ (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'free_pages_before':baseline,'free_pages_after':after,'checks':['actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion','native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0','MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations','all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives','mixed live allocation patterns, string overlap and complete region release','abandoned mappings are reclaimed by actual process reaper','repeated exec/spawn launches preserve free physical pages']},indent=2))
 except Exception:
  (out/'failure.txt').write_text(g.text());raise
 finally:g.close()

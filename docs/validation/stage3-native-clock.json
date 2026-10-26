@@ -1,0 +1,94 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "source_sha256": {
+    "kernel/platform/clock.c": "98ad410eeed6aec1fc0930e708544694f88ae97ea4de7f7cc9274d7fa5b5ce86",
+    "kernel/core/syscall.c": "f24df29799e116925d91c4b740071d068101a9402ff2ed77594a3879fbac13c8",
+    "include/chos/clock_api.h": "b62611f4799f4a5808de573f847ee9292dac5e83d1c318924d14abfa9aaa69a8",
+    "userland/libc/time.c": "42184ff685ec9c5e7ef2a8a7801f15c6cdbd0f21c22813b01bd7f12f2411491c",
+    "userland/libc/include/time.h": "c19f3b182f797d9823ac6e602108502ea60a6c069b06a8fa7b13f734df803985",
+    "userland/examples/runtime_test.c": "5d1f8dcd1a08a9ea009a7907bc9744e3c7476bdf28a668b9e9e8c66905bbde61"
+  },
+  "guest_profiles": [
+    {
+      "evidence": "/workspace/chos-evidence/clock-native-direct2/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "131752a634318356853855adea340226cedbd8aba0c55a0768805d76b86354c7",
+        "free_pages_before": 117695,
+        "free_pages_after": 117695,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "2555d63c8f6904738ba44df2a9cdbdc94c42e804faadc0ef41e46f0aef5b8532"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/clock-native-no-wall2/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "131752a634318356853855adea340226cedbd8aba0c55a0768805d76b86354c7",
+        "free_pages_before": 117695,
+        "free_pages_after": 117695,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "2555d63c8f6904738ba44df2a9cdbdc94c42e804faadc0ef41e46f0aef5b8532"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/clock-native-uefi2/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "131752a634318356853855adea340226cedbd8aba0c55a0768805d76b86354c7",
+        "free_pages_before": 500556,
+        "free_pages_after": 500556,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "01060573e471c14252e5436d20b0564a25105e5b015e330863e9b2012c479bee",
+        "iso_sha256": "4a5ecfb66ea5c4a966e9d229d38b2424e2cbc92258b775d76cadf0b183eda2af",
+        "iso_embedded_kernel_sha256": "01060573e471c14252e5436d20b0564a25105e5b015e330863e9b2012c479bee",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "host_and_sanitizer": [
+    "clock-runtime-host1.log",
+    "clock-runtime-host-final.log",
+    "clock-runtime-sanitize-final.log"
+  ],
+  "retained_failure": {
+    "evidence": "/workspace/chos-evidence/clock-native-direct1",
+    "diagnosis": "test incorrectly required scheduled SLEEP after direct runtime-exit; corrected app accepts ENOSYS and still verifies clock progress"
+  },
+  "security_limit": "available UTC is not authenticated trusted time; TLS/entropy remain open",
+  "platform_limit": "QEMU component results; new Fusion/Pi/laptop API validation NOT RUN"
+}

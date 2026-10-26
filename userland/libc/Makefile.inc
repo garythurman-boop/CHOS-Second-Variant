@@ -1,6 +1,6 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c
+LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
 LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES))
 $(BUILD)/userland/libc/%.o: userland/libc/%.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h
@@ -36,3 +36,17 @@ test test-userland: $(BUILD)/userland/runtime_test.elf $(BUILD)/userland/libc-cp
 test: test-user-allocator
 test-sanitize: test-user-allocator-sanitize
 .PHONY: test-user-allocator test-user-allocator-sanitize
+
+$(BUILD)/test-libc-time: tests/test_libc_time.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -DCHOS_HOST_TEST -Iinclude $(LIBC_INCLUDES) tests/test_libc_time.c userland/libc/time.c -o $@
+$(SAN_DIR)/test-libc-time: tests/test_libc_time.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Wno-misleading-indentation -DCHOS_HOST_TEST $(LIBC_INCLUDES) tests/test_libc_time.c userland/libc/time.c -o $@
+test-libc-time: $(BUILD)/test-libc-time
+	./$(BUILD)/test-libc-time
+test-libc-time-sanitize: $(SAN_DIR)/test-libc-time
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-libc-time
+test: test-libc-time
+test-sanitize: test-libc-time-sanitize
+.PHONY: test-libc-time test-libc-time-sanitize

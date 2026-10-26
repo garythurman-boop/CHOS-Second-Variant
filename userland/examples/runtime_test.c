@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include "chos/user.h"
@@ -11,6 +12,23 @@ static int fail(unsigned line){
 }
 #define CHECK(x) do{if(!(x))return fail(__LINE__);}while(0)
 int main(int argc,char **argv){
+    chos_clock_info_t ci;
+    CHECK(chos_syscall2(CHOS_SYS_CLOCK_INFO,0,sizeof(ci))==-CHOS_ERRNO_EFAULT);
+    CHECK(chos_syscall2(CHOS_SYS_CLOCK_INFO,(long)(uintptr_t)&ci,sizeof(ci)-1)==-CHOS_ERRNO_EINVAL);
+    CHECK(chos_syscall2(CHOS_SYS_CLOCK_INFO,(long)(uintptr_t)main,sizeof(ci))==-CHOS_ERRNO_EFAULT);
+    struct {uint64_t before;chos_clock_info_t info;uint64_t after;} guarded={.before=0x12345678,.after=0x87654321};
+    CHECK(!chos_clock_status(&guarded.info)&&guarded.before==0x12345678&&guarded.after==0x87654321);
+    CHECK(!chos_clock_status(&ci)&&ci.version==1&&ci.size_bytes==48&&!ci.reserved);
+    struct timespec a,b;CHECK(!clock_gettime(CLOCK_MONOTONIC,&a));
+    long slept=chos_sleep_ticks(2);CHECK(slept==0 || slept==-CHOS_ERRNO_ENOSYS);
+    CHECK(!clock_gettime(CLOCK_MONOTONIC,&b));
+    CHECK(b.tv_sec>a.tv_sec || (b.tv_sec==a.tv_sec&&b.tv_nsec>a.tv_nsec));
+    CHECK(a.tv_nsec>=0&&a.tv_nsec<1000000000 && b.tv_nsec>=0&&b.tv_nsec<1000000000);
+    if(ci.flags&CHOS_CLOCK_REALTIME_VALID){
+        time_t now;struct tm calendar;CHECK(time(&now)>0&&gmtime_r(&now,&calendar));
+        CHECK(calendar.tm_year>=120&&calendar.tm_year<=8099);
+    }else CHECK(clock_gettime(CLOCK_REALTIME,&a)==-1&&errno==EAGAIN);
+    {const char *message="[ OK ] native clock API pointer bounds, monotonic progress and UTC conversion passed\n";chos_write(message,strlen(message));}
     chos_heap_stats_t stats;CHECK(!chos_libc_heap_info(&stats)&&!stats.regions);
     CHECK(!chos_native_cpp_api_smoke());
     if(argc>1&&!strcmp(argv[1],"abandon")){

@@ -122,3 +122,7 @@ publication hold remains active. Existing d91d135 downloads remain unchanged.
 The [consolidated local runtime record](validation/stage3-uefi-runtime.json)
 includes exact input manifests, matched binaries, accepted component profiles and
 retained failures. It explicitly leaves full Stage 3 and binary release incomplete.
+
+A further [native clock prerequisite](NATIVE_CLOCK_API.md) exposes bounded
+read-only monotonic/UTC status and actual C/C++ time conversions. It does not
+close authenticated-clock, secure entropy, TLS or modern-engine gates.

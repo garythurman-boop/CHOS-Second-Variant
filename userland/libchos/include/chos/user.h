@@ -1,3 +1,4 @@
+#include "chos/clock_api.h"
 #ifndef CHOS_USER_RUNTIME_H
 #define CHOS_USER_RUNTIME_H
 
@@ -114,6 +115,7 @@ static inline long chos_rmdir(const char *path) {
 static inline long chos_map_memory(size_t bytes){return chos_syscall2(CHOS_SYS_MAP_MEMORY,(long)bytes,0);}
 static inline long chos_unmap_memory(void *base,size_t bytes){return chos_syscall2(CHOS_SYS_UNMAP_MEMORY,(long)(uintptr_t)base,(long)bytes);}
 static inline long chos_network_status(chos_net_status_t *out){return chos_syscall2(CHOS_SYS_NET_INFO,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_clock_status(chos_clock_info_t *out) {return chos_syscall2(CHOS_SYS_CLOCK_INFO,(uint64_t)(uintptr_t)out,sizeof(*out));}
 static inline long chos_network_status6(chos_net6_info_t *out){return chos_syscall2(CHOS_SYS_NET6_INFO,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_ping6(const char *literal){return chos_syscall1(CHOS_SYS_NET6_PING,(long)(uintptr_t)literal);}
 

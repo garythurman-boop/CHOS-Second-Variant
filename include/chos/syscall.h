@@ -50,6 +50,7 @@
 #define CHOS_SYS_NET6_ABORT 45u /* x0=handle, immediate owner-only release */
 #define CHOS_SYS_NET6_DNS_START 46u /* x0=hostname; owner-bound async AAAA over validated RDNSS server */
 #define CHOS_SYS_NET6_DNS_STATUS 47u /* x0=writable chos_dns6_info_t,x1=capacity */
+#define CHOS_SYS_CLOCK_INFO 48u /* x0=writable chos_clock_info_t,x1=capacity; read-only clocks */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

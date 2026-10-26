@@ -6,9 +6,11 @@
 #include "../kernel/platform/clock.c"
 static uint64_t mock_counter;
 static unsigned mmio_reads;
+uint64_t timer_frequency_hz(void) {return 1000u;}
 uint64_t timer_counter(void) {return mock_counter;}
 uint32_t chos_clock_mock_mmio(uintptr_t a) {assert(a==0x12340000);++mmio_reads;return 1792800000;}
 int main(void) {
+    chos_clock_info_t info;
     uint64_t epoch;
     chos_firmware_time_t time={.year=1970,.month=1,.day=1};
     assert(chos_firmware_time_epoch(&time,&epoch) && epoch==0);
@@ -23,11 +25,18 @@ int main(void) {
     time.day=32;assert(!chos_firmware_time_epoch(&time,&epoch));
     chos_boot_info_t boot={.flags=CHOS_BOOT_FLAG_CLOCK,.clock_unix_seconds=1792800000,.clock_counter=100,.clock_frequency=1000};
     mock_counter=100;assert(chos_clock_init_uefi(&boot));assert(platform_rtc_unix_seconds()==1792800000);
+    mock_counter=1600;chos_clock_get_info(&info);
+    assert(info.flags==3u && info.source==1 && info.realtime_seconds==1792800001 && info.realtime_nanoseconds==500000000u);
+    assert(info.monotonic_seconds==1u && info.monotonic_nanoseconds==600000000u && !info.reserved);
+    mock_counter=100;
     mock_counter+=61000;assert(platform_rtc_unix_seconds()==1792800061 && !mmio_reads);
     boot.clock_counter=UINT64_MAX-999;mock_counter=1000;assert(chos_clock_init_uefi(&boot));
     assert(platform_rtc_unix_seconds()==1792800002); /* architectural counter wrap */
     boot.clock_frequency=0;assert(!chos_clock_init_uefi(&boot));assert(!platform_rtc_unix_seconds() && !mmio_reads);
     assert(chos_clock_use_pl031(0x12340000));assert(platform_rtc_unix_seconds()==1792800000 && mmio_reads==2);
     assert(!chos_clock_init_uefi(NULL));assert(!platform_rtc_unix_seconds() && mmio_reads==2);
+    chos_clock_get_info(&info);assert(info.flags==CHOS_CLOCK_MONOTONIC_VALID && !info.source && !info.realtime_seconds);
+    boot.clock_frequency=UINT64_MAX;assert(!chos_clock_init_uefi(&boot));
+    chos_clock_get_info(NULL);
     puts("Clock: EFI calendar/timezone bounds, counter progress/wrap, no IRQ dependency and no UEFI fixed-MMIO access passed");
 }

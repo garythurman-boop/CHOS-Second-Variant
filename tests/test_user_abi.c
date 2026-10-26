@@ -6,8 +6,10 @@
 #include "chos/net_tcp_api.h"
 #include "chos/net_dns_api.h"
 #include "chos/net6_api.h"
+#include "chos/clock_api.h"
 
 int main(void) {
+    assert(CHOS_SYS_CLOCK_INFO==48u&&sizeof(chos_clock_info_t)==48u);
     assert(CHOS_SYS_WRITE == 1u);
     assert(CHOS_SYS_EXIT == 2u);
     assert(CHOS_SYS_NET6_INFO==37u && CHOS_SYS_NET6_PING==38u);

@@ -12,4 +12,6 @@ int *__chos_errno_location(void);
 #define EIO 5
 #define ENOMEM 12
 #define EINVAL 22
+#define EAGAIN 11
+#define EOVERFLOW 75
 #endif

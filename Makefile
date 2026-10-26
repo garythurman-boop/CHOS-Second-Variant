@@ -1409,3 +1409,5 @@ test-userland test: $(BUILD)/userland/dns6_test.chcx
 test: test-guest-iso-artifacts
 test-guest-iso-artifacts:
 	python3 tests/test_guest_iso_artifacts.py
+
+$(BUILD)/test-clock $(SAN_DIR)/test-clock $(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi: include/chos/clock_api.h

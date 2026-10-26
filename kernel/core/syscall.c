@@ -1,3 +1,4 @@
+#include "chos/clock.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/atomic.h"
@@ -935,6 +936,15 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 if(frame->x[1]<sizeof(status)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 if(!syscall_user_range_writable(fault_space,frame->x[0],sizeof(status))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
                 chos_net_manager_status(&status);
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&status,sizeof(status))?0u:neg_errno(CHOS_ERRNO_EFAULT);
+                return frame;
+            }
+            case CHOS_SYS_CLOCK_INFO: {
+                chos_clock_info_t status;
+                if(!process_pid_for_address_space(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[1]<sizeof(status)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[0],sizeof(status))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                chos_clock_get_info(&status);
                 frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&status,sizeof(status))?0u:neg_errno(CHOS_ERRNO_EFAULT);
                 return frame;
             }
