@@ -125,6 +125,8 @@ static inline long chos_ipc_get_status(uint64_t h,chos_ipc_info_t *out){return c
 static inline long chos_ipc_write(uint64_t h,const void *p,size_t n){return chos_syscall3(CHOS_SYS_IPC_SEND,(long)h,(long)(uintptr_t)p,(long)n);}
 static inline long chos_ipc_read(uint64_t h,void *p,size_t n){return chos_syscall3(CHOS_SYS_IPC_RECV,(long)h,(long)(uintptr_t)p,(long)n);}
 static inline long chos_ipc_release(uint64_t h){return chos_syscall1(CHOS_SYS_IPC_CLOSE,(long)h);}
+static inline long chos_wait_word(volatile uint32_t *word,uint32_t expected,uint64_t ticks){return chos_syscall3(CHOS_SYS_FUTEX_WAIT,(long)(uintptr_t)word,expected,(long)ticks);}
+static inline long chos_wake_word(volatile uint32_t *word,unsigned count){return chos_syscall2(CHOS_SYS_FUTEX_WAKE,(long)(uintptr_t)word,count);}
 static inline long chos_thread_create(const chos_thread_request_t *r){return chos_syscall2(CHOS_SYS_THREAD_CREATE,(long)(uintptr_t)r,sizeof(*r));}
 static inline long chos_thread_status(uint32_t tid,chos_thread_info_t *out){return chos_syscall3(CHOS_SYS_THREAD_INFO,tid,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_thread_collect(uint32_t tid){return chos_syscall1(CHOS_SYS_THREAD_REAP,tid);}

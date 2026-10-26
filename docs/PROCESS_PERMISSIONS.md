@@ -3,7 +3,9 @@
 SPAWN_LIMITED (54) launches a child with a reduced effective syscall mask.
 CAPABILITIES (55) reads the caller's own mask. Process EXIT, secondary-thread
 EXIT and permission inspection remain available. The native thread extension
-uses syscalls56..60 with the same process-wide immutable permission guard. Unknown bits, adding a permission the parent lacks, or an
+uses syscalls56..60, and private futex wait/wake use61/62, with the same
+process-wide immutable permission guard. The scalar representation has now
+reached its positive62-bit bound. Unknown bits, adding a permission the parent lacks, or an
 invalid user string fail before loading or publishing a child. Unknown syscall
 numbers fail closed until the kernel explicitly extends the supported range.
 The current scalar ABI intentionally has a compile-time size bound; adding more

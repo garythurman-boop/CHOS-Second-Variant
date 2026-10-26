@@ -2,6 +2,7 @@
 #include "chos/process_caps.h"
 #include "chos/syscall.h"
 int main(void){
+ assert((int64_t)CHOS_PROCESS_CAP_ALL>0);
  uint64_t out=123;
  assert(chos_process_cap_reduction(CHOS_PROCESS_CAP_ALL,0,&out));
  assert(out==CHOS_PROCESS_CAP_REQUIRED);

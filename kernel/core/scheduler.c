@@ -514,6 +514,21 @@ void scheduler_sleep_ticks(uint64_t ticks) {
     /* The task resumes only after a wake path has made it READY and dispatched it. */
 }
 
+int scheduler_prepare_sleep_ticks(uint64_t ticks){
+ uint64_t flags=scheduler_critical_enter();
+ if(!ticks||!scheduler_running||!preemption_requested||!timer_is_ready()||current_slot>=CHOS_SCHED_MAX_TASKS||task_states[current_slot]!=SCHED_TASK_RUNNING){
+  scheduler_critical_leave(flags);return 0;
+ }
+ task_states[current_slot]=SCHED_TASK_SLEEPING;
+ task_wake_ticks[current_slot]=sleep_deadline(timer_ticks(),ticks);++sleep_calls;
+ scheduler_critical_leave(flags);return 1;
+}
+void scheduler_await_dispatch(void){
+ size_t slot=current_slot;if(slot>=CHOS_SCHED_MAX_TASKS)return;
+ volatile scheduler_task_state_t *state=&task_states[slot];
+ while(*state!=SCHED_TASK_RUNNING)__asm__ volatile("wfi":::"memory");
+}
+
 int scheduler_wake_task(uint32_t task_id) {
     size_t i;
     uint64_t daif = scheduler_critical_enter();

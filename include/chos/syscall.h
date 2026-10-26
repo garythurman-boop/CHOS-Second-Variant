@@ -63,6 +63,8 @@
 #define CHOS_SYS_THREAD_REAP 58u /* x0=own exited TID; releases join record */
 #define CHOS_SYS_THREAD_EXIT 59u /* x0=64-bit result; secondary thread only */
 #define CHOS_SYS_THREAD_SELF 60u /* stable own thread ID, including the main task */
+#define CHOS_SYS_FUTEX_WAIT 61u /* x0=private RW word,x1=uint32 expected,x2=relative timeout ticks */
+#define CHOS_SYS_FUTEX_WAKE 62u /* x0=private RW word,x1=max waiters0..8; returns count */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

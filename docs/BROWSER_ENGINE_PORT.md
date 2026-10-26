@@ -148,3 +148,9 @@ EL0 workers, private saved TPIDR_EL0 state, stack lifetime pins, join/reap and
 process-wide exit/fault cancellation. This is not complete pthread/futex, compiler
 TLS or a thread-safe C/C++ runtime. The modern engine and other Stage3 gates
 remain open; binary publication remains held.
+
+[Private futex wait/wake](PRIVATE_FUTEX.md) now supplies an interlocked compare/
+queue/sleep transaction for shared-AS workers, bounded notification/timeouts and
+process cancellation. This is a real native synchronization primitive; pthread,
+compiler TLS, thread-safe C/C++/TLS libraries, full engine integration and the
+remaining internet/wireless gates stay open. Binary publication remains held.

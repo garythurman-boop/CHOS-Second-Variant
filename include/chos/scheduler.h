@@ -76,6 +76,10 @@ int scheduler_preemption_enabled(void);
 chos_irq_context_t *scheduler_on_timer_irq(chos_irq_context_t *interrupted_context);
 void scheduler_yield(void);    /* Voluntary round-robin yield by current task. */
 void scheduler_sleep_ticks(uint64_t ticks); /* Cooperative sleep; timer ticks continue in IRQ. */
+/* Internal interlocked wait API: prepare with local IRQs masked, then enable
+ * IRQs and await dispatch. Only the preemptive user runtime may use this pair. */
+int scheduler_prepare_sleep_ticks(uint64_t);
+void scheduler_await_dispatch(void);
 int scheduler_wake_task(uint32_t task_id);  /* Wake a sleeping task by ID. */
 void scheduler_exit_current(void) __attribute__((noreturn));
 int scheduler_is_running(void);

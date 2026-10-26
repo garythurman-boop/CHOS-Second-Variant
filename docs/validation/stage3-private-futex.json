@@ -1,0 +1,179 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "completion_version_reserved": "0.50.0",
+  "scope": "native bounded private compare/sleep/wake for shared-AS threads, not full POSIX or browser integration",
+  "source_sha256": {
+    "include/chos/futex.h": "48aa518ce65f5bf855ab1c108d0aadedc6bae21c209d1c20d9dca69ed633581d",
+    "include/chos/syscall.h": "20475e43513a036733c5783f1dd9533ea2d8dd607ca974164e3ef6e0facdf7dd",
+    "include/chos/process_caps.h": "2fd1cb4609222c9777cb2a0d842307f8a0f8bc60b159aea9497899d066f5d014",
+    "include/chos/scheduler.h": "6fe06e50b5ab59660cefe751f54ea012aa91b3ef147ae6ec6761c4bb834bafb2",
+    "kernel/core/futex.c": "0e659f12dfacfbca6ff4c325bec9ea248d598984aa3fbbbaba263685be2b34d9",
+    "kernel/core/scheduler.c": "177bc44e0dc114ee09eaf08438abb731513e293c1b0fdeb50e67e443ab4ab579",
+    "kernel/core/syscall.c": "3ecc24f61d190c5a272f7925cc50fc53d56251ea7e2195633d46510297e9daa6",
+    "userland/libchos/include/chos/user.h": "6e76a866d3cb9f2f0284f643f9c78a436c8d903dd013b055dec2bf9bc2d94c26",
+    "userland/examples/futex_test.c": "48aee6cb5b7a1a27e62262102bbb1d1955447a92621e172b9e0b07aa2b50406d",
+    "tests/test_futex.c": "a12859091a09f6659de22b0a83b7de9fcda2f88c96b2854799b927c666747e4e",
+    "tests/qemu_futex.py": "940f686fa89633d51fd75d260d94313a687006817c03e66bee294a6187e644df",
+    "tests/test_user_abi.c": "c9fb75c34bc19f54593c0bec439677c57429a392d336f7d23a29c1a8d2197d42",
+    "tests/test_process_caps.c": "d6559fd2f9a57955b87282e50e3beabd9df1351b1128c7bfb26dc0c08cb228e7"
+  },
+  "host_and_sanitizer": [
+    "futex-host1.log",
+    "futex-host-full.log",
+    "futex-sanitize-full.log",
+    "futex-smoke.log"
+  ],
+  "guest_profiles": [
+    {
+      "evidence": "/workspace/chos-evidence/futex-direct-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "17b7a08fedf2b63420c6bbfa195ba320d9dd096ccc8a36d6b21b110dc6142ddd",
+        "kernel_futex_counters": {
+          "futex_wait_calls": 367,
+          "futex_wake_events": 360,
+          "futex_timeouts": 5,
+          "futex_cancellations": 2
+        },
+        "cold_free_pages": 117699,
+        "free_pages_before": 117690,
+        "free_pages_after": 117690,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 465,
+        "checks": [
+          "three actual EL0 workers contend, yield while holding mutex and preserve600 exact updates per lifecycle",
+          "same virtual address in foreign process cannot wake private-key waiters",
+          "wake counts2 and1 are bounded and condition must be rechecked after wake",
+          "mismatched value returns EAGAIN without sleeping; timeout and invalid word/width/capacity rejected",
+          "three worker lifecycles per process, repeated process launches and stable physical pages",
+          "process exit cancels futex sleepers and leaves zero queued wait records",
+          "post-cancellation normal process succeeds"
+        ],
+        "limits": [
+          "native private bounded futex; not shared-process futex, POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "e78b3aa1ce6f7d95bd3711399fda49c3121fc3569f8fe85f326fb1f99024cc57"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/futex-uefi-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "17b7a08fedf2b63420c6bbfa195ba320d9dd096ccc8a36d6b21b110dc6142ddd",
+        "kernel_futex_counters": {
+          "futex_wait_calls": 367,
+          "futex_wake_events": 360,
+          "futex_timeouts": 5,
+          "futex_cancellations": 2
+        },
+        "cold_free_pages": 500528,
+        "free_pages_before": 500519,
+        "free_pages_after": 500519,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 465,
+        "checks": [
+          "three actual EL0 workers contend, yield while holding mutex and preserve600 exact updates per lifecycle",
+          "same virtual address in foreign process cannot wake private-key waiters",
+          "wake counts2 and1 are bounded and condition must be rechecked after wake",
+          "mismatched value returns EAGAIN without sleeping; timeout and invalid word/width/capacity rejected",
+          "three worker lifecycles per process, repeated process launches and stable physical pages",
+          "process exit cancels futex sleepers and leaves zero queued wait records",
+          "post-cancellation normal process succeeds"
+        ],
+        "limits": [
+          "native private bounded futex; not shared-process futex, POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "5afb89a3d8748d61dcbdd2f611268f7550262d35f72e7407e9c437d042df34ff",
+        "iso_sha256": "dbac32cc0245dc4cf4fd76cc3cc04fef6dd2abf8d0ae58924a97ec0d25063274",
+        "iso_embedded_kernel_sha256": "5afb89a3d8748d61dcbdd2f611268f7550262d35f72e7407e9c437d042df34ff",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/futex-caps-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "551d9b1be9f6f71de936c62e8175b6f3638dbec871b29dffdd06577f745c863b",
+        "cold_free_pages": 117699,
+        "free_pages_before": 117693,
+        "free_pages_after": 117693,
+        "checks": [
+          "child limits installed before scheduler entry",
+          "filesystem/network/GUI/entropy rejected without invoking those services",
+          "ordinary SPAWN and SPAWN_ARGS inherit reduced rights",
+          "restricted spawn cannot increase its own mask",
+          "EXIT/query remain available after further reduction to zero optional rights",
+          "parent retains its original rights; repeated nested cleanup returns stable physical pages"
+        ],
+        "limits": [
+          "per-process syscall permission reduction, not complete site/filesystem/browser sandboxing",
+          "no browser-engine or TLS completion claim",
+          "QEMU evidence, new Fusion behavior NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "e78b3aa1ce6f7d95bd3711399fda49c3121fc3569f8fe85f326fb1f99024cc57"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/futex-threads-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "be5d48e63b28a63aeb23e8127508eace7de53c538f26d7c68b93e9d242afd010",
+        "cold_free_pages": 500528,
+        "free_pages_before": 500495,
+        "free_pages_after": 500495,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 236,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "5afb89a3d8748d61dcbdd2f611268f7550262d35f72e7407e9c437d042df34ff",
+        "iso_sha256": "dbac32cc0245dc4cf4fd76cc3cc04fef6dd2abf8d0ae58924a97ec0d25063274",
+        "iso_embedded_kernel_sha256": "5afb89a3d8748d61dcbdd2f611268f7550262d35f72e7407e9c437d042df34ff",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "unqualified_investigation": [
+    {
+      "evidence": "futex-direct1/result.json",
+      "diagnosis": "initial zero-queue oracle passed offset4 to Guest.symbol, reading padding; corrected actual-counter read and qualified profiles below are accepted instead"
+    }
+  ],
+  "limits": [
+    "single-CPU private futex with mandatory relative timeout0..60000ticks",
+    "no process-shared/PI/robust/requeue/bitset operations or FIFO promise",
+    "native C allocator/errno, pthread and TLS library integration still open",
+    "scalar syscall permission limit now62; future extension needs explicit ABI redesign",
+    "no modern-engine, browser or wireless completion",
+    "new Fusion/Pi/laptop qualification NOT RUN"
+  ]
+}

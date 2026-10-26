@@ -1,7 +1,7 @@
 #ifndef CHOS_PROCESS_CAPS_H
 #define CHOS_PROCESS_CAPS_H
 #include <stdint.h>
-#define CHOS_PROCESS_SYSCALL_LIMIT 60u
+#define CHOS_PROCESS_SYSCALL_LIMIT 62u
 _Static_assert(CHOS_PROCESS_SYSCALL_LIMIT<63u,"syscall permissions must fit a positive64-bit mask");
 #define CHOS_PROCESS_CAP(n) (UINT64_C(1)<<(n))
 #define CHOS_PROCESS_CAP_ALL ((UINT64_C(1)<<(CHOS_PROCESS_SYSCALL_LIMIT+1u))-2u)

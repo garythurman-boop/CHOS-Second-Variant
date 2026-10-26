@@ -1,3 +1,4 @@
+#include "chos/futex.h"
 #include "chos/ipc.h"
 #include "chos/threads.h"
 #include "chos/clock.h"
@@ -485,6 +486,12 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 chos_threads_stop(fault_space,(int64_t)frame->x[0],0);
                 user_mode_request_exit(frame, (int64_t)frame->x[0], 0);
                 return frame;
+            case CHOS_SYS_FUTEX_WAIT:
+                if(frame->x[1]>UINT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_futex_wait(fault_space,frame->x[0],(uint32_t)frame->x[1],frame->x[2]);return frame;
+            case CHOS_SYS_FUTEX_WAKE:
+                if(frame->x[1]>CHOS_SCHED_MAX_TASKS){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_futex_wake(fault_space,frame->x[0],(unsigned)frame->x[1]);return frame;
             case CHOS_SYS_THREAD_SELF:
                 frame->x[0]=(uint64_t)chos_thread_self(fault_space);return frame;
             case CHOS_SYS_THREAD_EXIT:
