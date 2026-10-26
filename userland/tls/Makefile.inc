@@ -1,7 +1,7 @@
 # Reviewed TLS1.2/1.3 prerequisite profile, separately configured from boot entropy.
 TLS_MODULES := hkdf psa_crypto psa_crypto_aead psa_crypto_cipher psa_crypto_client psa_crypto_driver_wrappers_no_static psa_crypto_ecp psa_crypto_hash psa_crypto_mac psa_crypto_rsa psa_crypto_slot_management psa_util ssl_tls13_client ssl_tls13_generic ssl_tls13_keys aes asn1parse asn1write base64 bignum bignum_core bignum_mod bignum_mod_raw cipher cipher_wrap constant_time ecdh ecdsa ecp ecp_curves gcm hmac_drbg md oid pk pk_ecc pk_wrap pkparse platform_util rsa rsa_alt_helpers sha256 sha512 ssl_ciphersuites ssl_client ssl_msg ssl_tls ssl_tls12_client x509 x509_crt
 TLS_HEADERS := $(LIBC_HEADERS) $(wildcard userland/tls/include/*.h third_party/mbedtls/include/mbedtls/*.h third_party/mbedtls/include/psa/*.h third_party/mbedtls/library/*.h)
-TLS_FLAGS := $(LIBC_INCLUDES) -Iuserland/tls/include -Ithird_party/mbedtls/include -DMBEDTLS_CONFIG_FILE='"chos_tls_config.h"' -ffunction-sections -fdata-sections
+TLS_FLAGS := -Iuserland/tls/include $(LIBC_INCLUDES) -Ithird_party/mbedtls/include -DMBEDTLS_CONFIG_FILE='"chos_tls_config.h"' -ffunction-sections -fdata-sections
 TLS_OBJECTS := $(addprefix $(BUILD)/userland/tls/upstream/,$(addsuffix .o,$(TLS_MODULES)))
 $(BUILD)/userland/tls/upstream/%.o: third_party/mbedtls/library/%.c $(TLS_HEADERS)
 	@mkdir -p $(dir $@)

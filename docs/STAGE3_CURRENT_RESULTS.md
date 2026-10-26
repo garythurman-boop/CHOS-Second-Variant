@@ -240,3 +240,14 @@ Legacy FP isolation, pthread and verified IPv6 TLS regressions pass; see
 [exact evidence](validation/stage3-native-math.json). Binary128/nexttoward, complete
 C++/POSIX and engine-sized runtime remain open, alongside the actual browser,
 production trust policy and wireless gates. The binary publication hold remains active.
+
+The [native libc++ subset](NATIVE_CXX_SUBSET.md) now runs actual array/vector/string,
+RAII, allocation/deallocation and atomic operations on three native pthread workers.
+Pinned unchanged LLVM code and real CHOS filename APIs link without host libraries.
+Direct/UEFI guest tests verify normal operation, OOM/bounds process isolation,
+clean relaunch and stable warm pages; aggregate host/sanitizer and threaded IPv6
+TLS regressions pass. See [exact evidence](validation/stage3-native-cxx.json).
+This is a static no-exceptions/no-RTTI container profile, not a complete C++ ABI,
+std::thread/mutex runtime or modern engine. Engine-sized memory/events/POSIX,
+production trust policy, actual browser integration and real wireless remain
+open; binary publication remains held.

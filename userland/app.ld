@@ -5,6 +5,7 @@ PHDRS { code PT_LOAD FLAGS(5); constant PT_LOAD FLAGS(4); writable PT_LOAD FLAGS
 SECTIONS {
  . = 0x20000000;
  .text : { KEEP(*(.text.boot)) *(.text .text.*) } :code
+ __lcxx_override : { __start___lcxx_override = .; KEEP(*(__lcxx_override)) __stop___lcxx_override = .; } :code
  . = ALIGN(4096);
  .rodata : { *(.rodata .rodata.*) } :constant
  .note.chos : { KEEP(*(.note.chos)) } :abi

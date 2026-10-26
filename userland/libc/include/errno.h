@@ -9,6 +9,13 @@ int *__chos_errno_location(void);
 }
 #endif
 #define errno (*__chos_errno_location())
+#define ENOENT 2
+#define EFAULT 14
+#define EEXIST 17
+#define ENOTDIR 20
+#define EISDIR 21
+#define ENOSPC 28
+#define ENOTEMPTY 39
 #define EIO 5
 #define ENOMEM 12
 #define EINVAL 22
