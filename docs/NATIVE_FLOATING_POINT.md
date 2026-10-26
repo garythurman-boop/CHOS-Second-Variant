@@ -15,6 +15,11 @@ CPU discovery requires base FP and Advanced SIMD before installing these vectors
 EL2 entry permits base FP; CPACR_EL1 enables it at EL0/EL1 while keeping SVE and
 SME trapped. Scalable vectors and streaming/ZA state are not part of this ABI.
 
+The subsequent [native math profile](NATIVE_MATH.md) makes C pthreads deliberately
+inherit only their creating thread's FPCR/FPSR before the callback runs. This is a
+user-runtime contract over the fresh kernel entry, not cross-process Q-register
+inheritance. Real distinct rounding/status and original fresh-process tests pass.
+
 Kernel C must remain compiled with `-mgeneral-regs-only`: the cooperative EL1
 switcher deliberately retains its existing integer-register ABI. Application
 state is protected by the surrounding exception frames, including when a syscall

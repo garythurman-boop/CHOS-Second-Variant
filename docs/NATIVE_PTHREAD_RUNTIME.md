@@ -24,6 +24,12 @@ worker, or a user fault still terminates the group. Fault status takes precedenc
 This extends THREAD_EXIT59 to the main scheduled task; synchronous single-task
 profiles use the explicit no-sibling process-exit fallback.
 
+The [native math extension](NATIVE_MATH.md) now captures creator FPCR/FPSR and
+installs that environment before a worker callback. Raw kernel Q registers remain
+fresh, while C pthread rounding/status follows the creator and is isolated after
+creation. The native C runtime retains its integer compilation contract through
+a small user-only assembly shim.
+
 `errno` lives in the current TCB, using TPIDR_EL0 state preserved by the kernel.
 The main TCB initializes lazily without allocating. The allocator serializes whole
 heap transactions, including map/unmap, metadata changes and error capture, through

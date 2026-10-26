@@ -2,7 +2,10 @@
 LIBC_INCLUDES := -Iuserland/libc/include
 LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
-LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o
+LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o
+$(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) -c $< -o $@
 EMUTLS_HEADERS := $(wildcard third_party/compiler-rt/lib/builtins/*.h)
 EMUTLS_HOOKS := -Dpthread_key_create=__chos_pthread_key_create_late -Dpthread_mutex_lock=__chos_emutls_mutex_lock -Dpthread_mutex_unlock=__chos_emutls_mutex_unlock -Dpthread_once=__chos_emutls_once -Dpthread_setspecific=__chos_emutls_setspecific
 $(BUILD)/userland/libc/compiler_rt_emutls.o: third_party/compiler-rt/lib/builtins/emutls.c $(EMUTLS_HEADERS) $(LIBC_HEADERS)

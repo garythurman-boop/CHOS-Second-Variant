@@ -11,6 +11,7 @@ typedef struct {
  uint32_t tid,done,joining,once_depth,exiting;
  void *result;void *(*start)(void *);void *argument;
  uint64_t stack_base;size_t stack_bytes;
+ uint64_t initial_fpcr,initial_fpsr;
  void *cxx_destructors;unsigned cxx_destructor_count;
  mbstate_t unicode_states[4];
  pthread_once_t *active_once[8];

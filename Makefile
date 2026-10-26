@@ -1351,6 +1351,7 @@ test-userland test: $(BUILD)/userland/native_test.elf
 $(BUILD)/test-process-format $(SAN_DIR)/test-process-format $(BUILD)/test-romfs $(SAN_DIR)/test-romfs $(BUILD)/test-chfs $(SAN_DIR)/test-chfs $(BUILD)/test-installer-io $(SAN_DIR)/test-installer-io: include/chos/elf_image.h
 
 include userland/libc/Makefile.inc
+include userland/libm/Makefile.inc
 
 $(BUILD)/userland/tcp6_test.o: userland/examples/tcp6_test.c userland/libchos/include/chos/user.h include/chos/net_tcp6_api.h include/chos/syscall.h
 	@mkdir -p $(dir $@)

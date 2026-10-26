@@ -231,3 +231,12 @@ state. Host differential/exhaustive scalar tests and actual direct/UEFI thread
 tests pass alongside compiler-TLS/HTTPS regressions. See
 [exact evidence](validation/stage3-base-c.json). This does not complete libc++,
 the modern engine, production trust policy or wireless; binary publication is held.
+
+The [native math profile](NATIVE_MATH.md) now builds pinned original musl float/
+double and actual ARM64 fenv code.889 high-precision scalar fixtures, special-value
+checks, host sanitizers and direct/UEFI FP-environment tests pass. Native pthreads
+inherit creator controls/status while raw kernel workers retain fresh vector state.
+Legacy FP isolation, pthread and verified IPv6 TLS regressions pass; see
+[exact evidence](validation/stage3-native-math.json). Binary128/nexttoward, complete
+C++/POSIX and engine-sized runtime remain open, alongside the actual browser,
+production trust policy and wireless gates. The binary publication hold remains active.

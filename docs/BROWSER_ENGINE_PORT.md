@@ -196,3 +196,12 @@ allocation-free per-thread UTF-8/16/32 conversions with host and actual EL0 evid
 This addresses its div/mbstate prerequisites. Math, scheduler/thread, C++ library/
 ABI and further engine dependencies remain active; this compile probe is not an
 engine build or browser conformance result.
+
+The [native math profile](NATIVE_MATH.md) now builds pinned original musl float/
+double and actual ARM64 fenv code.889 high-precision scalar fixtures, special-value
+checks, host sanitizers and direct/UEFI FP-environment tests pass. Native pthreads
+inherit creator controls/status while raw kernel workers retain fresh vector state.
+Legacy FP isolation, pthread and verified IPv6 TLS regressions pass; see
+[exact evidence](validation/stage3-native-math.json). Binary128/nexttoward, complete
+C++/POSIX and engine-sized runtime remain open, alongside the actual browser,
+production trust policy and wireless gates. The binary publication hold remains active.

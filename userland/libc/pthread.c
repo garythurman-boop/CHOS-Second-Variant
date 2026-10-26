@@ -6,6 +6,9 @@
 #define ATTR_MAGIC UINT32_C(0x50544154)
 #define KEY_INDEX_BITS 6u
 #define KEY_GENERATION_MAX (UINT32_MAX>>KEY_INDEX_BITS)
+/* Kept in a GPR-only assembly shim so native libc C retains its integer ABI. */
+extern void __chos_pthread_get_fp(uint64_t *,uint64_t *);
+extern void __chos_pthread_set_fp(uint64_t,uint64_t);
 typedef struct {uint32_t generation,live,late;void (*destroy)(void *);} key_t;
 static key_t keys[PTHREAD_KEYS_MAX];
 static pthread_mutex_t keys_lock=PTHREAD_MUTEX_INITIALIZER;
@@ -78,14 +81,22 @@ void pthread_exit(void *result){
  /* The synchronous single-task profile has no siblings to preserve. */
  chos_exit(t->main_thread&&rc==-CHOS_ERRNO_ENOSYS?0:127);
 }
-static void start_thread(void *p){chos_libc_tcb_t *t=p;pthread_exit(t->start(t->argument));}
+static void start_thread(void *p){
+ chos_libc_tcb_t *t=p;
+ /* Raw kernel workers start with zero FP state; the C pthread contract inherits
+  * only its creating thread's FP environment, never another process's Q data. */
+ __chos_pthread_set_fp(t->initial_fpcr,t->initial_fpsr);
+ pthread_exit(t->start(t->argument));
+}
 int pthread_create(pthread_t *out,const pthread_attr_t *a,void *(*start)(void *),void *argument){
  if(!out||!start||(a&&a->magic!=ATTR_MAGIC))return EINVAL;
  if(a&&a->detached!=PTHREAD_CREATE_JOINABLE)return ENOTSUP;
  size_t bytes=a?a->stack_bytes:32768;if(bytes<PTHREAD_STACK_MIN||bytes>CHOS_THREAD_STACK_MAX||(bytes&4095u))return EINVAL;
+ uint64_t fpcr,fpsr;__chos_pthread_get_fp(&fpcr,&fpsr);
  (void)__chos_libc_tls();chos_libc_tcb_t *t=calloc(1,sizeof(*t));if(!t)return ENOMEM;
  long base=chos_map_memory(bytes);if(base<0){free(t);return (int)-base;}
  t->magic=CHOS_TCB_MAGIC;t->start=start;t->argument=argument;t->stack_base=(uint64_t)base;t->stack_bytes=bytes;
+ t->initial_fpcr=fpcr;t->initial_fpsr=fpsr;
  chos_thread_request_t r={.version=1,.size_bytes=sizeof(r),.entry=(uint64_t)(uintptr_t)start_thread,.stack_base=(uint64_t)base,
   .stack_bytes=bytes,.argument=(uint64_t)(uintptr_t)t,.tls=(uint64_t)(uintptr_t)t};
  long id=chos_thread_create(&r);
