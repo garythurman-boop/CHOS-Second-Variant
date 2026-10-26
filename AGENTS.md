@@ -34,6 +34,8 @@ On the prepared cloud machine:
   make CC=clang LD=ld.lld -j4 all uefi-iso install-disk-image build/qemu-smoke-disk.img build/userland/rng_test.chcx
   make test CC=clang LD=ld.lld -j1
   make test-sanitize CC=clang LD=ld.lld -j1
+  # Host/API targets may rebuild embedded apps/kernel; resynchronize ISO first.
+  make CC=clang LD=ld.lld -j4 all uefi-iso install-disk-image
   make qemu-smoke CC=clang LD=ld.lld
 
 Use tests/qemu_platform.py with a fresh output directory for live acceptance checks.

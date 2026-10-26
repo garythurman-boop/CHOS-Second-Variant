@@ -8,8 +8,10 @@
 #include "chos/net6_api.h"
 #include "chos/clock_api.h"
 #include "chos/ipc.h"
+#include "chos/process_caps.h"
 
 int main(void) {
+    assert(CHOS_SYS_SPAWN_LIMITED==54u&&CHOS_SYS_CAPABILITIES==CHOS_PROCESS_SYSCALL_LIMIT);
     assert(CHOS_SYS_IPC_OPEN==49u&&CHOS_SYS_IPC_CLOSE==53u&&sizeof(chos_ipc_info_t)==64u);
     assert(CHOS_SYS_CLOCK_INFO==48u&&sizeof(chos_clock_info_t)==48u);
     assert(CHOS_SYS_WRITE == 1u);

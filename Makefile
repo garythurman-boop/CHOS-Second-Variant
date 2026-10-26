@@ -1465,3 +1465,25 @@ $(BUILD)/userland/ipc_test.o: userland/examples/ipc_test.c include/chos/ipc.h us
 $(BUILD)/userland/ipc_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/ipc_test.o $(BUILD)/userland/native_abi.o userland/native.ld
 	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/ipc_test.o $(BUILD)/userland/native_abi.o
 test test-userland: $(BUILD)/userland/ipc_test.elf
+
+$(BUILD)/test-process-caps: tests/test_process_caps.c include/chos/process_caps.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-process-caps: tests/test_process_caps.c include/chos/process_caps.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+test-process-caps: $(BUILD)/test-process-caps
+	./$(BUILD)/test-process-caps
+test-process-caps-sanitize: $(SAN_DIR)/test-process-caps
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-process-caps
+$(BUILD)/userland/caps_test.o: userland/examples/caps_test.c include/chos/process_caps.h userland/libchos/include/chos/user.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) -c $< -o $@
+$(BUILD)/userland/caps_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/caps_test.o $(BUILD)/userland/native_abi.o userland/native.ld
+	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/caps_test.o $(BUILD)/userland/native_abi.o
+test: test-process-caps $(BUILD)/userland/caps_test.elf
+test-sanitize: test-process-caps-sanitize
+.PHONY: test-process-caps test-process-caps-sanitize
+
+$(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi: include/chos/process_caps.h include/chos/syscall.h include/chos/ipc.h
+$(BUILD)/userland/libc-cpp-api.o: userland/libchos/include/chos/user.h include/chos/process_caps.h

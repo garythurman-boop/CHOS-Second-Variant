@@ -36,6 +36,7 @@ typedef struct {
 
 typedef struct {
     chos_process_info_t info;
+    uint64_t allowed_syscalls;
     address_space_handle_t space;
     process_file_handle_t open_files[CHOS_PROCESS_MAX_OPEN_FILES];
     uint64_t code_mapped_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
@@ -66,6 +67,7 @@ static size_t foreground_process_slot = CHOS_PROCESS_MAX;
 #define SPAWN_REQUEST_DONE 3u
 typedef struct {
     uint32_t ticket;
+    uint64_t allowed_syscalls;
     uint8_t state;
     uint8_t with_arguments;
     uint16_t reserved;
@@ -267,6 +269,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
     }
     zero_bytes(&process_slots[index], sizeof(process_slots[index]));
     slot = &process_slots[index];
+    slot->allowed_syscalls=CHOS_PROCESS_CAP_ALL;
     slot->info.state = CHOS_PROCESS_LOADING;
     slot->info.exit_status = -1;
     slot->info.pid = next_process_id++;
@@ -490,9 +493,9 @@ chos_process_error_t process_spawn_image(const char *name, const void *file_byte
     return process_spawn_image_args(name, file_bytes, file_size, NULL, 0u, pid_out);
 }
 
-chos_process_error_t process_spawn_image_args(const char *name, const void *file_bytes,
+static chos_process_error_t process_spawn_image_args_policy(const char *name, const void *file_bytes,
                                          size_t file_size, const char *const argv[],
-                                         size_t argc, uint32_t *pid_out) {
+                                         size_t argc, uint32_t *pid_out,uint64_t policy) {
     process_slot_t *slot;
     pmm_stats_t ignored_baseline;
     size_t index;
@@ -510,6 +513,7 @@ chos_process_error_t process_spawn_image_args(const char *name, const void *file
     if (error != PROCESS_OK) return error;
     slot = &process_slots[index];
     flags = chos_spin_lock_irqsave(&process_lock);
+    slot->allowed_syscalls=policy;
     if (!scheduler_create_task_in_address_space(slot->info.name, process_scheduled_entry,
                                                 (void *)(uintptr_t)index, slot->space, &task_id)) {
         chos_spin_unlock_irqrestore(&process_lock, flags);
@@ -520,6 +524,11 @@ chos_process_error_t process_spawn_image_args(const char *name, const void *file
     *pid_out = slot->info.pid;
     chos_spin_unlock_irqrestore(&process_lock, flags);
     return PROCESS_OK;
+}
+
+chos_process_error_t process_spawn_image_args(const char *name,const void *bytes,size_t size,
+ const char *const argv[],size_t argc,uint32_t *pid){
+ return process_spawn_image_args_policy(name,bytes,size,argv,argc,pid,CHOS_PROCESS_CAP_ALL);
 }
 
 int process_preemptive_isolation_test(void) {
@@ -776,7 +785,7 @@ chos_process_error_t process_spawn_path(const char *path, uint32_t *pid_out) {
     return status;
 }
 
-chos_process_error_t process_spawn_path_args(const char *path, const char *arguments, uint32_t *pid_out) {
+static chos_process_error_t process_spawn_path_args_policy(const char *path, const char *arguments, uint32_t *pid_out,uint64_t policy) {
     chos_romfs_file_t file;
     const char *base, *cursor;
     const char *argv[CHOS_PROCESS_MAX_ARGS];
@@ -809,9 +818,13 @@ chos_process_error_t process_spawn_path_args(const char *path, const char *argum
     for (i = 0u; i < argc; ++i) if (argv[i] == NULL) return PROCESS_ERR_ARGUMENT;
     resolved = resolve_program_file(path, &file, &owned);
     if (resolved != 1) return resolve_file_error(resolved);
-    spawn_result = process_spawn_image_args(base, file.data, file.size, argv, argc, pid_out);
+    spawn_result = process_spawn_image_args_policy(base, file.data, file.size, argv, argc, pid_out,policy);
     if (owned != NULL) (void)kheap_free(owned);
     return spawn_result;
+}
+
+chos_process_error_t process_spawn_path_args(const char *path,const char *args,uint32_t *pid){
+ return process_spawn_path_args_policy(path,args,pid,CHOS_PROCESS_CAP_ALL);
 }
 
 static size_t bounded_string_length(const char *text, size_t capacity) {
@@ -821,11 +834,12 @@ static size_t bounded_string_length(const char *text, size_t capacity) {
     return n;
 }
 
-uint32_t process_spawn_request_enqueue(const char *path, const char *arguments, int with_arguments) {
+uint32_t process_spawn_request_enqueue_policy(const char *path, const char *arguments, int with_arguments,uint64_t policy) {
     size_t i, path_len, args_len = 0u;
     uint64_t flags;
     uint32_t ticket = 0u;
-    if (!scheduler_is_running() || !romfs_path_is_valid(path)) return 0u;
+    if (!scheduler_is_running() || !romfs_path_is_valid(path) ||
+        (policy&~CHOS_PROCESS_CAP_ALL) || (policy&CHOS_PROCESS_CAP_REQUIRED)!=CHOS_PROCESS_CAP_REQUIRED) return 0u;
     path_len = bounded_string_length(path, PROCESS_SPAWN_REQUEST_PATH_CAPACITY);
     if (path_len == 0u || path_len >= PROCESS_SPAWN_REQUEST_PATH_CAPACITY) return 0u;
     if (with_arguments) {
@@ -842,6 +856,7 @@ uint32_t process_spawn_request_enqueue(const char *path, const char *arguments, 
         ticket = next_spawn_request_ticket++;
         if (ticket == 0u) ticket = next_spawn_request_ticket++;
         request->ticket = ticket;
+        request->allowed_syscalls=policy;
         request->with_arguments = with_arguments ? 1u : 0u;
         copy_bytes((uint8_t *)request->path, (const uint8_t *)path, path_len);
         request->path[path_len] = '\0';
@@ -853,6 +868,12 @@ uint32_t process_spawn_request_enqueue(const char *path, const char *arguments, 
     }
     chos_spin_unlock_irqrestore(&process_lock, flags);
     return ticket;
+}
+
+uint32_t process_spawn_request_enqueue(const char *path,const char *args,int with_args){
+ address_space_handle_t space;uint64_t policy=CHOS_PROCESS_CAP_ALL;
+ if(user_mode_get_address_space(&space) && !process_get_capabilities(space,&policy))return 0;
+ return process_spawn_request_enqueue_policy(path,args,with_args,policy);
 }
 
 int process_spawn_request_status(uint32_t ticket, chos_process_error_t *error_out, uint32_t *pid_out) {
@@ -910,6 +931,7 @@ int process_service_pending_spawn_request(void) {
     size_t i;
     uint64_t flags;
     uint32_t ticket;
+    uint64_t policy;
     int with_arguments;
     char path[PROCESS_SPAWN_REQUEST_PATH_CAPACITY];
     char arguments[PROCESS_SPAWN_REQUEST_ARGS_CAPACITY];
@@ -927,13 +949,13 @@ int process_service_pending_spawn_request(void) {
     }
     spawn_requests[i].state = SPAWN_REQUEST_RUNNING;
     ticket = spawn_requests[i].ticket;
+    policy=spawn_requests[i].allowed_syscalls;
     with_arguments = spawn_requests[i].with_arguments != 0u;
     copy_bytes((uint8_t *)path, (const uint8_t *)spawn_requests[i].path, sizeof(path));
     copy_bytes((uint8_t *)arguments, (const uint8_t *)spawn_requests[i].arguments, sizeof(arguments));
     chos_spin_unlock_irqrestore(&process_lock, flags);
 
-    error = with_arguments ? process_spawn_path_args(path, arguments, &pid)
-                           : process_spawn_path(path, &pid);
+    error = process_spawn_path_args_policy(path,with_arguments?arguments:NULL,&pid,policy);
 
     flags = chos_spin_lock_irqsave(&process_lock);
     for (i = 0u; i < PROCESS_SPAWN_REQUEST_CAPACITY; ++i) {
@@ -1049,6 +1071,17 @@ done:
         uart_puts("\n[FAIL] async launch/runtime syscalls or process cleanup did not pass\n");
     }
     return ok;
+}
+
+int process_get_capabilities(address_space_handle_t space,uint64_t *out){
+ if(!out)return 0;
+ uint64_t f=chos_spin_lock_irqsave(&process_lock);int found=0;
+ for(unsigned i=0;i<CHOS_PROCESS_MAX;i++){
+  process_slot_t *s=&process_slots[i];
+  if(s->address_space_live && s->info.state==CHOS_PROCESS_RUNNING && s->space.slot==space.slot &&
+     s->space.generation==space.generation && s->space.id==space.id){*out=s->allowed_syscalls;found=1;break;}
+ }
+ chos_spin_unlock_irqrestore(&process_lock,f);return found;
 }
 
 uint32_t process_pid_for_address_space(address_space_handle_t space) {

@@ -115,6 +115,13 @@ static int syscall_copy_user_path(address_space_handle_t space, uint64_t user_po
     return 0;
 }
 
+static int syscall_copy_user_optional_args(address_space_handle_t space,uint64_t pointer,char *out,size_t capacity){
+ char first;
+ if(!capacity || !address_space_copy_from_user(space,&first,pointer,1u))return 0;
+ if(!first){out[0]=0;return 1;}
+ return syscall_copy_user_path(space,pointer,out,capacity);
+}
+
 static int syscall_user_range_writable(address_space_handle_t space, uint64_t user_pointer,
                                         size_t length) {
     size_t checked = 0u;
@@ -405,13 +412,13 @@ static int syscall_spawn_errno(chos_process_error_t error) {
 }
 
 static uint64_t syscall_spawn_via_kernel_service(const char *path, const char *arguments,
-                                                int with_arguments) {
+                                                int with_arguments,uint64_t policy) {
     uint32_t ticket, pid = 0u;
     uint64_t start_tick;
     chos_process_error_t error = PROCESS_ERR_CONTEXT;
     int status;
     if (!scheduler_is_running()) return neg_errno(CHOS_ERRNO_ENOSYS);
-    ticket = process_spawn_request_enqueue(path, arguments, with_arguments);
+    ticket = process_spawn_request_enqueue_policy(path, arguments, with_arguments,policy);
     if (ticket == 0u) return neg_errno(CHOS_ERRNO_EBUSY);
     start_tick = timer_ticks();
     for (;;) {
@@ -454,6 +461,17 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
 
     ec = (frame->esr >> 26) & 0x3fu;
     if (ec == 0x15u && (frame->esr & 0xffffu) == 0u) { /* SVC #0 from AArch64 EL0. */
+        uint64_t permissions=CHOS_PROCESS_CAP_ALL;
+        int registered=process_get_capabilities(fault_space,&permissions);
+        uint32_t number=(uint32_t)frame->x[8];
+        if(!number || number>CHOS_PROCESS_SYSCALL_LIMIT){frame->x[0]=neg_errno(CHOS_ERRNO_ENOSYS);return frame;}
+        /* Legacy kernel-created EL0 diagnostic payloads have no process record;
+         * permit only their established WRITE/EXIT path, never a full profile. */
+        if(!registered && number>=1u && number<=CHOS_PROCESS_SYSCALL_LIMIT &&
+           number!=CHOS_SYS_WRITE && number!=CHOS_SYS_EXIT){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+        if(number>=1u && number<=CHOS_PROCESS_SYSCALL_LIMIT && !(permissions&CHOS_PROCESS_CAP(number))){
+            frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;
+        }
         switch ((uint32_t)frame->x[8]) {
             case CHOS_SYS_WRITE:
                 syscall_write(frame);
@@ -461,6 +479,16 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
             case CHOS_SYS_EXIT:
                 user_mode_request_exit(frame, (int64_t)frame->x[0], 0);
                 return frame;
+            case CHOS_SYS_CAPABILITIES:
+                frame->x[0]=process_pid_for_address_space(fault_space)?permissions:neg_errno(CHOS_ERRNO_ESRCH);return frame;
+            case CHOS_SYS_SPAWN_LIMITED: {
+                uint64_t reduced;char path[CHOS_ROMFS_PATH_CAPACITY],args[128];
+                if(!process_pid_for_address_space(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(!chos_process_cap_reduction(permissions,frame->x[2],&reduced)){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
+                if(!syscall_copy_user_path(fault_space,frame->x[0],path,sizeof(path)) ||
+                   !syscall_copy_user_optional_args(fault_space,frame->x[1],args,sizeof(args))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                frame->x[0]=syscall_spawn_via_kernel_service(path,args,1,reduced);return frame;
+            }
             case CHOS_SYS_GETPID: {
                 uint32_t pid = process_pid_for_address_space(fault_space);
                 frame->x[0] = pid != 0u ? (uint64_t)pid : neg_errno(CHOS_ERRNO_ESRCH);
@@ -547,7 +575,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 if (!syscall_copy_user_path(fault_space, frame->x[0], path, sizeof(path))) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
-                frame->x[0] = syscall_spawn_via_kernel_service(path, "", 0);
+                frame->x[0] = syscall_spawn_via_kernel_service(path, "", 0,permissions);
                 return frame;
             }
             case CHOS_SYS_LIST_FILES: {
@@ -564,7 +592,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                     !syscall_copy_user_path(fault_space, frame->x[1], arguments, sizeof(arguments))) {
                     frame->x[0] = neg_errno(CHOS_ERRNO_EFAULT); return frame;
                 }
-                frame->x[0] = syscall_spawn_via_kernel_service(path, arguments, 1);
+                frame->x[0] = syscall_spawn_via_kernel_service(path, arguments, 1,permissions);
                 return frame;
             }
             case CHOS_SYS_CONSOLE_READ: {

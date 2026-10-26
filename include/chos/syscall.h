@@ -56,6 +56,8 @@
 #define CHOS_SYS_IPC_SEND 51u /* x0=handle,x1=bytes,x2=length1..512 */
 #define CHOS_SYS_IPC_RECV 52u /* x0=handle,x1=bytes,x2=capacity1..512 */
 #define CHOS_SYS_IPC_CLOSE 53u /* x0=owner handle */
+#define CHOS_SYS_SPAWN_LIMITED 54u /* x0=path,x1=arguments,x2=reduced inherited syscall mask */
+#define CHOS_SYS_CAPABILITIES 55u /* returns own effective mask; always permitted */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

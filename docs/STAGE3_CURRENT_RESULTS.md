@@ -136,3 +136,9 @@ gates remain open. Neither the version nor binary hold is advanced for it.
 foreign-process evidence on direct and UEFI QEMU, plus cleanup and ownership
 checks. They are not POSIX sockets/shared memory/descriptor passing, and do not
 close the modern browser, complete runtime or content-sandbox gates.
+
+[Inherited syscall permissions](PROCESS_PERMISSIONS.md) now constrain children
+before first execution, and ordinary child launches cannot restore omitted
+rights. Actual nested EL0 tests deny filesystem/network/GUI/entropy access.
+Browser roles, site/path policy and complete content sandbox integration remain
+open, along with the engine, TLS, wireless and other mandatory gates.

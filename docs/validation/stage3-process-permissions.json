@@ -1,0 +1,118 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "completion_version_reserved": "0.50.0",
+  "source_sha256": {
+    "include/chos/process_caps.h": "46c0943b158e38078a02bb22b8ba11a34eb86e9fc48b5ce14bfa01664f740124",
+    "kernel/core/process.c": "190a930bc1fb576e219e51d1b516f38570211c3f201ad3d15a7ccd7bbca1ab5c",
+    "kernel/core/syscall.c": "237d0a241d1458973892ae93f9cb35d89a16a61870965e5cc957188b15f57405",
+    "userland/examples/caps_test.c": "b865ad3803b62864c6813737e8d86027f0c45e41c131a68080e566c9b97528b4",
+    "tests/qemu_process_caps.py": "de8e4a2c36d807aa1496bbefbdb66591f650bf1e40e32f02bd3354027cb1e8d9"
+  },
+  "host_and_sanitizer": [
+    "caps-host-verified.log",
+    "caps-sanitize-verified.log",
+    "caps-host-app1.log",
+    "caps-smoke-final.log"
+  ],
+  "guest_profiles": [
+    {
+      "evidence": "/workspace/chos-evidence/caps-direct-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "4145a499910832021d12b4a394c90ebe69f4dc35f8dffb5c8db928467c9d6d5a",
+        "cold_free_pages": 117703,
+        "free_pages_before": 117697,
+        "free_pages_after": 117697,
+        "checks": [
+          "child limits installed before scheduler entry",
+          "filesystem/network/GUI/entropy rejected without invoking those services",
+          "ordinary SPAWN and SPAWN_ARGS inherit reduced rights",
+          "restricted spawn cannot increase its own mask",
+          "EXIT/query remain available after further reduction to zero optional rights",
+          "parent retains its original rights; repeated nested cleanup returns stable physical pages"
+        ],
+        "limits": [
+          "per-process syscall permission reduction, not complete site/filesystem/browser sandboxing",
+          "no browser-engine or TLS completion claim",
+          "QEMU evidence, new Fusion behavior NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "021ce59189b44aa5b3637b4db32cd7e5520aa0806a9ed9f40176a4bd6db20628"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/caps-uefi-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "4145a499910832021d12b4a394c90ebe69f4dc35f8dffb5c8db928467c9d6d5a",
+        "cold_free_pages": 500541,
+        "free_pages_before": 500535,
+        "free_pages_after": 500535,
+        "checks": [
+          "child limits installed before scheduler entry",
+          "filesystem/network/GUI/entropy rejected without invoking those services",
+          "ordinary SPAWN and SPAWN_ARGS inherit reduced rights",
+          "restricted spawn cannot increase its own mask",
+          "EXIT/query remain available after further reduction to zero optional rights",
+          "parent retains its original rights; repeated nested cleanup returns stable physical pages"
+        ],
+        "limits": [
+          "per-process syscall permission reduction, not complete site/filesystem/browser sandboxing",
+          "no browser-engine or TLS completion claim",
+          "QEMU evidence, new Fusion behavior NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "b91a305de93f0a15efa0eb90166ef8d251ce87df0b7de2ab508b913996107f5f",
+        "iso_sha256": "ecd4ec7e295c8ed5a4b5d59b2dd911b927dfbbdba05fbbdaa568a4ca2a7a0418",
+        "iso_embedded_kernel_sha256": "b91a305de93f0a15efa0eb90166ef8d251ce87df0b7de2ab508b913996107f5f",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/caps-native-cpp-uefi2/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "89ba55ee8f40121a15ee34dc912cbd050112ad23e72ff730e111b973d9e6fc4d",
+        "free_pages_before": 500521,
+        "free_pages_after": 500521,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "b91a305de93f0a15efa0eb90166ef8d251ce87df0b7de2ab508b913996107f5f",
+        "iso_sha256": "ecd4ec7e295c8ed5a4b5d59b2dd911b927dfbbdba05fbbdaa568a4ca2a7a0418",
+        "iso_embedded_kernel_sha256": "b91a305de93f0a15efa0eb90166ef8d251ce87df0b7de2ab508b913996107f5f",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "retained_failures": [
+    {
+      "evidence": "/workspace/chos-evidence/caps-host-final.log",
+      "diagnosis": "ABI test missing direct permission-header include; corrected and aggregate rerun passes"
+    },
+    {
+      "evidence": "/workspace/chos-evidence/caps-native-cpp-uefi.log",
+      "diagnosis": "aggregate host target rebuilt kernel after ISO creation; artifact guard refused stale ISO before boot; resynchronized matched pair passes"
+    }
+  ],
+  "limits": [
+    "not integrated WPE process roles, site policy, path brokerage or complete browser sandbox",
+    "trusted legacy desktop apps retain full existing permissions",
+    "no modernengine/TLS/WiFi completion",
+    "Fusion/physical new permission tests NOT RUN"
+  ]
+}

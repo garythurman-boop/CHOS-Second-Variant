@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "chos/address_space.h"
 #include "chos/elf_image.h"
+#include "chos/process_caps.h"
 
 #define CHOS_PROCESS_MAX 4u
 #define CHOS_PROCESS_NAME_CAPACITY 16u
@@ -149,6 +150,8 @@ void process_reap_pending(void);
 /* EL0 process creation is serviced by the scheduled kernel runtime task. The
  * syscall copies arguments into this bounded queue, yields while waiting, and
  * receives the real PID/status after the kernel task performs the privileged load. */
+int process_get_capabilities(address_space_handle_t,uint64_t *);
+uint32_t process_spawn_request_enqueue_policy(const char *,const char *,int,uint64_t);
 uint32_t process_spawn_request_enqueue(const char *path, const char *arguments, int with_arguments);
 int process_spawn_request_status(uint32_t ticket, chos_process_error_t *error_out, uint32_t *pid_out);
 int process_spawn_request_cancel(uint32_t ticket);
