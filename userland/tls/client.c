@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 #include "mbedtls/ssl.h"
 #include "mbedtls/hmac_drbg.h"
 #include "mbedtls/x509_crt.h"
@@ -21,9 +22,11 @@ struct chos_tls_client {
  uint8_t peer6[16];
  uint16_t peer_port;
 };
-/* All native client APIs are single-threaded. PSA's external RNG draws from
- * the currently executing, already-seeded client. Never from a hidden source.
- * Separate EL0 processes have separate globals. Threads require a new contract. */
+/* Serialize complete bounded API calls, including all upstream PSA lifetimes.
+ * The lock is released on every AGAIN return, never held across caller sleeps.
+ * The external RNG is scoped to this operation and its actual owning thread. */
+static pthread_mutex_t runtime_lock=PTHREAD_MUTEX_INITIALIZER;
+static pthread_t active_owner;
 static mbedtls_hmac_drbg_context *active_random;
 static unsigned psa_clients;
 psa_status_t mbedtls_psa_external_get_random(mbedtls_psa_external_random_context_t *context,
@@ -31,7 +34,7 @@ psa_status_t mbedtls_psa_external_get_random(mbedtls_psa_external_random_context
  (void)context;
  if(!length||(!out&&bytes))return PSA_ERROR_INVALID_ARGUMENT;
  *length=0;
- if(!active_random||bytes>MBEDTLS_HMAC_DRBG_MAX_REQUEST){
+ if(__atomic_load_n(&active_owner,__ATOMIC_ACQUIRE)!=pthread_self()||!active_random||bytes>MBEDTLS_HMAC_DRBG_MAX_REQUEST){
   if(out)mbedtls_platform_zeroize(out,bytes);
   return PSA_ERROR_INSUFFICIENT_ENTROPY;
  }
@@ -40,6 +43,8 @@ psa_status_t mbedtls_psa_external_get_random(mbedtls_psa_external_random_context
  }
  *length=bytes;return PSA_SUCCESS;
 }
+static chos_tls_client_t *chos_tls_create_ex_unlocked(uint32_t,uint16_t,const char *,const void *,size_t,int *);
+static void chos_tls_destroy_unlocked(chos_tls_client_t *);
 static int now_ms(uint64_t *out){
  struct timespec t;
  if(clock_gettime(CLOCK_MONOTONIC,&t)||t.tv_sec<0 || (uint64_t)t.tv_sec>(UINT64_MAX-TLS_TIMEOUT_MS)/1000u-1u)return -1;
@@ -107,13 +112,13 @@ static int hostname_valid(const char *s){
  return 1;
 }
 static chos_tls_client_t *create_transport(uint32_t,const uint8_t *,uint16_t,const char *,const void *,size_t,int *);
-chos_tls_client_t *chos_tls_create(uint32_t ipv4,uint16_t port,const char *hostname,const void *ca,size_t bytes){
- return chos_tls_create_ex(ipv4,port,hostname,ca,bytes,0);
+static chos_tls_client_t *chos_tls_create_unlocked(uint32_t ipv4,uint16_t port,const char *hostname,const void *ca,size_t bytes){
+ return chos_tls_create_ex_unlocked(ipv4,port,hostname,ca,bytes,0);
 }
-chos_tls_client_t *chos_tls_create_ex(uint32_t ipv4,uint16_t port,const char *hostname,const void *ca,size_t bytes,int *initial_error){
+static chos_tls_client_t *chos_tls_create_ex_unlocked(uint32_t ipv4,uint16_t port,const char *hostname,const void *ca,size_t bytes,int *initial_error){
  return create_transport(ipv4,0,port,hostname,ca,bytes,initial_error);
 }
-chos_tls_client_t *chos_tls_create6_ex(const uint8_t peer[16],uint16_t port,const char *hostname,const void *ca,size_t bytes,int *initial_error){
+static chos_tls_client_t *chos_tls_create6_ex_unlocked(const uint8_t peer[16],uint16_t port,const char *hostname,const void *ca,size_t bytes,int *initial_error){
  if(!peer){if(initial_error)*initial_error=CHOS_TLS_INIT_ARGUMENT;return 0;}
  unsigned any=0;for(unsigned i=0;i<16;i++)any|=peer[i];
  if(!any||peer[0]==0xff){if(initial_error)*initial_error=CHOS_TLS_INIT_ARGUMENT;return 0;}
@@ -159,9 +164,9 @@ static chos_tls_client_t *create_transport(uint32_t ipv4,const uint8_t *peer6,ui
  return c;
 failed:
  if(initial_error)*initial_error=reason;
- chos_tls_destroy(c);return 0;
+ chos_tls_destroy_unlocked(c);return 0;
 }
-int chos_tls_step(chos_tls_client_t *c){
+static int chos_tls_step_unlocked(chos_tls_client_t *c){
  if(!c||c->state==CHOS_TLS_FAILED||c->state==CHOS_TLS_CLOSED)return CHOS_TLS_ERROR;
  if(deadline(c))return CHOS_TLS_ERROR;
  if(c->state==CHOS_TLS_CONNECTING){
@@ -180,7 +185,9 @@ int chos_tls_step(chos_tls_client_t *c){
  }
  if(c->state==CHOS_TLS_READY)return 0;
  active_random=&c->random;
+ __atomic_store_n(&active_owner,pthread_self(),__ATOMIC_RELEASE);
  int rc=mbedtls_ssl_handshake(&c->ssl);
+ __atomic_store_n(&active_owner,0,__ATOMIC_RELEASE);
  active_random=0;
  if(rc==MBEDTLS_ERR_SSL_WANT_READ||rc==MBEDTLS_ERR_SSL_WANT_WRITE)return CHOS_TLS_AGAIN;
  if(rc)return fail(c,rc);
@@ -188,10 +195,12 @@ int chos_tls_step(chos_tls_client_t *c){
  if(c->flags)return fail(c,MBEDTLS_ERR_X509_CERT_VERIFY_FAILED);
  c->state=CHOS_TLS_READY;progress(c);return 0;
 }
-int chos_tls_read(chos_tls_client_t *c,void *p,size_t n){
+static int chos_tls_read_unlocked(chos_tls_client_t *c,void *p,size_t n){
  if(!c||!p||!n||n>16384u||c->state!=CHOS_TLS_READY||deadline(c))return CHOS_TLS_ERROR;
  active_random=&c->random;
+ __atomic_store_n(&active_owner,pthread_self(),__ATOMIC_RELEASE);
  int rc=mbedtls_ssl_read(&c->ssl,p,n);
+ __atomic_store_n(&active_owner,0,__ATOMIC_RELEASE);
  active_random=0;
  if(rc==MBEDTLS_ERR_SSL_WANT_READ||rc==MBEDTLS_ERR_SSL_WANT_WRITE)return CHOS_TLS_AGAIN;
  /* Raw TCP EOF is an unauthenticated truncation, never successful TLS EOF. */
@@ -200,19 +209,21 @@ int chos_tls_read(chos_tls_client_t *c,void *p,size_t n){
  if(rc<0)return fail(c,rc);
  progress(c);return rc;
 }
-int chos_tls_write(chos_tls_client_t *c,const void *p,size_t n){
+static int chos_tls_write_unlocked(chos_tls_client_t *c,const void *p,size_t n){
  if(!c||!p||!n||n>16384u||c->state!=CHOS_TLS_READY||deadline(c))return CHOS_TLS_ERROR;
  active_random=&c->random;
+ __atomic_store_n(&active_owner,pthread_self(),__ATOMIC_RELEASE);
  int rc=mbedtls_ssl_write(&c->ssl,p,n);
+ __atomic_store_n(&active_owner,0,__ATOMIC_RELEASE);
  active_random=0;
  if(rc==MBEDTLS_ERR_SSL_WANT_READ||rc==MBEDTLS_ERR_SSL_WANT_WRITE)return CHOS_TLS_AGAIN;
  if(rc<=0)return fail(c,rc?rc:MBEDTLS_ERR_SSL_INTERNAL_ERROR);
  progress(c);return rc;
 }
-int chos_tls_state(const chos_tls_client_t *c){return c?c->state:CHOS_TLS_FAILED;}
-int chos_tls_error(const chos_tls_client_t *c){return c?c->error:MBEDTLS_ERR_SSL_BAD_INPUT_DATA;}
-uint32_t chos_tls_verify_flags(const chos_tls_client_t *c){return c?c->flags:UINT32_MAX;}
-void chos_tls_destroy(chos_tls_client_t *c){
+static int chos_tls_state_unlocked(const chos_tls_client_t *c){return c?c->state:CHOS_TLS_FAILED;}
+static int chos_tls_error_unlocked(const chos_tls_client_t *c){return c?c->error:MBEDTLS_ERR_SSL_BAD_INPUT_DATA;}
+static uint32_t chos_tls_verify_flags_unlocked(const chos_tls_client_t *c){return c?c->flags:UINT32_MAX;}
+static void chos_tls_destroy_unlocked(chos_tls_client_t *c){
  if(!c)return;
  abort_transport(c);
  mbedtls_ssl_free(&c->ssl);mbedtls_ssl_config_free(&c->config);
@@ -220,3 +231,25 @@ void chos_tls_destroy(chos_tls_client_t *c){
  if(c->psa_reference&&psa_clients&&!--psa_clients)mbedtls_psa_crypto_free();
  mbedtls_platform_zeroize(c,sizeof(*c));free(c);
 }
+
+/* A process with unusable synchronization rights cannot safely continue sharing
+ * upstream cryptographic globals. Fail closed; the OS reaper owns its sockets
+ * and private pages. No API returns apparent success after a guard failure. */
+static void enter_runtime(void){if(pthread_mutex_lock(&runtime_lock))chos_exit(95);}
+static void leave_runtime(void){if(pthread_mutex_unlock(&runtime_lock))chos_exit(95);}
+chos_tls_client_t *chos_tls_create(uint32_t ip,uint16_t port,const char *host,const void *ca,size_t n){
+ enter_runtime();chos_tls_client_t *c=chos_tls_create_unlocked(ip,port,host,ca,n);leave_runtime();return c;
+}
+chos_tls_client_t *chos_tls_create_ex(uint32_t ip,uint16_t port,const char *host,const void *ca,size_t n,int *why){
+ enter_runtime();chos_tls_client_t *c=chos_tls_create_ex_unlocked(ip,port,host,ca,n,why);leave_runtime();return c;
+}
+chos_tls_client_t *chos_tls_create6_ex(const uint8_t ip[16],uint16_t port,const char *host,const void *ca,size_t n,int *why){
+ enter_runtime();chos_tls_client_t *c=chos_tls_create6_ex_unlocked(ip,port,host,ca,n,why);leave_runtime();return c;
+}
+int chos_tls_step(chos_tls_client_t *c){enter_runtime();int rc=chos_tls_step_unlocked(c);leave_runtime();return rc;}
+int chos_tls_read(chos_tls_client_t *c,void *p,size_t n){enter_runtime();int rc=chos_tls_read_unlocked(c,p,n);leave_runtime();return rc;}
+int chos_tls_write(chos_tls_client_t *c,const void *p,size_t n){enter_runtime();int rc=chos_tls_write_unlocked(c,p,n);leave_runtime();return rc;}
+int chos_tls_state(const chos_tls_client_t *c){enter_runtime();int rc=chos_tls_state_unlocked(c);leave_runtime();return rc;}
+int chos_tls_error(const chos_tls_client_t *c){enter_runtime();int rc=chos_tls_error_unlocked(c);leave_runtime();return rc;}
+uint32_t chos_tls_verify_flags(const chos_tls_client_t *c){enter_runtime();uint32_t rc=chos_tls_verify_flags_unlocked(c);leave_runtime();return rc;}
+void chos_tls_destroy(chos_tls_client_t *c){enter_runtime();chos_tls_destroy_unlocked(c);leave_runtime();}

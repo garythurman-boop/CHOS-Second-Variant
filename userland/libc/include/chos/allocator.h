@@ -3,8 +3,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* Current single-thread CHOS runtime. Each backing mapping is private RW/XN.
- * The caller owns this metadata; callbacks must not re-enter the allocator. */
+/* Each backing mapping is private RW/XN. This core requires caller serialization;
+ * the native libc wrapper supplies a process-local mutex. The caller owns this
+ * metadata; callbacks must not re-enter the allocator. */
 #define CHOS_HEAP_REGIONS 16u
 #define CHOS_HEAP_MAP_MAX (128u*1024u)
 #define CHOS_HEAP_PAGE 4096u

@@ -111,8 +111,8 @@ client contexts, and the final destructor releases upstream PSA state after its
 SSL/key/DRBG objects. Two overlapping handshakes and subsequent authenticated
 requests prove that destroying one client does not erase the other's keys.
 Four-context exhaustion/cancellation and later recreation remain tested. The
-component currently owns that process's PSA lifetime; integration with other PSA
-consumers or future threads requires a coordinated ownership/locking contract.
+component owns that process's PSA lifetime. Native pthread use now has the guarded
+contract below; unrelated PSA consumers still need a coordinated ownership contract.
 
 `tests/run_tls_cipher.py --suite TLS_AES_128_GCM_SHA256 -- --mode direct --out FRESH`
 and the analogous AES256/UEFI invocation restrict only the local fixture's
@@ -151,3 +151,48 @@ their numerical kernel handles coincide. Missing clock/entropy runs permit no
 TCP6 frames or peer connection. This is actual transport evidence, not public-site,
 Fusion IPv6, browser or live wireless qualification. See
 [IPv6 TLS results](validation/stage3-native-tls6.json).
+
+## Native pthread concurrency contract
+
+Public client calls now serialize complete bounded operations under one process-local
+private-futex mutex, including PSA initialization, reference counting, SSL/key
+operations and final PSA teardown. Every AGAIN return releases the guard before
+the caller sleeps or retries; no network response is awaited while holding it.
+The existing nonblocking transport and15-second deadlines stay in force.
+Cryptographic CPU work is serialized within this process and remains preemptible
+by the kernel. This chooses predictable ownership over parallel cryptographic
+throughput; it is not an SMP performance claim.
+
+The PSA external RNG accepts a request only from the currently executing client
+operation's actual pthread identity and already-seeded DRBG. A different thread
+cannot consume that scope during preemption. The owner is published with release/
+acquire atomics and cleared before the public call returns. Outside that scope,
+the callback fails and clears the requested output. No new randomness source,
+certificate exception or plaintext retry is introduced.
+
+Different native pthreads may use different clients, including mixed IPv4/IPv6
+contexts. Callers must coordinate object lifetime: destroy cannot race use of the
+same pointer, and a pending write needs one writer retrying its identical buffer
+and length. This component owns all upstream PSA calls in its process; directly
+calling PSA alongside it is not covered. Native threading/transport/entropy/memory
+permissions must include private futex wait/wake for contention. An unusable guard
+fails closed through process exit95 and OS-owned cleanup; APIs never proceed with
+unprotected cryptographic globals or report a failed guard as success.
+
+The actual guest fixture runs three workers through simultaneous verified
+connections, requests and independent destruction. A second three-worker case
+rejects one wrong-host certificate while two verified clients continue. The main
+thread probes the external RNG outside any operation while workers run. TLS1.3
+direct IPv4 and UEFI dual-stack runs, plus TLS1.2-only peers, pass all existing
+certificate/chain/record/deadline/capacity cases and the new thread cases. Each
+qualified normal profile receives14 authenticated requests, with no application
+request from the invalid-host client, stable warm pages and zero remaining futex
+records. Missing entropy/clock profiles open no connection.
+
+For responsiveness checks the local fixture deliberately withholds the worker
+responses until the desktop handles a real QMP-injected Diagnostics key. The
+measured22..66ms response range describes these single-CPU QEMU runs only, not
+physical-hardware latency or public-site rendering performance. No guest state is
+changed by the test controller. See [exact concurrency evidence](validation/stage3-threaded-tls.json).
+Modern engine integration, production CA/time/reseed policy, live wireless and
+independent Fusion qualification remain open; the release hold stays active.

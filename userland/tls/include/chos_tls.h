@@ -3,7 +3,15 @@
 #include <stddef.h>
 #include <stdint.h>
 /* Experimental native client prerequisite, not the browser or a system trust store.
- * All APIs are single-threaded and owned by the creating process. */
+ * Calls are serialized within the creating process, including shared PSA state.
+ * Different native pthreads may own different clients. A caller must coordinate
+ * object lifetime: destroy must not race any use of that client; a pending write
+ * must be retried by one writer with the identical pointer/length until complete.
+ * Contended operation needs private futex rights; guard failure exits the process
+ * rather than continuing with unsynchronized cryptographic globals. */
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef struct chos_tls_client chos_tls_client_t;
 enum { CHOS_TLS_CONNECTING=1, CHOS_TLS_HANDSHAKE, CHOS_TLS_READY, CHOS_TLS_FAILED, CHOS_TLS_CLOSED };
 #define CHOS_TLS_AGAIN (-1)
@@ -26,4 +34,7 @@ int chos_tls_state(const chos_tls_client_t *);
 int chos_tls_error(const chos_tls_client_t *);
 uint32_t chos_tls_verify_flags(const chos_tls_client_t *);
 void chos_tls_destroy(chos_tls_client_t *);
+#ifdef __cplusplus
+}
+#endif
 #endif

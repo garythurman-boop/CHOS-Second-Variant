@@ -21,7 +21,7 @@ o=p.parse_args();out=o.out.resolve();out.mkdir(parents=True,exist_ok=False)
 fixture=out/'fixture';fixture.mkdir()
 from tls_fixture_certs import certificate as cert,fixture_roots
 rootkey=fixture_roots(fixture)
-servers=[];events=[];lock=threading.Lock();stop=threading.Event()
+servers=[];events=[];lock=threading.Lock();stop=threading.Event();thread_response_gate=threading.Event()
 def server(kind,begin=2029,end=2031):
  key=rsa.generate_private_key(public_exponent=65537,key_size=2048) if kind.startswith('rsa') else ec.generate_private_key(ec.SECP384R1() if kind=='aes256' else ec.SECP256R1());leaf=cert('fixture.chos.test',key,'CHOS ephemeral test CA',rootkey,begin,end,server_auth=(kind!='wrong-purpose'))
  chain=b''
@@ -60,6 +60,7 @@ def server(kind,begin=2029,end=2031):
     request+=part
    assert request.startswith(b'GET /fixture HTTP/1.1\r\n'),request
    with lock:events.append({'kind':kind,'request':'GET /fixture'})
+   if kind=='threaded':assert thread_response_gate.wait(5),'desktop did not release stalled threaded response fixture'
    body=b'HTTP/1.1 200 OK\r\nContent-Length: 26\r\nConnection: close\r\n\r\nchos-native-tls-fixture-ok\n'
    # Many authenticated records exercise partial record and application reads.
    for offset in range(0,len(body),17):conn.sendall(body[offset:offset+17])
@@ -76,7 +77,7 @@ def server(kind,begin=2029,end=2031):
    except OSError:return
    threading.Thread(target=handle,args=(raw,),daemon=True).start()
  threading.Thread(target=accept,daemon=True).start();return listener.getsockname()[1]
-ports={kind:server(kind,*dates) for kind,dates in [('valid',(2029,2031)),('chain',(2029,2031)),('bad-chain',(2029,2031)),('rsa',(2029,2031)),('rsa256',(2029,2031)),('aes256',(2029,2031)),('wrong-purpose',(2029,2031)),('expired',(2027,2028)),('future',(2032,2033)),('truncated',(2029,2031)),('malformed',(2029,2031)),('stall',(2029,2031))]}
+ports={kind:server(kind,*dates) for kind,dates in [('valid',(2029,2031)),('threaded',(2029,2031)),('chain',(2029,2031)),('bad-chain',(2029,2031)),('rsa',(2029,2031)),('rsa256',(2029,2031)),('aes256',(2029,2031)),('wrong-purpose',(2029,2031)),('expired',(2027,2028)),('future',(2032,2033)),('truncated',(2029,2031)),('malformed',(2029,2031)),('stall',(2029,2031))]}
 disk=out/'disposable.img';shutil.copyfile('build/qemu-smoke-disk.img',disk)
 app=pathlib.Path('build/userland/tls_test.elf')
 for dest,src in [('/BIN/TLSTEST.ELF',app),('/TLS/CA.DER',fixture/'ca.der'),('/TLS/OTHER.DER',fixture/'other.der'),('/TLS/BAD.DER',fixture/'bad.der')]:
@@ -96,14 +97,22 @@ def free_pages():
  wait(lambda:len(re.findall(r'Free pages: (\d+)',g.text()))>before,3,'free pages')
  return int(re.findall(r'Free pages: (\d+)',g.text())[-1])
 def run(kind,expected=0,host='fixture.chos.test',ca='/TLS/CA.DER'):
+ if kind=='threaded':thread_response_gate.clear()
+ requests_before=sum(e.get('kind')=='threaded' and 'request' in e for e in events)
  before=len(g.text());started=time.monotonic();g.serial(f'exec /BIN/TLSTEST.ELF {ports[kind]} {host} {expected} {ca}'+(' 6' if o.ipv6 else ''))
+ response_seconds=None
+ if kind=='threaded':
+  wait(lambda:sum(e.get('kind')=='threaded' and 'request' in e for e in events)>=requests_before+(3 if expected==989 else 2),10,'authenticated concurrent worker requests')
+  response_start=time.monotonic();g.hmp('sendkey f1');wait(lambda:g.symbol('view')==4,3,'desktop response during three live TLS workers')
+  response_seconds=time.monotonic()-response_start;g.screen('responsive-threaded-'+str(expected))
+  thread_response_gate.set();g.hmp('sendkey esc')
  if kind=='stall':
   wait(lambda:any(e.get('kind')=='stall' and e.get('accepted') for e in events),5,'stall transport accepted')
   g.hmp('sendkey f1');wait(lambda:g.symbol('view')==4,3,'desktop diagnostics remains responsive during TLS timeout')
   g.screen('responsive-during-tls-stall');g.hmp('sendkey esc')
  wait(lambda:'[ OK ] native TLS' in g.text()[before:] or '[FAIL]' in g.text()[before:] or '[USER FAULT]' in g.text()[before:] or '[FATAL]' in g.text()[before:],40,'native TLS '+kind)
  section=g.text()[before:];assert '[ OK ] native TLS' in section,section
- cases.append({'kind':kind,'expected':expected,'hostname':host,'seconds':time.monotonic()-started,'result':'PASS'})
+ cases.append({'kind':kind,'expected':expected,'hostname':host,'seconds':time.monotonic()-started,'stalled_network_gui_response_seconds':response_seconds,'result':'PASS'})
 try:
  wait(lambda:'chos> ' in g.text(),45,'scheduled runtime')
  if o.mode=='uefi':assert 'UEFI CPU isolation active' in g.text()
@@ -116,9 +125,14 @@ try:
   run('valid');baseline=free_pages()
   for kind,expected,host,ca in [('chain',0,'fixture.chos.test','/TLS/CA.DER'),('bad-chain',8,'fixture.chos.test','/TLS/CA.DER'),('rsa',0,'fixture.chos.test','/TLS/CA.DER'),('rsa256',0,'fixture.chos.test','/TLS/CA.DER'),('aes256',0,'fixture.chos.test','/TLS/CA.DER'),('valid',4,'wrong.chos.test','/TLS/CA.DER'),('valid',8,'fixture.chos.test','/TLS/OTHER.DER'),('wrong-purpose',4096,'fixture.chos.test','/TLS/CA.DER'),('expired',1,'fixture.chos.test','/TLS/CA.DER'),('future',512,'fixture.chos.test','/TLS/CA.DER'),('malformed',998,'fixture.chos.test','/TLS/CA.DER'),('truncated',997,'fixture.chos.test','/TLS/CA.DER'),('stall',996,'fixture.chos.test','/TLS/CA.DER'),('valid',993,'fixture.chos.test','/TLS/BAD.DER'),('valid',995,'fixture.chos.test','/TLS/CA.DER'),('valid',994,'fixture.chos.test','/TLS/CA.DER'),('valid',0,'fixture.chos.test','/TLS/CA.DER')]:
    run(kind,expected,host,ca);observed=free_pages();assert observed==baseline,('TLS lifecycle leaked pages',baseline,observed)
+  preemptions=g.symbol('preemption_switches')
+  for expected in [989,988]:
+   run('threaded',expected);assert free_pages()==baseline,'threaded TLS lifecycle leaked pages'
+  assert g.symbol('preemption_switches')>preemptions,'threaded TLS did not switch actual tasks'
+  assert g.symbol('futex_queued_waiters')==0,'threaded TLS retained futex waiters'
   assert any(e.get('sni')=='fixture.chos.test' for e in events),events
   assert any(e.get('sni')=='wrong.chos.test' for e in events),events
-  assert sum('request' in e for e in events)==9,events
+  assert sum('request' in e for e in events)==14,events
   assert all(e.get('alpn')=='http/1.1' for e in events if 'alpn' in e),events
   assert all(e['version']=='TLSv'+o.tls_version for e in events if 'version' in e),events
   if o.expect_cipher:assert all(e['cipher']==o.expect_cipher for e in events if 'cipher' in e),events

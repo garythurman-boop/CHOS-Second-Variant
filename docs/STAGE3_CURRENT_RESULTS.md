@@ -198,3 +198,14 @@ allocator/errno/pthread prerequisite status. Complete POSIX/C++/compiler TLS,
 engine-sized memory/events/loader, thread-safe TLS library integration, actual
 modern engine and remaining network/wireless gates stay open. New Fusion/Pi/laptop
 qualification is NOT RUN; binary publication remains held.
+
+The [native TLS client](NATIVE_TLS_CLIENT.md) now has a separate pthread concurrency
+contract: complete bounded API calls serialize shared PSA lifetimes and the external
+RNG accepts only its current owning thread. Actual three-worker TLS1.3/direct/UEFI/
+IPv6 and TLS1.2 runs validate independent clients, wrong-host rejection while valid
+workers continue, GUI response during withheld replies and stable cleanup. Missing
+clock/entropy still opens no connection. See [exact evidence](validation/stage3-threaded-tls.json).
+Object lifetime/pending-write ownership and unrelated PSA consumers remain explicit
+boundaries. This supersedes the earlier single-thread-only TLS status; production
+trust/time/reseed policy, modern engine/runtime and live wireless remain open.
+The binary hold and reserved completion version0.50.0 remain unchanged.

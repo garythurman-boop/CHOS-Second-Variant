@@ -29,8 +29,9 @@ The main TCB initializes lazily without allocating. The allocator serializes who
 heap transactions, including map/unmap, metadata changes and error capture, through
 a private futex mutex. This makes the supplied malloc/calloc/realloc/free/alignment
 operations safe among native C threads. It does not make unrelated libraries
-thread-safe: in particular, the current TLS-client API remains single-threaded
-within a process until its shared PSA/RNG state receives a separate contract.
+thread-safe. The subsequent [TLS-client concurrency contract](NATIVE_TLS_CLIENT.md)
+separately serializes that component's shared PSA state and scopes its RNG to the
+executing thread; arbitrary third-party libraries still need their own contracts.
 
 Mutexes support normal, error-checking and recursive types, try-lock, owner-checked
 unlock, and busy-destroy refusal. Contended locks sleep on a32-bit futex word;
