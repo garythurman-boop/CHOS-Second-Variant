@@ -7,12 +7,12 @@
   "schema": 1,
   "artifact_interval": 2,
   "iterations_since_artifacts": 1,
-  "last_counted_source_commit": "3655d217f38f448adf8d5c269231b4d4ef9da538",
+  "last_counted_source_commit": "3eb27cd802e3459dc912d48a24068ba0896061e8",
   "release_hold": {
     "active": true,
     "reason": "User instruction: no new build publication until revised Stage 3 is satisfied and thoroughly tested",
     "completion_report": "docs/STAGE3_CURRENT_RESULTS.md",
     "completion_version": "0.50.0"
   },
-  "held_source_iterations": 6
+  "held_source_iterations": 7
 }
