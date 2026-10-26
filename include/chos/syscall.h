@@ -51,6 +51,11 @@
 #define CHOS_SYS_NET6_DNS_START 46u /* x0=hostname; owner-bound async AAAA over validated RDNSS server */
 #define CHOS_SYS_NET6_DNS_STATUS 47u /* x0=writable chos_dns6_info_t,x1=capacity */
 #define CHOS_SYS_CLOCK_INFO 48u /* x0=writable chos_clock_info_t,x1=capacity; read-only clocks */
+#define CHOS_SYS_IPC_OPEN 49u /* x0=live peerPID; mutual consent before communication */
+#define CHOS_SYS_IPC_STATUS 50u /* x0=owner handle,x1=status,x2=capacity */
+#define CHOS_SYS_IPC_SEND 51u /* x0=handle,x1=bytes,x2=length1..512 */
+#define CHOS_SYS_IPC_RECV 52u /* x0=handle,x1=bytes,x2=capacity1..512 */
+#define CHOS_SYS_IPC_CLOSE 53u /* x0=owner handle */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u
@@ -63,6 +68,8 @@
 #define CHOS_SYS_MAX_RANDOM_BYTES 256u
 #define CHOS_SYS_MAX_SLEEP_TICKS 60000u /* 10 minutes at CHOS's 100 Hz timer */
 
+#define CHOS_ERRNO_EPIPE 32
+#define CHOS_ERRNO_EMSGSIZE 90
 #define CHOS_ERRNO_EPERM 1
 #define CHOS_ERRNO_ENOENT 2
 #define CHOS_ERRNO_EEXIST 17

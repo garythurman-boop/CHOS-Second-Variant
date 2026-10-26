@@ -1,3 +1,4 @@
+#include "chos/ipc.h"
 #include "chos/clock.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -938,6 +939,46 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 chos_net_manager_status(&status);
                 frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&status,sizeof(status))?0u:neg_errno(CHOS_ERRNO_EFAULT);
                 return frame;
+            }
+            case CHOS_SYS_IPC_OPEN: {
+                uint32_t owner=process_pid_for_address_space(fault_space);
+                chos_process_info_t peer;
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[0]>UINT32_MAX || !process_get_info_by_pid((uint32_t)frame->x[0],&peer) ||
+                   (peer.state!=CHOS_PROCESS_RUNNING && peer.state!=CHOS_PROCESS_QUEUED)){
+                    frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;
+                }
+                frame->x[0]=(uint64_t)chos_ipc_open(owner,peer.pid);return frame;
+            }
+            case CHOS_SYS_IPC_STATUS: {
+                uint32_t owner=process_pid_for_address_space(fault_space);chos_ipc_info_t info;
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[2]<sizeof(info)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[1],sizeof(info))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int rc=chos_ipc_status(owner,frame->x[0],&info);
+                if(!rc && !address_space_copy_to_user(fault_space,frame->x[1],&info,sizeof(info)))rc=-CHOS_ERRNO_EFAULT;
+                frame->x[0]=(uint64_t)(int64_t)rc;return frame;
+            }
+            case CHOS_SYS_IPC_SEND:
+            case CHOS_SYS_IPC_RECV: {
+                uint32_t owner=process_pid_for_address_space(fault_space);uint8_t data[CHOS_IPC_MESSAGE_MAX];
+                uint64_t handle=frame->x[0],pointer=frame->x[1],length=frame->x[2];int rc;
+                if(!owner){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(!length||length>sizeof(data)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if((uint32_t)frame->x[8]==CHOS_SYS_IPC_SEND){
+                    if(!address_space_copy_from_user(fault_space,data,pointer,(size_t)length))rc=-CHOS_ERRNO_EFAULT;
+                    else rc=chos_ipc_send(owner,handle,data,(size_t)length);
+                }else{
+                    if(!syscall_user_range_writable(fault_space,pointer,(size_t)length))rc=-CHOS_ERRNO_EFAULT;
+                    else{rc=chos_ipc_receive(owner,handle,data,(size_t)length);
+                        if(rc>0 && !address_space_copy_to_user(fault_space,pointer,data,(size_t)rc))rc=-CHOS_ERRNO_EFAULT;
+                    }
+                }
+                frame->x[0]=(uint64_t)(int64_t)rc;return frame;
+            }
+            case CHOS_SYS_IPC_CLOSE: {
+                uint32_t owner=process_pid_for_address_space(fault_space);
+                frame->x[0]=owner?(uint64_t)(int64_t)chos_ipc_close(owner,frame->x[0]):neg_errno(CHOS_ERRNO_ESRCH);return frame;
             }
             case CHOS_SYS_CLOCK_INFO: {
                 chos_clock_info_t status;

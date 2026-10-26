@@ -1,0 +1,94 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "completion_version_reserved": "0.50.0",
+  "source_sha256": {
+    "kernel/core/ipc.c": "8edbbb6d02cec64cd8fedda849b9eafb4ec2ab96b10cfa8e6104c958966661c6",
+    "kernel/core/syscall.c": "18735be4ca003dcf6da054446555930d0e3b120d4f295d2457a965f8f8ac89bd",
+    "kernel/core/process.c": "db134e4719529947b3868681daf90a601854cfa1219fb3578b737443ef7c92ef",
+    "include/chos/ipc.h": "986fc52c067b99db8183583d200eb3319d7368b28bc3ccb4a1553735d3ba961a",
+    "include/chos/syscall.h": "841cbf5d0adbcb409c5ea69a15188db2009b5be12761a3ee5b747d458c270a1a",
+    "userland/examples/ipc_test.c": "377bee11d9d435d1c5746cc1e2ad96f3ebfe3adca49615307ac8b609e332b4a6",
+    "tests/qemu_ipc.py": "2b642048dc81c0da38b9d417e83d48646a1ae7001976c78e347145534ded4a2e",
+    "tests/test_ipc.c": "00e60041ac4d2ecfa30d31a8ca2c64d6a3963d77ea862f00d12869e6d0b0e7ab"
+  },
+  "host_and_sanitizer": [
+    "ipc-host1.log",
+    "ipc-host-final.log",
+    "ipc-sanitize-final.log",
+    "ipc-smoke-final.log"
+  ],
+  "guest_profiles": [
+    {
+      "evidence": "/workspace/chos-evidence/ipc-direct-final/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "6f736e269373f16d63830a7389bb321c7e85a1e73b5fadc0f9b83a5bb958e3f2",
+        "cold_free_pages": 117703,
+        "free_pages_before": 117696,
+        "free_pages_after": 117696,
+        "checks": [
+          "actual parent and child512-byte bidirectional IPC over SVC",
+          "24 foreign-process attempts cannot inspect/send/read/close another owner handle",
+          "invalid/read-only user destinations and undersized capacity do not consume messages",
+          "child exits without close; reaper preserves queued message then EOF/EPIPE",
+          "three measured runs after one warmup, each spawning12children reclaim all process frames and channel slots"
+        ],
+        "limits": [
+          "message IPC primitive, not POSIX socketpair/shared-memory/FD passing",
+          "no browser-engine or TLS completion claim",
+          "QEMU evidence, new Fusion behavior NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "a9b06bf75203a5e6dd1364867229bfeb49c0d5501c8f6644ab92eba7749a8657"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/ipc-uefi-final/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "6f736e269373f16d63830a7389bb321c7e85a1e73b5fadc0f9b83a5bb958e3f2",
+        "cold_free_pages": 500542,
+        "free_pages_before": 500535,
+        "free_pages_after": 500535,
+        "checks": [
+          "actual parent and child512-byte bidirectional IPC over SVC",
+          "24 foreign-process attempts cannot inspect/send/read/close another owner handle",
+          "invalid/read-only user destinations and undersized capacity do not consume messages",
+          "child exits without close; reaper preserves queued message then EOF/EPIPE",
+          "three measured runs after one warmup, each spawning12children reclaim all process frames and channel slots"
+        ],
+        "limits": [
+          "message IPC primitive, not POSIX socketpair/shared-memory/FD passing",
+          "no browser-engine or TLS completion claim",
+          "QEMU evidence, new Fusion behavior NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "67763e778e57f75e7554289e3347499e988e8e2dfabe67508bb0a19cbec22435",
+        "iso_sha256": "e14d2cc0d75588cbda75f3277c120fe2a48e08ac7fad02a6e48a7c8e03b3661e",
+        "iso_embedded_kernel_sha256": "67763e778e57f75e7554289e3347499e988e8e2dfabe67508bb0a19cbec22435",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "retained_failures": [
+    {
+      "evidence": "/workspace/chos-evidence/ipc-direct1",
+      "diagnosis": "cold baseline included first-use kernel file-buffer heap arena retained7pages; corrected fixture records warmup and requires stable subsequent quiescent counts"
+    },
+    {
+      "evidence": "/workspace/chos-evidence/ipc-uefi1",
+      "diagnosis": "cold baseline included first-use kernel file-buffer heap arena retained7pages; corrected fixture records warmup and requires stable subsequent quiescent counts"
+    }
+  ],
+  "limits": [
+    "not POSIX sockets, descriptor passing, shared memory or WPE integration",
+    "Fusion/physical IPC validation NOT RUN",
+    "PID exhaustion fails closed in code but4billion actual guest launches NOT RUN",
+    "modern engine/TLS/Pi5wireless and other fullStage3 gates remain unfinished"
+  ]
+}

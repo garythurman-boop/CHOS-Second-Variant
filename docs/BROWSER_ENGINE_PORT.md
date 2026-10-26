@@ -107,3 +107,7 @@ static ELF64 with separate RX/R/RW segments, bounded larger sparse images and
 deferred cleanup now has live direct-EL0 evidence. This is not Linux binary
 compatibility, a complete C/C++ runtime or engine integration. UEFI runtime qualification, engine-sized memory, threads/IPC and secure transport
 remain open. Native allocation/string prerequisites are recorded in NATIVE_C_RUNTIME.md.
+
+PROCESS_IPC.md records a further nonblocking, owner-bound mutual-process message
+primitive with real EL0 tests. WPE process integration, POSIX stream/descriptor
+semantics, shared buffers, threads and full engine-sized runtime remain open.

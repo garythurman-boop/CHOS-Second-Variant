@@ -1,3 +1,4 @@
+#include "chos/ipc.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/address_space.h"
@@ -260,7 +261,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
     process_reap_pending();
     irq_flags = chos_spin_lock_irqsave(&process_lock);
     index = choose_slot_locked();
-    if (index == CHOS_PROCESS_MAX) {
+    if (index == CHOS_PROCESS_MAX || next_process_id == 0u) {
         chos_spin_unlock_irqrestore(&process_lock, irq_flags);
         return PROCESS_ERR_CAPACITY;
     }
@@ -269,7 +270,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
     slot->info.state = CHOS_PROCESS_LOADING;
     slot->info.exit_status = -1;
     slot->info.pid = next_process_id++;
-    if (next_process_id == 0u) next_process_id = 1u;
+    /* Exhaustion stays zero: never recycle a security owner PID within a boot. */
     slot->sequence = process_sequence++;
     if (process_sequence == 0u) process_sequence = 1u;
     copy_name(slot->info.name, name);
@@ -399,6 +400,7 @@ static void process_scheduled_entry(void *argument) {
                                &status, &faulted);
     chos_tcp_drop_owner(slot->info.pid);
     chos_net6_drop_owner(slot->info.pid);
+    chos_ipc_drop_owner(slot->info.pid);
 
     /* This task cannot destroy its own active address space. Mark it pending;
      * scheduler cleanup switches to the kernel root and drops its pin first. */
@@ -446,6 +448,7 @@ chos_process_error_t process_run_image(const char *name, const void *file_bytes,
                                 &exit_status, &faulted);
     chos_tcp_drop_owner(slot->info.pid);
     chos_net6_drop_owner(slot->info.pid);
+    chos_ipc_drop_owner(slot->info.pid);
     chos_gui_process_exited(slot->info.pid);
     irq_flags = chos_spin_lock_irqsave(&process_lock);
     foreground_process_slot = CHOS_PROCESS_MAX;

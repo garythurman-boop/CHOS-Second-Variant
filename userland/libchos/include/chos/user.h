@@ -1,3 +1,4 @@
+#include "chos/ipc.h"
 #include "chos/clock_api.h"
 #ifndef CHOS_USER_RUNTIME_H
 #define CHOS_USER_RUNTIME_H
@@ -115,6 +116,11 @@ static inline long chos_rmdir(const char *path) {
 static inline long chos_map_memory(size_t bytes){return chos_syscall2(CHOS_SYS_MAP_MEMORY,(long)bytes,0);}
 static inline long chos_unmap_memory(void *base,size_t bytes){return chos_syscall2(CHOS_SYS_UNMAP_MEMORY,(long)(uintptr_t)base,(long)bytes);}
 static inline long chos_network_status(chos_net_status_t *out){return chos_syscall2(CHOS_SYS_NET_INFO,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_ipc_connect(uint32_t peer){return chos_syscall1(CHOS_SYS_IPC_OPEN,peer);}
+static inline long chos_ipc_get_status(uint64_t h,chos_ipc_info_t *out){return chos_syscall3(CHOS_SYS_IPC_STATUS,(long)h,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_ipc_write(uint64_t h,const void *p,size_t n){return chos_syscall3(CHOS_SYS_IPC_SEND,(long)h,(long)(uintptr_t)p,(long)n);}
+static inline long chos_ipc_read(uint64_t h,void *p,size_t n){return chos_syscall3(CHOS_SYS_IPC_RECV,(long)h,(long)(uintptr_t)p,(long)n);}
+static inline long chos_ipc_release(uint64_t h){return chos_syscall1(CHOS_SYS_IPC_CLOSE,(long)h);}
 static inline long chos_clock_status(chos_clock_info_t *out) {return chos_syscall2(CHOS_SYS_CLOCK_INFO,(uint64_t)(uintptr_t)out,sizeof(*out));}
 static inline long chos_network_status6(chos_net6_info_t *out){return chos_syscall2(CHOS_SYS_NET6_INFO,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_ping6(const char *literal){return chos_syscall1(CHOS_SYS_NET6_PING,(long)(uintptr_t)literal);}

@@ -131,3 +131,8 @@ The user reserves **0.50.0** for full revised Stage3 completion. A subsequent
 [firmware entropy prerequisite](FIRMWARE_ENTROPY.md) has QEMU/host evidence, but
 Fusion availability, live reseeding/lifetime policy, TLS and the other mandatory
 gates remain open. Neither the version nor binary hold is advanced for it.
+
+[Bounded process messages](PROCESS_IPC.md) now have actual isolated parent/child/
+foreign-process evidence on direct and UEFI QEMU, plus cleanup and ownership
+checks. They are not POSIX sockets/shared memory/descriptor passing, and do not
+close the modern browser, complete runtime or content-sandbox gates.
