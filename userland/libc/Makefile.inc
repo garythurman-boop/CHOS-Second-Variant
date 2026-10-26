@@ -1,6 +1,6 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c
+LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
 LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
@@ -149,3 +149,17 @@ test-libc-filename-sanitize: $(SAN_DIR)/test-libc-filename
 test: test-libc-filename
 test-sanitize: test-libc-filename-sanitize
 .PHONY: test-libc-filename test-libc-filename-sanitize
+GUARD_HOST_FLAGS := -DCHOS_HOST_TEST -include tests/guard_host_names.h $(LIBC_INCLUDES)
+$(BUILD)/test-cxx-guard: tests/test_cxx_guard.c tests/guard_host_names.h userland/libc/cxx_guard.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 $(GUARD_HOST_FLAGS) tests/test_cxx_guard.c userland/libc/cxx_guard.c -o $@
+$(SAN_DIR)/test-cxx-guard: tests/test_cxx_guard.c tests/guard_host_names.h userland/libc/cxx_guard.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $(GUARD_HOST_FLAGS) tests/test_cxx_guard.c userland/libc/cxx_guard.c -o $@
+test-cxx-guard: $(BUILD)/test-cxx-guard
+	./$(BUILD)/test-cxx-guard
+test-cxx-guard-sanitize: $(SAN_DIR)/test-cxx-guard
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-cxx-guard
+test: test-cxx-guard
+test-sanitize: test-cxx-guard-sanitize
+.PHONY: test-cxx-guard test-cxx-guard-sanitize

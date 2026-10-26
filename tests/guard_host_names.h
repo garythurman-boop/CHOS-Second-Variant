@@ -1,0 +1,4 @@
+#define __cxa_guard_acquire chos_test_guard_acquire
+#define __cxa_guard_release chos_test_guard_release
+#define __cxa_guard_abort chos_test_guard_abort
+#define abort chos_test_abort

@@ -75,7 +75,9 @@ static void destructors(chos_libc_tcb_t *t){
 }
 void pthread_exit(void *result){
  chos_libc_tcb_t *t=__chos_libc_tls();
- if(!t->exiting){t->exiting=1;__chos_once_abandon(t);__chos_cxx_thread_finalize(t);destructors(t);}
+ if(!t->exiting){t->exiting=1;__chos_once_abandon(t);__chos_cxx_guard_abandon(t);__chos_cxx_thread_finalize(t);destructors(t);}
+ /* A key/TLS destructor may itself exit during a new guarded initializer. */
+ __chos_cxx_guard_abandon(t);
  t->result=result;__atomic_store_n(&t->done,1,__ATOMIC_RELEASE);(void)chos_wake_word(&t->done,8);
  long rc=chos_syscall1(CHOS_SYS_THREAD_EXIT,(long)(uintptr_t)result);
  /* The synchronous single-task profile has no siblings to preserve. */

@@ -251,3 +251,14 @@ This is a static no-exceptions/no-RTTI container profile, not a complete C++ ABI
 std::thread/mutex runtime or modern engine. Engine-sized memory/events/POSIX,
 production trust policy, actual browser integration and real wireless remain
 open; binary publication remains held.
+
+The subsequent [native static-guard runtime](NATIVE_STATIC_GUARDS.md) supplies
+real compiler-emitted C++ local-static initialization, acquire/release publication,
+private-futex contention and retry after initializer pthread_exit, including exit
+inside key-destructor execution. Direct/UEFI guest tests cover competing workers,
+16-level nesting, recursive/quota refusal and stable cleanup; host/sanitizer,
+compiler-TLS, C++ containers and verified IPv6 TLS regressions pass. See
+[exact evidence](validation/stage3-static-guards.json). This supersedes the earlier
+missing-local-guards status. Global constructor/atexit, complete C++/POSIX and
+engine-sized memory/events/loader, actual browser, production trust and wireless
+requirements remain open. Binary publication remains held.

@@ -87,3 +87,7 @@ No guest behavior was changed to satisfy these test expectations.
 QEMU evidence does not establish new Fusion/Pi/laptop qualification. Full C++/
 POSIX/events/memory/loader support, the actual modern browser and conformance,
 production trust/time/reseed policy and real Pi5 wireless remain required.
+
+The subsequent [static-guard iteration](NATIVE_STATIC_GUARDS.md) closes the local-
+initialization-guard gap with direct/UEFI contention and exit/retry evidence.
+The other full C++ ABI/engine limits above remain active.
