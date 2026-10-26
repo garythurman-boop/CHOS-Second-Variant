@@ -156,3 +156,12 @@ exhaustion/cancellation and missing clock/entropy fixtures are implemented.
 This is not browser integration, TLS1.3, a production CA trust/update policy or
 authenticated time. WPE/Soup integration, the modern engine and live Pi5 wireless
 remain active gates. Recovery-preview HTTPS remains blocked and binaries held.
+
+The subsequent native TLS protocol iteration adds reviewed upstream TLS1.3/PSA
+and certificate-authenticated ephemeral exchange. Both TLS1.3 AES-GCM suites,
+TLS1.2-only peers, intermediate chains/invalid issuers and overlapping client
+lifetimes have real QEMU fixtures. See [current TLS protocol evidence](validation/stage3-native-tls13.json).
+The earlier TLS1.2-only description is historical. Production CA/time policy,
+engine/Soup integration, full browser behavior, live wireless and independent
+Fusion qualification remain open. No recovery-preview HTTPS or binary release
+is enabled by this source milestone.

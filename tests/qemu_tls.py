@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Real native CHOS TLS1.2 client against ephemeral local certificate fixtures.
+"""Real native CHOS TLS1.2/1.3 client against ephemeral local certificate fixtures.
 No production CA store, modern browser, trusted-time or physical Wi-Fi claim.
 """
 import argparse,datetime,hashlib,json,pathlib,re,shutil,socket,ssl,subprocess,sys,threading,time
@@ -12,6 +12,8 @@ from qemu_platform import Guest,wait
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--out',type=pathlib.Path,required=True)
 p.add_argument('--mode',choices=['direct','uefi'],default='direct')
+p.add_argument('--tls-version',choices=['1.2','1.3'],default='1.3')
+p.add_argument('--expect-cipher',choices=['TLS_AES_128_GCM_SHA256','TLS_AES_256_GCM_SHA384'])
 p.add_argument('--missing-entropy',action='store_true')
 p.add_argument('--missing-clock',action='store_true')
 o=p.parse_args();out=o.out.resolve();out.mkdir(parents=True,exist_ok=False)
@@ -21,11 +23,18 @@ rootkey=fixture_roots(fixture)
 servers=[];events=[];lock=threading.Lock();stop=threading.Event()
 def server(kind,begin=2029,end=2031):
  key=rsa.generate_private_key(public_exponent=65537,key_size=2048) if kind.startswith('rsa') else ec.generate_private_key(ec.SECP384R1() if kind=='aes256' else ec.SECP256R1());leaf=cert('fixture.chos.test',key,'CHOS ephemeral test CA',rootkey,begin,end,server_auth=(kind!='wrong-purpose'))
+ chain=b''
+ if kind in ('chain','bad-chain'):
+  intermediate_key=ec.generate_private_key(ec.SECP256R1())
+  signer=ec.generate_private_key(ec.SECP256R1()) if kind=='bad-chain' else rootkey
+  intermediate=cert('CHOS temporary intermediate',intermediate_key,'CHOS ephemeral test CA',signer,2020,2040,True)
+  leaf=cert('fixture.chos.test',key,'CHOS temporary intermediate',intermediate_key,begin,end)
+  chain=intermediate.public_bytes(serialization.Encoding.PEM)
  certfile=fixture/(kind+'.pem');keyfile=fixture/(kind+'.key')
- certfile.write_bytes(leaf.public_bytes(serialization.Encoding.PEM))
+ certfile.write_bytes(leaf.public_bytes(serialization.Encoding.PEM)+chain)
  keyfile.write_bytes(key.private_bytes(serialization.Encoding.PEM,serialization.PrivateFormat.PKCS8,serialization.NoEncryption()))
  keyfile.chmod(0o600)
- ctx=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);ctx.minimum_version=ssl.TLSVersion.TLSv1_2;ctx.maximum_version=ssl.TLSVersion.TLSv1_2
+ ctx=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);version=ssl.TLSVersion.TLSv1_3 if o.tls_version=='1.3' else ssl.TLSVersion.TLSv1_2;ctx.minimum_version=version;ctx.maximum_version=version
  ctx.set_ciphers(('ECDHE-RSA-' if kind.startswith('rsa') else 'ECDHE-ECDSA-')+('AES256-GCM-SHA384' if kind in ('aes256','rsa256') else 'AES128-GCM-SHA256'));
  if kind=='aes256':ctx.set_ecdh_curve('secp384r1')
  ctx.load_cert_chain(certfile,keyfile);ctx.set_alpn_protocols(['http/1.1'])
@@ -64,7 +73,7 @@ def server(kind,begin=2029,end=2031):
    except OSError:return
    threading.Thread(target=handle,args=(raw,),daemon=True).start()
  threading.Thread(target=accept,daemon=True).start();return listener.getsockname()[1]
-ports={kind:server(kind,*dates) for kind,dates in [('valid',(2029,2031)),('rsa',(2029,2031)),('rsa256',(2029,2031)),('aes256',(2029,2031)),('wrong-purpose',(2029,2031)),('expired',(2027,2028)),('future',(2032,2033)),('truncated',(2029,2031)),('malformed',(2029,2031)),('stall',(2029,2031))]}
+ports={kind:server(kind,*dates) for kind,dates in [('valid',(2029,2031)),('chain',(2029,2031)),('bad-chain',(2029,2031)),('rsa',(2029,2031)),('rsa256',(2029,2031)),('aes256',(2029,2031)),('wrong-purpose',(2029,2031)),('expired',(2027,2028)),('future',(2032,2033)),('truncated',(2029,2031)),('malformed',(2029,2031)),('stall',(2029,2031))]}
 disk=out/'disposable.img';shutil.copyfile('build/qemu-smoke-disk.img',disk)
 app=pathlib.Path('build/userland/tls_test.elf')
 for dest,src in [('/BIN/TLSTEST.ELF',app),('/TLS/CA.DER',fixture/'ca.der'),('/TLS/OTHER.DER',fixture/'other.der'),('/TLS/BAD.DER',fixture/'bad.der')]:
@@ -102,13 +111,15 @@ try:
   run('valid',991 if o.missing_clock else 992);assert not events,events
  else:
   run('valid');baseline=free_pages()
-  for kind,expected,host,ca in [('rsa',0,'fixture.chos.test','/TLS/CA.DER'),('rsa256',0,'fixture.chos.test','/TLS/CA.DER'),('aes256',0,'fixture.chos.test','/TLS/CA.DER'),('valid',4,'wrong.chos.test','/TLS/CA.DER'),('valid',8,'fixture.chos.test','/TLS/OTHER.DER'),('wrong-purpose',4096,'fixture.chos.test','/TLS/CA.DER'),('expired',1,'fixture.chos.test','/TLS/CA.DER'),('future',512,'fixture.chos.test','/TLS/CA.DER'),('malformed',998,'fixture.chos.test','/TLS/CA.DER'),('truncated',997,'fixture.chos.test','/TLS/CA.DER'),('stall',996,'fixture.chos.test','/TLS/CA.DER'),('valid',993,'fixture.chos.test','/TLS/BAD.DER'),('valid',995,'fixture.chos.test','/TLS/CA.DER'),('valid',0,'fixture.chos.test','/TLS/CA.DER')]:
+  for kind,expected,host,ca in [('chain',0,'fixture.chos.test','/TLS/CA.DER'),('bad-chain',8,'fixture.chos.test','/TLS/CA.DER'),('rsa',0,'fixture.chos.test','/TLS/CA.DER'),('rsa256',0,'fixture.chos.test','/TLS/CA.DER'),('aes256',0,'fixture.chos.test','/TLS/CA.DER'),('valid',4,'wrong.chos.test','/TLS/CA.DER'),('valid',8,'fixture.chos.test','/TLS/OTHER.DER'),('wrong-purpose',4096,'fixture.chos.test','/TLS/CA.DER'),('expired',1,'fixture.chos.test','/TLS/CA.DER'),('future',512,'fixture.chos.test','/TLS/CA.DER'),('malformed',998,'fixture.chos.test','/TLS/CA.DER'),('truncated',997,'fixture.chos.test','/TLS/CA.DER'),('stall',996,'fixture.chos.test','/TLS/CA.DER'),('valid',993,'fixture.chos.test','/TLS/BAD.DER'),('valid',995,'fixture.chos.test','/TLS/CA.DER'),('valid',994,'fixture.chos.test','/TLS/CA.DER'),('valid',0,'fixture.chos.test','/TLS/CA.DER')]:
    run(kind,expected,host,ca);observed=free_pages();assert observed==baseline,('TLS lifecycle leaked pages',baseline,observed)
   assert any(e.get('sni')=='fixture.chos.test' for e in events),events
   assert any(e.get('sni')=='wrong.chos.test' for e in events),events
-  assert sum('request' in e for e in events)==6,events
+  assert sum('request' in e for e in events)==9,events
   assert all(e.get('alpn')=='http/1.1' for e in events if 'alpn' in e),events
- (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'profile':'native TLS1.2 ECDHE-ECDSA/RSA AES128/256-GCM; isolated prerequisite, not integrated browser','application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'missing_clock':o.missing_clock,'missing_entropy':o.missing_entropy,'cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'cases':cases,'server_events':events,'limits':['ephemeral test root only; production trust store/update policy still open','firmware/RTC clock availability is not authenticated time','TLS1.3, browser integration, full modern engine and live Wi-Fi remain open','QEMU evidence; Fusion/physical TLS NOT RUN']},indent=2)+'\n')
+  assert all(e['version']=='TLSv'+o.tls_version for e in events if 'version' in e),events
+  if o.expect_cipher:assert all(e['cipher']==o.expect_cipher for e in events if 'cipher' in e),events
+ (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'profile':'native TLS'+o.tls_version+' ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser','application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'missing_clock':o.missing_clock,'missing_entropy':o.missing_entropy,'cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'cases':cases,'server_events':events,'limits':['ephemeral test root only; production trust store/update policy still open','firmware/RTC clock availability is not authenticated time','browser integration, full modern engine and live Wi-Fi remain open','QEMU evidence; Fusion/physical TLS NOT RUN']},indent=2)+'\n')
 except Exception:
  (out/'failure.txt').write_text(g.text());(out/'server-events.json').write_text(json.dumps(events,indent=2));raise
 finally:

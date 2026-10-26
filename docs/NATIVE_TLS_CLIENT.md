@@ -8,8 +8,9 @@ HTTPS feature in the recovery preview. No new application control advertises it.
 
 ## Protocol and security contract
 
-This first profile supports TLS1.2 only, ECDHE-ECDSA/RSA, AES128-GCM/SHA256 and
-AES256-GCM/SHA384, with P256/P384. TLS1.3 is not yet implemented in this port.
+The profile supports TLS1.2 and TLS1.3 with certificate-authenticated ephemeral
+exchange, ECDSA/RSA certificates, AES128-GCM/SHA256 and AES256-GCM/SHA384, with
+P256/P384. TLS1.3 PSK,0RTT and session resumption are not enabled.
 There is no plaintext retry, insecure verification mode, PSK bypass or caller
 callback that can override certificate validation. A nonempty ASCII hostname is
 mandatory; MbedTLS checks the chain, hostname, dates and server purpose. SNI uses
@@ -62,7 +63,7 @@ session. This is not an engine-sized memory or concurrent-tab capacity claim.
 
 ## Dependencies and verification
 
-The exact upstream commit, Apache2 license choice and125-file original-byte
+The exact upstream commit, Apache2 license choice and174-file original-byte
 compiler dependency closure are in `docs/dependencies/mbedtls.json` and verified
 by `tools/verify_mbedtls.py`. The boot entropy configuration stays separate.
 No upstream crypto code is modified. `MBEDTLS_NO_UDBL_DIVISION` selects the
@@ -79,7 +80,8 @@ and malformed DER under ASan/UBSan. Use the regular aggregate suites too.
 
 `tests/qemu_tls.py --mode direct|uefi --out FRESH` boots immutable kernel/ISO
 snapshots with disposable CHFS disks and real emulated Ethernet queues. It records
-actual TLS negotiations, SNI/ALPN, all four configured ciphersuites, P384, certificate
+actual TLS negotiations, SNI/ALPN, all four TLS1.2 ciphersuites and both configured
+TLS1.3 ciphersuites, P384, intermediate chains and damaged issuer signatures, certificate
 purpose/host/root/date failures, malformed records, fragmented authenticated data,
 unauthenticated EOF, a stalled peer, cancellation/exhaustion and stable physical
 pages after the loader's first-use retained file-buffer arena. The stalled-peer
@@ -92,3 +94,36 @@ Results and retained investigation failures are in the machine-readable report.
 QEMU evidence does not qualify Fusion or physical hardware. Modern rendering,
 JavaScript, full browser security/integration and live Pi5 wireless remain open;
 Stage3 is incomplete, binaries stay held, and0.50.0 remains reserved.
+
+## TLS1.3 PSA state and test method
+
+TLS1.3 uses upstream PSA Crypto, HKDF and TLS1.3 implementation units from the
+same immutable MbedTLS release. The external PSA RNG is bound only while a client
+handshake/read/write call executes, to that client's already-seeded HMAC-DRBG.
+It is cleared before every return, including WANT/error returns. A request outside
+that scope returns insufficient entropy, a zero output count and erased output.
+Actual guest tests check that property before creation and after every handshake
+step. There is no hidden PSA seed, timer entropy, alternate RNG or exported key.
+
+The client API remains single-threaded within each process. Separate EL0 processes
+have separate state. Per-process PSA initialization is reference-counted across
+client contexts, and the final destructor releases upstream PSA state after its
+SSL/key/DRBG objects. Two overlapping handshakes and subsequent authenticated
+requests prove that destroying one client does not erase the other's keys.
+Four-context exhaustion/cancellation and later recreation remain tested. The
+component currently owns that process's PSA lifetime; integration with other PSA
+consumers or future threads requires a coordinated ownership/locking contract.
+
+`tests/run_tls_cipher.py --suite TLS_AES_128_GCM_SHA256 -- --mode direct --out FRESH`
+and the analogous AES256/UEFI invocation restrict only the local fixture's
+OpenSSL TLS1.3 ciphersuite through a temporary configuration file. The runner
+asserts the actual negotiated version, cipher, SNI, ALPN and request counts.
+`tests/qemu_tls.py --tls-version 1.2 ...` verifies negotiation with TLS1.2-only
+peers using the same dual-protocol native executable. Neither mechanism modifies
+CHOS verification settings or installs a test root into the product.
+
+See [TLS1.3 results](validation/stage3-native-tls13.json) for the current profile;
+[initial TLS1.2 results](validation/stage3-native-tls.json) retain their earlier
+snapshot and investigation failures. Production CA/time policy, modern engine
+integration, IPv6 TLS adaptation, live wireless and platform qualification remain
+open; this protocol extension does not complete Stage3.

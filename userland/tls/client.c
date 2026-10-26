@@ -7,6 +7,8 @@
 #include "mbedtls/hmac_drbg.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/platform_util.h"
+#include "psa/crypto.h"
+#include "psa/crypto_extra.h"
 #define TLS_TIMEOUT_MS UINT64_C(15000)
 struct chos_tls_client {
  mbedtls_ssl_context ssl;
@@ -15,8 +17,27 @@ struct chos_tls_client {
  mbedtls_hmac_drbg_context random;
  uint64_t deadline;
  uint32_t flags;
- int socket,state,error;
+ int socket,state,error,psa_reference;
 };
+/* All native client APIs are single-threaded. PSA's external RNG draws from
+ * the currently executing, already-seeded client. Never from a hidden source.
+ * Separate EL0 processes have separate globals. Threads require a new contract. */
+static mbedtls_hmac_drbg_context *active_random;
+static unsigned psa_clients;
+psa_status_t mbedtls_psa_external_get_random(mbedtls_psa_external_random_context_t *context,
+                                            uint8_t *out,size_t bytes,size_t *length){
+ (void)context;
+ if(!length||(!out&&bytes))return PSA_ERROR_INVALID_ARGUMENT;
+ *length=0;
+ if(!active_random||bytes>MBEDTLS_HMAC_DRBG_MAX_REQUEST){
+  if(out)mbedtls_platform_zeroize(out,bytes);
+  return PSA_ERROR_INSUFFICIENT_ENTROPY;
+ }
+ if(mbedtls_hmac_drbg_random(active_random,out,bytes)){
+  mbedtls_platform_zeroize(out,bytes);return PSA_ERROR_INSUFFICIENT_ENTROPY;
+ }
+ *length=bytes;return PSA_SUCCESS;
+}
 static int now_ms(uint64_t *out){
  struct timespec t;
  if(clock_gettime(CLOCK_MONOTONIC,&t)||t.tv_sec<0 || (uint64_t)t.tv_sec>(UINT64_MAX-TLS_TIMEOUT_MS)/1000u-1u)return -1;
@@ -83,6 +104,9 @@ chos_tls_client_t *chos_tls_create_ex(uint32_t ipv4,uint16_t port,const char *ho
  mbedtls_x509_crt_init(&c->anchors);mbedtls_hmac_drbg_init(&c->random);
  static const unsigned char personal[]="CHOS isolated TLS client v1";
  static const char *alpn[]={"http/1.1",0};
+ reason=CHOS_TLS_INIT_LIBRARY;
+ if(psa_crypto_init()!=PSA_SUCCESS)goto failed;
+ ++psa_clients;c->psa_reference=1;
  reason=CHOS_TLS_INIT_CA;
  if(mbedtls_x509_crt_parse_der(&c->anchors,ca,bytes))goto failed;
  reason=CHOS_TLS_INIT_ENTROPY;
@@ -115,7 +139,9 @@ int chos_tls_step(chos_tls_client_t *c){
   c->state=CHOS_TLS_HANDSHAKE;
  }
  if(c->state==CHOS_TLS_READY)return 0;
+ active_random=&c->random;
  int rc=mbedtls_ssl_handshake(&c->ssl);
+ active_random=0;
  if(rc==MBEDTLS_ERR_SSL_WANT_READ||rc==MBEDTLS_ERR_SSL_WANT_WRITE)return CHOS_TLS_AGAIN;
  if(rc)return fail(c,rc);
  c->flags=mbedtls_ssl_get_verify_result(&c->ssl);
@@ -124,7 +150,9 @@ int chos_tls_step(chos_tls_client_t *c){
 }
 int chos_tls_read(chos_tls_client_t *c,void *p,size_t n){
  if(!c||!p||!n||n>16384u||c->state!=CHOS_TLS_READY||deadline(c))return CHOS_TLS_ERROR;
+ active_random=&c->random;
  int rc=mbedtls_ssl_read(&c->ssl,p,n);
+ active_random=0;
  if(rc==MBEDTLS_ERR_SSL_WANT_READ||rc==MBEDTLS_ERR_SSL_WANT_WRITE)return CHOS_TLS_AGAIN;
  /* Raw TCP EOF is an unauthenticated truncation, never successful TLS EOF. */
  if(rc==0)return fail(c,MBEDTLS_ERR_SSL_CONN_EOF);
@@ -134,7 +162,9 @@ int chos_tls_read(chos_tls_client_t *c,void *p,size_t n){
 }
 int chos_tls_write(chos_tls_client_t *c,const void *p,size_t n){
  if(!c||!p||!n||n>16384u||c->state!=CHOS_TLS_READY||deadline(c))return CHOS_TLS_ERROR;
+ active_random=&c->random;
  int rc=mbedtls_ssl_write(&c->ssl,p,n);
+ active_random=0;
  if(rc==MBEDTLS_ERR_SSL_WANT_READ||rc==MBEDTLS_ERR_SSL_WANT_WRITE)return CHOS_TLS_AGAIN;
  if(rc<=0)return fail(c,rc?rc:MBEDTLS_ERR_SSL_INTERNAL_ERROR);
  progress(c);return rc;
@@ -147,5 +177,6 @@ void chos_tls_destroy(chos_tls_client_t *c){
  if(c->socket>0)(void)chos_net_tcp_abort(c->socket);
  mbedtls_ssl_free(&c->ssl);mbedtls_ssl_config_free(&c->config);
  mbedtls_x509_crt_free(&c->anchors);mbedtls_hmac_drbg_free(&c->random);
+ if(c->psa_reference&&psa_clients&&!--psa_clients)mbedtls_psa_crypto_free();
  mbedtls_platform_zeroize(c,sizeof(*c));free(c);
 }

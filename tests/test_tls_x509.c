@@ -6,8 +6,14 @@
 #include <time.h>
 #include <assert.h>
 #include "mbedtls/x509_crt.h"
+#include "psa/crypto.h"
+#include "psa/crypto_extra.h"
 #include "mbedtls/platform_time.h"
 #include "mbedtls/platform_util.h"
+/* Verification fixtures must not ask for random secret-key material. */
+psa_status_t mbedtls_psa_external_get_random(mbedtls_psa_external_random_context_t *ctx,uint8_t *p,size_t n,size_t *length){
+ (void)ctx;(void)p;(void)n;*length=0;return PSA_ERROR_INSUFFICIENT_ENTROPY;
+}
 static time_t fixture_time=INT64_C(1906545600); /*2030-06-01T12:00:00Z*/
 time_t chos_tls_time(time_t *p){if(p)*p=fixture_time;return fixture_time;}
 struct tm *mbedtls_platform_gmtime_r(const mbedtls_time_t *p,struct tm *out){return gmtime_r(p,out);}
@@ -24,7 +30,7 @@ static uint32_t verify(const unsigned char *ca,size_t ca_bytes,const unsigned ch
  assert((rc==0)==(flags==0));mbedtls_x509_crt_free(&peer);mbedtls_x509_crt_free(&anchor);return flags;
 }
 int main(int argc,char **argv){
- assert(argc==4);size_t ca_bytes,other_bytes,leaf_bytes;
+ assert(argc==4);assert(psa_crypto_init()==PSA_SUCCESS);size_t ca_bytes,other_bytes,leaf_bytes;
  unsigned char *ca=read_file(argv[1],&ca_bytes),*other=read_file(argv[2],&other_bytes),*leaf=read_file(argv[3],&leaf_bytes);
  assert(!verify(ca,ca_bytes,leaf,leaf_bytes,"fixture.chos.test"));
  assert(verify(ca,ca_bytes,leaf,leaf_bytes,"wrong.chos.test")&MBEDTLS_X509_BADCERT_CN_MISMATCH);
@@ -40,5 +46,5 @@ int main(int argc,char **argv){
   unsigned char *bad=calloc(1,n);assert(bad);mbedtls_x509_crt crt;mbedtls_x509_crt_init(&crt);
   assert(mbedtls_x509_crt_parse_der(&crt,bad,n)!=0);mbedtls_x509_crt_free(&crt);free(bad);
  }
- free(ca);free(other);free(leaf);puts("TLS X.509: pinned parser, hostname/chain/date/signature failures and every truncation passed");return 0;
+ free(ca);free(other);free(leaf);mbedtls_psa_crypto_free();puts("TLS X.509: pinned parser, hostname/chain/date/signature failures and every truncation passed");return 0;
 }
