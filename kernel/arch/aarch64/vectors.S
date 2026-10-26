@@ -109,12 +109,12 @@ exception_irq_entry:
     /*
      * Full, preemption-ready exception frame. Frame layout in
      * include/chos/irq_context.h: x0..x30, ELR_EL1, SPSR_EL1, ESR_EL1, SP_EL0.
-     * 816 bytes preserves 16-byte SP alignment. Saving SP_EL0 is required for
+     * 832 bytes preserves 16-byte SP alignment. Saving SP_EL0 is required for
      * correct restoration when preempting and switching between EL0 processes.
      * the development scheduler may return a different saved task frame; normal
      * builds stay cooperative by default.
      */
-    sub sp, sp, #816
+    sub sp, sp, #832
     stp x0,  x1,  [sp, #0]
     stp x2,  x3,  [sp, #16]
     stp x4,  x5,  [sp, #32]
@@ -141,6 +141,9 @@ exception_irq_entry:
     str x0, [sp, #272]
     str xzr, [sp, #280]
     SAVE_FP
+    mrs x9, tpidr_el0
+    str x9, [sp, #816]
+    str xzr, [sp, #824]
 
     mov x0, sp
     bl interrupt_irq_dispatch
@@ -154,7 +157,7 @@ exception_irq_entry:
  * to the EL1 return trampoline for SYS_EXIT or an EL0 fault. */
 .type exception_lower_sync_entry, %function
 exception_lower_sync_entry:
-    sub sp, sp, #816
+    sub sp, sp, #832
     stp x0,  x1,  [sp, #0]
     stp x2,  x3,  [sp, #16]
     stp x4,  x5,  [sp, #32]
@@ -181,8 +184,12 @@ exception_lower_sync_entry:
     str x0, [sp, #272]
     str xzr, [sp, #280]
     SAVE_FP
+    mrs x9, tpidr_el0
+    str x9, [sp, #816]
+    str xzr, [sp, #824]
     mov x0, sp
     bl exception_lower_sync_dispatch
+    bl chos_threads_cancel_return
     mov sp, x0
     b exception_irq_restore
 
@@ -202,6 +209,8 @@ exception_irq_restore:
     /* Restore the selected task's user stack before ERET. */
     ldr x16, [sp, #272]
     msr sp_el0, x16
+    ldr x9, [sp, #816]
+    msr tpidr_el0, x9
     RESTORE_FP
     ldp x0,  x1,  [sp, #0]
     ldp x2,  x3,  [sp, #16]
@@ -219,7 +228,7 @@ exception_irq_restore:
     ldp x26, x27, [sp, #208]
     ldp x28, x29, [sp, #224]
     ldr x30, [sp, #240]
-    add sp, sp, #816
+    add sp, sp, #832
     eret
 .type exception_fiq_entry, %function
 exception_fiq_entry:

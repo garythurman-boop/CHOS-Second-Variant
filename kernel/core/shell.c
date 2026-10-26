@@ -1,3 +1,4 @@
+#include "chos/threads.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/shell.h"
@@ -1920,7 +1921,7 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         uart_puts("\n");
     } else if (strings_equal(line, "irqinfo")) {
         uart_puts("AArch64 IRQ context diagnostics\n");
-        uart_puts("Frame size: 816 bytes (GPRs, ELR/SPSR/ESR, SP_EL0, Q0-Q31, FPCR/FPSR)\n");
+        uart_puts("Frame size: 832 bytes (GPRs, ELR/SPSR/ESR, SP_EL0, Q0-Q31, FPCR/FPSR, TPIDR_EL0)\n");
         uart_puts("Frames captured: "); print_decimal((size_t)interrupt_context_frame_count()); uart_puts("\n");
         uart_puts("Last interrupted PC (ELR_EL1): "); print_hex64(interrupt_context_last_elr()); uart_puts("\n");
         uart_puts("Last saved PSTATE (SPSR_EL1): "); print_hex64(interrupt_context_last_spsr()); uart_puts("\n");
@@ -2316,7 +2317,7 @@ static void shell_loop(const fdt_info_t *device_tree, int runtime_mode) {
                 chos_input_poll();
                 chos_net_stack_poll();chos_net_manager_poll();
                 if (runtime_mode) {
-                    (void)process_service_pending_spawn_request();
+                    (void)process_service_pending_spawn_request();chos_threads_service();
                     if ((++idle_polls & 255u) == 0u) process_reap_pending();
                 }
                 if (uart_try_getc(&c)) break;

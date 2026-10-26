@@ -156,6 +156,7 @@ static void initialize_task_irq_frame(size_t slot) {
     frame->reserved = 0u;
     for(i=0;i<32u;++i)frame->q[i][0]=frame->q[i][1]=0u;
     frame->fpcr=frame->fpsr=0u;
+    frame->tpidr_el0=frame->thread_reserved=0u;
     tasks[slot].irq_frame = frame;
 }
 
@@ -183,6 +184,7 @@ static void prepare_preemptive_contexts(void) {
     preemptive_idle_initial_frame->reserved = 0u;
     for(i=0;i<32u;++i)preemptive_idle_initial_frame->q[i][0]=preemptive_idle_initial_frame->q[i][1]=0u;
     preemptive_idle_initial_frame->fpcr=preemptive_idle_initial_frame->fpsr=0u;
+    preemptive_idle_initial_frame->tpidr_el0=preemptive_idle_initial_frame->thread_reserved=0u;
 }
 
 /* Called with IRQs masked. The timer ISR updates only its own tick counter. */
@@ -277,7 +279,7 @@ static int scheduler_create_task_internal(const char *name,
     uintptr_t stack_top;
     uint64_t daif = scheduler_critical_enter();
 
-    if (!scheduler_initialized || entry == NULL ||
+    if (!scheduler_initialized || entry == NULL || next_task_id == 0u ||
         (scheduler_running &&
          (current_slot >= CHOS_SCHED_MAX_TASKS ||
           task_states[current_slot] != SCHED_TASK_RUNNING ||
@@ -315,7 +317,7 @@ static int scheduler_create_task_internal(const char *name,
         ? *address_space : (address_space_handle_t){0u, 0u, 0u};
     initialize_task_irq_frame(slot);
     tasks[slot].id = next_task_id++;
-    if (next_task_id == 0u) next_task_id = 1u;
+    /* Exhaustion never recycles a task identity while old records may exist. */
     task_wake_ticks[slot] = 0u;
     copy_name(tasks[slot].name, name);
     task_states[slot] = SCHED_TASK_READY;

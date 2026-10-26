@@ -10,6 +10,8 @@ static int verify_denials(void){
  char data[64];
  CHECK((uint64_t)chos_capabilities()==child_mask());
  CHECK(chos_syscall0(999)==-CHOS_ERRNO_ENOSYS);
+ CHECK(chos_thread_create(0)==-CHOS_ERRNO_EPERM);
+ CHECK(chos_thread_id()==-CHOS_ERRNO_EPERM);
  CHECK(chos_open("/DOCUMENTS/SECRET.TXT")==-CHOS_ERRNO_EPERM);
  CHECK(chos_write_file("/DOCUMENTS/ESCAPE.TXT","bad",3)==-CHOS_ERRNO_EPERM);
  CHECK(chos_syscall0(CHOS_SYS_NET_OPEN)==-CHOS_ERRNO_EPERM);

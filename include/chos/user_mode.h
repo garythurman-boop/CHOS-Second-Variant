@@ -9,6 +9,7 @@
 int user_mode_self_test(void);
 /* Synchronously run a mapped, executable EL0 entry and return its SYS_EXIT status.
  * The caller owns the address space and must clean it up after this returns. */
+int user_mode_execute_with_tls(address_space_handle_t,uint64_t,uint64_t,uint64_t,uint64_t,int64_t *,int *,uint64_t);
 int user_mode_execute(address_space_handle_t space, uint64_t entry,
                       uint64_t user_stack_top, int64_t *exit_status_out,
                       int *faulted_out);

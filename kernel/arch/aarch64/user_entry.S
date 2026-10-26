@@ -5,8 +5,8 @@
 .global chos_enter_el0
 .type chos_enter_el0, %function
 chos_enter_el0:
-    /* x0=entry, x1=user SP, x2=argc, x3=argv, x4=kernel faulted_out. */
-    stp x19, x20, [sp, #-128]!
+    /* x0=entry, x1=user SP, x2=argc, x3=argv, x4=kernel faulted_out, x5=user TPIDR_EL0. */
+    stp x19, x20, [sp, #-144]!
     stp x21, x22, [sp, #16]
     stp x23, x24, [sp, #32]
     stp x25, x26, [sp, #48]
@@ -17,6 +17,9 @@ chos_enter_el0:
     str x4, [sp, #104]
     str x2, [sp, #112]
     str x3, [sp, #120]
+    mrs x9, tpidr_el0
+    str x9, [sp, #128]
+    msr tpidr_el0, x5
 
     msr sp_el0, x1
     msr elr_el1, x0
@@ -111,7 +114,9 @@ chos_user_mode_return:
     ldp x25, x26, [sp, #48]
     ldp x27, x28, [sp, #64]
     ldp x29, x30, [sp, #80]
-    add sp, sp, #128
+    ldr x9, [sp, #128]
+    msr tpidr_el0, x9
+    add sp, sp, #144
     msr daif, x10
     isb
     ret

@@ -142,3 +142,9 @@ using owner-bound TCP6 rather than a separate discovery/configuration path. See
 NATIVE_TLS_CLIENT.md and validation/stage3-native-tls6.json. This supplies a real
 transport seam; it does not complete WPE/Soup, DNS-to-navigation, modern engine,
 production CA/time or wireless integration.
+
+[Native shared-address-space threads](NATIVE_THREADS.md) now provide real bounded
+EL0 workers, private saved TPIDR_EL0 state, stack lifetime pins, join/reap and
+process-wide exit/fault cancellation. This is not complete pthread/futex, compiler
+TLS or a thread-safe C/C++ runtime. The modern engine and other Stage3 gates
+remain open; binary publication remains held.

@@ -4,7 +4,9 @@ The AArch64 application profile now enables base floating-point and Advanced SIM
 Both IRQ and lower-EL synchronous exception entry save all 32 full 128-bit Q
 registers, FPCR and FPSR alongside the existing GPR/ELR/SPSR/ESR/SP_EL0 frame.
 The common return path restores the scheduler-selected frame. The first 288 bytes
-retain their previous offsets; the complete frame is 816 bytes, aligned to 16.
+retain their previous offsets; the original FP frame is816 bytes. The subsequent native-thread extension adds
+TPIDR_EL0 and padding, making the current frame832 bytes, aligned to16. See
+[NATIVE_THREADS.md](NATIVE_THREADS.md); the saved FP offsets remain unchanged.
 Synthetic task and idle frames are explicitly zero-initialized.
 
 Fresh EL0 entry clears all vector registers and both controls before user code.

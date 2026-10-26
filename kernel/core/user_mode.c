@@ -22,7 +22,7 @@ static address_space_handle_t user_mode_space;
 extern uint8_t chos_user_demo_start[];
 extern uint8_t chos_user_demo_end[];
 extern int64_t chos_enter_el0(uint64_t entry, uint64_t user_stack_pointer,
-                              uint64_t argc, uint64_t argv, int *faulted_out);
+                              uint64_t argc, uint64_t argv, int *faulted_out,uint64_t tls);
 
 int user_mode_is_active(void) {
     return chos_atomic_load_u32(&user_mode_session_active) != 0u;
@@ -45,9 +45,9 @@ static int same_space(address_space_handle_t a, address_space_handle_t b) {
     return a.slot == b.slot && a.generation == b.generation && a.id == b.id;
 }
 
-int user_mode_execute_with_args(address_space_handle_t space, uint64_t entry,
+int user_mode_execute_with_tls(address_space_handle_t space, uint64_t entry,
                       uint64_t user_stack_top, uint64_t argc, uint64_t argv,
-                      int64_t *exit_status_out, int *faulted_out) {
+                      int64_t *exit_status_out, int *faulted_out,uint64_t tls) {
     vmm_mapping_info_t entry_mapping, stack_mapping;
     address_space_info_t space_info;
     address_space_handle_t current_space;
@@ -85,7 +85,7 @@ int user_mode_execute_with_args(address_space_handle_t space, uint64_t entry,
 
     *faulted_out = 0;
     /* SP/DAIF/result storage is on this task's EL1 stack, never shared globally. */
-    trampoline_status = chos_enter_el0(entry, user_stack_top, argc, argv, faulted_out);
+    trampoline_status = chos_enter_el0(entry, user_stack_top, argc, argv, faulted_out,tls);
 
     if (activated_here) {
         chos_atomic_store_u32(&user_mode_session_active, 0u);
@@ -99,6 +99,9 @@ int user_mode_execute_with_args(address_space_handle_t space, uint64_t entry,
     return 1;
 }
 
+int user_mode_execute_with_args(address_space_handle_t space,uint64_t entry,uint64_t sp,uint64_t argc,uint64_t argv,int64_t *status,int *faulted){
+ return user_mode_execute_with_tls(space,entry,sp,argc,argv,status,faulted,0u);
+}
 int user_mode_execute(address_space_handle_t space, uint64_t entry,
                       uint64_t user_stack_top, int64_t *exit_status_out,
                       int *faulted_out) {
@@ -186,7 +189,7 @@ int user_mode_self_test(void) {
     chos_atomic_store_u32(&user_mode_session_active, 1u);
     uart_puts("[ .. ] Entering EL0 test payload; successful output must come through SYS_WRITE.\n");
     entered = 1;
-    exit_status = (int)chos_enter_el0(USER_CODE_VA, USER_STACK_TOP, 0u, 0u, &faulted);
+    exit_status = (int)chos_enter_el0(USER_CODE_VA, USER_STACK_TOP, 0u, 0u, &faulted,0u);
     chos_atomic_store_u32(&user_mode_session_active, 0u);
 
     if (exit_status != 0) {

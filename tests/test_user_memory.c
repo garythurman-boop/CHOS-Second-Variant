@@ -20,6 +20,14 @@ int main(void){
  address_space_handle_t a={.slot=0,.id=1,.generation=1},b={.slot=1,.id=2,.generation=1};reset();
  assert(chos_user_memory_map(a,0,0)==-CHOS_ERRNO_EINVAL);assert(chos_user_memory_map(a,(size_t)-1,0)==-CHOS_ERRNO_EINVAL);assert(chos_user_memory_map(a,4096,1)==-CHOS_ERRNO_EINVAL);
  int64_t va=chos_user_memory_map(a,8192,0);assert(va>0&&used(0)==2);
+ assert(chos_user_memory_pin(a,(uint64_t)va,8192));
+ assert(!chos_user_memory_pin(a,(uint64_t)va,8192));
+ assert(!chos_user_memory_pin(b,(uint64_t)va,8192));
+ assert(!chos_user_memory_pin(a,(uint64_t)va+4096,4096));
+ assert(chos_user_memory_unmap(a,(uint64_t)va,8192)==-CHOS_ERRNO_EBUSY);
+ assert(!chos_user_memory_release(a)&&used(0)==2);
+ assert(chos_user_memory_unpin(a,(uint64_t)va,8192));
+ assert(!chos_user_memory_unpin(a,(uint64_t)va,8192));
  assert(chos_user_memory_unmap(b,(uint64_t)va,8192)==-CHOS_ERRNO_EINVAL);
  assert(chos_user_memory_unmap(a,(uint64_t)va,4096)==-CHOS_ERRNO_EINVAL);
  assert(chos_user_memory_unmap(a,CHOS_AS_USER_VA_BASE,4096)==-CHOS_ERRNO_EINVAL);

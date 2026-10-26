@@ -58,6 +58,11 @@
 #define CHOS_SYS_IPC_CLOSE 53u /* x0=owner handle */
 #define CHOS_SYS_SPAWN_LIMITED 54u /* x0=path,x1=arguments,x2=reduced inherited syscall mask */
 #define CHOS_SYS_CAPABILITIES 55u /* returns own effective mask; always permitted */
+#define CHOS_SYS_THREAD_CREATE 56u /* x0=64-byte request,x1=capacity; scheduled shared-AS worker */
+#define CHOS_SYS_THREAD_INFO 57u /* x0=own thread TID,x1=32-byte output,x2=capacity */
+#define CHOS_SYS_THREAD_REAP 58u /* x0=own exited TID; releases join record */
+#define CHOS_SYS_THREAD_EXIT 59u /* x0=64-bit result; secondary thread only */
+#define CHOS_SYS_THREAD_SELF 60u /* stable own thread ID, including the main task */
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u
@@ -70,6 +75,8 @@
 #define CHOS_SYS_MAX_RANDOM_BYTES 256u
 #define CHOS_SYS_MAX_SLEEP_TICKS 60000u /* 10 minutes at CHOS's 100 Hz timer */
 
+#define CHOS_ERRNO_EINTR 4
+#define CHOS_ERRNO_ETIMEDOUT 110
 #define CHOS_ERRNO_EPIPE 32
 #define CHOS_ERRNO_EMSGSIZE 90
 #define CHOS_ERRNO_EPERM 1

@@ -1,7 +1,7 @@
 #include "chos/user_memory.h"
 #include "chos/syscall.h"
 #include "chos/spinlock.h"
-typedef struct {uint64_t first;uint32_t pages,state;} region_t;
+typedef struct {uint64_t first;uint32_t pages,state,pins;} region_t;
 typedef struct {uint32_t generation,id;region_t regions[CHOS_USER_MAP_REGIONS];} map_owner_t;
 static map_owner_t owners[CHOS_AS_MAX_SPACES];
 static chos_spinlock_t memory_lock=CHOS_SPINLOCK_INITIALIZER;
@@ -65,6 +65,7 @@ int chos_user_memory_unmap(address_space_handle_t h,uint64_t address,size_t n){
  for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
   region_t *r=&o->regions[i];
   if(r->state==1 && r->first==address && r->pages==pages){
+   if(r->pins){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EBUSY;}
    for(uint32_t p=0;p<pages;p++){vmm_mapping_info_t m;if(!address_space_query(h,address+(uint64_t)p*VMM_PAGE_SIZE,&m)){r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;}}
    int ok=remove_pages(h,r,1);chos_spin_unlock_irqrestore(&memory_lock,irq);return ok?0:-CHOS_ERRNO_EIO;
   }
@@ -73,6 +74,23 @@ int chos_user_memory_unmap(address_space_handle_t h,uint64_t address,size_t n){
 }
 int chos_user_memory_release(address_space_handle_t h){
  uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);int ok=1;
- if(o)for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++)if(o->regions[i].state && !remove_pages(h,&o->regions[i],0))ok=0;
+ if(o)for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++)if(o->regions[i].state){
+  if(o->regions[i].pins||!remove_pages(h,&o->regions[i],0))ok=0;
+ }
  chos_spin_unlock_irqrestore(&memory_lock,irq);return ok;
 }
+
+static int pin_change(address_space_handle_t h,uint64_t base,size_t bytes,int add){
+ if(!bytes||(bytes&4095u)||(base&4095u))return 0;
+ uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);int ok=0;
+ if(o)for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+  region_t *r=&o->regions[i];
+  if(r->state==1&&r->first==base&&(uint64_t)r->pages*4096u==bytes){
+   if(add&&!r->pins){r->pins=1;ok=1;}
+   if(!add&&r->pins){r->pins=0;ok=1;}break;
+  }
+ }
+ chos_spin_unlock_irqrestore(&memory_lock,irq);return ok;
+}
+int chos_user_memory_pin(address_space_handle_t h,uint64_t base,size_t bytes){return pin_change(h,base,bytes,1);}
+int chos_user_memory_unpin(address_space_handle_t h,uint64_t base,size_t bytes){return pin_change(h,base,bytes,0);}

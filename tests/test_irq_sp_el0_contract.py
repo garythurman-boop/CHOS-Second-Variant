@@ -12,11 +12,11 @@ assert source.count("str x0, [sp, #272]") == 2
 # The common restore path must restore the selected frame's SP_EL0 before ERET.
 assert "ldr x16, [sp, #272]" in source
 assert "msr sp_el0, x16" in source
-assert source.count("sub sp, sp, #816") == 2
-assert "add sp, sp, #816" in source
+assert source.count("sub sp, sp, #832") == 2
+assert "add sp, sp, #832" in source
 # C and assembly must agree on offsets and keep the frame call-aligned.
 assert "offsetof(chos_irq_context_t, sp_el0) == 272u" in header
-assert "sizeof(chos_irq_context_t) == 816u" in header
+assert "sizeof(chos_irq_context_t) == 832u" in header
 print("IRQ frame contract: SP_EL0 is captured/restored and C/assembly offsets agree")
 
 assert source.count("    SAVE_FP\n")==2
@@ -25,3 +25,7 @@ for i in range(0,32,2):
  assert f"stp q{i}, q{i+1}, [sp, #{288+i*16}]" in source
  assert f"ldp q{i}, q{i+1}, [sp, #{288+i*16}]" in source
 assert "msr fpcr, x9" in source and "msr fpsr, x9" in source
+
+assert source.count("mrs x9, tpidr_el0")==2
+assert "msr tpidr_el0, x9" in source
+assert "offsetof(chos_irq_context_t,tpidr_el0)==816u" in header

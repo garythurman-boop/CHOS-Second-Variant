@@ -1,4 +1,5 @@
 #include "chos/ipc.h"
+#include "chos/threads.h"
 #include "chos/clock.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -429,7 +430,9 @@ static uint64_t syscall_spawn_via_kernel_service(const char *path, const char *a
             return (uint64_t)pid;
         }
         if (status < 0) return neg_errno(CHOS_ERRNO_EIO);
-        if (timer_ticks() - start_tick >= 500u) {
+        address_space_handle_t current_space;
+        int stopping=user_mode_get_address_space(&current_space)&&chos_threads_stopping(current_space);
+        if (stopping || timer_ticks() - start_tick >= 500u) {
             /* If the request never reached the kernel runtime worker, cancel it
              * instead of leaving an EL0 caller blocked indefinitely. A running
              * load is allowed to finish so its resources remain well-owned. */
@@ -459,6 +462,8 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
         exception_panic(frame->esr, frame->elr, far, frame->spsr, 0u);
     }
 
+    chos_threads_cancel_return(frame);
+    if((frame->spsr&15u)!=0u)return frame;
     ec = (frame->esr >> 26) & 0x3fu;
     if (ec == 0x15u && (frame->esr & 0xffffu) == 0u) { /* SVC #0 from AArch64 EL0. */
         uint64_t permissions=CHOS_PROCESS_CAP_ALL;
@@ -477,8 +482,40 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 syscall_write(frame);
                 return frame;
             case CHOS_SYS_EXIT:
+                chos_threads_stop(fault_space,(int64_t)frame->x[0],0);
                 user_mode_request_exit(frame, (int64_t)frame->x[0], 0);
                 return frame;
+            case CHOS_SYS_THREAD_SELF:
+                frame->x[0]=(uint64_t)chos_thread_self(fault_space);return frame;
+            case CHOS_SYS_THREAD_EXIT:
+                if(!chos_thread_is_secondary(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                user_mode_request_exit(frame,(int64_t)frame->x[0],0);return frame;
+            case CHOS_SYS_THREAD_REAP:
+                if(frame->x[0]>UINT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_thread_reap(fault_space,(uint32_t)frame->x[0]);return frame;
+            case CHOS_SYS_THREAD_INFO: {
+                chos_thread_info_t info;
+                if(frame->x[0]>UINT32_MAX||frame->x[2]<sizeof(info)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[1],sizeof(info))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int rc=chos_thread_info(fault_space,(uint32_t)frame->x[0],&info);
+                if(rc<0){frame->x[0]=(uint64_t)(int64_t)rc;return frame;}
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[1],&info,sizeof(info))?0:neg_errno(CHOS_ERRNO_EFAULT);return frame;
+            }
+            case CHOS_SYS_THREAD_CREATE: {
+                chos_thread_request_t request;
+                if(frame->x[1]!=sizeof(request)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!address_space_copy_from_user(fault_space,&request,frame->x[0],sizeof(request))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int64_t tid=chos_thread_enqueue(fault_space,&request);
+                if(tid<0){frame->x[0]=(uint64_t)tid;return frame;}
+                uint64_t started=timer_ticks();
+                for(;;){
+                    if(timer_ticks()-started>=500u)chos_thread_cancel_pending(fault_space,(uint32_t)tid);
+                    int rc=chos_thread_create_result(fault_space,(uint32_t)tid);
+                    if(rc){frame->x[0]=rc>0?(uint64_t)tid:(uint64_t)(int64_t)rc;return frame;}
+                    uint64_t daif=read_daif();
+                    __asm__ volatile("msr daifclr,#2\n\tisb":::"memory");scheduler_yield();restore_daif(daif);
+                }
+            }
             case CHOS_SYS_CAPABILITIES:
                 frame->x[0]=process_pid_for_address_space(fault_space)?permissions:neg_errno(CHOS_ERRNO_ESRCH);return frame;
             case CHOS_SYS_SPAWN_LIMITED: {
@@ -531,6 +568,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 /* Waiting is implemented by scheduling other runnable tasks. The
                  * target's terminal record remains queryable until its slot is reused. */
                 for (;;) {
+                    if(chos_threads_stopping(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_EINTR);return frame;}
                     uint64_t daif = read_daif();
                     __asm__ volatile("msr daifclr, #2\n\tisb" ::: "memory");
                     scheduler_yield();
@@ -1171,6 +1209,7 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
        the kernel. Report it and redirect exception return to the EL1 cleanup trampoline. */
     far = read_far_el1();
     process_record_user_fault(frame->esr, frame->elr, far);
+    chos_threads_stop(fault_space,(int64_t)(-128-(int64_t)ec),1);
     uart_puts("\n[USER FAULT] EL0 context trapped; ESR=");
     print_hex64(frame->esr);
     uart_puts(" ELR=");

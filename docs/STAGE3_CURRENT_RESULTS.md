@@ -174,3 +174,9 @@ connect, mixed IPv4/IPv6 contexts and actual IPv6 wire frames are tested by the
 fixtures in [the IPv6 TLS report](validation/stage3-native-tls6.json).
 Browser DNS/URL integration, IPv6 settings/DHCPv6, production trust policy, full
 engine/runtime and live wireless remain incomplete. No binary is published.
+
+[Native shared-address-space threads](NATIVE_THREADS.md) now provide real bounded
+EL0 workers, private saved TPIDR_EL0 state, stack lifetime pins, join/reap and
+process-wide exit/fault cancellation. This is not complete pthread/futex, compiler
+TLS or a thread-safe C/C++ runtime. The modern engine and other Stage3 gates
+remain open; binary publication remains held.

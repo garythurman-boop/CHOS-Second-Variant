@@ -1,3 +1,4 @@
+#include "chos/threads.h"
 #include <stdint.h>
 #include "chos/fdt.h"
 #include "chos/platform.h"
@@ -215,7 +216,7 @@ static void uefi_desktop_task(void *argument) {
     for(;;){
         chos_platform_drivers_poll();chos_net_stack_poll();chos_net_manager_poll();
         if(input_ready)chos_input_poll();else chos_gui_pump();
-        (void)process_service_pending_spawn_request();
+        (void)process_service_pending_spawn_request();chos_threads_service();
         process_reap_pending();
         scheduler_sleep_ticks(1u);
     }

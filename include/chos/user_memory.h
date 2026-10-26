@@ -11,5 +11,7 @@
 int64_t chos_user_memory_map(address_space_handle_t,size_t,unsigned flags);
 int chos_user_memory_unmap(address_space_handle_t,uint64_t,size_t);
 /* Process reaper: unmap before address_space_destroy frees all owned frames. */
+int chos_user_memory_pin(address_space_handle_t,uint64_t,size_t);
+int chos_user_memory_unpin(address_space_handle_t,uint64_t,size_t);
 int chos_user_memory_release(address_space_handle_t);
 #endif

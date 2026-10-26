@@ -1,3 +1,4 @@
+#include "chos/threads.h"
 #include <stdint.h>
 #include "chos/interrupt.h"
 #include "chos/platform.h"
@@ -179,7 +180,7 @@ chos_irq_context_t *interrupt_irq_dispatch(chos_irq_context_t *context) {
     else mmio_write32(cpu_interface_base + GICC_EOIR, acknowledge);
     data_sync_barrier();
     if (interrupt_id == timer_interrupt_id) {
-        return scheduler_on_timer_irq(context);
+        return chos_threads_cancel_return(scheduler_on_timer_irq(context));
     }
     return context;
 }

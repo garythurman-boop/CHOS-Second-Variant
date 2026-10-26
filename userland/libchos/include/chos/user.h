@@ -1,3 +1,4 @@
+#include "chos/thread_api.h"
 #include "chos/process_caps.h"
 #include "chos/ipc.h"
 #include "chos/clock_api.h"
@@ -124,6 +125,12 @@ static inline long chos_ipc_get_status(uint64_t h,chos_ipc_info_t *out){return c
 static inline long chos_ipc_write(uint64_t h,const void *p,size_t n){return chos_syscall3(CHOS_SYS_IPC_SEND,(long)h,(long)(uintptr_t)p,(long)n);}
 static inline long chos_ipc_read(uint64_t h,void *p,size_t n){return chos_syscall3(CHOS_SYS_IPC_RECV,(long)h,(long)(uintptr_t)p,(long)n);}
 static inline long chos_ipc_release(uint64_t h){return chos_syscall1(CHOS_SYS_IPC_CLOSE,(long)h);}
+static inline long chos_thread_create(const chos_thread_request_t *r){return chos_syscall2(CHOS_SYS_THREAD_CREATE,(long)(uintptr_t)r,sizeof(*r));}
+static inline long chos_thread_status(uint32_t tid,chos_thread_info_t *out){return chos_syscall3(CHOS_SYS_THREAD_INFO,tid,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_thread_collect(uint32_t tid){return chos_syscall1(CHOS_SYS_THREAD_REAP,tid);}
+static inline long chos_thread_id(void){return chos_syscall0(CHOS_SYS_THREAD_SELF);}
+static inline void *chos_thread_tls(void){uintptr_t p;__asm__ volatile("mrs %0,tpidr_el0":"=r"(p));return (void *)p;}
+static inline __attribute__((noreturn)) void chos_thread_exit(int64_t status){chos_syscall1(CHOS_SYS_THREAD_EXIT,status);for(;;)__asm__ volatile("wfe");}
 static inline long chos_clock_status(chos_clock_info_t *out) {return chos_syscall2(CHOS_SYS_CLOCK_INFO,(uint64_t)(uintptr_t)out,sizeof(*out));}
 static inline long chos_network_status6(chos_net6_info_t *out){return chos_syscall2(CHOS_SYS_NET6_INFO,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_ping6(const char *literal){return chos_syscall1(CHOS_SYS_NET6_PING,(long)(uintptr_t)literal);}

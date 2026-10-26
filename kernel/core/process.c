@@ -1,3 +1,4 @@
+#include "chos/threads.h"
 #include "chos/ipc.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -176,7 +177,7 @@ static int reap_slot(size_t index) {
     }
     /* All process-reaper work must run under the canonical kernel root. */
     if (vmm_current_root_table_address() != vmm_kernel_root_table_address()) return 0;
-    if(!chos_user_memory_release(slot->space))return 0;
+    if(!chos_threads_drop(slot->space)||!chos_user_memory_release(slot->space))return 0;
 
     for (i = 0u; i < slot->info.image_pages; ++i) {
         uint64_t bit = UINT64_C(1) << (i%64u);
@@ -401,6 +402,8 @@ static void process_scheduled_entry(void *argument) {
     entered = user_mode_execute_with_args(slot->space, slot->info.entry_address,
                                slot->initial_stack_pointer, slot->argument_count, slot->argv_address,
                                &status, &faulted);
+    if(!entered)faulted=1;
+    chos_threads_finish(slot->space,&status,&faulted);
     chos_tcp_drop_owner(slot->info.pid);
     chos_net6_drop_owner(slot->info.pid);
     chos_ipc_drop_owner(slot->info.pid);
@@ -722,17 +725,9 @@ int64_t process_file_read_for_address_space(address_space_handle_t space, int fd
     data = slot->open_files[file_index].data; offset = slot->open_files[file_index].offset;
     available = slot->open_files[file_index].size - offset;
     amount = length < available ? length : available;
-    chos_spin_unlock_irqrestore(&process_lock, flags);
-    if (amount == 0u) return 0;
-    if (!address_space_copy_to_user(space, user_destination, data + offset, amount))
-        return -(int64_t)CHOS_ERRNO_EFAULT;
-    flags = chos_spin_lock_irqsave(&process_lock);
-    index = find_process_slot_for_space_locked(space);
-    if (index == CHOS_PROCESS_MAX || !process_slots[index].open_files[file_index].active ||
-        process_slots[index].open_files[file_index].data != data ||
-        process_slots[index].open_files[file_index].offset != offset) {
-        chos_spin_unlock_irqrestore(&process_lock, flags);
-        return -(int64_t)CHOS_ERRNO_EBADF;
+    if (amount == 0u) {chos_spin_unlock_irqrestore(&process_lock,flags);return 0;}
+    if (!address_space_copy_to_user(space,user_destination,data+offset,amount)){
+        chos_spin_unlock_irqrestore(&process_lock,flags);return -(int64_t)CHOS_ERRNO_EFAULT;
     }
     process_slots[index].open_files[file_index].offset += amount;
     chos_spin_unlock_irqrestore(&process_lock, flags);
@@ -1148,6 +1143,7 @@ void process_record_user_fault(uint64_t esr, uint64_t elr, uint64_t far) {
     size_t current_index = CHOS_SCHED_NO_INDEX;
     size_t i;
     uint64_t flags;
+    address_space_handle_t fault_space={0};int has_space=user_mode_get_address_space(&fault_space);
     if (scheduler_is_running()) {
         scheduler_task_info_t task_info;
         current_index = scheduler_current_task_index();
@@ -1159,7 +1155,8 @@ void process_record_user_fault(uint64_t esr, uint64_t elr, uint64_t far) {
         process_slot_t *slot = &process_slots[i];
         int match = 0;
         if (slot->info.state != CHOS_PROCESS_RUNNING) continue;
-        if (current_task_id != 0u) match = slot->info.scheduler_task_id == current_task_id;
+        if (has_space) match=space_equal(slot->space,fault_space);
+        else if (current_task_id != 0u) match = slot->info.scheduler_task_id == current_task_id;
         else match = foreground_process_slot == i;
         if (match) {
             slot->info.fault_esr = esr;
