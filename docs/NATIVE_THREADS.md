@@ -33,16 +33,17 @@ rather than silently recycling identities; the4-billion boundary is code-reviewe
 not exercised by4-billion launches.
 
 SELF identifies the current native task, including the main task. THREAD_EXIT
-ends a secondary worker only; it returns EINVAL on the main task. Process EXIT
-from any worker and any user fault terminate the group. Main-thread pthread_exit,
-detach, signals and POSIX cancellation semantics are not supplied by this API.
-The native C allocator/errno and libraries still need a coordinated thread-safe
-runtime; merely creating threads does not make those libraries safe concurrently.
+ends the current thread. Main-task THREAD_EXIT now preserves live workers and
+drains them before process teardown; a worker can still terminate the whole group
+with process EXIT. Any user fault also terminates the group. The
+[native C runtime](NATIVE_PTHREAD_RUNTIME.md) implements bounded pthread creation,
+join and synchronization plus protected allocation and per-thread errno. Other
+libraries need their own concurrency contract; raw threads alone do not supply it.
 
 ## Exit and fault cleanup
 
-The process remains RUNNING while its main kernel trampoline stops and drains
-workers. Pending creates are cancelled, sleeping tasks are woken, and a CPU-bound
+The process remains RUNNING while its main kernel trampoline drains workers.
+On group termination, pending creates are cancelled, sleeping tasks are woken, and a CPU-bound
 EL0 worker is redirected through its own return trampoline on a timer return.
 An EL1 IRQ frame is never redirected out of a live kernel critical section.
 Blocking SVC WAIT/spawn paths observe cancellation and unwind through the original
@@ -69,7 +70,8 @@ value when returning to EL1. Main process entry retains its previous argc/argv
 interface and initializes the user thread pointer to zero.
 
 This is opaque thread-pointer preservation, not PT_TLS loading, compiler TLS
-relocation support, libc per-thread errno, or the C++ thread_local runtime. SVE/SME
+relocation support or the C++ thread_local runtime. Native libc uses that pointer
+for its documented TCB and per-thread errno. SVE/SME
 remain trapped and kernel C retains its integer-only register contract.
 
 ## Verification and remaining work
@@ -96,6 +98,6 @@ recorded separately rather than called a process leak.
 Aggregate host/sanitizer, legacy FP, permission, C/C++ allocation, typing and TLS
 checks are reported in validation/stage3-native-threads.json. QEMU is evidence for
 those virtual profiles only; new Fusion/Pi/laptop thread qualification is NOT RUN.
-Full pthread/futex/event APIs, compiler TLS, thread-safe runtime/libraries,
+Full POSIX/event APIs, compiler TLS, complete C/C++ runtime/library contracts,
 engine-sized memory, actual modern engine and wireless work remain mandatory.
 No binary is published and0.50.0 stays reserved for complete revised Stage3.

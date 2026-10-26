@@ -186,3 +186,15 @@ queue/sleep transaction for shared-AS workers, bounded notification/timeouts and
 process cancellation. This is a real native synchronization primitive; pthread,
 compiler TLS, thread-safe C/C++/TLS libraries, full engine integration and the
 remaining internet/wireless gates stay open. Binary publication remains held.
+
+The [native C thread runtime](NATIVE_PTHREAD_RUNTIME.md) adds actual bounded
+pthread creation/join, private mutex/condition/once operations, generation-tagged
+thread-specific keys, per-thread errno and serialized allocation. Direct and UEFI
+EL0 runs exercise real contention, timeout, destructor, capacity rollback and main
+thread exit/join with stable warm pages and no remaining futex records. Host and
+sanitizer regressions plus native TLS/permissions/allocator/thread tests pass; see
+[exact evidence](validation/stage3-native-pthread.json). This supersedes the earlier
+allocator/errno/pthread prerequisite status. Complete POSIX/C++/compiler TLS,
+engine-sized memory/events/loader, thread-safe TLS library integration, actual
+modern engine and remaining network/wireless gates stay open. New Fusion/Pi/laptop
+qualification is NOT RUN; binary publication remains held.

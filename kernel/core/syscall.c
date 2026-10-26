@@ -495,7 +495,9 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
             case CHOS_SYS_THREAD_SELF:
                 frame->x[0]=(uint64_t)chos_thread_self(fault_space);return frame;
             case CHOS_SYS_THREAD_EXIT:
-                if(!chos_thread_is_secondary(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!chos_thread_is_secondary(fault_space)){
+                    int rc=chos_threads_main_exit(fault_space);if(rc<0){frame->x[0]=(uint64_t)(int64_t)rc;return frame;}
+                }
                 user_mode_request_exit(frame,(int64_t)frame->x[0],0);return frame;
             case CHOS_SYS_THREAD_REAP:
                 if(frame->x[0]>UINT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}

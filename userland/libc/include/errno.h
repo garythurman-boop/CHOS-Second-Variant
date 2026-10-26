@@ -1,6 +1,6 @@
 #ifndef CHOS_LIBC_ERRNO_H
 #define CHOS_LIBC_ERRNO_H
-/* Single-thread runtime storage; this must become thread-local before pthreads. */
+/* Native runtime TCB storage, preserved through TPIDR_EL0 by the kernel. */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,4 +14,11 @@ int *__chos_errno_location(void);
 #define EINVAL 22
 #define EAGAIN 11
 #define EOVERFLOW 75
+#define EPERM 1
+#define ESRCH 3
+#define EINTR 4
+#define EBUSY 16
+#define EDEADLK 35
+#define ENOTSUP 95
+#define ETIMEDOUT 110
 #endif

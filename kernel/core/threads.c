@@ -18,7 +18,7 @@ typedef struct {
 typedef struct {
  address_space_handle_t space;
  uint32_t main_tid,main_task;
- int stopping,faulted;
+ int stopping,faulted,main_exited;
  int64_t status;
 } owner_t;
 static thread_t threads[THREAD_SLOTS];
@@ -51,6 +51,12 @@ int64_t chos_thread_self(address_space_handle_t h){
  uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,1,task);int64_t id=-CHOS_ERRNO_EAGAIN;
  if(o){id=o->main_tid;for(unsigned i=0;i<THREAD_SLOTS;i++)if(threads[i].state&&equal(threads[i].space,h)&&threads[i].task_id==task){id=threads[i].tid;break;}}
  chos_spin_unlock_irqrestore(&lock,f);return id;
+}
+int chos_threads_main_exit(address_space_handle_t h){
+ uint32_t task=current_task();if(!scheduler_is_running()||!task)return -CHOS_ERRNO_ENOSYS;
+ uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,1,task);int rc=0;
+ if(!o)rc=-CHOS_ERRNO_EAGAIN;else if(o->main_task!=task)rc=-CHOS_ERRNO_EINVAL;else o->main_exited=1;
+ chos_spin_unlock_irqrestore(&lock,f);return rc;
 }
 int chos_thread_is_secondary(address_space_handle_t h){
  uint32_t task=current_task();uint64_t f=chos_spin_lock_irqsave(&lock);int found=0;
@@ -166,12 +172,14 @@ void chos_threads_service(void){
  chos_spin_unlock_irqrestore(&lock,f);
 }
 void chos_threads_finish(address_space_handle_t h,int64_t *status,int *faulted){
- chos_threads_stop(h,*status,*faulted);
+ uint64_t begin=chos_spin_lock_irqsave(&lock);owner_t *initial=owner(h,0,0);
+ int main_exited=initial&&initial->main_exited;chos_spin_unlock_irqrestore(&lock,begin);
+ if(!main_exited||*faulted)chos_threads_stop(h,*status,*faulted);
  uint64_t daif;__asm__ volatile("mrs %0,daif":"=r"(daif));
  for(;;){
   uint64_t f=chos_spin_lock_irqsave(&lock);int busy=0;owner_t *o=owner(h,0,0);
   for(unsigned i=0;i<THREAD_SLOTS;i++)if(equal(threads[i].space,h)&&live(&threads[i]))busy=1;
-  if(!busy&&o){*status=o->status;*faulted=o->faulted;}
+  if(!busy&&o){*status=o->stopping?o->status:0;*faulted=o->stopping?o->faulted:0;}
   chos_spin_unlock_irqrestore(&lock,f);if(!busy)break;
   __asm__ volatile("msr daifclr,#2\n\tisb":::"memory");scheduler_sleep_ticks(1);
  }

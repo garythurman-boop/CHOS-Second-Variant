@@ -1,0 +1,774 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "completion_version_reserved": "0.50.0",
+  "scope": "native bounded pthread C runtime, private synchronization, per-thread errno and protected allocator; not full POSIX/C++ or engine integration",
+  "source_sha256": {
+    "include/chos/threads.h": "7293cde6cef183f5916d1f802f307963942887e28fb820fde25f4ab73611611a",
+    "kernel/core/syscall.c": "94dcf688114834e008674e300452337138e53df79e7436130695bdf1c500e601",
+    "kernel/core/threads.c": "71ce54298df9584e459fb671b455e3387385db79d7d9ab069d2bf20856878068",
+    "tests/pthread_host_names.h": "4a0c4758639d94edd2b69725ab3ab4db08f23ef56c127185289cb4889308ebf1",
+    "tests/qemu_pthread.py": "c8fde24c05bfd1c0b60f67bb432bf09036e327b4d3d6c45bda632cb9809449c2",
+    "tests/test_libc_cpp_api.cpp": "934b3cda4bbb62228219551ebd0cc8960236a20e4cf5bd4b9f2eb62f0af51fca",
+    "tests/test_pthread_sync.c": "dd86384b8441fbc98e6c3b5b74b96e9d26d75a6946b1514e93469f3e1cd7c8b7",
+    "tools/browser_runtime_probe.py": "6d9c0a72cfadb6790587cd23c964ffd9191841a362c1daa43dfa27a5fa3c5c56",
+    "userland/examples/pthread_test.c": "924978ddc41b1322afafd40bb8866bcfe00d34f0e4821905c0443a5f8e34daa4",
+    "userland/libc/Makefile.inc": "0a69ca5b035d5bb10cbb0443a76314a38ec7b3a20c397fdf7f22eb9c791dc6ac",
+    "userland/libc/include/chos/tls_runtime.h": "74e552423f985a8122d4ab52c8507db35b1ec9718f9dc411765e0dac80ce90d8",
+    "userland/libc/include/errno.h": "874960855e372b0f54674c21045237346cdd35f2276f4a1a7b81276ee68672fe",
+    "userland/libc/include/pthread.h": "f1d8f359e833f8429021098654c332abe88d772e5408e1bccf7fbb7821fb8938",
+    "userland/libc/pthread.c": "bec920514e284abd34131af2d0256d4d6316b1e52bc2999bb9b0bf19c02d0c70",
+    "userland/libc/pthread_sync.c": "0e2f8d6aa7dcff0db8a5c7a6b619b848e4c93aec9828862462ddda56108e8299",
+    "userland/libc/stdlib.c": "511f3aa9ecd0d48faa975d39165fa1b6c8712602736e4a020b61d96d554124d3",
+    "userland/libc/tls.c": "b42ca622d358e1a3b38446bca60cc8cd514abaebe9c20d8cbc7c69bcfdcebcac"
+  },
+  "host_and_sanitizer": [
+    "pthread-host1.log",
+    "pthread-host-full.log",
+    "pthread-sanitize-full.log",
+    "pthread-smoke.log"
+  ],
+  "compiler_preflight": {
+    "stage3_complete": false,
+    "modern_browser_integrated": false,
+    "scope": "CHOS-target compile-only prerequisite preflight; availability does not prove link/runtime/full POSIX support",
+    "missing": [
+      "cxx_standard_runtime",
+      "virtual_memory",
+      "file_descriptor_poll",
+      "wpe_embed_api"
+    ],
+    "probes": [
+      {
+        "capability": "freestanding_cxx20",
+        "available": true,
+        "diagnostic": "",
+        "command": [
+          "clang++",
+          "--target=aarch64-none-elf",
+          "-ffreestanding",
+          "-std=c++20",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-Iuserland/libc/include",
+          "-Iuserland/libchos/include",
+          "-Iinclude",
+          "-c",
+          "/tmp/chos-engine-probe-4cvlaz5_/freestanding_cxx20.cc",
+          "-o",
+          "/tmp/chos-engine-probe-4cvlaz5_/freestanding_cxx20.o"
+        ]
+      },
+      {
+        "capability": "cxx_standard_runtime",
+        "available": false,
+        "diagnostic": "/tmp/chos-engine-probe-4cvlaz5_/cxx_standard_runtime.cc:1:10: fatal error: 'thread' file not found\n    1 | #include <thread>\n      |          ^~~~~~~~\n1 error generated.\n",
+        "command": [
+          "clang++",
+          "--target=aarch64-none-elf",
+          "-ffreestanding",
+          "-std=c++20",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-Iuserland/libc/include",
+          "-Iuserland/libchos/include",
+          "-Iinclude",
+          "-c",
+          "/tmp/chos-engine-probe-4cvlaz5_/cxx_standard_runtime.cc",
+          "-o",
+          "/tmp/chos-engine-probe-4cvlaz5_/cxx_standard_runtime.o"
+        ]
+      },
+      {
+        "capability": "native_pthread_subset",
+        "available": true,
+        "diagnostic": "",
+        "command": [
+          "clang++",
+          "--target=aarch64-none-elf",
+          "-ffreestanding",
+          "-std=c++20",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-Iuserland/libc/include",
+          "-Iuserland/libchos/include",
+          "-Iinclude",
+          "-c",
+          "/tmp/chos-engine-probe-4cvlaz5_/native_pthread_subset.cc",
+          "-o",
+          "/tmp/chos-engine-probe-4cvlaz5_/native_pthread_subset.o"
+        ]
+      },
+      {
+        "capability": "virtual_memory",
+        "available": false,
+        "diagnostic": "/tmp/chos-engine-probe-4cvlaz5_/virtual_memory.cc:1:10: fatal error: 'sys/mman.h' file not found\n    1 | #include <sys/mman.h>\n      |          ^~~~~~~~~~~~\n1 error generated.\n",
+        "command": [
+          "clang++",
+          "--target=aarch64-none-elf",
+          "-ffreestanding",
+          "-std=c++20",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-Iuserland/libc/include",
+          "-Iuserland/libchos/include",
+          "-Iinclude",
+          "-c",
+          "/tmp/chos-engine-probe-4cvlaz5_/virtual_memory.cc",
+          "-o",
+          "/tmp/chos-engine-probe-4cvlaz5_/virtual_memory.o"
+        ]
+      },
+      {
+        "capability": "file_descriptor_poll",
+        "available": false,
+        "diagnostic": "/tmp/chos-engine-probe-4cvlaz5_/file_descriptor_poll.cc:1:10: fatal error: 'poll.h' file not found\n    1 | #include <poll.h>\n      |          ^~~~~~~~\n1 error generated.\n",
+        "command": [
+          "clang++",
+          "--target=aarch64-none-elf",
+          "-ffreestanding",
+          "-std=c++20",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-Iuserland/libc/include",
+          "-Iuserland/libchos/include",
+          "-Iinclude",
+          "-c",
+          "/tmp/chos-engine-probe-4cvlaz5_/file_descriptor_poll.cc",
+          "-o",
+          "/tmp/chos-engine-probe-4cvlaz5_/file_descriptor_poll.o"
+        ]
+      },
+      {
+        "capability": "wpe_embed_api",
+        "available": false,
+        "diagnostic": "/tmp/chos-engine-probe-4cvlaz5_/wpe_embed_api.cc:1:10: fatal error: 'wpe/wpe.h' file not found\n    1 | #include <wpe/wpe.h>\n      |          ^~~~~~~~~~~\n1 error generated.\n",
+        "command": [
+          "clang++",
+          "--target=aarch64-none-elf",
+          "-ffreestanding",
+          "-std=c++20",
+          "-fno-exceptions",
+          "-fno-rtti",
+          "-Iuserland/libc/include",
+          "-Iuserland/libchos/include",
+          "-Iinclude",
+          "-c",
+          "/tmp/chos-engine-probe-4cvlaz5_/wpe_embed_api.cc",
+          "-o",
+          "/tmp/chos-engine-probe-4cvlaz5_/wpe_embed_api.o"
+        ]
+      }
+    ]
+  },
+  "guest_profiles": [
+    {
+      "evidence": "/workspace/chos-evidence/pthread-direct-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "df2b173488f76b603c9108451e5f68e23625ba15b6cffca3d5efd4c51a17340b",
+        "cold_free_pages": 117699,
+        "free_pages_before": 117673,
+        "free_pages_after": 117673,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 621,
+        "checks": [
+          "real pthread create/join return values, same-process synchronization and repeated lifetime cleanup",
+          "concurrent malloc/calloc/realloc/free with data and zero checks",
+          "per-thread errno and generation-tagged specific keys remain isolated across actual scheduling",
+          "normal/errorcheck/recursive mutex and condition predicate/signal/broadcast",
+          "absolute monotonic condition timeout reacquires original mutex",
+          "exactly-once initialization under contention and retry if initializer calls pthread_exit",
+          "key destructor reset/repeat, deleted key generation and quota refusal",
+          "main pthread_exit preserves worker, join result and final normal process teardown",
+          "no remaining kernel futex waiters and stable physical pages"
+        ],
+        "limits": [
+          "bounded native pthread subset, not full POSIX/compiler ELF TLS or C++ standard library",
+          "detached/process-shared/robust/PI/cancellation/signal/priority/affinity APIs not supplied",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "40c49c3bdff7f7d9ec277226a5b9222cea6a6bfde3fed2fd42d8b92e7ee99528"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/pthread-uefi-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "df2b173488f76b603c9108451e5f68e23625ba15b6cffca3d5efd4c51a17340b",
+        "cold_free_pages": 500528,
+        "free_pages_before": 500502,
+        "free_pages_after": 500502,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 621,
+        "checks": [
+          "real pthread create/join return values, same-process synchronization and repeated lifetime cleanup",
+          "concurrent malloc/calloc/realloc/free with data and zero checks",
+          "per-thread errno and generation-tagged specific keys remain isolated across actual scheduling",
+          "normal/errorcheck/recursive mutex and condition predicate/signal/broadcast",
+          "absolute monotonic condition timeout reacquires original mutex",
+          "exactly-once initialization under contention and retry if initializer calls pthread_exit",
+          "key destructor reset/repeat, deleted key generation and quota refusal",
+          "main pthread_exit preserves worker, join result and final normal process teardown",
+          "no remaining kernel futex waiters and stable physical pages"
+        ],
+        "limits": [
+          "bounded native pthread subset, not full POSIX/compiler ELF TLS or C++ standard library",
+          "detached/process-shared/robust/PI/cancellation/signal/priority/affinity APIs not supplied",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9b3b93ab1918c675bc7068df41c0d3d494a6649baebac68676b619a9e682c714",
+        "iso_sha256": "cec2134c45b7ee6344b11c69b34f87404da556b1247055eb507141e1a6795b06",
+        "iso_embedded_kernel_sha256": "9b3b93ab1918c675bc7068df41c0d3d494a6649baebac68676b619a9e682c714",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/pthread-crt-direct/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "0243a4c449147cab5a5ddd1b78874e262b5d9ddda32dd04a9b89749a74410d41",
+        "free_pages_before": 117671,
+        "free_pages_after": 117671,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "40c49c3bdff7f7d9ec277226a5b9222cea6a6bfde3fed2fd42d8b92e7ee99528"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/pthread-raw-threads/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "be5d48e63b28a63aeb23e8127508eace7de53c538f26d7c68b93e9d242afd010",
+        "cold_free_pages": 117699,
+        "free_pages_before": 117666,
+        "free_pages_after": 117666,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 231,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "40c49c3bdff7f7d9ec277226a5b9222cea6a6bfde3fed2fd42d8b92e7ee99528"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/pthread-caps-direct/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "551d9b1be9f6f71de936c62e8175b6f3638dbec871b29dffdd06577f745c863b",
+        "cold_free_pages": 117699,
+        "free_pages_before": 117693,
+        "free_pages_after": 117693,
+        "checks": [
+          "child limits installed before scheduler entry",
+          "filesystem/network/GUI/entropy rejected without invoking those services",
+          "ordinary SPAWN and SPAWN_ARGS inherit reduced rights",
+          "restricted spawn cannot increase its own mask",
+          "EXIT/query remain available after further reduction to zero optional rights",
+          "parent retains its original rights; repeated nested cleanup returns stable physical pages"
+        ],
+        "limits": [
+          "per-process syscall permission reduction, not complete site/filesystem/browser sandboxing",
+          "no browser-engine or TLS completion claim",
+          "QEMU evidence, new Fusion behavior NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "40c49c3bdff7f7d9ec277226a5b9222cea6a6bfde3fed2fd42d8b92e7ee99528"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/pthread-tls6-uefi/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "eb92f14daab8a54e54838c133d088c5d642fdb34fda2529eb96107d4c177a5bd",
+        "ipv6": true,
+        "tcp6_wire_frames": 285,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500528,
+        "free_pages_before": 500191,
+        "free_pages_after": 500191,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6288238419947447,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6075253739982145,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.4870811419968959,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.48880949900194537,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5057395969924983,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.667428357002791,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.44567222899058834,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.32387960399501026,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.3846519899962004,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.4453711169917369,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.4462686670012772,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.24299971299478784,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.506689681991702,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.202852653004811,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.1625398609903641,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.16217901700292714,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8113053980050609,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.486776732999715,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 53424, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 49762, 0, 0)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 53964, 0, 0)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 33500, 0, 0)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 40160, 0, 0)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: SSLV3_ALERT_BAD_CERTIFICATE] ssl/tls alert bad certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: SSLV3_ALERT_UNSUPPORTED_CERTIFICATE] ssl/tls alert unsupported certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_EXPIRED] ssl/tls alert certificate expired (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_UNKNOWN] ssl/tls alert certificate unknown (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 52714, 0, 0)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 53020, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 36802, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 53026, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9b3b93ab1918c675bc7068df41c0d3d494a6649baebac68676b619a9e682c714",
+        "iso_sha256": "cec2134c45b7ee6344b11c69b34f87404da556b1247055eb507141e1a6795b06",
+        "iso_embedded_kernel_sha256": "9b3b93ab1918c675bc7068df41c0d3d494a6649baebac68676b619a9e682c714",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "unqualified_investigation": [
+    {
+      "evidence": "pthread-direct1/",
+      "diagnosis": "initial fixture invocation interrupted without a completed result; not accepted; later direct and UEFI qualified runs use the final bounds/quota fixture"
+    }
+  ],
+  "limits": [
+    "three secondary join records, single-CPU scheduler, stacks16..128KiB",
+    "no detached/process-shared/robust/PI/cancel/signals/priorities/affinity or full C++ runtime",
+    "native TCB is not compiler ELF/PT_TLS ABI",
+    "TLS client API remains single-threaded per process pending shared PSA/RNG contract",
+    "no modern engine, live wireless, production CA/time or Stage3 completion",
+    "new Fusion/Pi/laptop qualification NOT RUN"
+  ]
+}

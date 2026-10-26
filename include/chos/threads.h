@@ -11,6 +11,7 @@ int chos_thread_create_result(address_space_handle_t,uint32_t tid);
 int64_t chos_thread_self(address_space_handle_t);
 int chos_thread_info(address_space_handle_t,uint32_t,chos_thread_info_t *);
 int chos_thread_reap(address_space_handle_t,uint32_t);
+int chos_threads_main_exit(address_space_handle_t);
 int chos_thread_is_secondary(address_space_handle_t);
 void chos_threads_service(void);
 void chos_threads_stop(address_space_handle_t,int64_t status,int faulted);

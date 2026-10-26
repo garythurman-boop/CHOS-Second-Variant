@@ -55,8 +55,9 @@ exit with blocked waiters and successful later reuse. Physical pages return to a
 stable warm baseline; queued records must be zero. Keyless wait/wake/timeout/cancel
 counters are captured from the immutable guest for actual execution evidence.
 
-The complete C/C++/pthread runtime and modern browser integration are separate
-remaining work. This primitive does not make the existing allocator or libraries
-thread-safe by itself. New Fusion/Pi/laptop futex qualification is NOT RUN. No
+The [native C thread runtime](NATIVE_PTHREAD_RUNTIME.md) now uses these primitives
+for a bounded pthread subset and serialized allocation. Complete C/C++/POSIX and
+modern browser integration remain separate work; unrelated libraries still require
+their own concurrency contracts. New Fusion/Pi/laptop futex qualification is NOT RUN. No
 Stage3 completion,0.50.0 version bump or binary publication is implied. See
 validation/stage3-private-futex.json for exact profiles and retained investigation.
