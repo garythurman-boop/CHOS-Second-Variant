@@ -62,13 +62,15 @@ code applies profiles. Ordinary EL0 file-mutation syscalls cannot replace/delete
 its profile or move its protected parent. This boundary is tested by a real EL0
 application. It is not yet a complete web-content sandbox or per-site permissions.
 
-Prefer the selected engine's maintained TLS/network implementation through an
-OS transport adapter. WPE's Soup3 stack brings GnuTLS dependencies; evaluate that
-complete dependency chain against an isolated CHOS transport before selecting a
-second independent TLS implementation. Require validated entropy, clock policy,
-trust roots, SNI/hostname/chain/date validation and fail-closed deterministic tests.
-Fusion has no supported entropy source yet. No HTTP downgrade or certificate-check
-bypass is permitted. The HTTP preview keeps HTTPS disabled.
+WPE's Soup3 stack brings GnuTLS dependencies; that engine networking integration
+remains open. The native transport now uses pinned MbedTLS, extending the existing
+reviewed DRBG dependency through a bounded C interface with actual EL0 handshake,
+certificate and failure tests. This is a tested CHOS transport seam, not evidence
+that Soup/GnuTLS or WPE already uses it. Engine integration must resolve the broker
+adapter or the complete Soup dependency chain without assuming a drop-in swap.
+Production entropy/time/trust-root policy still needs qualification; accepted EFI
+RNG availability on Fusion has NOT RUN. No HTTP downgrade or certificate-check
+bypass is permitted. The HTTP recovery preview keeps HTTPS disabled.
 
 WebKit contains LGPL/BSD and other separately licensed components. Before vendoring,
 record actual release tarball/commit, digest/signature provenance, every component
@@ -134,3 +136,9 @@ The earlier TLS1.2-only description is historical. Production CA/time policy,
 engine/Soup integration, full browser behavior, live wireless and independent
 Fusion qualification remain open. No recovery-preview HTTPS or binary release
 is enabled by this source milestone.
+
+The native TLS adapter now accepts IPv6 peers through the same verified context,
+using owner-bound TCP6 rather than a separate discovery/configuration path. See
+NATIVE_TLS_CLIENT.md and validation/stage3-native-tls6.json. This supplies a real
+transport seam; it does not complete WPE/Soup, DNS-to-navigation, modern engine,
+production CA/time or wireless integration.

@@ -125,5 +125,29 @@ CHOS verification settings or installs a test root into the product.
 See [TLS1.3 results](validation/stage3-native-tls13.json) for the current profile;
 [initial TLS1.2 results](validation/stage3-native-tls.json) retain their earlier
 snapshot and investigation failures. Production CA/time policy, modern engine
-integration, IPv6 TLS adaptation, live wireless and platform qualification remain
+integration, live wireless and platform qualification remain
 open; this protocol extension does not complete Stage3.
+
+## IPv6 transport extension
+
+`chos_tls_create6_ex` adds a16-byte network-order IPv6 peer on the existing
+OS-selected interface. Named-host verification/SNI and all TLS policy are shared
+with IPv4; no raw route, NIC or network-configuration access is added. The caller
+supplies a resolved address; this does not wire browser AAAA/URL handling or add
+manual IPv6 settings/DHCPv6. Scope-ID selection and IPv6 literal certificate names
+are not provided by this DNS-hostname-oriented API.
+
+The context retains its transport family for every status/send/read/abort operation.
+IPv6 status validates the versioned OS ABI. A pending TCP6 entropy refill keeps
+the same socket and fixed connect deadline, returning AGAIN without emitting a SYN
+or resetting a driver. Real connection errors remain fatal. Zero/multicast peers
+are rejected. IPv4 APIs keep their existing transport and verification path.
+
+The IPv6 fixture uses the real guest network stack and host IPv6 loopback through
+QEMU user networking. Captured Ethernet/IPv6/TCP packets must include actual SYN
+and data. The dual-stack fixture also keeps IPv4 and IPv6 contexts live together,
+completes their verified requests and independently frees each family, even when
+their numerical kernel handles coincide. Missing clock/entropy runs permit no
+TCP6 frames or peer connection. This is actual transport evidence, not public-site,
+Fusion IPv6, browser or live wireless qualification. See
+[IPv6 TLS results](validation/stage3-native-tls6.json).

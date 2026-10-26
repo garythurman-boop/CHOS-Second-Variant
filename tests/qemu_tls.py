@@ -2,7 +2,7 @@
 """Real native CHOS TLS1.2/1.3 client against ephemeral local certificate fixtures.
 No production CA store, modern browser, trusted-time or physical Wi-Fi claim.
 """
-import argparse,datetime,hashlib,json,pathlib,re,shutil,socket,ssl,subprocess,sys,threading,time
+import argparse,datetime,hashlib,json,pathlib,re,shutil,socket,ssl,struct,subprocess,sys,threading,time
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes,serialization
 from cryptography.hazmat.primitives.asymmetric import ec,rsa
@@ -14,6 +14,7 @@ p.add_argument('--out',type=pathlib.Path,required=True)
 p.add_argument('--mode',choices=['direct','uefi'],default='direct')
 p.add_argument('--tls-version',choices=['1.2','1.3'],default='1.3')
 p.add_argument('--expect-cipher',choices=['TLS_AES_128_GCM_SHA256','TLS_AES_256_GCM_SHA384'])
+p.add_argument('--ipv6',action='store_true')
 p.add_argument('--missing-entropy',action='store_true')
 p.add_argument('--missing-clock',action='store_true')
 o=p.parse_args();out=o.out.resolve();out.mkdir(parents=True,exist_ok=False)
@@ -41,7 +42,9 @@ def server(kind,begin=2029,end=2031):
  def sni(sock,hostname,context):
   with lock:events.append({'kind':kind,'sni':hostname})
  ctx.set_servername_callback(sni)
- listener=socket.socket();listener.bind(('0.0.0.0',0));listener.listen();listener.settimeout(.2);servers.append(listener)
+ listener=socket.socket(socket.AF_INET6 if o.ipv6 else socket.AF_INET,socket.SOCK_STREAM)
+ if o.ipv6:listener.setsockopt(socket.IPPROTO_IPV6,socket.IPV6_V6ONLY,0)
+ listener.bind(('::' if o.ipv6 else '0.0.0.0',0));listener.listen();listener.settimeout(.2);servers.append(listener)
  def handle(raw):
   raw.settimeout(20)
   with lock:events.append({'kind':kind,'accepted':True})
@@ -49,7 +52,7 @@ def server(kind,begin=2029,end=2031):
    if kind=='stall':stop.wait(18);return
    if kind=='malformed':raw.sendall(b'\x16\x03\x03\x00\x04FAIL');return
    conn=ctx.wrap_socket(raw,server_side=True)
-   with lock:events.append({'kind':kind,'version':conn.version(),'cipher':conn.cipher()[0],'alpn':conn.selected_alpn_protocol()})
+   with lock:events.append({'kind':kind,'version':conn.version(),'cipher':conn.cipher()[0],'alpn':conn.selected_alpn_protocol(),'peer':str(conn.getpeername())})
    request=b''
    while b'\r\n\r\n' not in request and len(request)<4096:
     part=conn.recv(512)
@@ -78,7 +81,7 @@ disk=out/'disposable.img';shutil.copyfile('build/qemu-smoke-disk.img',disk)
 app=pathlib.Path('build/userland/tls_test.elf')
 for dest,src in [('/BIN/TLSTEST.ELF',app),('/TLS/CA.DER',fixture/'ca.der'),('/TLS/OTHER.DER',fixture/'other.der'),('/TLS/BAD.DER',fixture/'bad.der')]:
  subprocess.run(['python3','tools/mkchfs.py','put',str(disk),dest,str(src)],check=True)
-a=argparse.Namespace(mode=o.mode,kernel=pathlib.Path('build/chos.elf'),uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=pathlib.Path('build/chos-0.30.0.iso'),memory='2G' if o.mode=='uefi' else '512M',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base='1970-01-01T00:00:00' if o.missing_clock else '2030-06-01T12:00:00',trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model='e1000e',storage_error=False,nvme=False,no_rng=o.missing_entropy,hub_depth=0,empty_usb=False,tablet=True)
+a=argparse.Namespace(mode=o.mode,kernel=pathlib.Path('build/chos.elf'),uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=pathlib.Path('build/chos-0.30.0.iso'),memory='2G' if o.mode=='uefi' else '512M',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base='1970-01-01T00:00:00' if o.missing_clock else '2030-06-01T12:00:00',trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model='e1000e',net_capture=True,storage_error=False,nvme=False,no_rng=o.missing_entropy,hub_depth=0,empty_usb=False,tablet=True)
 g=Guest(a,out,disk);cases=[]
 def free_pages():
  end=time.monotonic()+8
@@ -93,7 +96,7 @@ def free_pages():
  wait(lambda:len(re.findall(r'Free pages: (\d+)',g.text()))>before,3,'free pages')
  return int(re.findall(r'Free pages: (\d+)',g.text())[-1])
 def run(kind,expected=0,host='fixture.chos.test',ca='/TLS/CA.DER'):
- before=len(g.text());started=time.monotonic();g.serial(f'exec /BIN/TLSTEST.ELF {ports[kind]} {host} {expected} {ca}')
+ before=len(g.text());started=time.monotonic();g.serial(f'exec /BIN/TLSTEST.ELF {ports[kind]} {host} {expected} {ca}'+(' 6' if o.ipv6 else ''))
  if kind=='stall':
   wait(lambda:any(e.get('kind')=='stall' and e.get('accepted') for e in events),5,'stall transport accepted')
   g.hmp('sendkey f1');wait(lambda:g.symbol('view')==4,3,'desktop diagnostics remains responsive during TLS timeout')
@@ -119,7 +122,19 @@ try:
   assert all(e.get('alpn')=='http/1.1' for e in events if 'alpn' in e),events
   assert all(e['version']=='TLSv'+o.tls_version for e in events if 'version' in e),events
   if o.expect_cipher:assert all(e['cipher']==o.expect_cipher for e in events if 'cipher' in e),events
- (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'profile':'native TLS'+o.tls_version+' ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser','application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'missing_clock':o.missing_clock,'missing_entropy':o.missing_entropy,'cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'cases':cases,'server_events':events,'limits':['ephemeral test root only; production trust store/update policy still open','firmware/RTC clock availability is not authenticated time','browser integration, full modern engine and live Wi-Fi remain open','QEMU evidence; Fusion/physical TLS NOT RUN']},indent=2)+'\n')
+ frames=[];wire=(out/'network.pcap').read_bytes();pos=24
+ while pos+16<=len(wire):
+  _,_,n,_=struct.unpack_from('<IIII',wire,pos);pos+=16
+  assert pos+n<=len(wire)
+  frames.append(wire[pos:pos+n]);pos+=n
+ tcp6=[f for f in frames if len(f)>=74 and f[12:14]==b'\x86\xdd' and f[20]==6]
+ if o.ipv6:
+  if o.missing_entropy or o.missing_clock:assert not tcp6,'missing prerequisite emitted TCP6'
+  else:
+   assert any(f[67]&2 for f in tcp6) and any(len(f)>74 for f in tcp6),'missing actual IPv6 SYN/data'
+   assert any('::1' in e.get('peer','') for e in events),events
+   assert any('::ffff:127.0.0.1' in e.get('peer','') for e in events),events
+ (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'profile':'native TLS'+o.tls_version+' ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser','application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'ipv6':o.ipv6,'tcp6_wire_frames':len(tcp6),'missing_clock':o.missing_clock,'missing_entropy':o.missing_entropy,'cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'cases':cases,'server_events':events,'limits':['ephemeral test root only; production trust store/update policy still open','firmware/RTC clock availability is not authenticated time','browser integration, full modern engine and live Wi-Fi remain open','QEMU evidence; Fusion/physical TLS NOT RUN']},indent=2)+'\n')
 except Exception:
  (out/'failure.txt').write_text(g.text());(out/'server-events.json').write_text(json.dumps(events,indent=2));raise
 finally:

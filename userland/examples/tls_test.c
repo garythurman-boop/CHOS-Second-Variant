@@ -4,6 +4,7 @@
 #include <string.h>
 #include "psa/crypto.h"
 #include "psa/crypto_extra.h"
+static int use_ipv6;
 static int random_scope_closed(void){
  unsigned char probe[32];memset(probe,0x7f,sizeof(probe));size_t count=123;
  psa_status_t rc=mbedtls_psa_external_get_random(0,probe,sizeof(probe),&count);
@@ -15,7 +16,8 @@ static void say(const char *s){chos_write(s,strlen(s));}
 static void number(unsigned n){char s[11];s[10]='\n';for(int i=9;i>=0;i--){s[i]=(char)('0'+n%10);n/=10;}chos_write(s,sizeof(s));}
 static chos_tls_client_t *create(unsigned port,const char *host,const void *ca,size_t bytes,int *why,int retry){
  for(unsigned n=0;;n++){
-  chos_tls_client_t *c=chos_tls_create_ex(0x0a000202,(uint16_t)port,host,ca,bytes,why);
+  uint8_t peer[16]={0xfe,0xc0};peer[15]=2;
+  chos_tls_client_t *c=use_ipv6?chos_tls_create6_ex(peer,(uint16_t)port,host,ca,bytes,why):chos_tls_create_ex(0x0a000202,(uint16_t)port,host,ca,bytes,why);
   if(c||!retry||*why!=CHOS_TLS_INIT_ENTROPY||n==99)return c;
   /* Nonblocking provider may have a real refill in flight. Never replace it. */
   chos_sleep_ticks(1);
@@ -40,7 +42,16 @@ static int concurrent_exchange(chos_tls_client_t *c){
  CHECK(chos_tls_state(c)==CHOS_TLS_CLOSED);chos_tls_destroy(c);return 0;
 }
 int main(int argc,char **argv){
- CHECK(argc==5);CHECK(random_scope_closed());unsigned port=0,expected=0;
+ CHECK(argc==5||argc==6);CHECK(random_scope_closed());
+ use_ipv6=argc==6&&chos_strcmp(argv[5],"6")==0;
+ if(argc==6)CHECK(use_ipv6);
+ if(use_ipv6){
+  for(unsigned n=0;;n++){
+   chos_net6_info_t info;CHECK(!chos_network_status6(&info));
+   if(info.address_states[1]==CHOS_NET6_ADDRESS_PREFERRED)break;
+   CHECK(n<100);chos_sleep_ticks(10);
+  }
+ }unsigned port=0,expected=0;
  for(const char *p=argv[1];*p;p++){CHECK(*p>='0'&&*p<='9');port=port*10+(unsigned)(*p-'0');CHECK(port<=65535);}
  for(const char *p=argv[3];*p;p++){CHECK(*p>='0'&&*p<='9');expected=expected*10+(unsigned)(*p-'0');}
  int fd=(int)chos_open(argv[4]);CHECK(fd>=0);
@@ -49,7 +60,12 @@ int main(int argc,char **argv){
  CHECK(!chos_close(fd));
  if(expected==994){
   int why=0;chos_tls_client_t *clients[2];
-  for(unsigned i=0;i<2;i++){clients[i]=create(port,argv[2],ca,used,&why,1);CHECK(clients[i]);}
+  int family=use_ipv6;
+  for(unsigned i=0;i<2;i++){
+   /* On the IPv6 fixture, retain IPv6 and IPv4 clients simultaneously. */
+   use_ipv6=family&&i==0;clients[i]=create(port,argv[2],ca,used,&why,1);CHECK(clients[i]);
+  }
+  use_ipv6=family;
   for(unsigned n=0;;n++){
    CHECK(n<2500);unsigned ready=0;
    for(unsigned i=0;i<2;i++){int rc=chos_tls_step(clients[i]);CHECK(random_scope_closed());CHECK(rc==0||rc==CHOS_TLS_AGAIN);if(!rc)++ready;}

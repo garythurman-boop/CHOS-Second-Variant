@@ -15,6 +15,9 @@ chos_tls_client_t *chos_tls_create(uint32_t ipv4,uint16_t port,const char *hostn
                                   const void *ca_der,size_t ca_bytes);
 chos_tls_client_t *chos_tls_create_ex(uint32_t ipv4,uint16_t port,const char *hostname,
                                      const void *ca_der,size_t ca_bytes,int *initial_error);
+/* IPv6 uses the OS-selected interface and 16 network-order address bytes. */
+chos_tls_client_t *chos_tls_create6_ex(const uint8_t peer[16],uint16_t port,const char *hostname,
+                                      const void *ca_der,size_t ca_bytes,int *initial_error);
 int chos_tls_step(chos_tls_client_t *);
 int chos_tls_read(chos_tls_client_t *,void *,size_t);
 /* On AGAIN retry the identical pointer and length, per MbedTLS's write contract. */

@@ -17,7 +17,9 @@ struct chos_tls_client {
  mbedtls_hmac_drbg_context random;
  uint64_t deadline;
  uint32_t flags;
- int socket,state,error,psa_reference;
+ int socket,state,error,psa_reference,ipv6,connect_started;
+ uint8_t peer6[16];
+ uint16_t peer_port;
 };
 /* All native client APIs are single-threaded. PSA's external RNG draws from
  * the currently executing, already-seeded client. Never from a hidden source.
@@ -49,9 +51,25 @@ static int clock_valid(void){
   * This profile does not assert authenticity of firmware/RTC time. */
  return t>=INT64_C(1735689600) && gmtime_r(&t,&date)!=0;
 }
+static void abort_transport(chos_tls_client_t *c){
+ if(c->socket>0){
+  if(c->ipv6)(void)chos_net_tcp6_abort(c->socket);else (void)chos_net_tcp_abort(c->socket);
+  c->socket=0;
+ }
+}
+static int transport_state(chos_tls_client_t *c,unsigned *state){
+ if(c->ipv6){
+  chos_tcp6_socket_info_t info;
+  if(chos_net_tcp6_status(c->socket,&info)<0||info.version!=CHOS_TCP6_API_VERSION||info.size_bytes!=sizeof(info))return -1;
+  *state=info.state;
+ }else{
+  chos_tcp_socket_info_t info;if(chos_net_tcp_status(c->socket,&info)<0)return -1;*state=info.state;
+ }
+ return 0;
+}
 static int fail(chos_tls_client_t *c,int error){
  c->error=error;c->flags=mbedtls_ssl_get_verify_result(&c->ssl);c->state=CHOS_TLS_FAILED;
- if(c->socket>0){(void)chos_net_tcp_abort(c->socket);c->socket=0;}
+ abort_transport(c);
  return CHOS_TLS_ERROR;
 }
 static int deadline(chos_tls_client_t *c){
@@ -71,14 +89,14 @@ static int entropy(void *context,unsigned char *out,size_t count){
 static int send_bytes(void *context,const unsigned char *p,size_t n){
  chos_tls_client_t *c=context;
  if(n>CHOS_TCP_API_MAX_TRANSFER)n=CHOS_TCP_API_MAX_TRANSFER;
- long rc=chos_net_tcp_send(c->socket,p,n);
+ long rc=c->ipv6?chos_net_tcp6_send(c->socket,p,n):chos_net_tcp_send(c->socket,p,n);
  if(rc==-CHOS_ERRNO_EAGAIN)return MBEDTLS_ERR_SSL_WANT_WRITE;
  return rc<0?MBEDTLS_ERR_SSL_INTERNAL_ERROR:(int)rc;
 }
 static int receive_bytes(void *context,unsigned char *p,size_t n){
  chos_tls_client_t *c=context;
  if(n>CHOS_TCP_API_MAX_TRANSFER)n=CHOS_TCP_API_MAX_TRANSFER;
- long rc=chos_net_tcp_recv(c->socket,p,n);
+ long rc=c->ipv6?chos_net_tcp6_recv(c->socket,p,n):chos_net_tcp_recv(c->socket,p,n);
  if(rc==-CHOS_ERRNO_EAGAIN)return MBEDTLS_ERR_SSL_WANT_READ;
  return rc<0?MBEDTLS_ERR_SSL_INTERNAL_ERROR:(int)rc;
 }
@@ -88,14 +106,24 @@ static int hostname_valid(const char *s){
   if(!((c>='a'&&c<='z')||(c>='A'&&c<='Z')||(c>='0'&&c<='9')||c=='.'||c=='-'))return 0;}
  return 1;
 }
+static chos_tls_client_t *create_transport(uint32_t,const uint8_t *,uint16_t,const char *,const void *,size_t,int *);
 chos_tls_client_t *chos_tls_create(uint32_t ipv4,uint16_t port,const char *hostname,const void *ca,size_t bytes){
  return chos_tls_create_ex(ipv4,port,hostname,ca,bytes,0);
 }
 chos_tls_client_t *chos_tls_create_ex(uint32_t ipv4,uint16_t port,const char *hostname,const void *ca,size_t bytes,int *initial_error){
+ return create_transport(ipv4,0,port,hostname,ca,bytes,initial_error);
+}
+chos_tls_client_t *chos_tls_create6_ex(const uint8_t peer[16],uint16_t port,const char *hostname,const void *ca,size_t bytes,int *initial_error){
+ if(!peer){if(initial_error)*initial_error=CHOS_TLS_INIT_ARGUMENT;return 0;}
+ unsigned any=0;for(unsigned i=0;i<16;i++)any|=peer[i];
+ if(!any||peer[0]==0xff){if(initial_error)*initial_error=CHOS_TLS_INIT_ARGUMENT;return 0;}
+ return create_transport(0,peer,port,hostname,ca,bytes,initial_error);
+}
+static chos_tls_client_t *create_transport(uint32_t ipv4,const uint8_t *peer6,uint16_t port,const char *hostname,const void *ca,size_t bytes,int *initial_error){
  uint64_t now;
  int reason=CHOS_TLS_INIT_ARGUMENT;
  if(initial_error)*initial_error=reason;
- if(!ipv4||!port||!hostname_valid(hostname)||!ca||!bytes||bytes>65536u)return 0;
+ if((!ipv4&&!peer6)||!port||!hostname_valid(hostname)||!ca||!bytes||bytes>65536u)return 0;
  if(initial_error)*initial_error=CHOS_TLS_INIT_CLOCK;
  if(!clock_valid()||now_ms(&now))return 0;
  if(initial_error)*initial_error=CHOS_TLS_INIT_MEMORY;
@@ -118,10 +146,14 @@ chos_tls_client_t *chos_tls_create_ex(uint32_t ipv4,uint16_t port,const char *ho
  mbedtls_ssl_conf_rng(&c->config,mbedtls_hmac_drbg_random,&c->random);
  if(mbedtls_ssl_conf_alpn_protocols(&c->config,alpn)||mbedtls_ssl_setup(&c->ssl,&c->config)||mbedtls_ssl_set_hostname(&c->ssl,hostname))goto failed;
  reason=CHOS_TLS_INIT_TRANSPORT;
- c->socket=(int)chos_net_tcp_open(0);
+ c->ipv6=peer6!=0;c->peer_port=port;
+ if(peer6)memcpy(c->peer6,peer6,16);
+ c->socket=(int)(c->ipv6?chos_net_tcp6_open(0):chos_net_tcp_open(0));
  if(c->socket<=0)goto failed;
  mbedtls_ssl_set_bio(&c->ssl,c,send_bytes,receive_bytes,0);
- if(chos_net_tcp_connect(c->socket,ipv4,port)<0)goto failed;
+ long connect_rc=c->ipv6?chos_net_tcp6_connect(c->socket,c->peer6,port):chos_net_tcp_connect(c->socket,ipv4,port);
+ if(connect_rc<0&&!(c->ipv6&&connect_rc==-CHOS_ERRNO_EAGAIN))goto failed;
+ c->connect_started=connect_rc==0;
  c->state=CHOS_TLS_CONNECTING;c->deadline=now+TLS_TIMEOUT_MS;
  if(initial_error)*initial_error=0;
  return c;
@@ -133,9 +165,17 @@ int chos_tls_step(chos_tls_client_t *c){
  if(!c||c->state==CHOS_TLS_FAILED||c->state==CHOS_TLS_CLOSED)return CHOS_TLS_ERROR;
  if(deadline(c))return CHOS_TLS_ERROR;
  if(c->state==CHOS_TLS_CONNECTING){
-  chos_tcp_socket_info_t info;
-  if(chos_net_tcp_status(c->socket,&info)<0||info.state==CHOS_TCP_FAILED||info.state==CHOS_TCP_CLOSED)return fail(c,MBEDTLS_ERR_SSL_INTERNAL_ERROR);
-  if(info.state!=CHOS_TCP_ESTABLISHED)return CHOS_TLS_AGAIN;
+  /* TCP6 may have an entropy refill pending before it emits any SYN. Keep
+   * this same owned socket and deadline; do not retry/reset the whole driver. */
+  if(!c->connect_started){
+   long rc=chos_net_tcp6_connect(c->socket,c->peer6,c->peer_port);
+   if(rc==-CHOS_ERRNO_EAGAIN)return CHOS_TLS_AGAIN;
+   if(rc<0)return fail(c,MBEDTLS_ERR_SSL_INTERNAL_ERROR);
+   c->connect_started=1;
+  }
+  unsigned state;
+  if(transport_state(c,&state)<0||state==CHOS_TCP_FAILED||state==CHOS_TCP_CLOSED)return fail(c,MBEDTLS_ERR_SSL_INTERNAL_ERROR);
+  if(state!=CHOS_TCP_ESTABLISHED)return CHOS_TLS_AGAIN;
   c->state=CHOS_TLS_HANDSHAKE;
  }
  if(c->state==CHOS_TLS_READY)return 0;
@@ -174,7 +214,7 @@ int chos_tls_error(const chos_tls_client_t *c){return c?c->error:MBEDTLS_ERR_SSL
 uint32_t chos_tls_verify_flags(const chos_tls_client_t *c){return c?c->flags:UINT32_MAX;}
 void chos_tls_destroy(chos_tls_client_t *c){
  if(!c)return;
- if(c->socket>0)(void)chos_net_tcp_abort(c->socket);
+ abort_transport(c);
  mbedtls_ssl_free(&c->ssl);mbedtls_ssl_config_free(&c->config);
  mbedtls_x509_crt_free(&c->anchors);mbedtls_hmac_drbg_free(&c->random);
  if(c->psa_reference&&psa_clients&&!--psa_clients)mbedtls_psa_crypto_free();

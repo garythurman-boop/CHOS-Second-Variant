@@ -106,8 +106,10 @@ matched tests verify actual DHCP/DNS/HTTP traffic through isolated browser windo
 * Complete engine-sized memory/runtime, libc/C++/threads/futex/IPC/events/loader and
   web-content permission/isolation boundaries. Current static ELF and tiny process
   budgets are prerequisites rather than a browser-ready runtime.
-* Implement maintained TLS, trust roots/update policy, certificate/hostname/date
-  validation, reliable entropy on Fusion and negative security tests.
+* Complete browser integration of the tested native TLS1.2/1.3 transport,
+  production trust roots/update/time policy, reseeding and reliable entropy on
+  Fusion. Native certificate/hostname/date/failure fixtures now pass; they do not
+  complete that production/browser gate.
 * Implement actual Pi 5 radio/firmware/authentication, scanning, connection manager,
   secure credentials and live AP/reconnect/failure tests.
 * Finish IPv6 browser integration, DHCPv6 where required, manual IPv6 settings,
@@ -165,3 +167,10 @@ The earlier TLS1.2-only description is historical. Production CA/time policy,
 engine/Soup integration, full browser behavior, live wireless and independent
 Fusion qualification remain open. No recovery-preview HTTPS or binary release
 is enabled by this source milestone.
+
+The native secure transport also has an IPv6 constructor over the existing
+owner-bound TCP6 service. Shared certificate policy, named SNI, bounded deferred
+connect, mixed IPv4/IPv6 contexts and actual IPv6 wire frames are tested by the
+fixtures in [the IPv6 TLS report](validation/stage3-native-tls6.json).
+Browser DNS/URL integration, IPv6 settings/DHCPv6, production trust policy, full
+engine/runtime and live wireless remain incomplete. No binary is published.
