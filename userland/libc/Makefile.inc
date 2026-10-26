@@ -1,6 +1,6 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c
+LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
 LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o
 EMUTLS_HEADERS := $(wildcard third_party/compiler-rt/lib/builtins/*.h)
@@ -111,3 +111,24 @@ test-emutls-runtime-sanitize: $(SAN_DIR)/test-emutls-runtime $(SAN_DIR)/test-cxx
 test: test-emutls-runtime
 test-sanitize: test-emutls-runtime-sanitize
 .PHONY: test-emutls-runtime test-emutls-runtime-sanitize
+
+BASEC_HOST_FLAGS := -DCHOS_HOST_TEST -include tests/basec_host_names.h -fno-builtin $(LIBC_INCLUDES)
+$(BUILD)/test-libc-base: tests/test_libc_base.c tests/basec_host_names.h userland/libc/numeric.c userland/libc/unicode.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 $(BASEC_HOST_FLAGS) tests/test_libc_base.c userland/libc/numeric.c userland/libc/unicode.c -o $@
+$(SAN_DIR)/test-libc-base: tests/test_libc_base.c tests/basec_host_names.h userland/libc/numeric.c userland/libc/unicode.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Wno-misleading-indentation $(BASEC_HOST_FLAGS) tests/test_libc_base.c userland/libc/numeric.c userland/libc/unicode.c -o $@
+test-libc-base: $(BUILD)/test-libc-base
+	./$(BUILD)/test-libc-base
+test-libc-base-sanitize: $(SAN_DIR)/test-libc-base
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-libc-base
+test: test-libc-base
+test-sanitize: test-libc-base-sanitize
+.PHONY: test-libc-base test-libc-base-sanitize
+$(BUILD)/userland/basec_test.o: userland/examples/basec_test.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) -c $< -o $@
+$(BUILD)/userland/basec_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/basec_test.o $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) userland/native.ld
+	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(filter %.o,$^)
+test: $(BUILD)/userland/basec_test.elf

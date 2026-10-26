@@ -224,3 +224,10 @@ on corrected artifacts. See [exact evidence and retained failures](validation/st
 This is an explicit -femulated-tls static build profile, not PT_TLS/dynamic loading,
 a complete C++ standard library or a modern engine. Engine-sized runtime, browser,
 production trust/time and live wireless gates remain open; binaries remain held.
+
+[Base C library work](BASE_C_LIBRARY.md) now addresses concrete libc++ prerequisites:
+real numeric conversion, sorting/search and allocation-free per-thread UTF-8/16/32
+state. Host differential/exhaustive scalar tests and actual direct/UEFI thread
+tests pass alongside compiler-TLS/HTTPS regressions. See
+[exact evidence](validation/stage3-base-c.json). This does not complete libc++,
+the modern engine, production trust policy or wireless; binary publication is held.

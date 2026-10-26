@@ -21,4 +21,6 @@ int *__chos_errno_location(void);
 #define EDEADLK 35
 #define ENOTSUP 95
 #define ETIMEDOUT 110
+#define ERANGE 34
+#define EILSEQ 84
 #endif

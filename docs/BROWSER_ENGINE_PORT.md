@@ -189,3 +189,10 @@ on corrected artifacts. See [exact evidence and retained failures](validation/st
 This is an explicit -femulated-tls static build profile, not PT_TLS/dynamic loading,
 a complete C++ standard library or a modern engine. Engine-sized runtime, browser,
 production trust/time and live wireless gates remain open; binaries remain held.
+
+An actual LLVM libc++19.1.7 cross-compile now identifies concrete C-header/runtime
+gaps. The [base C iteration](BASE_C_LIBRARY.md) implements numeric/search/sort and
+allocation-free per-thread UTF-8/16/32 conversions with host and actual EL0 evidence.
+This addresses its div/mbstate prerequisites. Math, scheduler/thread, C++ library/
+ABI and further engine dependencies remain active; this compile probe is not an
+engine build or browser conformance result.

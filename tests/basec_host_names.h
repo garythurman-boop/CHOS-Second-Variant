@@ -1,0 +1,21 @@
+/* Keep native exports separate from host libc and sanitizer interceptors. */
+#define abs chos_test_abs
+#define labs chos_test_labs
+#define llabs chos_test_llabs
+#define div chos_test_div
+#define ldiv chos_test_ldiv
+#define lldiv chos_test_lldiv
+#define strtol chos_test_strtol
+#define strtoll chos_test_strtoll
+#define strtoul chos_test_strtoul
+#define strtoull chos_test_strtoull
+#define atoi chos_test_atoi
+#define atol chos_test_atol
+#define atoll chos_test_atoll
+#define bsearch chos_test_bsearch
+#define qsort chos_test_qsort
+#define mbrtoc32 chos_test_mbrtoc32
+#define c32rtomb chos_test_c32rtomb
+#define mbrtoc16 chos_test_mbrtoc16
+#define c16rtomb chos_test_c16rtomb
+#define mbsinit chos_test_mbsinit
