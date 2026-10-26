@@ -1,6 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/entropy.h"
+#ifndef CHOS_HOST_TEST
+#include "chos/seed_rng.h"
+#endif
 #include "chos/platform.h"
 #include "chos/virtio_transport.h"
 
@@ -252,7 +255,7 @@ static int initialize_device(uintptr_t base) {
     return 1;
 }
 
-int chos_entropy_init(void) {
+static int virtio_entropy_init(void) {
     uintptr_t base = mmio_base();
     unsigned slot;
     if (rng_is_ready) return 1; /* preserve live DMA and unconsumed entropy */
@@ -278,8 +281,16 @@ int chos_entropy_init(void) {
     return 0;
 }
 
-int chos_entropy_ready(void) { return rng_is_ready; }
-const char *chos_entropy_last_error(void) { return rng_error; }
+static int seed_ready(void){
+#ifdef CHOS_HOST_TEST
+    return 0;
+#else
+    return chos_seed_rng_ready();
+#endif
+}
+int chos_entropy_init(void){return virtio_entropy_init() || seed_ready();}
+int chos_entropy_ready(void) { return rng_is_ready || seed_ready(); }
+const char *chos_entropy_last_error(void) { return !rng_is_ready && seed_ready()?"UEFI-seeded HMAC-DRBG (finite boot budget)":rng_error; }
 
 static int poll_completion(void) {
     uint16_t device_index, ring_slot;
@@ -310,8 +321,15 @@ static int poll_completion(void) {
 size_t chos_entropy_read(void *destination, size_t capacity) {
     uint8_t *out = (uint8_t *)destination;
     size_t available, amount, i;
-    if (destination == NULL || capacity == 0u || capacity > CHOS_ENTROPY_MAX_REQUEST || !rng_is_ready)
+    if (destination == NULL || capacity == 0u || capacity > CHOS_ENTROPY_MAX_REQUEST)
         return 0u;
+    if(!rng_is_ready){
+#ifdef CHOS_HOST_TEST
+        return 0u;
+#else
+        return chos_seed_rng_read(destination,capacity);
+#endif
+    }
     if (!poll_completion()) return 0u;
     available = rng_pending_length - rng_pending_offset;
     amount = capacity < available ? capacity : available;

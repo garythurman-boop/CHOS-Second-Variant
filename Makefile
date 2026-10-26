@@ -28,6 +28,12 @@ $(patsubst %.c,$(BUILD)/uefi-kernel/%.o,kernel/net/net6.c $(LWIP_SOURCES)): UEFI
 
 SOURCES_C += kernel/platform/sdio.c kernel/platform/cyw_sdio.c
 
+CRYPTO_SOURCES := kernel/platform/seed_rng.c $(addprefix third_party/mbedtls/library/,hmac_drbg.c md.c sha256.c platform_util.c)
+CRYPTO_FLAGS := -Ithird_party/mbedtls-port/include -Ithird_party/mbedtls/include -DMBEDTLS_CONFIG_FILE='"chos_mbedtls_config.h"'
+SOURCES_C += $(CRYPTO_SOURCES)
+$(patsubst %.c,$(BUILD)/%.o,$(CRYPTO_SOURCES)): CFLAGS += $(CRYPTO_FLAGS)
+$(patsubst %.c,$(BUILD)/uefi-kernel/%.o,$(CRYPTO_SOURCES)): UEFI_KERNEL_CFLAGS += $(CRYPTO_FLAGS)
+
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
            $(BUILD)/kernel/arch/aarch64/context_switch.o $(BUILD)/kernel/arch/aarch64/register_stress.o $(BUILD)/kernel/arch/aarch64/user_entry.o \
            $(BUILD)/kernel/arch/aarch64/user_demo.o $(BUILD)/kernel/arch/aarch64/user_exit.o $(BUILD)/kernel/arch/aarch64/user_preempt_good.o \
@@ -1411,3 +1417,30 @@ test-guest-iso-artifacts:
 	python3 tests/test_guest_iso_artifacts.py
 
 $(BUILD)/test-clock $(SAN_DIR)/test-clock $(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi: include/chos/clock_api.h
+
+SEED_TEST_C := tests/test_seed_rng.c $(CRYPTO_SOURCES) kernel/core/spinlock.c
+$(BUILD)/test-seed-rng: $(SEED_TEST_C)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Wno-misleading-indentation -DCHOS_HOST_TEST -Iinclude $(CRYPTO_FLAGS) $(SEED_TEST_C) -o $@
+$(SAN_DIR)/test-seed-rng: $(SEED_TEST_C)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Wno-misleading-indentation -DCHOS_HOST_TEST $(CRYPTO_FLAGS) $(SEED_TEST_C) -o $@
+test-seed-rng: $(BUILD)/test-seed-rng
+	./$(BUILD)/test-seed-rng
+	./$(BUILD)/test-seed-rng zero
+	./$(BUILD)/test-seed-rng repeated
+	./$(BUILD)/test-seed-rng alloc-failure
+test-seed-rng-sanitize: $(SAN_DIR)/test-seed-rng
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-seed-rng
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-seed-rng zero
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-seed-rng repeated
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-seed-rng alloc-failure
+test: test-seed-rng
+test-sanitize: test-seed-rng-sanitize
+
+CRYPTO_HEADERS := $(shell python3 -c 'import json; print(" ".join("third_party/mbedtls/"+x for x in json.load(open("docs/dependencies/mbedtls.json"))["files"] if x.endswith(".h")))') $(wildcard third_party/mbedtls-port/include/*.h)
+$(BUILD)/test-seed-rng $(SAN_DIR)/test-seed-rng: $(CRYPTO_HEADERS) include/chos/seed_rng.h
+.PHONY: test-crypto-integrity test-seed-rng test-seed-rng-sanitize
+test-crypto-integrity:
+	python3 tools/verify_mbedtls.py
+test: test-crypto-integrity

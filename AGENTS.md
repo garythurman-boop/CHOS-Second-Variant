@@ -65,3 +65,9 @@ The user confirms 107ef51 power/storage/Console changes work in Fusion, but its
 actual NIC is Intel 8086:10d3. The user now confirms Fusion Ethernet/example.com work after 54b9731. Keep this
 user-reported evidence distinct from automated QEMU tests. The selected wireless
 target is Pi 5 CYW43455 over SDIO; do not regress Ethernet while adding it.
+
+## Completion version
+
+The user reserves version 0.50.0 for the fully completed revised Stage 3. Keep
+the current development version until every acceptance gate has evidence. Do not
+label a prerequisite milestone 0.50.0 or release binaries to imply completion.

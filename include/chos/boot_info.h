@@ -7,7 +7,7 @@
  * ExitBootServices. Physical addresses in this structure remain valid; UEFI
  * protocol function pointers must not be called from the kernel. */
 #define CHOS_BOOT_INFO_MAGIC UINT64_C(0x43484f53424f4f54) /* CHOSBOOT */
-#define CHOS_BOOT_INFO_VERSION 6u
+#define CHOS_BOOT_INFO_VERSION 7u
 #define CHOS_UEFI_ENTRY_MAGIC UINT64_C(0x43484f5355454631) /* CHOSUEF1 */
 
 #define CHOS_BOOT_FLAG_UEFI        (UINT64_C(1) << 0)
@@ -81,6 +81,9 @@ typedef struct {
     uint64_t clock_unix_seconds,clock_counter,clock_frequency;
     /* Optional installer payload retained in EFI LoaderData (never PMM-free). */
     uint64_t installer_payload_address,installer_payload_size;
+    /* Owned seed captured before EBS; kernel consumes/erases before devices. */
+    uint32_t rng_seed_bytes,rng_algorithm;
+    uint8_t rng_seed[64];
 } chos_boot_info_t;
 
 typedef struct {

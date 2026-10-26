@@ -11,7 +11,8 @@
   "release_hold": {
     "active": true,
     "reason": "User instruction: no new build publication until revised Stage 3 is satisfied and thoroughly tested",
-    "completion_report": "docs/STAGE3_CURRENT_RESULTS.md"
+    "completion_report": "docs/STAGE3_CURRENT_RESULTS.md",
+    "completion_version": "0.50.0"
   },
   "held_source_iterations": 4
 }

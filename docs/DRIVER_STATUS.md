@@ -108,3 +108,8 @@ identity DMA with data caching off. See [runtime contract and QEMU evidence](UEF
 This does not establish Fusion qualification for these new changes, native IOMMU
 ownership, a modern browser, verified TLS or live wireless support. The binary
 publication hold remains active until the complete revised Stage 3 passes.
+
+UEFI handoff ABI7 adds a one-time firmware RNG seed, consumed/erased into a
+bounded reviewed HMAC-DRBG. See [entropy contract](FIRMWARE_ENTROPY.md). Native
+VirtIO remains preferred. Firmware seed availability is QEMU-tested, with
+Fusion/physical support NOT RUN and no TLS/browser completion claim.

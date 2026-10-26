@@ -2,3 +2,5 @@
 /artifacts export-ignore
 # Keep the dependency byte-identical to its pinned upstream inventory.
 /third_party/lwip/** -whitespace
+
+third_party/mbedtls/** -whitespace

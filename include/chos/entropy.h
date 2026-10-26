@@ -6,8 +6,9 @@
 
 #define CHOS_ENTROPY_MAX_REQUEST 256u
 
-/* Nonblocking kernel entropy service backed by a VirtIO-RNG device. It never
- * fabricates bytes from timers, MAC addresses, or counters. */
+/* Nonblocking service preferring VirtIO-RNG, with a finite firmware-seeded
+ * HMAC-DRBG fallback when native VirtIO is absent. It never seeds from timers,
+ * MAC addresses, or counters. The fallback fails closed when its boot budget expires. */
 int chos_entropy_init(void);
 int chos_entropy_ready(void);
 /* Returns the number of bytes copied (0 when no bytes are currently available).

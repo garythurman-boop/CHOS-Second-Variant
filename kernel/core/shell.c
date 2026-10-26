@@ -6,6 +6,7 @@
 #include "chos/platform.h"
 #include "chos/drivers.h"
 #include "chos/entropy.h"
+#include "chos/seed_rng.h"
 #include "chos/uart.h"
 #include "chos/pmm.h"
 #include "chos/kheap.h"
@@ -2211,6 +2212,10 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         command_fsls();
     } else if (starts_with(line, "fsread ")) {
         command_fsread(skip_spaces(line + 7));
+    } else if (strings_equal(line,"rng-firmware-test")) {
+        uint8_t sample[32];size_t count=chos_seed_rng_read(sample,sizeof(sample));
+        volatile uint8_t *erase=sample;for(unsigned i=0;i<sizeof(sample);++i)erase[i]=0;
+        uart_puts(count==sizeof(sample)?"[ OK ] Firmware-seeded HMAC-DRBG generated 32 bytes; sample erased.\n":"[FAIL] Firmware-seeded entropy unavailable or boot budget exhausted.\n");
     } else if (strings_equal(line, "rng-test")) {
         uint8_t bytes[32]; size_t amount=0;
         uint64_t start=timer_counter(), limit=timer_frequency_hz()/10u;

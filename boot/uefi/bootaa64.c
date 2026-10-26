@@ -940,6 +940,31 @@ static void capture_firmware_tables(chos_boot_info_t *info) {
     if (info->acpi_rsdp_address != 0u) info->flags |= CHOS_BOOT_FLAG_ACPI;
 }
 
+typedef struct chos_efi_rng chos_efi_rng;
+struct chos_efi_rng {
+    EFI_STATUS (*GetInfo)(chos_efi_rng *,EFI_UINTN *,EFI_GUID *);
+    EFI_STATUS (*GetRNG)(chos_efi_rng *,EFI_GUID *,EFI_UINTN,uint8_t *);
+};
+static void capture_rng_seed(chos_boot_info_t *b){
+    EFI_GUID protocol={0x3152bca5,0xeade,0x433d,{0x86,0x2e,0xc0,0x1c,0xdc,0x29,0x1f,0x44}};
+    /* Prefer raw entropy; otherwise only explicit SP800-90 256-bit algorithms. */
+    EFI_GUID algorithms[]={
+        {0xe43176d7,0xb6e8,0x4827,{0xb7,0x84,0x7f,0xfd,0xc4,0xb6,0x85,0x61}},
+        {0xa7af67cb,0x603b,0x4d42,{0xba,0x21,0x70,0xbf,0xb6,0x29,0x3f,0x96}},
+        {0xc5149b43,0xae85,0x4f53,{0x99,0x82,0xb9,0x43,0x35,0xd3,0xa9,0xe7}},
+        {0x44f0de6e,0x4d8c,0x4045,{0xa8,0xc7,0x4d,0xd1,0x68,0x85,0x6b,0x9e}}};
+    chos_efi_rng *rng=NULL;
+    if(!g_st->BootServices->LocateProtocol ||
+       g_st->BootServices->LocateProtocol(&protocol,NULL,(void **)&rng)!=EFI_SUCCESS || !rng || !rng->GetRNG)return;
+    for(unsigned i=0;i<4;++i){
+        zero_bytes(b->rng_seed,sizeof(b->rng_seed));
+        if(rng->GetRNG(rng,&algorithms[i],sizeof(b->rng_seed),b->rng_seed)==EFI_SUCCESS){
+            b->rng_seed_bytes=sizeof(b->rng_seed);b->rng_algorithm=i+1;return;
+        }
+    }
+    zero_bytes(b->rng_seed,sizeof(b->rng_seed));
+}
+
 EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_table) {
     uint8_t *kernel_file = NULL;
     size_t kernel_size = 0u;
@@ -981,6 +1006,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
         boot_info->installer_payload_size=payload_size;
     }
     if(boot_volume_is_nvme(image_handle))boot_info->flags|=CHOS_BOOT_FLAG_BOOT_NVME;
+    capture_rng_seed(boot_info);
     capture_firmware_tables(boot_info);
     read_display_request(image_handle);
     capture_gop(boot_info);

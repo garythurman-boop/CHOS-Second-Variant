@@ -126,3 +126,8 @@ retained failures. It explicitly leaves full Stage 3 and binary release incomple
 A further [native clock prerequisite](NATIVE_CLOCK_API.md) exposes bounded
 read-only monotonic/UTC status and actual C/C++ time conversions. It does not
 close authenticated-clock, secure entropy, TLS or modern-engine gates.
+
+The user reserves **0.50.0** for full revised Stage3 completion. A subsequent
+[firmware entropy prerequisite](FIRMWARE_ENTROPY.md) has QEMU/host evidence, but
+Fusion availability, live reseeding/lifetime policy, TLS and the other mandatory
+gates remain open. Neither the version nor binary hold is advanced for it.

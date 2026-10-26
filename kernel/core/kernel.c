@@ -28,6 +28,7 @@
 #include "chos/nvme.h"
 #include "chos/installer_io.h"
 #include "chos/entropy.h"
+#include "chos/seed_rng.h"
 #include "chos/virtio_transport.h"
 #include "chos/xhci.h"
 #include "chos/build_stamp.h"
@@ -375,6 +376,10 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
         }
         if (console_ready) uefi_console_write("[OK] Kernel heap initialized.\n");
 
+        if(boot_info->rng_seed_bytes==CHOS_SEED_RNG_BYTES && boot_info->rng_algorithm>=1u && boot_info->rng_algorithm<=4u){
+            int seeded=chos_seed_rng_init((uint8_t *)(uintptr_t)boot_info->rng_seed,CHOS_SEED_RNG_BYTES);
+            if(console_ready)uefi_console_write(seeded?"[OK] Firmware RNG seed consumed and erased; bounded HMAC-DRBG available.\n":"[WARN] Firmware RNG seed rejected; no software entropy fallback.\n");
+        }
         int firmware_mmio=uefi_fdt_has_virtio_mmio(boot_info);
         /* Build translations before starting native DMA. Unsupported metadata
          * leaves the proven MMU-off recovery desktop available. */
@@ -487,7 +492,7 @@ void kernel_main(uintptr_t boot_hint, uint64_t boot_source_magic) {
                     uefi_console_write("[INFO] No usable VirtIO input queues: ");
                     uefi_console_write(chos_input_last_error()); uefi_console_write("\n");
                 }
-                if (chos_entropy_init()) uefi_console_write("[OK] VirtIO RNG initialized; nonblocking hardware-backed entropy is available.\n");
+                if (chos_entropy_init()) uefi_console_write("[OK] Entropy initialized; nonblocking secure-source service is available.\n");
                 else { uefi_console_write("[ .. ] VirtIO RNG unavailable: "); uefi_console_write(chos_entropy_last_error()); uefi_console_write("\n"); }
             } else {
                 (void)chos_entropy_init();

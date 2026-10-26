@@ -11,6 +11,8 @@ int chos_boot_info_validate(const chos_boot_info_t *info) {
         info->version != CHOS_BOOT_INFO_VERSION ||
         info->struct_size < sizeof(*info) ||
         (info->flags & CHOS_BOOT_FLAG_UEFI) == 0u) return 0;
+    if((info->rng_seed_bytes!=0u && info->rng_seed_bytes!=64u) ||
+       (info->rng_seed_bytes==0u ? info->rng_algorithm!=0u : info->rng_algorithm<1u || info->rng_algorithm>4u))return 0;
     if (info->memory_map_address == 0u || info->memory_map_size == 0u ||
         info->memory_descriptor_size < sizeof(chos_efi_memory_descriptor_t) ||
         info->memory_descriptor_size > 4096u ||
