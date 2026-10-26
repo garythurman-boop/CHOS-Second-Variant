@@ -115,11 +115,12 @@
       ],
       "limits": [
         "static C++20 no-exceptions/no-RTTI container/allocation profile,not full libc++/libc++abi",
-        "std::thread/mutex runtime,global constructors/static guards and process atexit remain absent",
+        "std::thread/mutex runtime,global constructors and process atexit remain absent",
         "binary128 default sort requires compiler-rt __lttf2 and is not linked by this profile",
         "no stdio streams/formatting/locale/full POSIX or JavaScriptCore execution",
         "new Fusion/physical behavior NOT RUN; modern browser and Stage3 incomplete"
-      ]
+      ],
+      "original_result_sha256": "79b133e20782dafb80bede38ec4c91b9583ecbfd4fcf4d05c70b3f9f5e26e689"
     },
     "guard-tls6-uefi": {
       "status": "PASS",
@@ -733,5 +734,11 @@
     "production trust/time/reseed policy and browser TLS integration",
     "real Pi5 SDIO host/firmware/authentication/wireless connectivity",
     "IPv6 settings/multiple interfaces and independent new Fusion/Pi/laptop qualification"
-  ]
+  ],
+  "metadata_corrections": {
+    "guest_labels": [
+      "guard-cxx-uefi"
+    ],
+    "reason": "Remove an obsolete runner limit saying static guards are absent. Native guard runtime and ELF match the independently accepted guard evidence. Raw guest JSON/logs remain unchanged; test criteria/status/observed measurements are unchanged."
+  }
 }

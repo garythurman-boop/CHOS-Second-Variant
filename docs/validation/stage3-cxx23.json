@@ -1,0 +1,130 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "scope": "same bounded static libc++ allocation/container subset compiled and executed as C++23; exact JSC integer128 type/alignment compile probe,not full C++23 conformance/ABI or engine",
+  "source_sha256": {
+    "docs/dependencies/libcxx-native.json": "64c101693e234dbb2931dffc3a2ded570543f29eaaf3d1ded4e3dec07d249667",
+    "userland/libcxx/Makefile.inc": "4429714cd3940a4b35922a381b4c0f80ab37370d4d26508789cc5d039a7962d6",
+    "userland/examples/cxx_test.cpp": "a5de09aa6f7cb89d5f085c481acce15e3ba4fe7b5a79e573565c1111ef73f21c",
+    "tests/qemu_cxx.py": "88a189eca8b3bf18d47fa604bcbcb2d895ef2f488ec6c536f3866a9a737b495e"
+  },
+  "dependency_manifest": "docs/dependencies/libcxx-native.json",
+  "original_upstream_files": 656,
+  "added_headers": [
+    "include/__algorithm/fold.h",
+    "include/__algorithm/ranges_contains_subrange.h",
+    "include/__algorithm/ranges_ends_with.h",
+    "include/__algorithm/ranges_starts_with.h",
+    "include/__algorithm/ranges_find_last.h",
+    "include/__utility/to_underlying.h"
+  ],
+  "guest_results": {
+    "cxx23-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "cxx_standard": "23",
+      "application_sha256": "c9eefd480cef83f09b6c835d202f64cd597adcf0fe25bb704cafcefd4a2774c0",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117497,
+      "free_pages_after": 117497,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 201,
+      "checks": [
+        "native array/vector/string,default integer sort/search,unique_ptr and RAII",
+        "regular/array/aligned/nothrow new/delete,handler retry and overflow refusal",
+        "three raw pthread workers use native containers and lock-free atomics across scheduling",
+        "file rename/read/remove,empty/nonempty directory,missing/protected paths and no-replace destination",
+        "three worker lifecycles and repeated processes return heap and PMM frames",
+        "OOM abort and hardening bounds fault are process-local with successful relaunch",
+        "no unresolved imports,global initarray or PT_TLS dependency; no retained futex waiters"
+      ],
+      "limits": [
+        "static C++20/23 no-exceptions/no-RTTI container/allocation profile,not full libc++/libc++abi",
+        "std::thread/mutex runtime,global constructors and process atexit remain absent",
+        "binary128 default sort requires compiler-rt __lttf2 and is not linked by this profile",
+        "no stdio streams/formatting/locale/full POSIX or JavaScriptCore execution",
+        "new Fusion/physical behavior NOT RUN; modern browser and Stage3 incomplete"
+      ],
+      "original_result_sha256": "1c88658591f722f1b85b92408430ebf9adff0fe1ac6d9125081fe7d395b922e4"
+    },
+    "cxx23-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "cxx_standard": "23",
+      "application_sha256": "c9eefd480cef83f09b6c835d202f64cd597adcf0fe25bb704cafcefd4a2774c0",
+      "cold_free_pages": 500528,
+      "free_pages_before": 500326,
+      "free_pages_after": 500326,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 201,
+      "checks": [
+        "native array/vector/string,default integer sort/search,unique_ptr and RAII",
+        "regular/array/aligned/nothrow new/delete,handler retry and overflow refusal",
+        "three raw pthread workers use native containers and lock-free atomics across scheduling",
+        "file rename/read/remove,empty/nonempty directory,missing/protected paths and no-replace destination",
+        "three worker lifecycles and repeated processes return heap and PMM frames",
+        "OOM abort and hardening bounds fault are process-local with successful relaunch",
+        "no unresolved imports,global initarray or PT_TLS dependency; no retained futex waiters"
+      ],
+      "limits": [
+        "static C++20/23 no-exceptions/no-RTTI container/allocation profile,not full libc++/libc++abi",
+        "std::thread/mutex runtime,global constructors and process atexit remain absent",
+        "binary128 default sort requires compiler-rt __lttf2 and is not linked by this profile",
+        "no stdio streams/formatting/locale/full POSIX or JavaScriptCore execution",
+        "new Fusion/physical behavior NOT RUN; modern browser and Stage3 incomplete"
+      ],
+      "original_result_sha256": "e06de12cf120677db721370cd2420429c668642899fd293b44814a47d4ec0b33"
+    },
+    "cxx23-cxx20-regression": {
+      "status": "PASS",
+      "mode": "direct",
+      "cxx_standard": "20",
+      "application_sha256": "0aa8f8600a38472011d4eeb52960bf05aba4f5c0a317eb32440b6bfaf2c69410",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117497,
+      "free_pages_after": 117497,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 201,
+      "checks": [
+        "native array/vector/string,default integer sort/search,unique_ptr and RAII",
+        "regular/array/aligned/nothrow new/delete,handler retry and overflow refusal",
+        "three raw pthread workers use native containers and lock-free atomics across scheduling",
+        "file rename/read/remove,empty/nonempty directory,missing/protected paths and no-replace destination",
+        "three worker lifecycles and repeated processes return heap and PMM frames",
+        "OOM abort and hardening bounds fault are process-local with successful relaunch",
+        "no unresolved imports,global initarray or PT_TLS dependency; no retained futex waiters"
+      ],
+      "limits": [
+        "static C++20/23 no-exceptions/no-RTTI container/allocation profile,not full libc++/libc++abi",
+        "std::thread/mutex runtime,global constructors and process atexit remain absent",
+        "binary128 default sort requires compiler-rt __lttf2 and is not linked by this profile",
+        "no stdio streams/formatting/locale/full POSIX or JavaScriptCore execution",
+        "new Fusion/physical behavior NOT RUN; modern browser and Stage3 incomplete"
+      ],
+      "original_result_sha256": "9971e9f684e3cc06d8ec0edc63175f249281f14b8cfeb00da39d6a8b3f3644f4"
+    }
+  },
+  "build_log": {
+    "path": "cxx23-build1.log",
+    "status": "PASS",
+    "sha256": "81d4e67a59d3d73c67851c9c9570ee17051084c6ae3e429fb26943949fa28716"
+  },
+  "jsc_type_probe": "PASS",
+  "jsc_evidence": "docs/validation/stage3-jsc-bringup.json",
+  "existing_runtime_regression": "docs/validation/stage3-static-guards.json",
+  "limits": [
+    "C++23 dependency-header additions are not conformance tests for every facility they declare",
+    "integer128 type/alignment compilation is not compiler-rt arithmetic/division qualification",
+    "global constructors/atexit,exceptions,std::thread/mutex/full C++ ABI/POSIX and engine-sized memory/loader remain open",
+    "actual JavaScriptCore/modern browser build and integration,production trust policy and Pi5 wireless remain incomplete",
+    "new Fusion/physical qualification NOT RUN; no binaries published"
+  ],
+  "metadata_corrections": {
+    "guest_labels": [
+      "cxx23-direct",
+      "cxx23-uefi",
+      "cxx23-cxx20-regression"
+    ],
+    "reason": "Remove an obsolete runner limit saying static guards are absent. Native guard runtime and ELF match the independently accepted guard evidence. Raw guest JSON/logs remain unchanged; test criteria/status/observed measurements are unchanged."
+  }
+}

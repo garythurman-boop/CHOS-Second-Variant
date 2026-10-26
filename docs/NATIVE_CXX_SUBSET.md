@@ -91,3 +91,10 @@ production trust/time/reseed policy and real Pi5 wireless remain required.
 The subsequent [static-guard iteration](NATIVE_STATIC_GUARDS.md) closes the local-
 initialization-guard gap with direct/UEFI contention and exit/retry evidence.
 The other full C++ ABI/engine limits above remain active.
+
+The subsequent [JavaScriptCore bring-up](JAVASCRIPTCORE_BRINGUP.md) adds six original
+headers, extending the closure to656 files and qualifying the same bounded
+container/allocation profile under C++23. Direct/UEFI C++23 tests and the engine's
+integer128 type/alignment compile probe pass. Added headers are dependencies,
+not conformance evidence for every new ranges/utility facility. Full C++23/ABI
+and engine integration remain open. See validation/stage3-cxx23.json.

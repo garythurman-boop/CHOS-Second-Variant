@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "role": "reproducible upstream-source dependency triage,not production engine vendoring/build",
+  "project": "WPE WebKit / JavaScriptCore",
+  "tag": "wpewebkit-2.54.2",
+  "tag_object": "6c294e37d744618c3f9983b44c7759b8265ecf63",
+  "commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "remote": "https://github.com/WebKit/WebKit.git",
+  "checkout": "partial Git clone with actual Source/cmake,WTF,JavaScriptCore and Tools/CMake sources; root tracked files included",
+  "source_files_sha256": {
+    "CMakeLists.txt": "6261cdbed79a26d31a1a4c04811eadddc69dbccb4d0770db63f6c348375890a4",
+    "Source/cmake/WebKitCommon.cmake": "fd9902edefdcee19c623f6bb5d6e88bab4774245ac8042d188e16bae09963469",
+    "Source/cmake/OptionsCommon.cmake": "d28e8c30b3a4ebd4b521ff5f027bd56ad2f4b1a325ca45bac4163ff517d54ade",
+    "Source/cmake/OptionsJSCOnly.cmake": "88beef9d63b1e160e83512eb8afe5459794f91c2006e4a0b77dcfd0bc3085af2",
+    "Source/JavaScriptCore/CMakeLists.txt": "750e70beabfa6c7e5c1f4016567a8aa26a3d37a7cbb22fdc99c7d9b247031ac8",
+    "Source/WTF/CMakeLists.txt": "c71386f4505f1b354a3412fc7fca58076f583f548182fd340596c6b343bacfe0"
+  },
+  "patch": "ports/webkit/patches/0001-recognize-chos-cmake-identity.patch",
+  "patch_sha256": "ab6748690995ee3b67becf482a6e4eaa32e577ddfc7fc18f641e233452fdc4fa",
+  "patched_files_sha256": {
+    "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c"
+  },
+  "signature_verification": "Not claimed; HTTPS Git object identity and exact inspected file/patch hashes recorded. Full license/dependency/release qualification remains open."
+}

@@ -6,6 +6,9 @@
 #include <atomic>
 #include <new>
 #include <limits>
+#if __cplusplus>=202302L
+#include <utility>
+#endif
 #include <pthread.h>
 #include <cstring>
 #include <cstdint>
@@ -73,6 +76,12 @@ extern "C" int main(int argc,char **argv){
   if(!std::strcmp(argv[1],"bounds")){std::vector<int> v{1,2};volatile size_t index=3;return v[index];}
   return fail(__LINE__);
  }
+#if __cplusplus>=202302L
+ enum class Mode:unsigned{native=73};CHECK(std::to_underlying(Mode::native)==73);
+ static_assert(std::numeric_limits<__int128_t>::is_specialized&&std::numeric_limits<__int128_t>::is_signed);
+ static_assert(std::numeric_limits<__uint128_t>::is_specialized);
+ static_assert(alignof(std::pair<long long,__int128_t>)==alignof(__int128_t));
+#endif
  static_assert(std::atomic<unsigned>::is_always_lock_free);
  static_assert(std::atomic<uint64_t>::is_always_lock_free);
  CHECK(containers(11)==0&&live==0&&files()==0);

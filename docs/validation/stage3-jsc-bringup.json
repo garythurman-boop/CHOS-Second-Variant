@@ -1,0 +1,59 @@
+{
+  "status": "CONFIGURATION_INCOMPLETE",
+  "stage3_complete": false,
+  "engine_built": false,
+  "engine_executed": false,
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "source_manifest": "docs/dependencies/webkit-jsc-bringup.json",
+  "command": [
+    "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+    "-S",
+    "/workspace/chos-reference/webkit-2.54.2",
+    "-B",
+    "/workspace/chos-evidence/jsc-cxx23-preflight/cmake",
+    "-G",
+    "Ninja",
+    "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+    "-DRuby_EXECUTABLE=/workspace/chos-tools/root/usr/bin/ruby3.3",
+    "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/webkit/chos-compile-preflight.cmake",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DPORT=JSCOnly",
+    "-DENABLE_STATIC_JSC=ON",
+    "-DENABLE_JIT=OFF",
+    "-DUSE_SYSTEM_MALLOC=ON",
+    "-DENABLE_TOOLS=OFF"
+  ],
+  "returncode": 1,
+  "seconds": 8.134378949005622,
+  "log_sha256": "8c8c0a80a012e5a01190b51a44e76a9fa0c13fe8e921a9912daecd0b1e65f83f",
+  "tool_versions": {
+    "cmake": "cmake version 3.31.6",
+    "ninja": "1.11.1.git.kitware.jobserver-1",
+    "ruby": "ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]",
+    "clang": "Debian clang version 19.1.7 (3+b1)",
+    "clang++": "Debian clang version 19.1.7 (3+b1)"
+  },
+  "int128_type_compile_probe": "PASS",
+  "compile_only_cmake_checks": true,
+  "target_library_search": "CHOS sysroot only; host executables permitted",
+  "icu_missing": true,
+  "limits": [
+    "Static try-compile results do not prove executable linking or runtime support.",
+    "CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.",
+    "The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.",
+    "No WebCore/WPE rendering,JavaScript execution,browser or conformance result."
+  ],
+  "evidence_directory": "/workspace/chos-evidence/jsc-cxx23-preflight",
+  "source_sha256": {
+    "tools/preflight_javascriptcore.py": "fd7f179747047db12c01a6fe95055c964fa1f532b28b77568b9aa793c5a298a7",
+    "ports/webkit/chos-compile-preflight.cmake": "4275321ea71465b048602105098c5d659774bbb14a942039f7a77c03f6cc8014",
+    "ports/webkit/cmake/Platform/CHOS.cmake": "64809dd040fa4452bf250abf01ec189d012e16d271b1c1e4f5556ea49b39a6b9",
+    "ports/webkit/patches/0001-recognize-chos-cmake-identity.patch": "ab6748690995ee3b67becf482a6e4eaa32e577ddfc7fc18f641e233452fdc4fa"
+  },
+  "retained_attempts": {
+    "jsc-configure-vanilla.log": "FAIL: upstream unknown Generic OS",
+    "jsc-configure-native1.log": "FAIL: missing host Ruby generator",
+    "jsc-configure-native2.log": "FAIL: actual missing target ICU; initial missing C++23 header diagnosed in CMakeConfigureLog.yaml",
+    "jsc-reproducible-preflight": "CONFIGURATION_INCOMPLETE,initial C++20 closure still failed integer128 type probe. Retained unchanged; superseded by jsc-cxx23-preflight where the type probe passes and ICU is still missing."
+  }
+}

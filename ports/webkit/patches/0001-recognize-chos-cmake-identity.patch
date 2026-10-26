@@ -1,0 +1,14 @@
+diff --git a/Source/cmake/WebKitCommon.cmake b/Source/cmake/WebKitCommon.cmake
+index d96e18503607a2775b44c2c0bf42eb5ea718b900..f258145eca3c5b11a558d97c1e7b7c1ed103f514 100644
+--- a/Source/cmake/WebKitCommon.cmake
++++ b/Source/cmake/WebKitCommon.cmake
+@@ -209,6 +209,9 @@ if (NOT HAS_RUN_WEBKIT_COMMON)
+         set(WTF_OS_WINDOWS 1)
+     elseif (CMAKE_SYSTEM_NAME MATCHES "Fuchsia")
+         set(WTF_OS_FUCHSIA 1)
++    elseif (CMAKE_SYSTEM_NAME STREQUAL "CHOS")
++        # Explicit bring-up identity; do not inherit Linux/UNIX feature claims.
++        set(WTF_OS_CHOS 1)
+     else ()
+         message(FATAL_ERROR "Unknown OS '${CMAKE_SYSTEM_NAME}'")
+     endif ()

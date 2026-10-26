@@ -262,3 +262,14 @@ compiler-TLS, C++ containers and verified IPv6 TLS regressions pass. See
 missing-local-guards status. Global constructor/atexit, complete C++/POSIX and
 engine-sized memory/events/loader, actual browser, production trust and wireless
 requirements remain open. Binary publication remains held.
+
+[Actual JavaScriptCore upstream-source bring-up](JAVASCRIPTCORE_BRINGUP.md) now
+reproduces configuration against inspected WebKit2.54.2 source with an explicit
+CHOS identity and isolated target-library searches. Configuration is INCOMPLETE:
+native ICU data/i18n/uc are absent and further POSIX/C++/loader work remains.
+Six original headers extend the closure to C++23; native C++23 container tests
+and the exact upstream integer128 type/alignment compile probe now pass. Compiler-only CMake thread/library
+fallbacks are explicitly not accepted as link evidence. No engine binary,
+JavaScript execution, rendering or browser-conformance result is claimed; see
+[the retained nonzero result](validation/stage3-jsc-bringup.json). The binary hold
+and all modern-browser/wireless acceptance gates remain active.
