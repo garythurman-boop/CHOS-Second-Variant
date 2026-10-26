@@ -1498,3 +1498,5 @@ $(BUILD)/userland/fpu_probe.o: userland/examples/fpu_probe.S
 $(BUILD)/userland/fpu_test.elf: $(BUILD)/userland/fpu_probe.o $(BUILD)/userland/fpu_test.o $(BUILD)/userland/native_abi.o userland/native.ld
 	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/fpu_probe.o $(BUILD)/userland/fpu_test.o $(BUILD)/userland/native_abi.o
 test test-userland: $(BUILD)/userland/fpu_test.elf
+
+include userland/tls/Makefile.inc

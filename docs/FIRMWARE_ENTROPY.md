@@ -9,7 +9,7 @@ are never called by the kernel. Boot-info validation checks size/algorithm pairs
 After heap initialization, the kernel consumes/erases a valid seed once. It refuses
 all-zero or repeated32-byte blocks; those checks do not certify entropy quality.
 Pinned MbedTLS3.6.7 LTS implements HMAC-DRBG/SHA256, with SHA256 selected explicitly.
-The26-file compiled closure is byte-identical to upstream commit
+The boot profile's26-file compiled closure is byte-identical to upstream commit
 068ff080b369adfac81509f9b57b2afabaf82dc5, selected under Apache-2.0; full dual-license
 text is retained. No cryptographic primitive is written in CHOS. Platform adapters
 provide allocation, private string comparison, assertions and nonverbose self-test
@@ -52,3 +52,8 @@ Use `make test-seed-rng test-seed-rng-sanitize test-crypto-integrity` and
 Source provenance and exact test results are recorded in validation/stage3-entropy.json.
 Monitor upstream LTS security updates and repeat provenance/negative tests before
 shipping; do not treat a permanently frozen version as a security update policy.
+
+The shared upstream directory now also contains the native TLS client closure.
+The manifest records the original boot-profile files separately; TLS does not
+change the kernel DRBG configuration or enable kernel-side secure browsing. See
+[NATIVE_TLS_CLIENT.md](NATIVE_TLS_CLIENT.md) for its tested scope and open policy.

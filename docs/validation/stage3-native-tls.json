@@ -1,0 +1,757 @@
+{
+  "stage3_complete": false,
+  "binary_publication": "HELD",
+  "completion_version_reserved": "0.50.0",
+  "scope": "real native TLS1.2 prerequisite, not modern-browser or production trust policy completion",
+  "source_sha256": {
+    "userland/tls/client.c": "a85913b5397a3e519f082638557fc1ce95b277e84b33d272a9d707085fa40d5a",
+    "userland/tls/platform.c": "67092478982fbbbd4ff1dbe4a28f90de7a704d75c6f01dd0766a3b71de7705d3",
+    "userland/tls/include/chos_tls.h": "4068e7d139b8ec655b361d1ddea8d41cd6ba8cbb8531605dff1b4c03dc685ec9",
+    "userland/tls/include/chos_tls_config.h": "e95378cf6e8013baecf5fb48a78e253e1631f7436abf9bd8d91b79daa2f357e4",
+    "userland/tls/Makefile.inc": "44e205330a3a3208dc73b39dbeee123e06e0aa2298244958170eeaa07901b19b",
+    "userland/examples/tls_test.c": "32e21b6c99ecc692f98e3f53c13295f034b31fac1a7acf66645f60843fdf3e4b",
+    "tests/qemu_tls.py": "254612dba7c75392bbd9232b507356daf6fcb07f12ebc6a5ed48f0fc0fda3867",
+    "tests/test_tls_x509.c": "4a228538c5c4a68306d32d3ff2ae0db782ec08ed8f80ae623001e73d3665cfcb",
+    "tests/tls_fixture_certs.py": "3eac756f7726e23b412db508213fffcb8c00bc0aee8abbc64d82960799c9017b",
+    "tests/run_tls_x509.py": "04933f51e2f010034dc695578a86bd06e223289b0d81ab19b21b78a3b2085e15",
+    "docs/dependencies/mbedtls.json": "8c51bebfd38d42a5ed2c22430d165683b0242ce8da4bf8bad1b83b9498606e39"
+  },
+  "host_and_sanitizer": [
+    "tls-host-full1.log",
+    "tls-sanitize-full1.log",
+    "tls-focused-qualified.log",
+    "tls-smoke1.log"
+  ],
+  "guest_profiles": [
+    {
+      "evidence": "/workspace/chos-evidence/tls-direct-refill-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "profile": "native TLS1.2 ECDHE-ECDSA/RSA AES128/256-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "03bbd26e3383a143163cff48e9419adf39bd023a08a23ff8424642e47956db75",
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 117703,
+        "free_pages_before": 117481,
+        "free_pages_after": 117481,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6077426190022379,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5261857610021252,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5258137159980834,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6672963059972972,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.24306902001262642,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.16206120899005327,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.2636980139941443,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.26392972499888856,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.24340144199959468,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.2031189160043141,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5480533189984271,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.098871371999849,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.14200123900081962,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.1420298820012249,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5477754839957925,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "TLS1.3, browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "9676a2f156c2d29036c2f83e6535c24575beb7bd7c066d75217197b9b02b1e2e"
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/tls-uefi-refill-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.2 ECDHE-ECDSA/RSA AES128/256-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "03bbd26e3383a143163cff48e9419adf39bd023a08a23ff8424642e47956db75",
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500541,
+        "free_pages_before": 500319,
+        "free_pages_after": 500319,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6271309279982233,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5480880590039305,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5261846320063341,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6682122460042592,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.2626261510013137,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.22286174999317154,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.28341961999831256,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.30376302399963606,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.3039587030070834,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.223066723003285,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6081869089975953,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.118335355000454,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.14219204500841442,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.1419931410055142,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.567673821002245,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.2",
+            "cipher": "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "alpn": "http/1.1"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "TLS1.3, browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "845181e417a6a03b14d2376191ac004010957185d5b2d465a29f526fabd4d573",
+        "iso_sha256": "9a9ae8798204d5944df5614f7a8cb0d5663db12f6738c0f219d892e7cb72a5f1",
+        "iso_embedded_kernel_sha256": "845181e417a6a03b14d2376191ac004010957185d5b2d465a29f526fabd4d573",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/tls-uefi-no-entropy-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.2 ECDHE-ECDSA/RSA AES128/256-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "03bbd26e3383a143163cff48e9419adf39bd023a08a23ff8424642e47956db75",
+        "missing_clock": false,
+        "missing_entropy": true,
+        "cold_free_pages": 501129,
+        "free_pages_before": null,
+        "free_pages_after": 500907,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 992,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.16219209400878754,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "TLS1.3, browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "845181e417a6a03b14d2376191ac004010957185d5b2d465a29f526fabd4d573",
+        "iso_sha256": "9a9ae8798204d5944df5614f7a8cb0d5663db12f6738c0f219d892e7cb72a5f1",
+        "iso_embedded_kernel_sha256": "845181e417a6a03b14d2376191ac004010957185d5b2d465a29f526fabd4d573",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "evidence": "/workspace/chos-evidence/tls-uefi-no-clock-qualified/result.json",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.2 ECDHE-ECDSA/RSA AES128/256-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "03bbd26e3383a143163cff48e9419adf39bd023a08a23ff8424642e47956db75",
+        "missing_clock": true,
+        "missing_entropy": false,
+        "cold_free_pages": 500541,
+        "free_pages_before": null,
+        "free_pages_after": 500319,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 991,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.12175721400126349,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "TLS1.3, browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "845181e417a6a03b14d2376191ac004010957185d5b2d465a29f526fabd4d573",
+        "iso_sha256": "9a9ae8798204d5944df5614f7a8cb0d5663db12f6738c0f219d892e7cb72a5f1",
+        "iso_embedded_kernel_sha256": "845181e417a6a03b14d2376191ac004010957185d5b2d465a29f526fabd4d573",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "retained_failures": [
+    {
+      "evidence": "tls-build1.log / tls-build2.log / tls-build3.log / tls-native-build1.log",
+      "diagnosis": "cross compile exposed missing assert/format declarations and time adapter; supplied narrow platform declarations and real clock adapter; upstream bytes unchanged"
+    },
+    {
+      "evidence": "tls-native-build3.log",
+      "diagnosis": "added upstream pk_ecc unit and selected upstream MBEDTLS_NO_UDBL_DIVISION to avoid unavailable compiler128-bit division helper"
+    },
+    {
+      "evidence": "tls-direct1/failure.txt",
+      "diagnosis": "fixture initially exceeded the existing256-byte file READ syscall bound; read in bounded chunks instead"
+    },
+    {
+      "evidence": "tls-uefi-responsive-final/failure.txt",
+      "diagnosis": "a pending VirtIO RNG refill correctly failed initialization after repeated handshakes; fixture caller now retries only the explicit entropy error, at most100 attempts separated by a scheduler tick; no fallback or certificate relaxation"
+    }
+  ],
+  "limits": [
+    "TLS1.3 not yet ported",
+    "caller-supplied ephemeral roots only; production CA storage/update policy open",
+    "clock availability not authenticated time; production provisioning open",
+    "finite firmware entropy budget, production reseeding open",
+    "not integrated WPE/Soup or browser, full modern engine or live Pi5 Wi-Fi",
+    "new Fusion/physical TLS NOT RUN"
+  ],
+  "desktop_during_tls_timeout": {
+    "status": "PASS",
+    "method": "F1 keyboard event opens real Diagnostics before the peer timeout; screenshot retained",
+    "evidence": "tls-uefi-refill-qualified/responsive-during-tls-stall.ppm"
+  }
+}

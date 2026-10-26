@@ -148,3 +148,11 @@ exception state, fresh-process zeroing and live concurrent EL0 arithmetic/contex
 tests in direct and UEFI QEMU. This closes another runtime prerequisite, while
 engine-sized memory, threads/POSIX, actual engine integration, TLS and live Wi-Fi
 remain open. Binary publication remains held.
+
+[NATIVE_TLS_CLIENT.md](NATIVE_TLS_CLIENT.md) now records an actual cross-compiled,
+isolated TLS1.2 client using the pinned MbedTLS dependency. Local direct/UEFI
+certificate/hostname/purpose/date, SNI/ALPN, four ciphersuites, truncation, timeout,
+exhaustion/cancellation and missing clock/entropy fixtures are implemented.
+This is not browser integration, TLS1.3, a production CA trust/update policy or
+authenticated time. WPE/Soup integration, the modern engine and live Pi5 wireless
+remain active gates. Recovery-preview HTTPS remains blocked and binaries held.
