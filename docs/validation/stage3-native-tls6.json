@@ -1837,7 +1837,7 @@
     "wire capture contains actual Ethernet IPv6 TCP SYN/data; host verifies encrypted request and response",
     "same process has simultaneous IPv4 and IPv6 contexts; independent family-specific status/send/read/abort",
     "pending TCP6 entropy refill retains one socket and deadline with nonblocking retry",
-    "versioned IPv6 status ABI checked; unspecified/multicast constructor inputs rejected",
+    "versioned IPv6 status ABI checked during actual transport",
     "negative certificates/issuers, malformed records, unauthenticated EOF, timeouts, quota/cancellation and cleanup retain existing semantics",
     "unchanged IPv4 client passes full UEFI TLS regression",
     "clock/entropy absence emits no TCP6 or peer connection"
@@ -1848,5 +1848,8 @@
     "production CA/time/entropy lifetime policy open",
     "not a modern browser engine or live Pi5 wireless implementation",
     "new Fusion/physical IPv6 TLS NOT RUN"
+  ],
+  "code_reviewed_contracts": [
+    "unspecified/multicast IPv6 constructor inputs rejected before allocation/transport; these branches were not separately live fault-injected"
   ]
 }
