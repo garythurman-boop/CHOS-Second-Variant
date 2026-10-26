@@ -1,0 +1,16 @@
+{
+  "version": "19.1.7",
+  "tag": "llvmorg-19.1.7",
+  "commit": "cd708029e0b2869e80abe31ddb175f7c35361f90",
+  "repository": "https://github.com/llvm/llvm-project",
+  "license": "Apache-2.0 WITH LLVM-exception",
+  "scope": "unmodified emulated compiler TLS implementation and internal header closure; compiled for native CHOS pthreads, not ELF PT_TLS or full compiler-rt/libc++",
+  "files": {
+    "LICENSE.TXT": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+    "lib/builtins/emutls.c": "a4437f3e329a0835adbc7df38e36df12f358d05c073b11813c409f849c2345d2",
+    "lib/builtins/int_endianness.h": "ec5175561075845b7b16a92ad5ecdfd42a284de2736dd07e4ca7011b75c37709",
+    "lib/builtins/int_lib.h": "b31130f10484636895daa13b91b63d47ea82b45547f29e4dd136b48a67854d30",
+    "lib/builtins/int_types.h": "b4b768e1b2251df4c0161b4c1f120417500ff4883b7008120104d042eeb2151f",
+    "lib/builtins/int_util.h": "63d06198ab720a75c20bfd84be895c2746581b129168bae6201e7384bbb0473b"
+  }
+}

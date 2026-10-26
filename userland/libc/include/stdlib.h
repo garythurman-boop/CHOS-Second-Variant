@@ -10,6 +10,7 @@ void *calloc(size_t,size_t);
 void *realloc(void *,size_t);
 void *aligned_alloc(size_t,size_t);
 int posix_memalign(void **,size_t,size_t);
+void abort(void) __attribute__((noreturn));
 #ifdef __cplusplus
 }
 #endif

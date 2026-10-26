@@ -1,7 +1,9 @@
 # Revised Stage 3 current evidence
 
-Stage 3 is **not complete**. The revised prompt's modern browser, verified TLS,
-complete isolation/runtime and real Pi 5 wireless requirements remain active.
+Stage 3 is **not complete**. The revised prompt's modern browser, integrated
+production TLS policy, complete isolation/runtime and real Pi 5 wireless
+requirements remain active. Native TLS certificate validation has separate
+component evidence below; it is not the integrated browser deliverable.
 The earlier machine-readable [results](validation/stage3-input-ipv6.json) preserve
 that component baseline and open gates and distinguish target reports from automated guest evidence.
 
@@ -103,9 +105,10 @@ matched tests verify actual DHCP/DNS/HTTP traffic through isolated browser windo
 
 * Integrate a maintained genuine modern engine and demonstrate HTML/CSS/JavaScript,
   browser features and conformance in CHOS. No engine currently renders in CHOS.
-* Complete engine-sized memory/runtime, libc/C++/threads/futex/IPC/events/loader and
-  web-content permission/isolation boundaries. Current static ELF and tiny process
-  budgets are prerequisites rather than a browser-ready runtime.
+* Complete engine-sized memory/runtime, C++ standard library, POSIX/event/loader
+  APIs and web-content permission/isolation boundaries. Bounded native pthreads,
+  futexes, messages and compiler-emulated TLS now have component evidence. Current
+  static ELF and tiny process budgets are not a browser-ready runtime.
 * Complete browser integration of the tested native TLS1.2/1.3 transport,
   production trust roots/update/time policy, reseeding and reliable entropy on
   Fusion. Native certificate/hostname/date/failure fixtures now pass; they do not
@@ -209,3 +212,15 @@ Object lifetime/pending-write ownership and unrelated PSA consumers remain expli
 boundaries. This supersedes the earlier single-thread-only TLS status; production
 trust/time/reseed policy, modern engine/runtime and live wireless remain open.
 The binary hold and reserved completion version0.50.0 remain unchanged.
+
+The [compiler-emulated TLS runtime](COMPILER_TLS_RUNTIME.md) now runs real Clang
+C11/C++17 thread-local variables and C++ thread-local constructors/destructors on
+native pthreads. Pinned unmodified LLVM compiler-rt uses checked native adapters;
+compiler storage survives all four ordinary key-destructor passes and is reclaimed
+after join. Direct/UEFI tests exercise48 controls, alignment, isolation, main return/
+exit and bounded quota/cleanup failures. The initial weak startup regression was
+fixed, then host/sanitizer, raw-thread, pthread, HTTPS and typing regressions passed
+on corrected artifacts. See [exact evidence and retained failures](validation/stage3-compiler-tls.json).
+This is an explicit -femulated-tls static build profile, not PT_TLS/dynamic loading,
+a complete C++ standard library or a modern engine. Engine-sized runtime, browser,
+production trust/time and live wireless gates remain open; binaries remain held.

@@ -3,18 +3,24 @@
 The user-provided [revised specification](STAGE3_REVISED_PROMPT.md) supersedes the
 Stage 3 section of the earlier Word document. Full modern web rendering and real
 wireless support remain completion requirements. This document does not certify
-an engine port, Wi-Fi or TLS on CHOS.
+an engine port, Wi-Fi or an integrated production browser TLS policy on CHOS.
 
 ## Existing system to preserve
 
-Direct boot has an MMU, bounded CHCX v2 EL0 applications and a single-core task
-scheduler. UEFI uses a relocated PIE kernel, native PCI USB/NVMe/GOP and a polled
-GUI with MMU/cache disabled for identity DMA. UEFI EL0 scheduling is unavailable.
-Current CHCX applications have a 64 KiB image limit, 32 KiB maximum stack, bounded
-argument passing, no dynamic loader, no complete libc, no POSIX threads/futexes,
-no browser-sized user heap or mmap, no general IPC/shared-memory service and no
-modern-engine sandbox. These are implementation dependencies, not external-hardware
-blockers. A Linux ARM64 browser binary cannot run on this ABI.
+Direct and UEFI now have bounded isolated EL0 applications and a single-CPU
+preemptive scheduler. UEFI retains its relocated PIE kernel, native PCI USB/NVMe/
+GOP, identity DMA and disabled data caching, with CPU MMU isolation enabled in its
+scheduled profile. New source still needs independent Fusion qualification.
+CHCX retains its64KiB bound; static native ELF has a2MiB image span and4MiB owned
+frame quota. There are four processes,32KiB main stacks and up to three secondary
+join records per process. Native C allocation/errno, pthread synchronization,
+private futexes, bounded process messages and explicit compiler-emulated C/C++ TLS
+now have guest evidence. They do not provide engine-sized heaps/images, complete
+POSIX/events/shared-memory/descriptor passing, a dynamic loader, C++ standard
+library or a modern-engine sandbox. Native MbedTLS1.2/1.3 clients validate peers;
+production trust/time/reseed policy and engine integration remain open. These are
+implementation dependencies, not external-hardware blockers. A Linux ARM64 browser
+binary cannot run on this ABI.
 
 Preserve the validated direct/UEFI boot, installed NVMe/CHFS, genuine installer,
 power lifecycle, native USB, GOP sizing and existing VirtIO paths. Networking has

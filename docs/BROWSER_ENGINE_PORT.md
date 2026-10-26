@@ -177,3 +177,15 @@ Object lifetime/pending-write ownership and unrelated PSA consumers remain expli
 boundaries. This supersedes the earlier single-thread-only TLS status; production
 trust/time/reseed policy, modern engine/runtime and live wireless remain open.
 The binary hold and reserved completion version0.50.0 remain unchanged.
+
+The [compiler-emulated TLS runtime](COMPILER_TLS_RUNTIME.md) now runs real Clang
+C11/C++17 thread-local variables and C++ thread-local constructors/destructors on
+native pthreads. Pinned unmodified LLVM compiler-rt uses checked native adapters;
+compiler storage survives all four ordinary key-destructor passes and is reclaimed
+after join. Direct/UEFI tests exercise48 controls, alignment, isolation, main return/
+exit and bounded quota/cleanup failures. The initial weak startup regression was
+fixed, then host/sanitizer, raw-thread, pthread, HTTPS and typing regressions passed
+on corrected artifacts. See [exact evidence and retained failures](validation/stage3-compiler-tls.json).
+This is an explicit -femulated-tls static build profile, not PT_TLS/dynamic loading,
+a complete C++ standard library or a modern engine. Engine-sized runtime, browser,
+production trust/time and live wireless gates remain open; binaries remain held.

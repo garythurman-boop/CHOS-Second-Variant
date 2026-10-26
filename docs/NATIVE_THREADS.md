@@ -74,6 +74,10 @@ relocation support or the C++ thread_local runtime. Native libc uses that pointe
 for its documented TCB and per-thread errno. SVE/SME
 remain trapped and kernel C retains its integer-only register contract.
 
+The subsequent [compiler-emulated TLS profile](COMPILER_TLS_RUNTIME.md) uses the
+native TCB/pthread library for Clang-generated TLS and C++ thread-local cleanup.
+It does not change the kernel's opaque pointer or add ELF PT_TLS relocation support.
+
 ## Verification and remaining work
 
 Host/sanitizer tests check frame offsets, request width/overflow/alignment/version/

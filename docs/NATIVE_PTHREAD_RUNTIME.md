@@ -59,7 +59,9 @@ Detached threads and process-shared mutex/condition attributes return ENOTSUP.
 Robust/PI locks, cancellation, signals, priority/affinity, barriers, rwlocks and
 timed mutex APIs are not supplied. Unsupported functions are not exported as
 success stubs. This TCB is a native runtime layout, not ELF PT_TLS, compiler TLS
-relocations, `thread_local` destructors, libc++ or `std::thread` support. Raw SDK
+relocations, libc++ or `std::thread` support. The subsequent
+[compiler-emulated TLS profile](COMPILER_TLS_RUNTIME.md) supplies tested Clang
+thread-local values and C++ thread-local destructors through this runtime. Raw SDK
 threads using another opaque TCB cannot silently use this libc layout; the runtime
 fails closed on a mismatched TCB magic. Engine-sized memory and loader/runtime
 integration remain open.

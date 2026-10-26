@@ -112,3 +112,11 @@ class GuestUserProbe:
     def foreground(self):
         view=self.g.symbol('view')
         return next((c for c in self.clients() if c['window_id']==view),None)
+    def queued_events(self,pid):
+        stride,members=self.layout('gui_app_client_t')
+        for off in range(0,self.symbol_sizes['gui_app_clients'],stride):
+            size=max(members['active']+4,members['owner_pid']+4)
+            data=self.g.block('gui_app_clients',off,size=size)
+            if self.u32(data,members['active']) and self.u32(data,members['owner_pid'])==pid:
+                return int.from_bytes(self.g.block('gui_app_clients',off+members['event_count'],size=8),'little')
+        raise AssertionError('No active GUI client for process '+str(pid))

@@ -10,6 +10,7 @@ typedef struct {
  uint32_t tid,done,joining,once_depth,exiting;
  void *result;void *(*start)(void *);void *argument;
  uint64_t stack_base;size_t stack_bytes;
+ void *cxx_destructors;unsigned cxx_destructor_count;
  pthread_once_t *active_once[8];
  chos_specific_t specific[PTHREAD_KEYS_MAX];
 } chos_libc_tcb_t;
@@ -18,6 +19,8 @@ extern "C" {
 #endif
 chos_libc_tcb_t *__chos_libc_tls(void);
 void __chos_once_abandon(chos_libc_tcb_t *);
+int __chos_pthread_key_create_late(pthread_key_t *,void (*)(void *));
+void __chos_cxx_thread_finalize(chos_libc_tcb_t *);
 #ifdef __cplusplus
 }
 #endif

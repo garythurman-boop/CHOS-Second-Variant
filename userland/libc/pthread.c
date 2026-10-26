@@ -6,7 +6,7 @@
 #define ATTR_MAGIC UINT32_C(0x50544154)
 #define KEY_INDEX_BITS 6u
 #define KEY_GENERATION_MAX (UINT32_MAX>>KEY_INDEX_BITS)
-typedef struct {uint32_t generation,live;void (*destroy)(void *);} key_t;
+typedef struct {uint32_t generation,live,late;void (*destroy)(void *);} key_t;
 static key_t keys[PTHREAD_KEYS_MAX];
 static pthread_mutex_t keys_lock=PTHREAD_MUTEX_INITIALIZER;
 pthread_t pthread_self(void){return (pthread_t)(uintptr_t)__chos_libc_tls();}
@@ -22,13 +22,16 @@ static int key_lookup(pthread_key_t key,unsigned *index){
  if(slot>=PTHREAD_KEYS_MAX||!generation||!keys[slot].live||keys[slot].generation!=generation)return 0;
  *index=slot;return 1;
 }
-int pthread_key_create(pthread_key_t *out,void (*destroy)(void *)){
+static int key_create(pthread_key_t *out,void (*destroy)(void *),unsigned late){
  if(!out)return EINVAL;int rc=pthread_mutex_lock(&keys_lock);if(rc)return rc;
  unsigned i;for(i=0;i<PTHREAD_KEYS_MAX;i++)if(!keys[i].live&&keys[i].generation<KEY_GENERATION_MAX)break;
  if(i==PTHREAD_KEYS_MAX){pthread_mutex_unlock(&keys_lock);return EAGAIN;}
- ++keys[i].generation;keys[i].live=1;keys[i].destroy=destroy;*out=(keys[i].generation<<KEY_INDEX_BITS)|i;
+ ++keys[i].generation;keys[i].live=1;keys[i].late=late;keys[i].destroy=destroy;*out=(keys[i].generation<<KEY_INDEX_BITS)|i;
  pthread_mutex_unlock(&keys_lock);return 0;
 }
+int pthread_key_create(pthread_key_t *out,void (*destroy)(void *)){return key_create(out,destroy,0);}
+/* Compiler TLS storage must survive every ordinary pthread destructor pass. */
+int __chos_pthread_key_create_late(pthread_key_t *out,void (*destroy)(void *)){return key_create(out,destroy,1);}
 int pthread_key_delete(pthread_key_t key){
  int rc=pthread_mutex_lock(&keys_lock);if(rc)return rc;unsigned slot;
  if(!key_lookup(key,&slot)){pthread_mutex_unlock(&keys_lock);return EINVAL;}
@@ -50,7 +53,7 @@ static void destructors(chos_libc_tcb_t *t){
   for(unsigned i=0;i<PTHREAD_KEYS_MAX;i++){
    void (*destroy)(void *)=0;void *value=0;
    if(pthread_mutex_lock(&keys_lock))return;
-   if(keys[i].live&&t->specific[i].generation==keys[i].generation&&t->specific[i].value){
+   if(keys[i].live&&!keys[i].late&&t->specific[i].generation==keys[i].generation&&t->specific[i].value){
     destroy=keys[i].destroy;value=t->specific[i].value;t->specific[i].value=0;
    }
    pthread_mutex_unlock(&keys_lock);
@@ -58,10 +61,18 @@ static void destructors(chos_libc_tcb_t *t){
   }
   if(!called)break;
  }
+ for(unsigned i=0;i<PTHREAD_KEYS_MAX;i++){
+  void (*destroy)(void *)=0;void *value=0;
+  if(pthread_mutex_lock(&keys_lock))abort();
+  if(keys[i].live&&keys[i].late&&t->specific[i].generation==keys[i].generation&&t->specific[i].value){
+   destroy=keys[i].destroy;value=t->specific[i].value;t->specific[i].value=0;
+  }
+  pthread_mutex_unlock(&keys_lock);if(destroy)destroy(value);
+ }
 }
 void pthread_exit(void *result){
  chos_libc_tcb_t *t=__chos_libc_tls();
- if(!t->exiting){t->exiting=1;__chos_once_abandon(t);destructors(t);}
+ if(!t->exiting){t->exiting=1;__chos_once_abandon(t);__chos_cxx_thread_finalize(t);destructors(t);}
  t->result=result;__atomic_store_n(&t->done,1,__ATOMIC_RELEASE);(void)chos_wake_word(&t->done,8);
  long rc=chos_syscall1(CHOS_SYS_THREAD_EXIT,(long)(uintptr_t)result);
  /* The synchronous single-task profile has no siblings to preserve. */

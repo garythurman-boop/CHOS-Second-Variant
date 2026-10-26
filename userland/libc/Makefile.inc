@@ -1,8 +1,13 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c
+LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
-LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES))
+LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o
+EMUTLS_HEADERS := $(wildcard third_party/compiler-rt/lib/builtins/*.h)
+EMUTLS_HOOKS := -Dpthread_key_create=__chos_pthread_key_create_late -Dpthread_mutex_lock=__chos_emutls_mutex_lock -Dpthread_mutex_unlock=__chos_emutls_mutex_unlock -Dpthread_once=__chos_emutls_once -Dpthread_setspecific=__chos_emutls_setspecific
+$(BUILD)/userland/libc/compiler_rt_emutls.o: third_party/compiler-rt/lib/builtins/emutls.c $(EMUTLS_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) -DEMUTLS_USE_POSIX_MEMALIGN=1 $(EMUTLS_HOOKS) -c $< -o $@
 $(BUILD)/userland/libc/%.o: userland/libc/%.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h
 	@mkdir -p $(dir $@)
 	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) -c $< -o $@
@@ -71,3 +76,38 @@ test-pthread-sync-sanitize: $(SAN_DIR)/test-pthread-sync
 test: test-pthread-sync
 test-sanitize: test-pthread-sync-sanitize
 .PHONY: test-pthread-sync test-pthread-sync-sanitize
+
+$(BUILD)/userland/emutls_test.o: userland/examples/emutls_test.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) -femulated-tls -c $< -o $@
+$(BUILD)/userland/emutls_cpp_test.o: userland/examples/emutls_test.cpp $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -std=c11,$(USER_CFLAGS)) -std=c++17 -fno-exceptions -fno-rtti $(LIBC_INCLUDES) -femulated-tls -c $< -o $@
+$(BUILD)/userland/emutls_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/emutls_test.o $(BUILD)/userland/emutls_cpp_test.o $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) userland/native.ld
+	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(filter %.o,$^)
+test: $(BUILD)/userland/emutls_test.elf
+
+EMUTLS_HOST_FLAGS := -std=c11 -D_POSIX_C_SOURCE=200809L -DEMUTLS_USE_POSIX_MEMALIGN=1 -D__emutls_get_address=chos_test_emutls_get_address
+$(BUILD)/test-emutls-runtime: tests/test_emutls_runtime.c third_party/compiler-rt/lib/builtins/emutls.c $(EMUTLS_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(EMUTLS_HOST_FLAGS) -Wall -Wextra -Werror -O2 -pthread $< third_party/compiler-rt/lib/builtins/emutls.c -o $@
+$(SAN_DIR)/test-emutls-runtime: tests/test_emutls_runtime.c third_party/compiler-rt/lib/builtins/emutls.c $(EMUTLS_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(EMUTLS_HOST_FLAGS) -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -pthread $< third_party/compiler-rt/lib/builtins/emutls.c -o $@
+CXX_ATEXIT_HOST_FLAGS := -include tests/cxx_atexit_host_names.h $(LIBC_INCLUDES)
+$(BUILD)/test-cxx-thread-atexit: tests/test_cxx_thread_atexit.c tests/cxx_atexit_host_names.h userland/libc/cxx_thread_atexit.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 $(CXX_ATEXIT_HOST_FLAGS) $< userland/libc/cxx_thread_atexit.c -o $@
+$(SAN_DIR)/test-cxx-thread-atexit: tests/test_cxx_thread_atexit.c tests/cxx_atexit_host_names.h userland/libc/cxx_thread_atexit.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Wno-misleading-indentation $(CXX_ATEXIT_HOST_FLAGS) $< userland/libc/cxx_thread_atexit.c -o $@
+test-emutls-runtime: $(BUILD)/test-emutls-runtime $(BUILD)/test-cxx-thread-atexit $(BUILD)/userland/emutls_test.elf
+	python3 tools/verify_compiler_rt.py
+	./$(BUILD)/test-emutls-runtime
+	./$(BUILD)/test-cxx-thread-atexit
+test-emutls-runtime-sanitize: $(SAN_DIR)/test-emutls-runtime $(SAN_DIR)/test-cxx-thread-atexit
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-emutls-runtime
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-cxx-thread-atexit
+test: test-emutls-runtime
+test-sanitize: test-emutls-runtime-sanitize
+.PHONY: test-emutls-runtime test-emutls-runtime-sanitize

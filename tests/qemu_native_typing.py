@@ -138,8 +138,20 @@ try:
  assert app_text(editor_pid,editor,'document',8192)==expected,'save must survive actual reopen'
  state('backspace',True);time.sleep(.62)
  if o.mode=='uefi':
-  g.qmp('device_del',id='kbd');time.sleep(.6);stopped=app_text(editor_pid,editor,'document',8192)
-  time.sleep(.6);assert app_text(editor_pid,editor,'document',8192)==stopped,'USB removal must release repeat'
+  unplug_start=time.monotonic();g.qmp('device_del',id='kbd')
+  # Removal is asynchronous. First require the actual kernel key release, then
+  # drain legitimate events queued before removal. A fixed wall-clock sleep can
+  # snapshot the document before its last queued event under host CPU load.
+  wait(lambda:int.from_bytes(g.block('repeat_key',size=2),'little')==0,4,'USB removal cancels actual kernel repeat')
+  wait(lambda:probe.queued_events(editor_pid)==0,4,'editor drains pre-removal key events')
+  switches=g.symbol('preemption_switches')
+  wait(lambda:g.symbol('preemption_switches')>=switches+8,4,'guest dispatch progresses past consumed input')
+  wait(lambda:probe.queued_events(editor_pid)==0 and
+       (c:=foreground('CHOS Text Editor')) and c['caret']['text_length']==len(app_text(editor_pid,editor,'document',8192).rsplit(b'\n',1)[-1]),
+       4,'editor presents the drained document caret')
+  stopped=app_text(editor_pid,editor,'document',8192)
+  (out/'unplug-drain.json').write_text(json.dumps({'seconds_until_drained':time.monotonic()-unplug_start,'document_length':len(stopped),'repeat_key':0,'queued_events':probe.queued_events(editor_pid),'dispatches_after_empty_queue':g.symbol('preemption_switches')-switches},indent=2))
+  time.sleep(.6);assert int.from_bytes(g.block('repeat_key',size=2),'little')==0 and probe.queued_events(editor_pid)==0 and app_text(editor_pid,editor,'document',8192)==stopped,'USB removal must release repeat after queued input drains'
   g.qmp('device_add',driver='usb-kbd',bus='xhci.0',id='kbd2');time.sleep(.7)
  else:state('backspace',False)
  expected=app_text(editor_pid,editor,'document',8192)

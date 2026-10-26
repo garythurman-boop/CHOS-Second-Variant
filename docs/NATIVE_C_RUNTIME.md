@@ -30,12 +30,14 @@ bounded length, comparison, copy, concatenation, character search and substring
 search. Overlap-safe memmove is tested in both directions. Other functions keep
 their normal C preconditions, including destination capacity and memcpy's
 non-overlap requirement. These are ASCII/byte operations, not Unicode text shaping.
-The implementation is CHOS source and introduces no third-party dependency.
+The allocation/string implementation is CHOS source. The subsequent compiler TLS
+runtime has its own pinned LLVM dependency described in COMPILER_TLS_RUNTIME.md.
 
-The runtime is **single-threaded**. Its heap initialization, metadata and errno
-storage must acquire appropriate thread semantics before pthreads or multiple
-threads share a process. There is no stdio, locale, signal, dynamic-loader,
-threading, filesystem-descriptor or complete C++ runtime here. C-linkage headers
+The [native pthread runtime](NATIVE_PTHREAD_RUNTIME.md) now protects heap
+transactions and supplies per-thread errno, join and synchronization. Compiler
+TLS has the separate explicit build profile in COMPILER_TLS_RUNTIME.md. Complete
+stdio, locale, signal, dynamic-loader, filesystem-descriptor and C++ runtime
+interfaces remain open. C-linkage headers
 are checked from freestanding C++17, and an actual C++ object calling these C
 symbols is linked and executed by the guest test. That does not imply exceptions,
 RTTI, operator new/delete, C++ standard-library containers or WebKit support.

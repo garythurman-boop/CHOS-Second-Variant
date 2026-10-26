@@ -42,3 +42,4 @@ int posix_memalign(void **out,size_t alignment,size_t bytes){
     if(p)*out=p;pthread_mutex_unlock(&heap_lock);return rc;
 }
 int chos_libc_heap_info(chos_heap_stats_t *out){int rc=pthread_mutex_lock(&heap_lock);if(rc)return -1;rc=chos_heap_stats(heap(),out);pthread_mutex_unlock(&heap_lock);return rc;}
+void abort(void){chos_exit(134);}

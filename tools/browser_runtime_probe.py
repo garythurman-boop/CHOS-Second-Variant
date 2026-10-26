@@ -8,6 +8,7 @@ units={
  'freestanding_cxx20':'struct A { virtual ~A(){}; }; extern "C" int probe(){ return sizeof(A); }',
  'cxx_standard_runtime':'#include <thread>\n#include <mutex>\n#include <condition_variable>\n#include <memory>\nint probe(){return sizeof(std::mutex);}',
  'native_pthread_subset':'#include <pthread.h>\nint probe(){pthread_mutex_t m=PTHREAD_MUTEX_INITIALIZER;return pthread_mutex_lock(&m)||pthread_mutex_unlock(&m);}',
+ 'compiler_emulated_tls':'thread_local int value=7;int probe(){return ++value;}',
  'virtual_memory':'#include <sys/mman.h>\nint probe(){return MAP_ANONYMOUS;}',
  'file_descriptor_poll':'#include <poll.h>\nint probe(){return sizeof(struct pollfd);}',
  'wpe_embed_api':'#include <wpe/wpe.h>\nint probe(){return 0;}',
@@ -17,6 +18,7 @@ with tempfile.TemporaryDirectory(prefix='chos-engine-probe-') as d:
  for name,text in units.items():
   source=pathlib.Path(d)/(name+'.cc');source.write_text(text)
   command=[o.compiler,'--target=aarch64-none-elf','-ffreestanding','-std=c++20','-fno-exceptions','-fno-rtti','-Iuserland/libc/include','-Iuserland/libchos/include','-Iinclude','-c',str(source),'-o',str(pathlib.Path(d)/(name+'.o'))]
+  if name=='compiler_emulated_tls':command.append('-femulated-tls')
   r=subprocess.run(command,capture_output=True,text=True,timeout=30)
   results.append({'capability':name,'available':r.returncode==0,'diagnostic':r.stderr[:1200],'command':command})
 missing=[r['capability'] for r in results if not r['available']]
