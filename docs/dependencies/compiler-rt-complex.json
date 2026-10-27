@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "project": "LLVM compiler-rt binary32/binary64 complex arithmetic",
+  "version": "20.1.8",
+  "commit": "87f0227cb60147a26a1eeb4fb06e3b505e9c7261",
+  "source_root": "https://raw.githubusercontent.com/llvm/llvm-project/87f0227cb60147a26a1eeb4fb06e3b505e9c7261/compiler-rt/lib/builtins/",
+  "license": "Apache-2.0 WITH LLVM-exception; shared LICENSE.TXT retained",
+  "provenance": "Original source bytes fetched over HTTPS at immutable upstream commit; no release signature verification claimed",
+  "scope": "four original C complex mul/div helpers,matching LLVM20 shared fp_lib.h; other shared internal dependency bytes pinned in compiler-rt-quad.json",
+  "sources": [
+    "lib/builtins/mulsc3.c",
+    "lib/builtins/muldc3.c",
+    "lib/builtins/divsc3.c",
+    "lib/builtins/divdc3.c"
+  ],
+  "files": {
+    "lib/builtins/mulsc3.c": "ced55a7c473dbde086ca3649c431dc198348cf66d612eec2316862837a84b14a",
+    "lib/builtins/muldc3.c": "6b5c3fba3f59901c717168ba3a51dab26674541ac16a7b870ce7af0f3e339644",
+    "lib/builtins/divsc3.c": "0c2532543221eee987579bd63d93687a4cb5ab83e2f403231be2f40014d8d7a3",
+    "lib/builtins/divdc3.c": "f6ebfa99e5a208078e998cf87e539f25a92d86e4e316fe983f4031f1745d938a"
+  }
+}

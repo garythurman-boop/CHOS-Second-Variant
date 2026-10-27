@@ -130,3 +130,9 @@ configure/build/execute gates remain open; syntax counts do not close those gate
 syntax failure in ICU messagepattern.cpp, raising the real SDK common-source
 inventory to195/202. Runtime tests qualify the parser component, not the complete
 ICU common/data/i18n dependency or the JSC engine gate.
+
+[Original ranges/complex headers and real compiler helpers](NATIVE_RANGES_COMPLEX.md)
+let197/202 original ICU common units generate actual native ARM64 objects. Five
+still fail on wide-character or file/time interfaces. These object files have no
+complete ICU/data/i18n link/runtime qualification and do not close the JSC engine
+gate. The C++20/23 component itself has independent direct/UEFI guest evidence.

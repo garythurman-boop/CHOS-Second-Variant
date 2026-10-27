@@ -87,3 +87,37 @@ test-libquad: $(BUILD)/userland/quad_test.elf
 	python3 tools/generate_quad_vectors.py --check
 test: test-libquad
 .PHONY: test-libquad
+
+# Original LLVM20 binary32/binary64 complex helpers, sharing the qualified
+# compiler headers. Binary128 complex operations are not supplied here.
+COMPLEX_RT_SOURCES := $(shell python3 -c 'import json;print(" ".join("third_party/compiler-rt/"+p for p in json.load(open("docs/dependencies/compiler-rt-complex.json"))["sources"]))')
+COMPLEX_RT_OBJECTS := $(addprefix $(BUILD)/userland/libcomplex/,$(addsuffix .o,$(basename $(COMPLEX_RT_SOURCES))))
+COMPLEX_RT_ARCHIVE := $(BUILD)/userland/libcomplex/libchos-complex.a
+$(BUILD)/userland/libcomplex/%.o: %.c $(QUAD_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) $(LIBC_INCLUDES) -ffunction-sections -fdata-sections -MMD -MP -c $< -o $@
+-include $(COMPLEX_RT_OBJECTS:.o=.d)
+$(COMPLEX_RT_ARCHIVE): $(COMPLEX_RT_OBJECTS)
+	rm -f $@
+	llvm-ar rcs $@ $^
+libcomplex: $(COMPLEX_RT_ARCHIVE)
+.PHONY: libcomplex
+COMPLEX_HOST_OBJECTS := $(addprefix $(BUILD)/complex-host/,$(addsuffix .o,$(basename $(COMPLEX_RT_SOURCES))))
+COMPLEX_SAN_OBJECTS := $(addprefix $(SAN_DIR)/complex-host/,$(addsuffix .o,$(basename $(COMPLEX_RT_SOURCES))))
+$(BUILD)/complex-host/%.o: %.c $(QUAD_HEADERS) tests/complex_host_names.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -include tests/complex_host_names.h -c $< -o $@
+$(SAN_DIR)/complex-host/%.o: %.c $(QUAD_HEADERS) tests/complex_host_names.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -include tests/complex_host_names.h -c $< -o $@
+$(BUILD)/test-complex-runtime: tests/test_complex_runtime.c tests/complex_vectors.h $(COMPLEX_HOST_OBJECTS)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Itests $< $(COMPLEX_HOST_OBJECTS) -lm -o $@
+$(SAN_DIR)/test-complex-runtime: tests/test_complex_runtime.c tests/complex_vectors.h $(COMPLEX_SAN_OBJECTS)
+	$(CC_HOST) $(SAN_FLAGS) -Itests $< $(COMPLEX_SAN_OBJECTS) -lm -o $@
+test-complex-runtime: $(BUILD)/test-complex-runtime
+	./$(BUILD)/test-complex-runtime
+test-complex-runtime-sanitize: $(SAN_DIR)/test-complex-runtime
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-complex-runtime
+test: test-complex-runtime
+test-sanitize: test-complex-runtime-sanitize
+.PHONY: test-complex-runtime test-complex-runtime-sanitize

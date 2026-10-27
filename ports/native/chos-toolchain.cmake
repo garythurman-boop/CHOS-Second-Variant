@@ -30,7 +30,7 @@ set(CHOS_LANGUAGE_FLAGS "-fhosted -fno-builtin -fno-stack-protector -fno-pic -fn
 set(CMAKE_C_FLAGS_INIT "${CHOS_LANGUAGE_FLAGS} -isystem \"${CHOS_SDK_ROOT}/include\"")
 set(CMAKE_CXX_FLAGS_INIT "${CHOS_LANGUAGE_FLAGS} -fno-exceptions -fno-rtti -nostdinc++ -isystem \"${CHOS_SDK_ROOT}/include/c++/v1\" -isystem \"${CHOS_SDK_ROOT}/include\"")
 set(CMAKE_EXE_LINKER_FLAGS_INIT "-nostdlib -static -fuse-ld=lld -Wl,-T,\"${CHOS_SDK_ROOT}/lib/app.ld\" -Wl,--gc-sections -Wl,-z,max-page-size=4096 \"${CHOS_SDK_ROOT}/lib/crt0.o\" \"${CHOS_SDK_ROOT}/lib/crtinit.o\" \"${CHOS_SDK_ROOT}/lib/chos-abi.o\"")
-set(CHOS_RUNTIME_LIBRARIES "-Wl,--start-group \"${CHOS_SDK_ROOT}/lib/libchos-c++.a\" \"${CHOS_SDK_ROOT}/lib/libchos-m.a\" \"${CHOS_SDK_ROOT}/lib/libchos-quad.a\" \"${CHOS_SDK_ROOT}/lib/libchos-floatparse.a\" \"${CHOS_SDK_ROOT}/lib/libchos-c.a\" -Wl,--end-group")
+set(CHOS_RUNTIME_LIBRARIES "-Wl,--start-group \"${CHOS_SDK_ROOT}/lib/libchos-c++.a\" \"${CHOS_SDK_ROOT}/lib/libchos-m.a\" \"${CHOS_SDK_ROOT}/lib/libchos-quad.a\" \"${CHOS_SDK_ROOT}/lib/libchos-complex.a\" \"${CHOS_SDK_ROOT}/lib/libchos-floatparse.a\" \"${CHOS_SDK_ROOT}/lib/libchos-c.a\" -Wl,--end-group")
 set(CMAKE_C_STANDARD_LIBRARIES "${CHOS_RUNTIME_LIBRARIES}")
 set(CMAKE_CXX_STANDARD_LIBRARIES "${CHOS_RUNTIME_LIBRARIES}")
 set(CMAKE_FIND_ROOT_PATH "${CHOS_SDK_ROOT}")

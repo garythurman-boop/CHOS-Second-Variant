@@ -80,3 +80,9 @@ real C-locale strtof/strtod/strtold/atof. The CMake probe really links strtod, a
 its full fixture executes through the SDK in isolated UEFI. Small original
 long-double math helpers and nexttoward are also now present; full streams,
 formatting, locale switching and long-double transcendental support remain open.
+
+[Ranges/span and binary32/64 complex arithmetic](NATIVE_RANGES_COMPLEX.md) are now
+included in the bounded native profile. libchos-complex.a supplies actual compiler
+mul/div helpers on demand; CMake performs a real complex link and its C++23
+range/complex fixture executes in UEFI CHOS. Exceptions, localization, stream I/O
+and binary128 complex support remain outside this qualified subset.

@@ -142,3 +142,16 @@ $(BUILD)/userland/rtti_factory.o: userland/examples/rtti_factory.cpp userland/ex
 $(BUILD)/userland/rtti_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/rtti_test.o $(BUILD)/userland/rtti_factory.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test-libcxx: $(BUILD)/userland/rtti_test.elf
+
+$(BUILD)/userland/ranges_complex_test.o: userland/examples/ranges_complex_test.cpp tests/complex_vectors.h $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -std=c++20,$(LIBCPP_FLAGS)) -std=c++23 -Itests -MMD -MP -c $< -o $@
+$(BUILD)/userland/ranges_complex20_test.o: userland/examples/ranges_complex_test.cpp tests/complex_vectors.h $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
+	@mkdir -p $(dir $@)
+	$(CC) $(LIBCPP_FLAGS) -Itests -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/ranges_complex_test.d $(BUILD)/userland/ranges_complex20_test.d
+$(BUILD)/userland/ranges_complex_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/ranges_complex_test.o $(LIBCPP_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
+$(BUILD)/userland/ranges_complex20_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/ranges_complex20_test.o $(LIBCPP_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
+test-libcxx: $(BUILD)/userland/ranges_complex_test.elf $(BUILD)/userland/ranges_complex20_test.elf

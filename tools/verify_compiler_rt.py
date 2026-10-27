@@ -9,6 +9,10 @@ quad=json.loads((root/'docs/dependencies/compiler-rt-quad.json').read_text())
 for name,wanted in quad['files'].items():
     if name in manifest['files']:assert manifest['files'][name]==wanted
     manifest['files'][name]=wanted
+complex_runtime=json.loads((root/'docs/dependencies/compiler-rt-complex.json').read_text())
+for name,wanted in complex_runtime['files'].items():
+    if name in manifest['files']:assert manifest['files'][name]==wanted
+    manifest['files'][name]=wanted
 actual={str(p.relative_to(base)) for p in base.rglob('*') if p.is_file()}
 assert 'lib/builtins/aarch64/fp_mode.c' in quad['sources']
 assert 'lib/builtins/fp_mode.c' not in actual,'generic dummy FP mode backend is forbidden'
@@ -19,4 +23,4 @@ for name,wanted in manifest['files'].items():
     path=base/name
     assert path.is_relative_to(base) and '..' not in path.parts
     assert hashlib.sha256(path.read_bytes()).hexdigest()==wanted,'modified upstream file '+name
-print('LLVM compiler-rt emutls/binary12819.1.7 with upstream20.1.8 carry header: '+str(len(actual))+' pinned original files verified')
+print('LLVM compiler-rt exact original TLS/quad/complex dependency closures: '+str(len(actual))+' pinned original files verified')

@@ -329,3 +329,11 @@ long-double math closure and real nexttoward behavior these dependencies need.
 ICU common syntax inventory is195/202; full ICU/data/i18n and the actual modern
 engine, production security and Pi5 radio gates remain open. See
 validation/stage3-native-floatparse.json. No new binaries are published.
+
+[Native ranges/span and complex arithmetic](NATIVE_RANGES_COMPLEX.md) add actual
+C++20/23 view/algorithm and numerical guest tests, with original LLVM compiler
+helpers and independent high-precision references. Actual native object generation
+now succeeds for197/202 original ICU common units (previously195 syntax successes).
+This remains distinct from full ICU/data/i18n linking and engine integration.
+See validation/stage3-native-ranges-complex.json; all full-stage gates and the
+binary/version hold remain active.

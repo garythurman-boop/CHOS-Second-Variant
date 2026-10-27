@@ -1,0 +1,257 @@
+{
+  "stage3_complete": false,
+  "engine_built": false,
+  "binary_publication": "HELD",
+  "base_commit": "3db43aa7f1b28bc3aa1d1e202245b9f982e5a178",
+  "source_sha256": {
+    "Makefile": "81d3a6c522e9e82b59ba1ce792cdac10632f43504321c5b242f4b79bdea529ac",
+    "ports/native/chos-toolchain.cmake": "7cb225bdb8bb2dbaf06577d23515dab5570e7261044e24eb159463e0f45ff84d",
+    "tests/native_sdk/CMakeLists.txt": "42b88e217866794e2231698cd36ae125dd5c855d5bea6ce98d92de7abef359d5",
+    "tools/install_native_sdk.py": "66fa0edc75ef4ebb84947a057071e0757736d60c23e8846a67abc6fad7736fdf",
+    "tools/verify_compiler_rt.py": "29e9b7751cb3d4d7419e4aa14b020b9f766d4356022669f94b91cd9bb01c9bd2",
+    "userland/libcxx/Makefile.inc": "9d0ab76b3c397c4d8be60a83020354c419d54fdec772c1bdfc18511aa3f2d3a5",
+    "userland/libm/Makefile.inc": "6859b17103c1db2ef01fbadfb7b1aeec461d9a38011a5a334834ab5d2eb3f718",
+    "tests/complex_host_names.h": "0afdb848a08cbae7789a2a856fe0373b49de1b6c3194f1e41fe1d172695d9b22",
+    "tests/complex_vectors.h": "6fbd642aada0b862541e855da85f6445c3b8db2c497190cdfc4024459ee1e214",
+    "tests/generate_complex_vectors.py": "e7758e3a075896363a9cafa55eee9c42702ce39d5674129fedfec274aa057495",
+    "tests/qemu_ranges_complex.py": "6538fcd7853f0609db2c84ae79c70c30f49d874050d0c472d29541f5822a2797",
+    "tests/test_complex_runtime.c": "293edf4eccaa9d04aa5b6e929da7e6eb007d9834e820b68ade237144c180d9b3",
+    "userland/examples/ranges_complex_test.cpp": "50aa8f7acf1aa56a55ddaa7e1bebe8ee3e8adef79665b34bbf5beb04c706f19a"
+  },
+  "dependencies": [
+    "docs/dependencies/libcxx-native.json",
+    "docs/dependencies/compiler-rt-complex.json",
+    "docs/dependencies/compiler-rt-quad.json"
+  ],
+  "sdk_manifest_sha256": "cf3e3b4d967409ea8b88c113aaeb20034f0a4fffe3e118767e17f06661ea5b4b",
+  "guest_results": {
+    "native-modern-cxx-direct20-accepted": {
+      "status": "PASS",
+      "mode": "direct",
+      "cxx_standard": "20",
+      "application_sha256": "ab67e3fcd291611e4ceb8fdc46e2bafeb5f788ea216e61bbd8c606db81f200af",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117423,
+      "free_pages_after": 117423,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 193,
+      "checks": [
+        "original libc++ ranges filter/transform/iota/take/drop/reverse/split/join,span and projection algorithms",
+        "C++23 ranges::to,zip and chunk_by in C++23 profile",
+        "396 mpmath200-digit float/double complex fixtures across11 operations",
+        "original LLVM20 mul/div helpers,NaN/infinity/signed-zero and negative-real sqrt branch",
+        "three std::thread workers and three lifecycles per process,zero retained native user heap",
+        "three native processes with exit0,stable warm frames and no queued futex waiters"
+      ],
+      "limits": [
+        "bounded no-exceptions/no-localization libc++ profile,not full standard library",
+        "complex binary32/64 nearest-mode numerical regression,not exhaustive IEEE/C++ conformance; binary128 complex arithmetic and stream I/O absent",
+        "ICU common/data/i18n,engine build/security/memory and Pi5 WiFi remain open",
+        "new Fusion/Pi/laptop qualification NOT RUN; Stage3/version/release incomplete"
+      ],
+      "measured_error_eps32_64": [
+        [
+          1.953438,
+          1.355626
+        ],
+        [
+          1.953438,
+          1.355626
+        ],
+        [
+          1.953438,
+          1.355626
+        ]
+      ]
+    },
+    "native-modern-cxx-sdk-uefi23": {
+      "status": "PASS",
+      "mode": "uefi",
+      "cxx_standard": "23",
+      "application_sha256": "8e927776bb10a00450e58beb91f39367bc6c1e7294cba6727d9616bec9806e10",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500256,
+      "free_pages_after": 500256,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 203,
+      "checks": [
+        "original libc++ ranges filter/transform/iota/take/drop/reverse/split/join,span and projection algorithms",
+        "C++23 ranges::to,zip and chunk_by in C++23 profile",
+        "396 mpmath200-digit float/double complex fixtures across11 operations",
+        "original LLVM20 mul/div helpers,NaN/infinity/signed-zero and negative-real sqrt branch",
+        "three std::thread workers and three lifecycles per process,zero retained native user heap",
+        "three native processes with exit0,stable warm frames and no queued futex waiters"
+      ],
+      "limits": [
+        "bounded no-exceptions/no-localization libc++ profile,not full standard library",
+        "complex binary32/64 nearest-mode numerical regression,not exhaustive IEEE/C++ conformance; binary128 complex arithmetic and stream I/O absent",
+        "ICU common/data/i18n,engine build/security/memory and Pi5 WiFi remain open",
+        "new Fusion/Pi/laptop qualification NOT RUN; Stage3/version/release incomplete"
+      ],
+      "measured_error_eps32_64": [
+        [
+          1.953438,
+          1.355626
+        ],
+        [
+          1.953438,
+          1.355626
+        ],
+        [
+          1.953438,
+          1.355626
+        ]
+      ]
+    },
+    "native-modern-cxx-rtti-regression": {
+      "status": "PASS",
+      "mode": "uefi",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "bad-cast",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "null-typeid",
+          "pid": 5,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 6,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "ae0b29f60f52430ffe86aeb9076f963d9a8edf8db58ba819ed7db6926c7894a4",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500377,
+      "free_pages_after": 500377,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 615,
+      "checks": [
+        "real original LLVM dynamic_cast/type_info algorithm, cross-TU identity and standard exception class RTTI",
+        "virtual diamonds, public and private bases, ambiguous and null casts, cross-casts and void-pointer adjustment",
+        "three std::thread workers, 64 graph checks each and three lifecycles per application",
+        "C-locale bytes EOF through 255, signed/unsigned intmax limits and overflow errno",
+        "failed reference cast and null polymorphic typeid terminate only their process with exit 134",
+        "six process runs, stable warm physical pages and no queued futexes"
+      ],
+      "limits": [
+        "bounded native no-exceptions libc++ subset with opt-in RTTI,not full standard library",
+        "std::thread/notify-at-exit are separately qualified; public futures and dynamic loading remain open",
+        "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+        "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+      ]
+    }
+  },
+  "checks": {
+    "native-modern-cxx-host-runtime.log": {
+      "status": "PASS",
+      "sha256": "bbd841aa53aeac9bcb062bdc4fa0cbf2c78508efad7ac5ece22d807345f67584"
+    },
+    "native-modern-cxx-full-host.log": {
+      "status": "PASS",
+      "sha256": "a9f4f05eccf093afe1900fe8d8442e4fd5f29fd14ec755a4edda25dd62a752ef"
+    },
+    "native-modern-cxx-full-sanitize.log": {
+      "status": "PASS",
+      "sha256": "5e1f5bbcc513505e8e26424e0d62398205f30f5723dc4f367833bef06ae64065"
+    },
+    "native-modern-cxx-media.log": {
+      "status": "PASS",
+      "sha256": "77a5ca48b7762779f9e6132695716f66088ebd82aa39486a750d2d7aa7f59751"
+    },
+    "native-modern-cxx-build4.log": {
+      "status": "PASS",
+      "sha256": "725679937970c4a3d9a9b4701e64cb45c6b19e02fa0f68287ee54d50ccf68661"
+    },
+    "native-modern-cxx-sdk-stage.log": {
+      "status": "PASS",
+      "sha256": "8f0a87954514069bd8fd78735f33850426fecd8b9d1fec416fc4fd81eb3a7ac1"
+    },
+    "native-modern-cxx-sdk-configure.log": {
+      "status": "PASS",
+      "sha256": "980c798d2187033f426f9c4859f96a116b5fc140d14864b69286286ef3328197"
+    },
+    "native-modern-cxx-sdk-build-final2.log": {
+      "status": "PASS",
+      "sha256": "8c35b1682f73592d30612d7b0fabdb384fcfff35cb5a076cb48b85b1368aa794"
+    }
+  },
+  "numerical_bound": "8 machine epsilon * max(abs(reference real),abs(reference imaginary)); reference bits retained from mpmath200 digits",
+  "icu_codegen": {
+    "status": "OBJECTS_ONLY",
+    "scope": "actual original ICU common native SDK object code generation,not complete archive/link/data/runtime evidence",
+    "units": 202,
+    "codegen_pass": 197,
+    "object_bytes": 3800656,
+    "result_sha256": "287aee20c775aa631fa3c7c1dbd5debebac02ff4b1b81e37117cf5b70f3a5faa",
+    "remaining": [
+      {
+        "source": "putil.cpp",
+        "returncode": 1,
+        "missing_header": "sys/time.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/putil.cpp:55:10: fatal error: 'sys/time.h' file not found"
+      },
+      {
+        "source": "umapfile.cpp",
+        "returncode": 1,
+        "missing_header": "unistd.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/umapfile.cpp:71:13: fatal error: 'unistd.h' file not found"
+      },
+      {
+        "source": "uresbund.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      },
+      {
+        "source": "ustr_wcs.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      },
+      {
+        "source": "ustring.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      }
+    ]
+  },
+  "retained_failures": {
+    "native-modern-cxx-direct20": "per-component ULP rejection for small real component of complex pow; original upstream host returns identical bits",
+    "native-modern-cxx-direct20-diagnostic": "records actual/expected values; error relative to total result is under one epsilon; numerical acceptance changed consistently to documented magnitude bound",
+    "native-modern-cxx-direct20-final": "exact real-zero assumption for finite negative-real sqrt fails original polar-form implementation on host too; use same magnitude bound and keep exact zero-input signed-zero checks",
+    "native-modern-cxx-host-probe.log": "host reproduction of pow bits",
+    "native-modern-cxx-host-sqrt.log": "host reproduction of tiny polar sqrt real residue"
+  },
+  "limits": [
+    "bounded no-exceptions/no-localization C++20/23 subset; no full standard library",
+    "binary32/64 complex nearest-mode numerical regression,not exhaustive IEEE/ECMAScript conformance; no binary128 complex or streams",
+    "ICU object generation is not a complete ICU/data/i18n link or runtime result",
+    "modern engine,memory/isolation,production TLS and actual Pi5 WiFi remain open; new Fusion/Pi qualification NOT RUN"
+  ]
+}
