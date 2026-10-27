@@ -1,0 +1,213 @@
+{
+  "stage3_complete": false,
+  "engine_built": false,
+  "binary_publication": "HELD",
+  "base_commit": "307f255acbc7f7ab9e5eed4d0d573590d8f1b9cc",
+  "source_sha256": {
+    "Makefile": "495df344bf0fc034abc525925eb9e864e0fe98dcdcafc35acec3085a3d34fbee",
+    "ports/native/chos-toolchain.cmake": "7bf09a860268e21a910c88b9ee3a745625de9fae095480727089305fa2d9e275",
+    "tests/native_sdk/CMakeLists.txt": "373883cc6db9fee56905b0143c9840ef7561769a12f2a05b7a110be9c65d71db",
+    "tools/install_native_sdk.py": "be184ed409330db7f9930d9bc59cfcfdc65d4b564be3600bfc4b1acd31854e1d",
+    "tools/verify_musl_math.py": "0e8072fb71f00b59e12c2e21f509a089f0081269c6841b4b4f9f0ba8d6f96f8d",
+    "userland/libc/include/stdlib.h": "f8d61933ec4644007da98affc2fc23c51c0821c0fd3fe0116b3ac9587916db60",
+    "tests/floatparse_vectors.h": "f3d749f337b3224eadf6f05791df3e633f685d397370e1de9afc8a4305a65995",
+    "tests/floatscan_host_names.h": "ed48c70fac9377170a21d4427bae53ec2fa2c10c08f40e3d0284470ded668456",
+    "tests/qemu_floatparse.py": "7039980f4e77384584a88978e47b3e6c95a8dede4e2ceb9eee7f186b94123816",
+    "tests/test_floatscan.c": "e78489ab96183453b8464c79ed3c669ab4b1a7f127cf3f3f9d9f72035132ee7c",
+    "tools/generate_floatparse_vectors.py": "97d0b9d24a6275a11ae764fef65a880b4b237420960022b3a93ea59cd50b1d51",
+    "userland/examples/floatparse_test.c": "65ba02a47b6fe73eab5afe47b20b70b5fc6004e91e75c9569af43c6f7abe2b14",
+    "userland/libc/floatscan/Makefile.inc": "ab2e0d15948e14067e0e83aa9c8526a20f8d8a38d1ee4cb4f5430bd03228dc67",
+    "userland/libc/floatscan/include/stdio.h": "6b00225d979c997953d7711556674181c5e3271791242f000eab967326277c9a",
+    "userland/libc/floatscan/include/stdio_impl.h": "9005f4fc0b0b85d2f3ea8f0c3871311c30e72e6ab5853a740c8e78b797ff4091",
+    "userland/libc/floatscan/stream.c": "663c009ac88334eb456b4407c747f54747f00d82abed3e92c5d69c9ed09ef42d"
+  },
+  "dependencies": [
+    "docs/dependencies/musl-floatscan.json",
+    "docs/dependencies/musl-math.json",
+    "docs/dependencies/compiler-rt-quad.json"
+  ],
+  "sdk_manifest_sha256": "17b234f4e8b852fc58096ff514de301cdd1ad0207c9611b4caa4fee05898e427",
+  "guest_results": {
+    "native-floatparse-final-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "868dc7468377e1d76c42ca6d2e33face3e4eba2c58aea8f7e41f96095fbbae82",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117628,
+      "free_pages_after": 117628,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 515,
+      "checks": [
+        "169 exact-ratio decimal/hex inputs across binary32/64/128,exact end pointers and range policy",
+        "original musl parser over bounded private string scanner,no FILE/syscall stubs",
+        "NaN/infinity/signed zero,malformed prefixes,preserved errno and atof",
+        "real long-double classification/frexpl/scaling/modulus/sign plus binary32/64 nexttoward",
+        "three native workers parse halfway cases under independent inherited rounding modes",
+        "three worker lifecycles/process and three repeated processes,stable warm physical pages/no futex waiters"
+      ],
+      "limits": [
+        "C-locale numeric strings; no locale switching or filesystem FILE streams",
+        "exact rational fixtures are regression coverage,not exhaustive IEC60559/C/ECMAScript conformance",
+        "subnormal errno follows original musl policy; no full dynamic-FENV or long-double transcendental/formatting conformance",
+        "not full C++ or browser integration",
+        "new Fusion/physical behavior NOT RUN",
+        "modern engine and Stage3 remain incomplete"
+      ]
+    },
+    "native-floatparse-final-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "e4501ac5dd03bd44b7c7c8a49a358c2fc301c640c141e325b4bb8a2c89588144",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500468,
+      "free_pages_after": 500468,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 517,
+      "checks": [
+        "169 exact-ratio decimal/hex inputs across binary32/64/128,exact end pointers and range policy",
+        "original musl parser over bounded private string scanner,no FILE/syscall stubs",
+        "NaN/infinity/signed zero,malformed prefixes,preserved errno and atof",
+        "real long-double classification/frexpl/scaling/modulus/sign plus binary32/64 nexttoward",
+        "three native workers parse halfway cases under independent inherited rounding modes",
+        "three worker lifecycles/process and three repeated processes,stable warm physical pages/no futex waiters"
+      ],
+      "limits": [
+        "C-locale numeric strings; no locale switching or filesystem FILE streams",
+        "exact rational fixtures are regression coverage,not exhaustive IEC60559/C/ECMAScript conformance",
+        "subnormal errno follows original musl policy; no full dynamic-FENV or long-double transcendental/formatting conformance",
+        "not full C++ or browser integration",
+        "new Fusion/physical behavior NOT RUN",
+        "modern engine and Stage3 remain incomplete"
+      ]
+    },
+    "native-floatparse-libm-uefi-final": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "cac666d540b688eedfe54c617ecd6c3a2666b1ea69261edd463efa2773fbed1f",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500422,
+      "free_pages_after": 500422,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 531,
+      "checks": [
+        "889 high-precision scalar fixtures across28 functions in binary32/binary64",
+        "NaN,infinity,signed zero,subnormal,FMA and domain/overflow flag behavior",
+        "real ARM64 fenv,invalid rounding refusal,hold/update environment",
+        "pthread inherits creating thread FPCR/FPSR and preserves distinct modes/flags across scheduling",
+        "three worker lifecycles/process and repeated cleanup",
+        "no remaining futex waiters and stable physical pages"
+      ],
+      "limits": [
+        "binary32/binary64 math profile; no binary128 long-double/nexttoward link support",
+        "scalar fixtures are regression coverage,not exhaustive C or ECMAScript conformance",
+        "legacy signgam is process-global; concurrent gamma-sign users need _r APIs",
+        "not full C++ or browser integration",
+        "new Fusion/physical behavior NOT RUN",
+        "modern engine and Stage3 remain incomplete"
+      ]
+    }
+  },
+  "checks": {
+    "native-floatparse-tests3.log": {
+      "status": "PASS",
+      "sha256": "09e802fb8e47132c2cf5f3abbf1a9b5adcbd0accc3be7aca6565a0b3635ef84d"
+    },
+    "native-floatparse-fixture-build-final.log": {
+      "status": "PASS",
+      "sha256": "fd4874908571a2edf7ef74aef0714b559d56ffd4ef35986b881de428e4f05188"
+    },
+    "native-floatparse-clean-build.log": {
+      "status": "PASS",
+      "sha256": "791e47618a1bc021c90ae9be13b36d112944eb1381950afc5c6d9b68e7559a39"
+    },
+    "native-floatparse-sdk-stage1.log": {
+      "status": "PASS",
+      "sha256": "2480b9a2140263270789dca84f98b0a541685e57c804d534274845bd8e24173c"
+    },
+    "native-floatparse-sdk-configure.log": {
+      "status": "PASS",
+      "sha256": "8f105c2427ee6217cb30a45741531c71f2bd24d6e6b9aff7535046ae8c245ce5"
+    },
+    "native-floatparse-sdk-build-final2.log": {
+      "status": "PASS",
+      "sha256": "695d31a28a960fe7a55d7c5234a5ffd125be8553c4fcad537f28cd55576525dd"
+    },
+    "native-floatparse-full-host.log": {
+      "status": "PASS",
+      "sha256": "f390a61c3d8355456ad7464205f68f9e742a0ff6ad896fa3c30e0f40deea0112"
+    },
+    "native-floatparse-full-sanitize.log": {
+      "status": "PASS",
+      "sha256": "c9c5c2f600d540d8a0000d098f977927625e80f9bb63a9a2d74c77a05110f434"
+    },
+    "native-floatparse-media.log": {
+      "status": "PASS",
+      "sha256": "77a5ca48b7762779f9e6132695716f66088ebd82aa39486a750d2d7aa7f59751"
+    }
+  },
+  "icu_inventory": {
+    "status": "SYNTAX_ONLY",
+    "scope": "actual original ICU common native SDK syntax inventory,not link/runtime evidence",
+    "sources": 202,
+    "syntax_pass": 195,
+    "result_sha256": "6ed0d8551d3a0e0f7fb580a4e5e7234e9eba8df45fcfb673596e45b904616f55",
+    "remaining": [
+      {
+        "source": "lstmbe.cpp",
+        "returncode": 1,
+        "missing_header": "complex",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/lstmbe.cpp:4:10: fatal error: 'complex' file not found"
+      },
+      {
+        "source": "putil.cpp",
+        "returncode": 1,
+        "missing_header": "sys/time.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/putil.cpp:55:10: fatal error: 'sys/time.h' file not found"
+      },
+      {
+        "source": "umapfile.cpp",
+        "returncode": 1,
+        "missing_header": "unistd.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/umapfile.cpp:71:13: fatal error: 'unistd.h' file not found"
+      },
+      {
+        "source": "uniset_props.cpp",
+        "returncode": 1,
+        "missing_header": "ranges",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/unicode/utfiterator.h:19:10: fatal error: 'ranges' file not found"
+      },
+      {
+        "source": "uresbund.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      },
+      {
+        "source": "ustr_wcs.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      },
+      {
+        "source": "ustring.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      }
+    ]
+  },
+  "retained_failures": {
+    "native-floatparse-build1.log": "Make include order expanded math-header path too early; separate float Make include now follows math,with clean-build proof; EOF header added to private adapter",
+    "native-floatparse-build2.log": "original intentional signed/unsigned scanner comparisons need scoped warning option; upstream source unchanged",
+    "native-floatparse-host1.log": "strtod minimum-subnormal errno differs between original musl/glibc; C permits implementation-defined underflow range reporting",
+    "native-floatparse-direct1": "FAIL of glibc-only underflow errno expectation; no numerical mismatch",
+    "native-floatparse-direct2": "diagnostic confirms only errno at random hex float underflow vector157; corrected C-policy expectation only",
+    "native-floatparse-libm-uefi": "REFUSED before QEMU: old ISO/supplied new kernel differed; accepted final tests use synchronized media"
+  },
+  "limits": [
+    "fixed C-locale parser,not locale switching/filesystem FILE streams/formatting",
+    "original musl underflow/no-conversion errno policy; full dynamic-FENV/exception semantics and long-double transcendentals not claimed",
+    "195/202 ICU common syntax successes do not establish full link/data/i18n or actual engine execution",
+    "engine-sized memory/isolation,production TLS and actual Pi5 WiFi remain open; new Fusion/Pi qualification NOT RUN"
+  ]
+}

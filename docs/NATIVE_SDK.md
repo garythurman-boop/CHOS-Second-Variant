@@ -74,3 +74,9 @@ libchos-quad.a and linked on demand in the same static runtime group. An actual
 CMake long-double divide probe and the full native arithmetic fixture link and
 run through the SDK. This does not supply complete long-double libm or dynamic
 floating-environment conformance.
+
+[Native floating parsing](NATIVE_FLOAT_PARSING.md) adds libchos-floatparse.a and
+real C-locale strtof/strtod/strtold/atof. The CMake probe really links strtod, and
+its full fixture executes through the SDK in isolated UEFI. Small original
+long-double math helpers and nexttoward are also now present; full streams,
+formatting, locale switching and long-double transcendental support remain open.

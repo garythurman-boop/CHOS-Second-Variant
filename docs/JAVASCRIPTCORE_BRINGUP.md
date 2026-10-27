@@ -125,3 +125,8 @@ fails. Full POSIX and an engine build are not claimed.
 ICU common units to pass native SDK syntax checks. The original LLVM dynamic_cast
 algorithm has direct/UEFI guest tests. Full ICU links/data/i18n and the JSC
 configure/build/execute gates remain open; syntax counts do not close those gates.
+
+[Native C floating parsing](NATIVE_FLOAT_PARSING.md) removes the missing strtod
+syntax failure in ICU messagepattern.cpp, raising the real SDK common-source
+inventory to195/202. Runtime tests qualify the parser component, not the complete
+ICU common/data/i18n dependency or the JSC engine gate.

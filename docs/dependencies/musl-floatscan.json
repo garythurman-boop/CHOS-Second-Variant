@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "project": "musl floating text conversion",
+  "version": "1.2.5",
+  "commit": "0784374d561435f7c787a555aeab8ede699ed298",
+  "source": "https://git.musl-libc.org/cgit/musl",
+  "scope": "original strtof/strtod/strtold/atof/floatscan over native bounded memory-string scanner; no stdio FILE streams or full locale support",
+  "sources": [
+    "src/stdlib/strtod.c",
+    "src/stdlib/atof.c",
+    "src/internal/floatscan.c"
+  ],
+  "files": {
+    "src/internal/floatscan.c": "13a007ee0be8682efa12c80e088a1758a425d8be1842980609f20c0f9d6d9ad5",
+    "src/internal/floatscan.h": "84b09ffb83d5bf7d0751f8cf21b7a1ab241576057b275339807b6a3af0f07f6b",
+    "src/internal/shgetc.h": "8bf68f99a81d25c7a7b17b3f862498c94e5dbd6d2daa2a94765ef7a5d950563d",
+    "src/stdlib/strtod.c": "4b1945084cb6bf53a6d5684ca3bfd0c824eab9cbdb2b2fdfc9811fb526dd67ab",
+    "src/stdlib/atof.c": "2d5733fbc1ae1b50b0b0b5bd6533551a6e69dae5491b0150f3b4c459dd722e45"
+  },
+  "provenance": "All 14 newly imported scanner/math files matched immutable musl Git mirror commit over HTTPS; no new release signature verification claimed",
+  "immutable_source_root": "https://raw.githubusercontent.com/ifduyue/musl/0784374d561435f7c787a555aeab8ede699ed298/"
+}

@@ -321,3 +321,11 @@ fixtures in direct/isolated UEFI QEMU. Those tests found an upstream19.1.7 multi
 carry defect; the pinned original20.1.8 helper header fixes it without weakening
 the oracle. Complete dynamic-FENV semantics, floating parsing/formatting and full
 ICU/engine integration remain open. See validation/stage3-native-binary128.json.
+
+[Native floating conversion](NATIVE_FLOAT_PARSING.md) now runs original musl
+strtof/strtod/strtold/atof over bounded memory strings, with exact-ratio target
+fixtures and host/sanitizer differential checks. The SDK also supplies the small
+long-double math closure and real nexttoward behavior these dependencies need.
+ICU common syntax inventory is195/202; full ICU/data/i18n and the actual modern
+engine, production security and Pi5 radio gates remain open. See
+validation/stage3-native-floatparse.json. No new binaries are published.

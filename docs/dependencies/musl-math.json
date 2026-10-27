@@ -4,7 +4,7 @@
   "commit": "0784374d561435f7c787a555aeab8ede699ed298",
   "upstream": "https://git.musl-libc.org/cgit/musl",
   "mirror": "https://github.com/ifduyue/musl",
-  "scope": "unmodified selected ARM64 binary32/binary64 math and real fenv sources; not full musl libc or binary128 long-double/nexttoward support",
+  "scope": "unmodified selected ARM64 binary32/binary64 math and real fenv,plus bounded binary128 classification/sign/modulus/scaling/frexp and nexttoward support; not full musl libc or long-double transcendental/FENV support",
   "license": "MIT with retained per-file notices; see COPYRIGHT",
   "sources": [
     "src/fenv/__flt_rounds.c",
@@ -176,7 +176,16 @@
     "src/math/tanh.c",
     "src/math/tanhf.c",
     "src/math/tgamma.c",
-    "src/math/tgammaf.c"
+    "src/math/tgammaf.c",
+    "src/math/__fpclassifyl.c",
+    "src/math/__signbitl.c",
+    "src/math/fmodl.c",
+    "src/math/scalbnl.c",
+    "src/math/frexpl.c",
+    "src/math/fabsl.c",
+    "src/math/copysignl.c",
+    "src/math/nexttoward.c",
+    "src/math/nexttowardf.c"
   ],
   "files": {
     "COPYRIGHT": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
@@ -413,7 +422,16 @@
     "src/math/tgammaf.c": "b827e09c7e2387a6d95fe91fe1c74fc01e709524a676aa25a8f3bd8ec364beae",
     "src/math/trunc.c": "2f2941542db65a5c3a8a6fa952b978a5ff757f8b14ffdaef8ad28e0cafead644",
     "src/math/truncf.c": "dd67c4d71894da6c93bc41ec6a141de45124d3d3f4d012bc95aac4fc792abccb",
-    "tools/mkalltypes.sed": "8ccea9ec27a8450a52973cab8cdea0af8b4bd93d246b1f206b37ccc6fa0b8b7b"
+    "tools/mkalltypes.sed": "8ccea9ec27a8450a52973cab8cdea0af8b4bd93d246b1f206b37ccc6fa0b8b7b",
+    "src/math/__fpclassifyl.c": "79a2f6d1f56dd3c3cc316d6fc5891ec0bd04b69a1b0f6688e028fb29c8f85a84",
+    "src/math/__signbitl.c": "53e77b86e2b7cf42a4a80c4b063d05519b50070c6b5c77b18d5a3e5d07812a3c",
+    "src/math/fmodl.c": "2e0331976ad4414bae10293befdb06a36b89cb8a7fcd66522cdb48c8485b97cb",
+    "src/math/scalbnl.c": "f4da2cc8aa06122ce93867a80516abf3f4002abb9fdaf2da826c2c1986759345",
+    "src/math/frexpl.c": "69d438311e12c803275c68d12c541e255ed393fa8e7af3e6d1a6559ac198ac7e",
+    "src/math/fabsl.c": "5837d6f134333ec433c14f46b09e0ebafbd86b7d2febce244bf6507ffa4c8c18",
+    "src/math/copysignl.c": "17851a8156e37d0c412e9347a48739b0c33b92ad7eb868a9825b865984b9534c",
+    "src/math/nexttoward.c": "ad4a0c12aae4a1d1c52abb2c38bdc025228883844706a606f4f763f24be12382",
+    "src/math/nexttowardf.c": "5041be5f1cfd74da514cda3b1165390c62a5fe25892032eccdcdf04f07cec9a0"
   },
   "host_sources": [
     "src/math/__cos.c",
