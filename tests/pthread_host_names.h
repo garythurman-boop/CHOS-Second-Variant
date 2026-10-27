@@ -5,6 +5,7 @@
 #define pthread_attr_init chos_test_pthread_attr_init
 #define pthread_attr_setdetachstate chos_test_pthread_attr_setdetachstate
 #define pthread_attr_setstacksize chos_test_pthread_attr_setstacksize
+#define pthread_cond_clockwait chos_test_pthread_cond_clockwait
 #define pthread_cond_broadcast chos_test_pthread_cond_broadcast
 #define pthread_cond_destroy chos_test_pthread_cond_destroy
 #define pthread_cond_init chos_test_pthread_cond_init

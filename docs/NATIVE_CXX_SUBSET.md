@@ -106,3 +106,9 @@ and post-key C++ TLS destruction with a shared per-TCB cleanup budget.
 global-startup/atexit status for the bounded dense static profile. Full C++/POSIX,
 ICU/modern engine,production security policy and wireless remain open; binaries
 stay held.
+
+The subsequent [C++ synchronization iteration](NATIVE_CXX_SYNCHRONIZATION.md)
+extends the original dependency closure to716 files and supplies mutex/CV/timed
+wait/call_once/shared ownership runtime. That document supersedes this historical
+profile's declaration-only threading status. std::thread and the other full
+standard-library/engine limits remain open.

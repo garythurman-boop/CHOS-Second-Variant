@@ -98,3 +98,11 @@ font/image dependencies, the TLS/network broker and real browser integration.
 Production trust/time/entropy policy, browser isolation/conformance, real Pi5
 wireless and independent new Fusion qualification remain full-stage requirements.
 Binaries stay held and completion version0.50.0 is not assigned.
+
+The subsequent [C++ synchronization component](NATIVE_CXX_SYNCHRONIZATION.md)
+implements real mutex/CV/call_once and shared ownership over native pthreads.
+Original ICU79.1 umutex.cpp now compiles and runs in the bounded component fixture
+with debug assertions. This closes the specific missing threading prerequisite;
+no target ICU uc/i18n/data libraries have been built or installed for FindICU, so
+the upstream configure gate is not marked passed. Larger runtime/memory and
+production engine/security qualification remain required.

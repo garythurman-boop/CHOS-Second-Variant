@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <uchar.h>
 #define CHOS_CXX_GUARD_DEPTH 16u
+#define CHOS_CXX_ONCE_DEPTH 16u
 #define CHOS_TCB_MAGIC UINT64_C(0x43484f5354434231)
 typedef struct { void *value;uint32_t generation; } chos_specific_t;
 typedef struct {
@@ -18,6 +19,7 @@ typedef struct {
  unsigned cxx_cleanup_started,cxx_finalize_depth,cxx_callbacks_left;
  mbstate_t unicode_states[4];
  pthread_once_t *active_once[8];
+ uint64_t *active_cxx_once[CHOS_CXX_ONCE_DEPTH];unsigned cxx_once_depth;
  uint64_t *active_guards[CHOS_CXX_GUARD_DEPTH];unsigned guard_depth;
  chos_specific_t specific[PTHREAD_KEYS_MAX];
 } chos_libc_tcb_t;
@@ -26,6 +28,7 @@ extern "C" {
 #endif
 chos_libc_tcb_t *__chos_libc_tls(void);
 void __chos_once_abandon(chos_libc_tcb_t *);
+int __chos_cxx_execute_once(volatile uint64_t *,void *,void (*)(void *));
 void __chos_cxx_guard_abandon(chos_libc_tcb_t *);
 int __chos_pthread_key_create_late(pthread_key_t *,void (*)(void *));
 void __chos_cxx_thread_finalize(chos_libc_tcb_t *);

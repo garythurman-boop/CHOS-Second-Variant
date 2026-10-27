@@ -26,5 +26,10 @@
     "No thread-disabled/data-stub substitute used to satisfy engine dependencies",
     "Full target data generation,build,licensing and release/security qualification remain open",
     "HTTPS Git identity recorded; release signature verification not claimed"
-  ]
+  ],
+  "subsequent_component": {
+    "manifest": "docs/dependencies/icu-threading.json",
+    "report": "docs/NATIVE_CXX_SYNCHRONIZATION.md",
+    "scope": "Original umutex.cpp now compiles/runs with enabled debug assertions in bounded native component fixture; test-only cleanup recorder. No full ICU libraries/data or engine installed."
+  }
 }

@@ -80,8 +80,8 @@ void pthread_exit(void *result){
  chos_libc_tcb_t *t=__chos_libc_tls();
  if(t->process_exiting||t->process_finalizer_depth)abort();
  if(!t->exiting){t->exiting=1;__chos_once_abandon(t);__chos_cxx_guard_abandon(t);__chos_cxx_thread_finalize(t);destructors(t);}
- /* A key/TLS destructor may itself exit during a new guarded initializer. */
- __chos_cxx_guard_abandon(t);
+ /* A key/TLS destructor may itself exit during a new guarded/once initializer. */
+ __chos_once_abandon(t);__chos_cxx_guard_abandon(t);
  /* Key destructors can construct previously unused C++ TLS objects. Their
   * callbacks must run while compiler TLS storage is still retained. */
  __chos_cxx_thread_finalize(t);

@@ -91,3 +91,9 @@ requires stable warm physical pages and zero remaining kernel futex wait records
 The legacy C/C++ header/link/runtime test also calls the native pthread interfaces;
 it does not claim a C++ standard library. Exact evidence is recorded in
 validation/stage3-native-pthread.json. New Fusion/Pi/laptop qualification is NOT RUN.
+
+The subsequent [C++ binding profile](NATIVE_CXX_SYNCHRONIZATION.md) adds per-call
+CLOCK_MONOTONIC/REALTIME pthread_cond_clockwait and independently tracks16 nested
+64-bit libc++ once flags. It supersedes the earlier absence of C++ mutex/CV/once
+bindings, while preserving the distinct32-bit pthread_once ABI and its8-level
+bound. Detached threads, C timed-lock APIs and the other listed POSIX limits remain.

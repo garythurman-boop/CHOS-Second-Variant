@@ -1,0 +1,1318 @@
+{
+  "stage3_complete": false,
+  "modern_engine_integrated": false,
+  "binary_publication": "HELD",
+  "scope": "Native no-exceptions/no-RTTI libc++ mutex/CV/timed waits,64-bit once with owner-exit retry,shared/weak ownership and original ICU threading component only",
+  "base_commit": "f7d2843731f3c5fdb733447650570fe27a2f41d5",
+  "source_sha256": {
+    "docs/dependencies/icu-threading.json": "871add4a0ee973b03bf1af42339dd61dc31480289db561cf88cedb4de2820f41",
+    "docs/dependencies/libcxx-native.json": "4f8d47b655e3c4501ecd862e117a0f8da254a893069bee3ad8378dba2ff2da9b",
+    "tests/pthread_host_names.h": "b7b97751d1f4957ac65692d20dde8cdb678b9c9c97c0e5936a88579c50aad415",
+    "tests/qemu_cxx.py": "46f18e1346ea63bc2be51d33a1747346f581a515a133ab5bc78bfe27f2f089a5",
+    "tests/qemu_cxx_sync.py": "eda043769a3bf84462b8f230da7fed2e8834091fbc815d799b1f7a88e4586c5e",
+    "tests/test_pthread_sync.c": "4d4f094abcd82d68d5cbaef0e3880e084ee574df7214ab30ca07f16043e376c0",
+    "tools/configure_libcxx.py": "26e7c3f61ff2583a28194cf0858f4f9dfa0fdd6a56f66531d3c829e0d24facce",
+    "tools/verify_icu_threading.py": "c388bca80f76c9529ce14aeeecd67a5466662cc4630fceaafaad906344e822f3",
+    "tools/verify_libcxx.py": "13788d364d2f65c90ed7cb0c76449abf9f6382c48a9520a37eeb9141ec894f30",
+    "userland/app.ld": "18a2bdb9a0071e0b6cfdbb0cf1239e8eb796e9fe8d42d3c08873329227866134",
+    "userland/examples/cxx_sync_test.cpp": "38a26517a21962f73a4d6e59fba2cdd77972520fc2833a0c7f80c9b70cd7885b",
+    "userland/examples/icu_threading_test.cpp": "1517cbe5841ca8d26626fe1f4c4021a4ac22b2e9869706fe3dd722c61fd29248",
+    "userland/libc/Makefile.inc": "22283eb8526bf80acf129732ad4d260da910acc9c607fd467b1c03d2b9a2ee95",
+    "userland/libc/allocator.c": "3d7f29b73df1f1f2f11b04511611715a3e32004957854317614fe1ea6250f972",
+    "userland/libc/assert.c": "32f8dc4353a1e88a76cce5fef807c6a00e255c8a00465e46d9ec7e5b23556f41",
+    "userland/libc/cxx_guard.c": "14831459f1657ae6a67aef5e5b4a0c396e6783286d9824ade569e3086b479777",
+    "userland/libc/cxx_thread_atexit.c": "2ecbe631b5781bfc5629ee27b2824faa4617d65e1bf22c87e2b84504cdb377b9",
+    "userland/libc/emutls_adapter.c": "398699fb8176dd8e95e4618ddae4d01ba9f88aedb6b96d0ddd72f646f3a6a215",
+    "userland/libc/exit.c": "d302a4c79c1265f09c282169a283100c1aa65a62e8c9a1afdaa9c81370ce747a",
+    "userland/libc/exit_registry.c": "1ca3cc7144d7c7a5fb812067d8be8fecf987e3887db09280cb5ab5cedff8a07e",
+    "userland/libc/filename.c": "084f3d535bbca06dfefa41714c8e12edf755d49caad9d34bf67bdc9406cb1417",
+    "userland/libc/fp_environment.S": "e0276bb3b2a1d8c456be281e0e3193bac6a94202dc2ed23f3223176f756873ed",
+    "userland/libc/include/assert.h": "a7f04c7177140e49754a038c8783abc4fce9fbc43f44aa96d84209638ca4517b",
+    "userland/libc/include/chos/allocator.h": "8324738ce128df2fc9a8a801a337c807a5026d3c559526dc69a2c6cd88317310",
+    "userland/libc/include/chos/libc.h": "2b55a9b0084d5dbf7feb505be3c3a803df529bd7e955ea94311a7e943afca0d4",
+    "userland/libc/include/chos/libc_string.h": "9b0dc2e7551910b6aeff1a7530f31574cb298583ed798504e3e147b70e503921",
+    "userland/libc/include/chos/tls_runtime.h": "6b02d0564b51f2ff1174128c3ff8bbc689a0a43081ab5c6c0f2d4c18ef3294fc",
+    "userland/libc/include/errno.h": "e1403888885c5b1491f385ca2e7d21e6ef4d9a864568ab22e8c1198524305660",
+    "userland/libc/include/pthread.h": "8ec41d0cc89f635c61d7b1d6c0f2fcc29187483d6d2212c8d6612e383ef9ee4d",
+    "userland/libc/include/stdio.h": "efb1f698bd424da5a89fbcce3a90a0680825265669e45c7167b1bdc41fbb672f",
+    "userland/libc/include/stdlib.h": "75816d57a5169ca5e41d89817e15ead31ef5619fed2b78af2c97554dc773bc0b",
+    "userland/libc/include/string.h": "b2c02d9ba5ba58152a36d0202a38c32a7663241d0974d0e5e3cfab28100a7417",
+    "userland/libc/include/time.h": "c19f3b182f797d9823ac6e602108502ea60a6c069b06a8fa7b13f734df803985",
+    "userland/libc/include/uchar.h": "f838e1736d84690122a9aa1b572234951dc4df0040b112250f299128a63c4546",
+    "userland/libc/internal/exit_registry.h": "c22af6a2b3e3089749e41e3f8d32ffd37d262cba7c76626e7cd5f07588ee50cc",
+    "userland/libc/numeric.c": "3eea1543ea3375dd102177f7fb05309f383536711cdb4f07c2a44ed928eeebfe",
+    "userland/libc/pthread.c": "ce7a8a1b5a322cfcb4fda5bc7a6a15ac08f86b913413f8a27f5e753115b7f9a9",
+    "userland/libc/pthread_sync.c": "0eabeff89342455aceeda035e40a5398aa7f35db5543d7d4dda7c1d54c7863f3",
+    "userland/libc/static_startup.c": "3bee92406e37de95ea0e121bd307ac73789a56a238793fcb7e4d43105fe253d5",
+    "userland/libc/stdlib.c": "dc1d8737990ac689499eb59aa75ed6dbb2b4257e10a729aa8c6be1544bcf74f5",
+    "userland/libc/string.c": "442fa8693416b37b23fc56c1ef09156b82435a161b9e5fab9a922bd3454c09a1",
+    "userland/libc/time.c": "42184ff685ec9c5e7ef2a8a7801f15c6cdbd0f21c22813b01bd7f12f2411491c",
+    "userland/libc/tls.c": "b42ca622d358e1a3b38446bca60cc8cd514abaebe9c20d8cbc7c69bcfdcebcac",
+    "userland/libc/unicode.c": "ecf2f7aae894d7e869a678c255f8bcc2804a8dc7fb6713859342596cb7b29848",
+    "userland/libcxx/Makefile.inc": "77b74a939354af18a1758317c5a4b6e0f37ece1c7b66ff719bafe46339c00a4e",
+    "userland/libcxx/clocks.cpp": "02a097dcbf36840efde1245380e0843aaa90eaec879f4db029df6a7e05a5735d",
+    "userland/libcxx/include/__external_threading": "312a97972c033f0205592c88735bcdfdfc0166b9b8f6f2fa0ecf71afca923eab",
+    "userland/libcxx/string_instantiations.cpp": "048b227ce1532fccb5f0787481fbab4fcb69962ebb8b5fa0288aafd7c4be3b47",
+    "userland/libcxx/threading.cpp": "4b04c193945f312e60fc970091681dc765d4d42ec7deb100af084728a18fb760",
+    "userland/libcxx/verbose_abort.cpp": "536fe65eba64eeb2b180a53cc76987f2a1f06544602f8d9872c7b790ae9a13b7",
+    "userland/native_abi.S": "0c65954b3e7b711cf6cf1ad46dce8173e5a1e79b3d1a6d9d765113418f9ef6a5",
+    "userland/start.S": "20ea4ed36c001d8e3bf6b303c1bec54f855c03de60073ead90d78d23ebca8d4b"
+  },
+  "guest_results": {
+    "cxx-sync-final-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "component": "cxx",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "recursive",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "quota",
+          "pid": 5,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "unlocked-wait",
+          "pid": 6,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "double-lock",
+          "pid": 7,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 8,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "2aba4a3d65b4eed3a4121b386913266fae43e0ffbe2af7c686a87cf70a3cdfc2",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117591,
+      "free_pages_after": 117591,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 513,
+      "checks": [
+        "upstream mutex/recursive/timed/recursive-timed algorithms with native pthread bindings",
+        "three contending workers,condition predicates,notify_one/all,unique_lock/scoped_lock and memory publication",
+        "original shared_ptr/weak_ptr concurrent ownership and exact destruction; condition_variable_any with recursive_mutex",
+        "real system/steady clocks,monotonic wait_for/until and timeout followed by lock reacquisition",
+        "once_flag full-width completion,argument forwarding,16 nested initializers and retry after pthread_exit including key destructor",
+        "recursive/depth17 once,unowned wait and double unique_lock abort134 without kernel failure",
+        "three process runs and relaunch after refusals,stable warm physical pages and no queued futexes"
+      ],
+      "limits": [
+        "bounded native no-exceptions/no-RTTI libc++ subset,not full standard library",
+        "std::thread/futures/notify-at-exit runtime and dynamic loading not qualified",
+        "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+        "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "cxx-sync-final-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "component": "cxx",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "recursive",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "quota",
+          "pid": 5,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "unlocked-wait",
+          "pid": 6,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "double-lock",
+          "pid": 7,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 8,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "2aba4a3d65b4eed3a4121b386913266fae43e0ffbe2af7c686a87cf70a3cdfc2",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500419,
+      "free_pages_after": 500419,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 516,
+      "checks": [
+        "upstream mutex/recursive/timed/recursive-timed algorithms with native pthread bindings",
+        "three contending workers,condition predicates,notify_one/all,unique_lock/scoped_lock and memory publication",
+        "original shared_ptr/weak_ptr concurrent ownership and exact destruction; condition_variable_any with recursive_mutex",
+        "real system/steady clocks,monotonic wait_for/until and timeout followed by lock reacquisition",
+        "once_flag full-width completion,argument forwarding,16 nested initializers and retry after pthread_exit including key destructor",
+        "recursive/depth17 once,unowned wait and double unique_lock abort134 without kernel failure",
+        "three process runs and relaunch after refusals,stable warm physical pages and no queued futexes"
+      ],
+      "limits": [
+        "bounded native no-exceptions/no-RTTI libc++ subset,not full standard library",
+        "std::thread/futures/notify-at-exit runtime and dynamic loading not qualified",
+        "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+        "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "icu-sync-final-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "component": "icu",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "assert",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 5,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "70d0694a8a29f50d180eac700918425b0e0e1f4ac41e23eeadde5a607be3b5b3",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117615,
+      "free_pages_after": 117615,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 795,
+      "checks": [
+        "unmodified ICU79.1 umutex.cpp,with original debug assertions enabled",
+        "three native workers contend on eight ICU mutexes plus global mutex",
+        "ICU UInitOnce exact-once data and failed-status publication through actual condition-variable wait/notify",
+        "test recorder captures only the mutex cleanup callback; invokes real ICU cleanup and placement reset across four complete lifecycles",
+        "native C assertion failure aborts only its process; clean relaunch,stable warm frames and no queued futexes"
+      ],
+      "limits": [
+        "bounded native no-exceptions/no-RTTI libc++ subset,not full standard library",
+        "std::thread/futures/notify-at-exit runtime and dynamic loading not qualified",
+        "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+        "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "icu-sync-final-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "component": "icu",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "assert",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 5,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "70d0694a8a29f50d180eac700918425b0e0e1f4ac41e23eeadde5a607be3b5b3",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500443,
+      "free_pages_after": 500443,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 795,
+      "checks": [
+        "unmodified ICU79.1 umutex.cpp,with original debug assertions enabled",
+        "three native workers contend on eight ICU mutexes plus global mutex",
+        "ICU UInitOnce exact-once data and failed-status publication through actual condition-variable wait/notify",
+        "test recorder captures only the mutex cleanup callback; invokes real ICU cleanup and placement reset across four complete lifecycles",
+        "native C assertion failure aborts only its process; clean relaunch,stable warm frames and no queued futexes"
+      ],
+      "limits": [
+        "bounded native no-exceptions/no-RTTI libc++ subset,not full standard library",
+        "std::thread/futures/notify-at-exit runtime and dynamic loading not qualified",
+        "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+        "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "cxx-sync-crt-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "applications_sha256": {
+        "/BIN/START.ELF": "f7e3549c6a308088b23fc6475bff85880800ab83aacecb5c520cab8d3402edfe",
+        "/BIN/EARLY.ELF": "1b4b6a15f01492fbe0f1c5912222b4c06588d766683cc7c7b2ef413932958efb"
+      },
+      "cold_free_pages": 500527,
+      "free_pages_before": 500464,
+      "free_pages_after": 500464,
+      "cases": [
+        {
+          "mode": "return",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 17,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8699083519750275,
+          "status": "PASS"
+        },
+        {
+          "mode": "exit",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 23,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8717637580120936,
+          "status": "PASS"
+        },
+        {
+          "mode": "last-thread",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 0,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.990822241990827,
+          "status": "PASS"
+        },
+        {
+          "mode": "worker-exit",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 37,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.990693096013274,
+          "status": "PASS"
+        },
+        {
+          "mode": "c-quota",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 18,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8909769700258039,
+          "status": "PASS"
+        },
+        {
+          "mode": "immediate",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 77,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8703879230015446,
+          "status": "PASS"
+        },
+        {
+          "mode": "return",
+          "path": "/BIN/EARLY.ELF",
+          "expected_exit": 9,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.20357771299313754,
+          "status": "PASS"
+        },
+        {
+          "mode": "cxx-quota",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 134,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8703876770159695,
+          "status": "PASS"
+        },
+        {
+          "mode": "loop",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 134,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.871028731984552,
+          "status": "PASS"
+        },
+        {
+          "mode": "recursion",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 134,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8702995269850362,
+          "status": "PASS"
+        },
+        {
+          "mode": "thread-in-exit",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 134,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8507352060114499,
+          "status": "PASS"
+        },
+        {
+          "mode": "thread-in-finalize",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 134,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8507411640021019,
+          "status": "PASS"
+        },
+        {
+          "mode": "recursive-exit",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 134,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8722473589878064,
+          "status": "PASS"
+        },
+        {
+          "mode": "pure-virtual",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 134,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8724901030072942,
+          "status": "PASS"
+        },
+        {
+          "mode": "array-ro",
+          "path": "/BIN/START.ELF",
+          "expected_exit": null,
+          "fault_expected": true,
+          "free_pages": 500464,
+          "seconds": 0.8712157479894813,
+          "status": "PASS"
+        },
+        {
+          "mode": "return",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 17,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.8735350520000793,
+          "status": "PASS"
+        },
+        {
+          "mode": "return",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 17,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.871087992010871,
+          "status": "PASS"
+        },
+        {
+          "mode": "return",
+          "path": "/BIN/START.ELF",
+          "expected_exit": 17,
+          "fault_expected": false,
+          "free_pages": 500464,
+          "seconds": 0.871633731003385,
+          "status": "PASS"
+        }
+      ],
+      "checks": [
+        "real preinit/init priorities before main,including native worker creation/join during a constructor",
+        "argc/argv preserved through startup and native C++ vector/global/local-static constructors execute",
+        "typed C/C++ LIFO,DSO-selective/repeated/concurrent finalization and exactly-once destruction",
+        "C++ thread-local destructors precede process statics; objects created in key destructors also finalize before compiler TLS release; current compiler TLS survives global teardown",
+        "normal main return,exit,last pthread_exit,worker-initiated exit and early-constructor exit",
+        "_Exit bypasses all callbacks and global fini arrays",
+        "callback quotas,rearm/recursion and forbidden pthread_exit/recursive exit fail closed",
+        "constructor arrays are file-backed RO; actual attempted store faults only that process",
+        "fini priorities run after process callbacks and can register additional atexit cleanup,clean relaunch and stable warm frames/no queued futexes"
+      ],
+      "limits": [
+        "bounded static native ELF profile,128 process callbacks,512 callback budget,16 recursive finalizations",
+        "no exceptions/unwinding,DSO loading,full libc++/POSIX or modern engine",
+        "new Fusion/Pi/laptop behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "cxx-sync-pthread-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "bfa885ba0367b177d2a032f9733e49b896e51018c65730f99472de5a70efa655",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117656,
+      "free_pages_after": 117656,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 621,
+      "checks": [
+        "real pthread create/join return values, same-process synchronization and repeated lifetime cleanup",
+        "concurrent malloc/calloc/realloc/free with data and zero checks",
+        "per-thread errno and generation-tagged specific keys remain isolated across actual scheduling",
+        "normal/errorcheck/recursive mutex and condition predicate/signal/broadcast",
+        "absolute monotonic condition timeout reacquires original mutex",
+        "exactly-once initialization under contention and retry if initializer calls pthread_exit",
+        "key destructor reset/repeat, deleted key generation and quota refusal",
+        "main pthread_exit preserves worker, join result and final normal process teardown",
+        "no remaining kernel futex waiters and stable physical pages"
+      ],
+      "limits": [
+        "bounded native pthread subset, not full POSIX/compiler ELF TLS or C++ standard library",
+        "detached/process-shared/robust/PI/cancellation/signal/priority/affinity APIs not supplied",
+        "new Fusion/physical behavior NOT RUN",
+        "modern engine and Stage3 remain incomplete"
+      ]
+    },
+    "cxx-sync-tls6-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+      "application_sha256": "01496a4c21bfe5cc11776aad546371f7a6d072c457823eec014434e9f107fabd",
+      "ipv6": true,
+      "tcp6_wire_frames": 362,
+      "missing_clock": false,
+      "missing_entropy": false,
+      "cold_free_pages": 500527,
+      "free_pages_before": 500170,
+      "free_pages_after": 500170,
+      "cases": [
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5468099389981944,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "chain",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5870359739928972,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "bad-chain",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.48602935901726596,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.46629708900582045,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.46624976000748575,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "aes256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6878817660035565,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 4,
+          "hostname": "wrong.chos.test",
+          "seconds": 0.38459990799310617,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.32396074099233374,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "wrong-purpose",
+          "expected": 4096,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.42517287802184,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "expired",
+          "expected": 1,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.44649731801473536,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "future",
+          "expected": 512,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.4482083810144104,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "malformed",
+          "expected": 998,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.2835367560037412,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "truncated",
+          "expected": 997,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5071823569887783,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "stall",
+          "expected": 996,
+          "hostname": "fixture.chos.test",
+          "seconds": 15.241525597986765,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 993,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.18435550699359737,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 995,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.203494204004528,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 994,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.791236930002924,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5275930870266166,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 989,
+          "hostname": "fixture.chos.test",
+          "seconds": 2.2447868050076067,
+          "stalled_network_gui_response_seconds": 0.06435025099199265,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 988,
+          "hostname": "fixture.chos.test",
+          "seconds": 1.7011493369936943,
+          "stalled_network_gui_response_seconds": 0.06397701098467223,
+          "result": "PASS"
+        }
+      ],
+      "server_events": [
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 46692, 0, 0)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "chain",
+          "accepted": true
+        },
+        {
+          "kind": "chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "chain",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 52312, 0, 0)"
+        },
+        {
+          "kind": "chain",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "bad-chain",
+          "accepted": true
+        },
+        {
+          "kind": "bad-chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "bad-chain",
+          "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+        },
+        {
+          "kind": "rsa",
+          "accepted": true
+        },
+        {
+          "kind": "rsa",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 33498, 0, 0)"
+        },
+        {
+          "kind": "rsa",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "rsa256",
+          "accepted": true
+        },
+        {
+          "kind": "rsa256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 56486, 0, 0)"
+        },
+        {
+          "kind": "rsa256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "aes256",
+          "accepted": true
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 55284, 0, 0)"
+        },
+        {
+          "kind": "aes256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: SSLV3_ALERT_BAD_CERTIFICATE] ssl/tls alert bad certificate (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+        },
+        {
+          "kind": "wrong-purpose",
+          "accepted": true
+        },
+        {
+          "kind": "wrong-purpose",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "wrong-purpose",
+          "server_error": "[SSL: SSLV3_ALERT_UNSUPPORTED_CERTIFICATE] ssl/tls alert unsupported certificate (_ssl.c:1010)"
+        },
+        {
+          "kind": "expired",
+          "accepted": true
+        },
+        {
+          "kind": "expired",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "expired",
+          "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_EXPIRED] ssl/tls alert certificate expired (_ssl.c:1010)"
+        },
+        {
+          "kind": "future",
+          "accepted": true
+        },
+        {
+          "kind": "future",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "future",
+          "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_UNKNOWN] ssl/tls alert certificate unknown (_ssl.c:1010)"
+        },
+        {
+          "kind": "malformed",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "truncated",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 42790, 0, 0)"
+        },
+        {
+          "kind": "truncated",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "stall",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 46432, 0, 0)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::ffff:127.0.0.1', 37604, 0, 0)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 46438, 0, 0)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 47406, 0, 0)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 47418, 0, 0)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::ffff:127.0.0.1', 59576, 0, 0)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 47430, 0, 0)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('::1', 47440, 0, 0)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        }
+      ],
+      "limits": [
+        "ephemeral test root only; production trust store/update policy still open",
+        "firmware/RTC clock availability is not authenticated time",
+        "browser integration, full modern engine and live Wi-Fi remain open",
+        "QEMU evidence; Fusion/physical TLS NOT RUN"
+      ]
+    },
+    "cxx-sync-typing-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "ordinary_tap_down_ms": 50,
+      "console_lengths": [
+        26,
+        19
+      ],
+      "browser_lengths": [
+        36,
+        29
+      ],
+      "document_lengths": [
+        36,
+        29
+      ],
+      "editor_sha256": "63e6a4eeaa44648420fa4ff01b2b7d1507c571e5d96419c1465f9566b3d5487b",
+      "checks": [
+        "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+        "plain I leaves Setup closed",
+        "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+        "actual isolated Console held Backspace/letters and visible caret pixels",
+        "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+        "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+        "native editor auto-saves on Escape; USB keyboard removal releases held key",
+        "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+        "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+      ]
+    },
+    "cxx-sync-emutls-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "4af01aad7b6efa7699e3d03c4b1c28955411d1b3bf05887bfe60466c1ab429a2",
+      "compiler_tls_controls": 48,
+      "elf_pt_tls": false,
+      "cold_free_pages": 500527,
+      "free_pages_before": 500481,
+      "free_pages_after": 500481,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 147,
+      "checks": [
+        "real clang -femulated-tls C11 and C++17 variables, initialization and4096-byte alignment",
+        "at least48 compiler TLS controls trigger upstream per-thread address-array growth",
+        "three workers preserve isolated TLS values across SVC/yield/preemption and repeated launches",
+        "C++ thread_local constructors once per thread, destructors in reverse order before C key callbacks",
+        "ordinary key callbacks access retained compiler TLS through all four destructor passes",
+        "compiler storage and C++ cleanup nodes reclaimed after join; user heap returns to exact main baseline",
+        "normal main return and explicit main pthread_exit run C++ TLS destructors with valid values",
+        "main pthread_exit preserves worker and join result",
+        "key/dtor quotas and recursive destructor registration fail closed with bounded exit134 and stable pages",
+        "no queued futex records, no unresolved runtime imports and no PT_TLS dependency"
+      ],
+      "limits": [
+        "explicit -femulated-tls static-link profile, not native ELF TLS relocations/dynamic loader",
+        "no full C++ standard library, exceptions or DSO unload support; this sparse fixture excludes global constructor arrays",
+        "C++ thread-local callback registration64 pending per thread, cleanup bound256 invocations",
+        "native heap, thread and key quotas remain in force",
+        "new Fusion/physical behavior NOT RUN; modern engine and Stage3 incomplete"
+      ]
+    },
+    "cxx-sync-cxx20-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "cxx_standard": "20",
+      "application_sha256": "85c37110e482242eb26af2ee8527b48d7e3b8bab1a288020eabfed85e1676739",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500319,
+      "free_pages_after": 500319,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 201,
+      "checks": [
+        "native array/vector/string,default integer sort/search,unique_ptr and RAII",
+        "regular/array/aligned/nothrow new/delete,handler retry and overflow refusal",
+        "three raw pthread workers use native containers and lock-free atomics across scheduling",
+        "file rename/read/remove,empty/nonempty directory,missing/protected paths and no-replace destination",
+        "three worker lifecycles and repeated processes return heap and PMM frames",
+        "OOM abort and hardening bounds fault are process-local with successful relaunch",
+        "no unresolved imports or PT_TLS dependency; no retained futex waiters"
+      ],
+      "limits": [
+        "static C++20/23 no-exceptions/no-RTTI container/allocation profile,not full libc++/libc++abi",
+        "std::mutex/CV/once are separately qualified; std::thread,exceptions and dynamic loading remain absent",
+        "binary128 default sort requires compiler-rt __lttf2 and is not linked by this profile",
+        "no stdio streams/formatting/locale/full POSIX or JavaScriptCore execution",
+        "new Fusion/physical behavior NOT RUN; modern browser and Stage3 incomplete"
+      ]
+    }
+  },
+  "guest_evidence_sha256": {
+    "cxx-sync-final-direct": {
+      "result.json": "f288d098348007f86821a23f04d214755ae07e1ba0c5a39bf4521001db10b336",
+      "artifacts.json": "b753bcf859251046e9e29615583b84346179e54e9e67bf080d987e555cbfc87b",
+      "serial.log": "a51d53dcfe22af9e87fb3d66ea9ba5ac34014090765fe197db34e061eed41045"
+    },
+    "cxx-sync-final-uefi": {
+      "result.json": "f13f0c6bbafcba102112a4f3186a6ed9133ac5fbdaa9026fae30d4c026ad192d",
+      "artifacts.json": "87f4d725951f55e2e5cda8f991541022bc0db2e2c65d12c54590b0ce81fc6f8e",
+      "serial.log": "67645067b950c6c30ac133df418b2a7430aba965358fc81b17fabb662b7d44d2"
+    },
+    "icu-sync-final-direct": {
+      "result.json": "31b1b6c634cc811eaa4b99bedc9e2aac7895a6e37ab154a4d8efd4918909feaf",
+      "artifacts.json": "b753bcf859251046e9e29615583b84346179e54e9e67bf080d987e555cbfc87b",
+      "serial.log": "d4509e0332557cd816998d4db87b697622bb9ca756b74df2928eea71e04e7776"
+    },
+    "icu-sync-final-uefi": {
+      "result.json": "f17128dfc12a3de7457130ef2b152b1cdbd1b6cf4b0b108d869d21f7625df99d",
+      "artifacts.json": "87f4d725951f55e2e5cda8f991541022bc0db2e2c65d12c54590b0ce81fc6f8e",
+      "serial.log": "dc806f8f0c4c306f3338d19a97e735f2c15a5ecb76aba63d6e0dd91f23fe3f8f"
+    },
+    "cxx-sync-crt-uefi": {
+      "result.json": "78ffd612e25f1e63985ffea172e61e83cb8a1da374eafd19991425bd0d944e79",
+      "artifacts.json": "87f4d725951f55e2e5cda8f991541022bc0db2e2c65d12c54590b0ce81fc6f8e",
+      "serial.log": "5983d76b56e5200840b9ad357ad4903503892566fac932b929b0a3f389fb1904"
+    },
+    "cxx-sync-pthread-direct": {
+      "result.json": "c74a67be246c70b8e1d4cde235488f29ada6b0edcf8cf3225b23d1a51f93d18e",
+      "artifacts.json": "b753bcf859251046e9e29615583b84346179e54e9e67bf080d987e555cbfc87b",
+      "serial.log": "556f3f969107ba1a85dd23a6bfafe4c051f3429574c2ec8777a4202fd55c7d21"
+    },
+    "cxx-sync-tls6-uefi": {
+      "result.json": "5cf7f2d383527d857f4d50183d9f918045ec1ad2bc3e3f0c55b32f45496e885f",
+      "artifacts.json": "87f4d725951f55e2e5cda8f991541022bc0db2e2c65d12c54590b0ce81fc6f8e",
+      "serial.log": "a09da74ddf164b5a8c81e3bec217edbb54b9f9230e249bac8feec67bf8ccf07d"
+    },
+    "cxx-sync-typing-uefi": {
+      "result.json": "fa3aa07588f6ce5787fffb366f657bc101382f68bad55f285e77992338ecf205",
+      "artifacts.json": "87f4d725951f55e2e5cda8f991541022bc0db2e2c65d12c54590b0ce81fc6f8e",
+      "serial.log": "5585912b9c0320625e5d96286e09059604a74dac9a03155c3ea90b22b573fd42"
+    },
+    "cxx-sync-emutls-uefi": {
+      "result.json": "1a9364bba2b13aaba8bb1cef6afdbf9521111f4620ae04a9ebfdd70ff8af4a9d",
+      "artifacts.json": "87f4d725951f55e2e5cda8f991541022bc0db2e2c65d12c54590b0ce81fc6f8e",
+      "serial.log": "5077a9d54584a5d2243fc455bd5cace2cb2b96a69cb8cce8341767f319f9c768"
+    },
+    "cxx-sync-cxx20-uefi": {
+      "result.json": "19a78184ea70ad2f6dc3f9291b196976811cf16d04953af49276d45a5cb6dc91",
+      "artifacts.json": "87f4d725951f55e2e5cda8f991541022bc0db2e2c65d12c54590b0ce81fc6f8e",
+      "serial.log": "f22bb768f12a3608d7180cd4e712ddf8b32f4c46ec1c431fabac1196ca44f846"
+    }
+  },
+  "host_results": {
+    "cxx-sync-host-full.log": {
+      "status": "PASS",
+      "sha256": "9c09746b11fe3f87dd0d9d15a857d2cf614106539855014a9e7f35f890911834",
+      "path": "/workspace/chos-evidence/cxx-sync-host-full.log"
+    },
+    "cxx-sync-sanitize-full.log": {
+      "status": "PASS",
+      "sha256": "df50ee436a9d2d46cfa9b489b5eb01d1f479ea52c5a5e08ab0ec8212cb93b144",
+      "path": "/workspace/chos-evidence/cxx-sync-sanitize-full.log"
+    },
+    "cxx-sync-media.log": {
+      "status": "PASS",
+      "sha256": "77a5ca48b7762779f9e6132695716f66088ebd82aa39486a750d2d7aa7f59751",
+      "path": "/workspace/chos-evidence/cxx-sync-media.log"
+    },
+    "cxx-sync-smoke.log": {
+      "status": "PASS",
+      "sha256": "f201c3438edb237510cf856cb2c00ecd246c96b6a66e3843e0510632040d3ddf",
+      "path": "/workspace/chos-evidence/cxx-sync-smoke.log"
+    }
+  },
+  "retained_investigations": [
+    {
+      "path": "/workspace/chos-evidence/cxx-sync-build1.log",
+      "sha256": "2b80edc8fa407de55f89eb0f100255f4cb835a3a6acfbc1db27263a5823f0220",
+      "diagnosis": "C++23 dependency closure omitted C++20 transitive system_error; imported actual C++20 closure."
+    },
+    {
+      "path": "/workspace/chos-evidence/icu79-threading-build1.log",
+      "sha256": "d381e3ca0af5ebe9d7643caa54da523a0ef6b346f485b083dfc0b8b5c75874ad",
+      "diagnosis": "Fixture referenced ICU separate Mutex helper; corrected to actual std::lock_guard<UMutex>."
+    },
+    {
+      "path": "/workspace/chos-evidence/icu79-sync-debug-initial-diagnosis.txt",
+      "sha256": "c0112214ae13a933fb1a8782b319a2af25b25c1725546425610ec854b38067dc",
+      "diagnosis": "Initial debug compile lacked assert.h; diagnostic summary retained,not raw stdout. Native assert/NDEBUG implemented without disabling ICU assertions."
+    },
+    {
+      "path": "/workspace/chos-evidence/cxx-sync-direct1/result.json",
+      "sha256": "7e981c07df2056490afd8fc94e94a51d4bb001e10a4f4ea77df42ac3b3d4d2f8",
+      "diagnosis": "PASS intermediate before shared/weak ownership and final assertion support; superseded by final profiles."
+    },
+    {
+      "path": "/workspace/chos-evidence/icu-sync-direct1/result.json",
+      "sha256": "b54fc9d0a4ed365e32e39090279f58104be9f2405354f47d7aeea0094a2b6776",
+      "diagnosis": "PASS intermediate before final NDEBUG/no-evaluation fixture and per-process status checks; superseded by final profiles."
+    }
+  ],
+  "limits": [
+    "std::thread/futures/notify-at-exit,exceptions/unwinding/RTTI and full libc++/POSIX remain open",
+    "ICU component fixture records only its mutex cleanup callback; full cleanup registry/common/i18n/data is not supplied",
+    "No JavaScriptCore execution or modern web rendering; engine-sized memory and browser isolation remain open",
+    "Production CA/time/reseed policy and real Pi5 CYW43455 SDIO radio/firmware/AP integration remain open",
+    "QEMU evidence does not establish new Fusion/Pi/laptop results; user-reported Fusion Ethernet belongs to the earlier published build",
+    "Version remains0.30.0 and new binaries remain held;0.50.0 reserved for complete revised Stage3 acceptance"
+  ]
+}

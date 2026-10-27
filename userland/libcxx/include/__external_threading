@@ -1,7 +1,8 @@
 #ifndef CHOS_LIBCPP_EXTERNAL_THREADING
 #define CHOS_LIBCPP_EXTERNAL_THREADING
-/* ABI type/declaration seam only. Runtime definitions are not yet ported.
- * Use the qualified raw pthread API; unsupported std::thread/mutex links fail. */
+/* Native bindings use the CHOS pthread ABI. No host pthread library is linked.
+ * Detaching is unsupported and returns ENOTSUP; the standard no-exception
+ * wrapper therefore terminates if detach is requested. */
 #include <__config>
 #include <__chrono/duration.h>
 #include <pthread.h>

@@ -284,3 +284,11 @@ startup/atexit gap; full C++/POSIX and engine integration remain open.
 An [actual ICU79.1 source probe](dependencies/icu-bringup.json) identifies native
 condition_variable/mutex/call_once as concrete next dependencies. No ICU library,
 modern engine or wireless runtime support is claimed. Binary publication stays held.
+
+The [native C++ synchronization profile](NATIVE_CXX_SYNCHRONIZATION.md) adds actual
+mutex/recursive/timed locks, condition variables, monotonic timed waits, 64-bit
+call_once with owner-exit retry, and shared/weak ownership. It also runs original
+ICU79.1 mutex/init-once code as a bounded component with a test-only cleanup
+recorder. This supersedes the missing C++ mutex/CV/once runtime status; it does
+not supply full ICU common/i18n/data, std::thread, JavaScriptCore or web rendering.
+All remaining full-stage acceptance gates and the binary hold stay active.

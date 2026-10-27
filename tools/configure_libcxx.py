@@ -11,7 +11,7 @@ def define(m):
  if name in values:return '#define '+name+' '+values[name]
  return '#define '+name if name in flags else '/* #undef '+name+' */'
 text=re.sub(r'^#cmakedefine (\w+).*$',define,text,flags=re.M)
-text=text.replace('@_LIBCPP_ABI_DEFINES@','').replace('@_LIBCPP_EXTRA_SITE_DEFINES@','')
+text=text.replace('@_LIBCPP_ABI_DEFINES@','').replace('@_LIBCPP_EXTRA_SITE_DEFINES@','/* Native pthread_cond_clockwait supports both checked CHOS clocks. */\n#define _LIBCPP_HAS_COND_CLOCKWAIT')
 assert '@' not in text and '#cmake' not in text
 o.out.mkdir(parents=True,exist_ok=True);(o.out/'__config_site').write_text(text)
 shutil.copyfile('third_party/libcxx/vendor/llvm/default_assertion_handler.in',o.out/'__assertion_handler')
