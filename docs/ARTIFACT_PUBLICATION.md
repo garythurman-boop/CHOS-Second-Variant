@@ -1,17 +1,13 @@
 # GitHub build publication
 
-The latest user instruction places new binary publications on hold until revised
-Stage 3 is complete and thoroughly tested. This supersedes the cadence below.
-Source pushes and local build/testing continue. The active release_hold in
-artifacts/publication.json prevents the helper from staging even with --publish-now.
-Do not clear it to publish a partial milestone. Existing downloads remain available.
-
-Source goes to GitHub after every completed iteration. The user's updated preference
-publishes ISO and related binary files after every other future implementation
-iteration. Build `2ed3e6d` was the initial publication. The latest pointer and
-iteration counter are persisted below; after each artifact publication the next
-iteration is source-only and the following one publishes artifacts. Bookkeeping
-commits do not count as separate implementation iterations.
+The user now authorizes interim binaries when a critical milestone is ready for
+user testing. This supersedes the earlier Stage 3 binary hold and automatic
+every-other-iteration cadence. Source is still pushed after each verified iteration.
+`manual_milestones` in `artifacts/publication.json` keeps ordinary `--iteration`
+source-only; `--publish-now` selects a tested milestone explicitly. Existing
+version directories and tags remain immutable. Every interim build needs a concrete
+Fusion test checklist, recorded QEMU evidence, and explicit outstanding gates.
+Version 0.50.0 remains reserved for complete revised Stage 3 acceptance.
 
 [Download the current build](../artifacts/README.md). Machine-readable state and the
 latest source/tag/directory are in `artifacts/publication.json`. Binaries identify
@@ -24,9 +20,10 @@ The historical `prebuilt/` directory remains the original 0.30.0 baseline.
    that full commit as the iteration's source reference. Continue pushing source
    after each iteration.
 2. Run `python3 tools/publish_artifacts.py --iteration --source-ref SOURCE_COMMIT`
-   once per completed iteration. A source-only iteration updates the counter;
-   the next iteration stages artifacts. Repeating the same source ref is idempotent.
-3. When artifacts are due, build the committed source cleanly first. The helper
+   once per completed iteration. Manual milestone mode records source work without
+   automatically staging artifacts. Repeating the same source ref is idempotent.
+3. For an explicitly selected user-test milestone, build the committed source cleanly first,
+   then use --publish-now. The helper
    checks both embedded kernel build IDs and that the ISO contains the same EFI
    loader/kernel being staged. Use `--handoff PATH.zip` to include a prepared
    source/test-evidence handoff whose README identifies the same full source commit.

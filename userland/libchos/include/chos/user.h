@@ -88,6 +88,9 @@ static inline long chos_open(const char *path) {
 static inline long chos_read(int fd, void *buffer, size_t length) {
     return chos_syscall3((long)CHOS_SYS_READ, (long)fd, (long)(uintptr_t)buffer, (long)length);
 }
+static inline long chos_seek(int fd,int64_t offset,unsigned origin) {
+    return chos_syscall3((long)CHOS_SYS_SEEK,(long)fd,(long)offset,(long)origin);
+}
 static inline long chos_close(int fd) {
     return chos_syscall1((long)CHOS_SYS_CLOSE, (long)fd);
 }

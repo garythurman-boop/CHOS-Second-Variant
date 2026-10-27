@@ -33,6 +33,24 @@ class PublicationTests(unittest.TestCase):
                 publisher.run(root,root/'build','3'*40)
                 self.assertEqual(path.read_bytes(),before)
 
+    def test_manual_milestones_require_explicit_publication(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=pathlib.Path(tmp); folder=root/'artifacts'; folder.mkdir()
+            state={'manual_milestones':True,'release_hold':{'active':False},
+                   'latest':{'source_commit':'previous'},'iterations_since_artifacts':1}
+            path=folder/'publication.json'; path.write_text(json.dumps(state))
+            with mock.patch.object(publisher,'stage',side_effect=AssertionError('source work must not auto-publish')):
+                for i in range(4):
+                    result=publisher.run(root,root/'build',str(i)*40)
+                    self.assertEqual(result['status'],'milestone-source-only')
+                    self.assertEqual(result['latest'],state['latest'])
+                self.assertEqual(result['milestone_source_iterations'],4)
+            with mock.patch.object(publisher,'stage',return_value=folder/('a'*7)) as stage:
+                result=publisher.run(root,root/'build','a'*40,force=True)
+            stage.assert_called_once()
+            self.assertEqual(result['status'],'artifacts-staged')
+            self.assertTrue(result['manual_milestones'])
+
     def test_every_other_iteration_and_duplicate(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)

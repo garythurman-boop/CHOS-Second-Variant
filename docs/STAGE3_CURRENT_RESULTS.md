@@ -1,5 +1,10 @@
 # Revised Stage 3 current evidence
 
+Current publication policy: the user now authorizes interim binaries for critical
+verified milestones suitable for Fusion testing. This supersedes historical hold
+statements below. Version 0.50.0 still requires full Stage 3 acceptance.
+See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
+
 Stage 3 is **not complete**. The revised prompt's modern browser, integrated
 production TLS policy, complete isolation/runtime and real Pi 5 wireless
 requirements remain active. Native TLS certificate validation has separate
@@ -345,3 +350,20 @@ runtime checks pass, with std::thread/compiler-TLS regressions. Wide formatted/
 numeric I/O stays unsupported and fails real link probes. Actual ICU common
 object generation reaches200/202; file/time platform sources, full data/i18n/
 link/runtime and the modern engine remain open. See validation/stage3-native-wide.json.
+
+## Native read streams and owned file positions
+
+Real read-only buffered C streams now link through the native SDK and pass native
+direct and isolated UEFI execution. SEEK63 uses READ permission without consuming
+the signed mask's sign bit. Ownership, reduced permissions, snapshot replacement,
+seek overflow, EOF, read-ahead, three concurrent std::thread readers, cleanup and
+stable warm physical frames have guest evidence. The ISO embeds an explicit
+`/BIN/STDIO.ELF` diagnostic for Fusion user testing. It also passes a launch through
+actual USB input in the desktop Console. Full host and ASan/UBSan suites pass;
+UEFI e1000e desktop/storage/input, VMXNET3/VirtIO dual-stack, reduced capabilities
+and actual native typing/caret/persistence regressions pass. Original ICU common
+source code generation is now **201/202** through the same SDK with the real
+MAP_STDIO backend; putil and full ICU/data/i18n/runtime remain unfinished.
+See [scope and Fusion checklist](NATIVE_READ_STREAMS.md) and
+[machine-readable evidence](validation/stage3-native-stdio.json). An interim
+runtime qualification binary is authorized; it is not Stage 3 completion.

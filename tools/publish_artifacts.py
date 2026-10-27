@@ -171,8 +171,8 @@ def write_download_index(root, latest):
     (root / 'artifacts' / 'README.md').write_text(
         '# Current CHOS build downloads\n\nTested source: `' + latest['source_commit'] + '`.\n'
         'Publication tag: `' + latest['tag'] + '`.\n\n' + links + '\n\n'
-        'Source is pushed each iteration. Binary downloads are published every other completed '
-        'implementation iteration; the next iteration after this publication is source-only.\n\n'
+        'Source is pushed each iteration. Binary downloads are published for selected verified '
+        'milestones that are useful for user testing. Stage 3 completion remains separately gated.\n\n'
         'See [publication instructions](../docs/ARTIFACT_PUBLICATION.md) and '
         '[installation guide](../docs/INSTALL_GUIDE.md) and [validation report](../docs/STAGE2_VALIDATION.md). '
         'Actual Fusion validation of this build remains pending. NVMe discovery is read-only; '
@@ -183,18 +183,19 @@ def run(root, build, source, force=False, handoff=None):
     state_path = root / 'artifacts' / 'publication.json'
     state = json.loads(state_path.read_text()) if state_path.exists() else {}
     hold = state.get('release_hold', {})
-    if hold.get('active'):
+    if hold.get('active') or (state.get('manual_milestones') and not force):
         if force:
             raise ValueError('Binary publication is held: ' + hold.get('reason', 'Stage 3 acceptance required'))
         if state.get('last_counted_source_commit') == source:
             return {'status': 'already-recorded', 'source_commit': source, 'release_hold': hold}
         # Keep the prior cadence checkpoint; count held iterations separately.
-        state['held_source_iterations'] = state.get('held_source_iterations', 0) + 1
+        counter = 'held_source_iterations' if hold.get('active') else 'milestone_source_iterations'
+        state[counter] = state.get(counter, 0) + 1
         state['last_counted_source_commit'] = source
         temporary = state_path.with_suffix('.json.tmp')
         temporary.write_text(json.dumps(state, indent=2) + '\n')
         temporary.replace(state_path)
-        return {'status': 'publication-held-source-only', **state}
+        return {'status': 'publication-held-source-only' if hold.get('active') else 'milestone-source-only', **state}
     due, count, duplicate = publication_due(state, source, force)
     if duplicate:
         return {'status': 'already-recorded', 'source_commit': source}

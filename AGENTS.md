@@ -18,14 +18,13 @@ The official prepared distribution image may be published compressed.
 
 ### Binary artifact cadence
 
-The latest user instruction supersedes the every-other-iteration binary cadence:
-DO NOT publish new ISOs, kernels, prepared images, handoffs or build tags until all
-revised Stage 3 acceptance gates are satisfied and thoroughly tested. Local builds
-and tests remain authorized. Source commits still go to main after each iteration.
-`artifacts/publication.json` persists the release hold; the publisher records held
-source iterations and refuses even --publish-now while the hold is active. Do not
-clear that hold merely to publish a partial milestone. Keep existing downloads
-unchanged. See docs/STAGE3_CURRENT_RESULTS.md for the open acceptance gates.
+The latest user instruction allows interim binaries when a critical milestone is
+ready for user testing. Publish only a coherent verified build with a concrete
+Fusion test checklist and accurate limitations. Stage 3 completion and version
+0.50.0 still require every revised acceptance gate. Source goes to main after each
+iteration. The publisher remains manual during Stage 3: --iteration counts source
+work; --publish-now stages an explicitly selected user-test milestone. Preserve
+previous downloads and record exact source/build hashes.
 
 ## Build and verification
 

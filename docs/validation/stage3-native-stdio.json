@@ -1,0 +1,291 @@
+{
+  "schema": 1,
+  "scope": "native read-only buffered C streams,owned seek syscall and SDK/ICU file backend prerequisite",
+  "stage3_complete": false,
+  "completion_version_reserved": "0.50.0",
+  "fusion_status": "new build NOT RUN; prior Ethernet user confirmation remains separate",
+  "guest_results": {
+    "native-stdio-direct3": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "02e3d0037106463c335e960604dacbfabb4ed2b709165f0c2a59a5aa339e60cb",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117391,
+      "free_pages_after": 117391,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 99,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-stdio-uefi-romfs": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "ea93b89e37a40b45e46b6f8f423da1f64d6a768bd949e441e77a6e3e6408894a",
+      "source": "embedded ROMFS",
+      "cold_free_pages": 500222,
+      "free_pages_before": 500222,
+      "free_pages_after": 500222,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 98,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-stdio-sdk-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "6cee6b38b7c5fb79df314d1f8b540a2b7a29f9258e9709e25b9f81c23b0704f8",
+      "source": "disposable CHFS SDK/application",
+      "cold_free_pages": 117547,
+      "free_pages_before": 117269,
+      "free_pages_after": 117269,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 100,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-stdio-console-uefi2": {
+      "status": "PASS",
+      "checks": [
+        "actual USB Console command launches embedded native ELF",
+        "completed diagnostic output visible in desktop Console",
+        "three separate processes exit and clean up",
+        "screenshot retained"
+      ],
+      "limits": [
+        "QEMU UEFI e1000e,not Fusion validation"
+      ]
+    },
+    "native-stdio-platform-e1000e": {
+      "mode": "uefi",
+      "checks": [
+        "32 fast USB keypress/release pairs",
+        "PCI VirtIO CHFS write/flush/read",
+        "PCI VirtIO hardware RNG",
+        "82574L e1000e DHCP/ARP/ICMP",
+        "keyboard shortcut",
+        "absolute tablet",
+        "wheel reports through hardware transport to shared input",
+        "window maximize/restore",
+        "title-bar drag",
+        "20 USB hot-unplug/reconnect cycles with ring wraps",
+        "2-second idle observation",
+        "storage persistence after fresh guest boot"
+      ],
+      "kernel_ready_seconds": 6.871,
+      "desktop_ready_seconds": 9.889,
+      "keyboard_visible_ms": 31.14,
+      "pointer_visible_ms": 44.98,
+      "maximize_visible_ms": 184.12,
+      "drag_visible_ms": 226.89,
+      "idle_cpu_percent": 9.5,
+      "status": "PASS"
+    },
+    "native-stdio-caps-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "c5308d6080164c5978adb11afec053cbe9aefff1c0b2b9f230376e9786d53751",
+      "cold_free_pages": 500222,
+      "free_pages_before": 500216,
+      "free_pages_after": 500216,
+      "checks": [
+        "child limits installed before scheduler entry",
+        "filesystem/network/GUI/entropy rejected without invoking those services",
+        "ordinary SPAWN and SPAWN_ARGS inherit reduced rights",
+        "restricted spawn cannot increase its own mask",
+        "EXIT/query remain available after further reduction to zero optional rights",
+        "parent retains its original rights; repeated nested cleanup returns stable physical pages"
+      ],
+      "limits": [
+        "per-process syscall permission reduction, not complete site/filesystem/browser sandboxing",
+        "no browser-engine or TLS completion claim",
+        "QEMU evidence, new Fusion behavior NOT RUN"
+      ]
+    },
+    "native-stdio-vmxnet3-ipv6": {
+      "status": "PASS",
+      "mode": "uefi",
+      "backend": "vmxnet3",
+      "icmp6_wire_types": [
+        128,
+        129,
+        133,
+        134,
+        135,
+        136
+      ],
+      "checks": [
+        "real DAD, router solicitation/advertisement and preferred SLAAC address",
+        "ICMPv6 echo to the emulated router over selected real Ethernet queues",
+        "IPv4 DHCP and ICMP remain working",
+        "link loss invalidates IPv6 state; reconnect performs SLAAC/DAD again"
+      ],
+      "limits": [
+        "IPv6 control plane only; TCP6/DNS6/DHCPv6 unavailable",
+        "QEMU router fixture, not a public Internet or Fusion IPv6 certification"
+      ]
+    },
+    "native-stdio-virtio-ipv6": {
+      "status": "PASS",
+      "mode": "uefi",
+      "backend": "virtio",
+      "icmp6_wire_types": [
+        128,
+        129,
+        133,
+        134,
+        135,
+        136
+      ],
+      "checks": [
+        "real DAD, router solicitation/advertisement and preferred SLAAC address",
+        "ICMPv6 echo to the emulated router over selected real Ethernet queues",
+        "IPv4 DHCP and ICMP remain working",
+        "link loss invalidates IPv6 state; reconnect performs SLAAC/DAD again"
+      ],
+      "limits": [
+        "IPv6 control plane only; TCP6/DNS6/DHCPv6 unavailable",
+        "QEMU router fixture, not a public Internet or Fusion IPv6 certification"
+      ]
+    },
+    "native-stdio-typing-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "ordinary_tap_down_ms": 50,
+      "console_lengths": [
+        26,
+        19
+      ],
+      "browser_lengths": [
+        36,
+        29
+      ],
+      "document_lengths": [
+        36,
+        29
+      ],
+      "editor_sha256": "44a3cc7803fdac6c40a7a2ca04e445f3532bb6393f16769c33730ef418d6bd2f",
+      "checks": [
+        "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+        "plain I leaves Setup closed",
+        "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+        "actual isolated Console held Backspace/letters and visible caret pixels",
+        "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+        "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+        "native editor auto-saves on Escape; USB keyboard removal releases held key",
+        "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+        "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+      ]
+    }
+  },
+  "icu_common_codegen": {
+    "sources": 202,
+    "objects": 201,
+    "bytes": 3914320,
+    "result_sha256": "c6e795a3ba775c6973b111f4f4613cd3bfd1a8b5e253408b072b307fae99fb66",
+    "command_prefix": [
+      "clang++",
+      "--target=aarch64-none-elf",
+      "-mcpu=cortex-a72",
+      "-mstrict-align",
+      "-std=c++23",
+      "-fhosted",
+      "-fno-exceptions",
+      "-frtti",
+      "-femulated-tls",
+      "-fno-pic",
+      "-fno-pie",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-O2",
+      "-nostdinc++",
+      "--sysroot=/workspace/CHOS-Second-Variant/build/native-sdk",
+      "-isystem",
+      "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1",
+      "-isystem",
+      "/workspace/CHOS-Second-Variant/build/native-sdk/include",
+      "-I/workspace/chos-reference/icu-79.1/icu4c/source/common",
+      "-DU_STATIC_IMPLEMENTATION=1",
+      "-DU_COMMON_IMPLEMENTATION=1",
+      "-DU_DEBUG=1",
+      "-DU_HAVE_MMAP=0",
+      "-c",
+      "-ferror-limit=3"
+    ],
+    "remaining": [
+      {
+        "source": "putil.cpp",
+        "returncode": 1,
+        "missing_header": "sys/time.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/putil.cpp:55:10: fatal error: 'sys/time.h' file not found"
+      }
+    ],
+    "limits": "actual original common source objects only,not complete ICU/archive/data/i18n/runtime or engine"
+  },
+  "host_logs": {
+    "native-stdio-full-host4": {
+      "exit": 0,
+      "sha256": "b4bab21fde477067c67cf1332c7226c364af6e3155bb1c7f1acde2f14c862195"
+    },
+    "native-stdio-full-sanitize": {
+      "exit": 0,
+      "sha256": "19064e548aa76b31a061123d7139c4ba3443870807e16171f2fbfc047e025e08"
+    },
+    "native-stdio-public-positions": {
+      "sha256": "20788201470e9d50601db9cb8416010d6dab2c66c9ad6036cff8398d9d3c6d80"
+    },
+    "native-stdio-smoke": {
+      "sha256": "9cec7a66584d47966daf3960cc261c12d772214df9ce6378445fe565e18d14cf"
+    },
+    "native-stdio-sdk-configure": {
+      "sha256": "db7b837926b3a600bd15566db9a6d4a8389096309fc7637f1519e7b54a0e36a1"
+    },
+    "native-stdio-sdk-build": {
+      "sha256": "7220b0e0458878ffeacbc8f40951b93d5dbab843411fc12b7e12a78a947b99d1"
+    },
+    "native-stdio-publication-policy3": {
+      "sha256": "637ad693971420b70a01476cd5d51065ecc3c7af270c41cfe91899ec8c2db4bd"
+    }
+  },
+  "known_failures": [
+    "first normal host compile lacked file_api include path; build rule corrected",
+    "native direct1 per-byte-yield stress exceeded30s; accepted workers yield every128bytes with same deadline",
+    "first GUI checker read process state before cleanup completed; checker now waits for actual quiescence"
+  ],
+  "open_gates": [
+    "ICU platform services,full library/data/i18n and runtime",
+    "modern WPEWebKit/JavaScriptCore build and desktop integration",
+    "production TLS trust/time/update/reseed and browser isolation",
+    "Pi5 SDIO/firmware/CYW43455 radio and WiFi authentication",
+    "independent new Fusion and physical target validation"
+  ]
+}

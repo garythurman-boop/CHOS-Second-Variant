@@ -142,3 +142,7 @@ three former wchar failures generate native code, bringing ICU common to200/202
 actual object-generation successes. putil.cpp and umapfile.cpp still need platform
 file/time interfaces, and no complete ICU/data/i18n link or JSC execution gate is
 closed. The updated private TCB state layout has native thread/TLS regressions.
+
+The native read-stream milestone code-generates original ICU umapfile.cpp with
+its MAP_STDIO backend. See [read-stream scope](NATIVE_READ_STREAMS.md); platform
+putil, full ICU data/i18n/runtime and engine execution remain open.

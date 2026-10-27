@@ -41,3 +41,11 @@ chos_romfs_fileman_end:
 chos_romfs_browser_start:
     .incbin "build/userland/browser.chcx"
 chos_romfs_browser_end:
+
+/* Opt-in runtime verification, launched explicitly from Console. */
+.balign 16
+.global chos_romfs_stdio_start
+.global chos_romfs_stdio_end
+chos_romfs_stdio_start:
+    .incbin "build/userland/stdio_test.elf"
+chos_romfs_stdio_end:

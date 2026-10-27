@@ -92,3 +92,6 @@ libchos-wide.a with original C++ wrappers and an actual wchar_t string
 instantiation. CMake links wstring and rejects unsupported wide formatting and
 wide numeric parsing. The UEFI fixture uses the SDK executable. C-locale wide
 classification is invariant; ICU Unicode/locale data and full streams remain open.
+
+Read-only buffered C streams and owned signed-64-bit file positions are now available
+in the SDK through libchos-stdio.a. See [profile, evidence and limitations](NATIVE_READ_STREAMS.md).

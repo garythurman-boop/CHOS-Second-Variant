@@ -10,6 +10,7 @@
 #include "chos/net6.h"
 #include "chos/storage.h"
 #include "chos/process.h"
+#include "chos/file_position.h"
 #include "chos/gui.h"
 #include "chos/romfs.h"
 #include "chos/scheduler.h"
@@ -723,7 +724,7 @@ int64_t process_file_read_for_address_space(address_space_handle_t space, int fd
     }
     slot = &process_slots[index];
     data = slot->open_files[file_index].data; offset = slot->open_files[file_index].offset;
-    available = slot->open_files[file_index].size - offset;
+    available = offset<slot->open_files[file_index].size ? slot->open_files[file_index].size-offset : 0u;
     amount = length < available ? length : available;
     if (amount == 0u) {chos_spin_unlock_irqrestore(&process_lock,flags);return 0;}
     if (!address_space_copy_to_user(space,user_destination,data+offset,amount)){
@@ -732,6 +733,17 @@ int64_t process_file_read_for_address_space(address_space_handle_t space, int fd
     process_slots[index].open_files[file_index].offset += amount;
     chos_spin_unlock_irqrestore(&process_lock, flags);
     return (int64_t)amount;
+}
+
+int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,int64_t offset,unsigned origin){
+    if(fd<CHOS_PROCESS_FD_BASE || fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)return -(int64_t)CHOS_ERRNO_EBADF;
+    size_t file_index=(size_t)(fd-CHOS_PROCESS_FD_BASE);uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    size_t index=find_process_slot_for_space_locked(space);
+    if(index==CHOS_PROCESS_MAX || !process_slots[index].open_files[file_index].active){chos_spin_unlock_irqrestore(&process_lock,flags);return -(int64_t)CHOS_ERRNO_EBADF;}
+    process_file_handle_t *file=&process_slots[index].open_files[file_index];uint64_t position;
+    int result=chos_file_position(file->offset,file->size,offset,origin,&position);
+    if(!result)file->offset=(size_t)position;
+    chos_spin_unlock_irqrestore(&process_lock,flags);return result?(int64_t)result:(int64_t)position;
 }
 
 int64_t process_file_close_for_address_space(address_space_handle_t space, int fd) {

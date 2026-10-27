@@ -136,7 +136,7 @@ $(BUILD)/userland/basec_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/ba
 	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(filter %.o,$^)
 test: $(BUILD)/userland/basec_test.elf
 
-FILENAME_HOST_FLAGS := -DCHOS_HOST_TEST -DCHOS_FILENAME_HOST_TEST -include tests/filename_host_names.h $(LIBC_INCLUDES)
+FILENAME_HOST_FLAGS := -Iinclude -DCHOS_HOST_TEST -DCHOS_FILENAME_HOST_TEST -include tests/filename_host_names.h $(LIBC_INCLUDES)
 $(BUILD)/test-libc-filename: tests/test_libc_filename.c userland/libc/filename.c $(LIBC_HEADERS) tests/filename_host_names.h
 	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 $(FILENAME_HOST_FLAGS) tests/test_libc_filename.c userland/libc/filename.c -o $@
 $(SAN_DIR)/test-libc-filename: tests/test_libc_filename.c userland/libc/filename.c $(LIBC_HEADERS) tests/filename_host_names.h

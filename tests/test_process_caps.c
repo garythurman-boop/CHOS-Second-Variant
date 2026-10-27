@@ -3,6 +3,10 @@
 #include "chos/syscall.h"
 int main(void){
  assert((int64_t)CHOS_PROCESS_CAP_ALL>0);
+ assert(CHOS_SYS_SEEK==63&&CHOS_SYSCALL_LIMIT==63);
+ assert(chos_process_syscall_capability(CHOS_SYS_SEEK)==CHOS_PROCESS_CAP(CHOS_SYS_READ));
+ assert(CHOS_PROCESS_CAP_SEEK==CHOS_PROCESS_CAP(CHOS_SYS_READ));
+ assert(!chos_process_syscall_capability(0)&&!chos_process_syscall_capability(64)&&!chos_process_syscall_capability(UINT32_MAX));
  uint64_t out=123;
  assert(chos_process_cap_reduction(CHOS_PROCESS_CAP_ALL,0,&out));
  assert(out==CHOS_PROCESS_CAP_REQUIRED);

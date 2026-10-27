@@ -237,7 +237,7 @@ $(BUILD)/userland/browser.chcx: $(BUILD)/userland/browser.bin $(BUILD)/userland/
 	python3 tools/mkchcx.py --stack-pages 4 --v2-symbols $(BUILD)/userland/browser.sym $(BUILD)/userland/browser.bin $@
 	python3 tools/mkchcx.py --verify $@
 
-userland-image: $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx
+userland-image: $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx $(BUILD)/userland/stdio_test.elf
 
 # AArch64 UEFI boot path (development milestone). The EFI loader reads CHOS.ELF
 # from the ISO EFI System Partition, validates ELF load segments, and exits boot
@@ -274,7 +274,7 @@ $(UEFI_KERNEL_BUILD)/kernel/gfx/gui.o: $(ASSET_HEADER)
 $(UEFI_KERNEL_BUILD)/kernel/arch/aarch64/romfs_userland.o: kernel/arch/aarch64/romfs_userland.S \
     $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx \
     $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx \
-    $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx
+    $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx $(BUILD)/userland/stdio_test.elf
 
 $(BUILD)/chos-$(CHOS_VERSION).iso: $(BUILD)/installer.payload $(UEFI_KERNEL_ELF) $(BUILD)/uefi/BOOTAA64.EFI tools/mkuefi_iso.py tests/test_uefi_kernel.py docs/RELEASE_NOTES_0.30.0.md
 	python3 tests/test_uefi_kernel.py $(UEFI_KERNEL_ELF)
@@ -332,7 +332,7 @@ disk-image: $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx $(BUILD
 disk-image-list:
 	python3 tools/mkchfs.py list chos-disk.img
 
-$(BUILD)/kernel/arch/aarch64/romfs_userland.o: kernel/arch/aarch64/romfs_userland.S $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx
+$(BUILD)/kernel/arch/aarch64/romfs_userland.o: kernel/arch/aarch64/romfs_userland.S $(BUILD)/userland/cdemo.chcx $(BUILD)/userland/gui_demo.chcx $(BUILD)/userland/text_viewer.chcx $(BUILD)/userland/console.chcx $(BUILD)/userland/file_manager.chcx $(BUILD)/userland/browser.chcx $(BUILD)/userland/stdio_test.elf
 	@mkdir -p $(dir $@)
 	$(CC) $(ASFLAGS) -c $< -o $@
 
@@ -1354,6 +1354,7 @@ include userland/libc/Makefile.inc
 include userland/libm/Makefile.inc
 include userland/libc/floatscan/Makefile.inc
 include userland/libc/wide.Makefile.inc
+include userland/libc/stdio.Makefile.inc
 include userland/libcxx/Makefile.inc
 
 $(BUILD)/userland/tcp6_test.o: userland/examples/tcp6_test.c userland/libchos/include/chos/user.h include/chos/net_tcp6_api.h include/chos/syscall.h
@@ -1547,7 +1548,7 @@ test: $(BUILD)/userland/futex_test.elf
 
 # Staged native headers, CRT and actual static runtime archives for external ports.
 NATIVE_SDK_ROOT ?= $(BUILD)/native-sdk
-native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(WIDE_ARCHIVE)
+native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(WIDE_ARCHIVE) $(STDIO_ARCHIVE)
 	python3 tools/install_native_sdk.py --build $(BUILD) --out $(NATIVE_SDK_ROOT) $(foreach obj,$(LIBC_OBJECTS),--libc-object $(obj))
 .PHONY: native-sdk
 
@@ -1555,3 +1556,17 @@ test-native-sdk-installer:
 	python3 tests/test_native_sdk_installer.py
 test: test-native-sdk-installer
 .PHONY: test-native-sdk-installer
+
+$(BUILD)/test-file-position: tests/test_file_position.c include/chos/file_position.h include/chos/syscall.h include/chos/file_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-file-position: tests/test_file_position.c include/chos/file_position.h include/chos/syscall.h include/chos/file_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+test-file-position: $(BUILD)/test-file-position
+	./$(BUILD)/test-file-position
+test-file-position-sanitize: $(SAN_DIR)/test-file-position
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-file-position
+test: test-file-position
+test-sanitize: test-file-position-sanitize
+.PHONY: test-file-position test-file-position-sanitize

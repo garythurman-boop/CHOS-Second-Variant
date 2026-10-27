@@ -29,6 +29,9 @@ extern const uint8_t chos_romfs_fileman_end[];
 extern const uint8_t chos_romfs_browser_start[];
 extern const uint8_t chos_romfs_browser_end[];
 
+extern const uint8_t chos_romfs_stdio_start[];
+extern const uint8_t chos_romfs_stdio_end[];
+
 static const embedded_file_t embedded_files[] = {
     { "/BIN/HELLO.CHX", chos_romfs_hello_start, chos_romfs_hello_end },
     { "/BIN/ABOUT.CHX", chos_romfs_about_start, chos_romfs_about_end },
@@ -39,7 +42,8 @@ static const embedded_file_t embedded_files[] = {
     { "/BIN/TEXTVIEW.CHX", chos_romfs_textview_start, chos_romfs_textview_end },
     { "/BIN/CONSOLE.CHX", chos_romfs_console_start, chos_romfs_console_end },
     { "/BIN/FILEMAN.CHX", chos_romfs_fileman_start, chos_romfs_fileman_end },
-    { "/BIN/BROWSER.CHX", chos_romfs_browser_start, chos_romfs_browser_end }
+    { "/BIN/BROWSER.CHX", chos_romfs_browser_start, chos_romfs_browser_end },
+    { "/BIN/STDIO.ELF", chos_romfs_stdio_start, chos_romfs_stdio_end }
 };
 
 size_t romfs_file_count(void) {

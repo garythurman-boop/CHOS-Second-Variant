@@ -163,3 +163,11 @@ $(BUILD)/userland/wide_test.o: userland/examples/wide_test.cpp $(LIBCPP_CONFIG) 
 $(BUILD)/userland/wide_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/wide_test.o $(LIBCPP_ARCHIVE) $(WIDE_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
 test-libcxx: $(BUILD)/userland/wide_test.elf
+
+$(BUILD)/userland/stdio_test.o: userland/examples/stdio_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -std=c++20,$(LIBCPP_FLAGS)) -std=c++23 -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/stdio_test.d
+$(BUILD)/userland/stdio_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/stdio_test.o $(LIBCPP_ARCHIVE) $(STDIO_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
+test: $(BUILD)/userland/stdio_test.elf

@@ -65,6 +65,8 @@
 #define CHOS_SYS_THREAD_SELF 60u /* stable own thread ID, including the main task */
 #define CHOS_SYS_FUTEX_WAIT 61u /* x0=private RW word,x1=uint32 expected,x2=relative timeout ticks */
 #define CHOS_SYS_FUTEX_WAKE 62u /* x0=private RW word,x1=max waiters0..8; returns count */
+#define CHOS_SYS_SEEK 63u /* x0=owned read-only fd,x1=signed offset,x2=SET0/CUR1/END2; shares READ permission */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_SEEK
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u
@@ -99,6 +101,7 @@
 #define CHOS_ERRNO_EFAULT 14
 #define CHOS_ERRNO_EINVAL 22
 #define CHOS_ERRNO_ENOSYS 38
+#define CHOS_ERRNO_EOVERFLOW 75
 #define CHOS_ERRNO_ECHILD 10
 #define CHOS_ERRNO_EDEADLK 35
 

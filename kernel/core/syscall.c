@@ -20,6 +20,7 @@
 #include "chos/gui.h"
 #include "chos/gui_protocol.h"
 #include "chos/file_api.h"
+#include "chos/file_position.h"
 #include "chos/storage.h"
 #include "chos/chfs.h"
 #include "chos/romfs.h"
@@ -470,12 +471,12 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
         uint64_t permissions=CHOS_PROCESS_CAP_ALL;
         int registered=process_get_capabilities(fault_space,&permissions);
         uint32_t number=(uint32_t)frame->x[8];
-        if(!number || number>CHOS_PROCESS_SYSCALL_LIMIT){frame->x[0]=neg_errno(CHOS_ERRNO_ENOSYS);return frame;}
+        if(!number || number>CHOS_SYSCALL_LIMIT){frame->x[0]=neg_errno(CHOS_ERRNO_ENOSYS);return frame;}
         /* Legacy kernel-created EL0 diagnostic payloads have no process record;
          * permit only their established WRITE/EXIT path, never a full profile. */
-        if(!registered && number>=1u && number<=CHOS_PROCESS_SYSCALL_LIMIT &&
+        if(!registered && number>=1u && number<=CHOS_SYSCALL_LIMIT &&
            number!=CHOS_SYS_WRITE && number!=CHOS_SYS_EXIT){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
-        if(number>=1u && number<=CHOS_PROCESS_SYSCALL_LIMIT && !(permissions&CHOS_PROCESS_CAP(number))){
+        if(number>=1u && number<=CHOS_SYSCALL_LIMIT && !(permissions&chos_process_syscall_capability(number))){
             frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;
         }
         switch ((uint32_t)frame->x[8]) {
@@ -614,6 +615,11 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                     fault_space, (int)frame->x[0], frame->x[1], (size_t)length);
                 return frame;
             }
+            case CHOS_SYS_SEEK:
+                if(frame->x[0]>INT32_MAX)frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);
+                else if(frame->x[2]>CHOS_SEEK_END)frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);
+                else frame->x[0]=(uint64_t)process_file_seek_for_address_space(fault_space,(int)frame->x[0],(int64_t)frame->x[1],(unsigned)frame->x[2]);
+                return frame;
             case CHOS_SYS_CLOSE:
                 frame->x[0] = (uint64_t)process_file_close_for_address_space(fault_space, (int)frame->x[0]);
                 return frame;

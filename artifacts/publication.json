@@ -9,10 +9,11 @@
   "iterations_since_artifacts": 1,
   "last_counted_source_commit": "c889daac7346e05ff95d3ffcff9013e73fb92585",
   "release_hold": {
-    "active": true,
-    "reason": "User instruction: no new build publication until revised Stage 3 is satisfied and thoroughly tested",
+    "active": false,
+    "reason": "Superseded by user authorization for critical interim user-test binaries; Stage 3 completion remains gated",
     "completion_report": "docs/STAGE3_CURRENT_RESULTS.md",
     "completion_version": "0.50.0"
   },
-  "held_source_iterations": 30
+  "held_source_iterations": 30,
+  "manual_milestones": true
 }

@@ -6,11 +6,12 @@
 #include "chos/address_space.h"
 #include "chos/elf_image.h"
 #include "chos/process_caps.h"
+#include "chos/file_api.h"
 
 #define CHOS_PROCESS_MAX 4u
 #define CHOS_PROCESS_NAME_CAPACITY 16u
 #define CHOS_PROCESS_MAX_ARGS 8u
-#define CHOS_PROCESS_MAX_OPEN_FILES 4u
+#define CHOS_PROCESS_MAX_OPEN_FILES CHOS_FILE_OPEN_MAX
 #define CHOS_PROCESS_FD_BASE 3
 #define CHOS_PROCESS_ARG_MAX_LENGTH 96u
 #define CHOS_EXEC_V1_HEADER_SIZE 24u
@@ -169,6 +170,7 @@ int process_query_pid(uint32_t pid, chos_process_state_t *state_out, int64_t *st
 int64_t process_file_open_for_address_space(address_space_handle_t space, const char *path);
 int64_t process_file_read_for_address_space(address_space_handle_t space, int fd,
                                             uint64_t user_destination, size_t length);
+int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,int64_t offset,unsigned origin);
 int64_t process_file_close_for_address_space(address_space_handle_t space, int fd);
 int process_slot_reuse_test(void);
 const char *process_state_name(chos_process_state_t state);
