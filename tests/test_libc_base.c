@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <limits.h>
 #include <locale.h>
+#include <ctype.h>
+#include <inttypes.h>
 static _Thread_local int error;
 int *__chos_errno_location(void){return &error;}
 extern int *__errno_location(void);
@@ -16,6 +18,24 @@ extern unsigned long reference_strtoul(const char *,char **,int) __asm__("strtou
 extern unsigned long long reference_strtoull(const char *,char **,int) __asm__("strtoull");
 extern size_t reference_c32rtomb(char *,uint32_t,void *) __asm__("c32rtomb");
 extern size_t reference_mbrtoc32(uint32_t *,const char *,size_t,void *) __asm__("mbrtoc32");
+extern int reference_isalnum(int) __asm__("isalnum");
+extern int reference_isalpha(int) __asm__("isalpha");
+extern int reference_isblank(int) __asm__("isblank");
+extern int reference_iscntrl(int) __asm__("iscntrl");
+extern int reference_isdigit(int) __asm__("isdigit");
+extern int reference_isgraph(int) __asm__("isgraph");
+extern int reference_islower(int) __asm__("islower");
+extern int reference_isprint(int) __asm__("isprint");
+extern int reference_ispunct(int) __asm__("ispunct");
+extern int reference_isspace(int) __asm__("isspace");
+extern int reference_isupper(int) __asm__("isupper");
+extern int reference_isxdigit(int) __asm__("isxdigit");
+extern int reference_tolower(int) __asm__("tolower");
+extern int reference_toupper(int) __asm__("toupper");
+extern int reference_isascii(int) __asm__("isascii");
+extern int reference_toascii(int) __asm__("toascii");
+extern intmax_t reference_strtoimax(const char *,char **,int) __asm__("strtoimax");
+extern uintmax_t reference_strtoumax(const char *,char **,int) __asm__("strtoumax");
 static uint32_t random_state=0x238176;
 static uint32_t random_value(void){random_state^=random_state<<13;random_state^=random_state>>17;random_state^=random_state<<5;return random_state;}
 static int compare(const void *a,const void *b){int x=*(const int *)a,y=*(const int *)b;return (x>y)-(x<y);}
@@ -31,6 +51,7 @@ static void numeric(void){
   __typeof__(native(s,&a,base)) x=native(s,&a,base),y=reference(s,&b,base); \
   assert(x==y&&a-s==b-s&&errno==*__errno_location());}while(0)
   DIFFERENTIAL(strtol,reference_strtol);DIFFERENTIAL(strtoll,reference_strtoll);
+  DIFFERENTIAL(strtoimax,reference_strtoimax);DIFFERENTIAL(strtoumax,reference_strtoumax);
   DIFFERENTIAL(strtoul,reference_strtoul);DIFFERENTIAL(strtoull,reference_strtoull);
  }
  char *end;errno=0;assert(!strtol("12",&end,1)&&errno==EINVAL&&*end=='1');
@@ -53,6 +74,130 @@ static void numeric(void){
  errno=29;qsort(0,0,0,0);assert(!bsearch(0,0,0,0,0)&&errno==29);
  qsort(values,SIZE_MAX,sizeof(int),compare);assert(errno==EINVAL);
  assert(!bsearch(values,values,SIZE_MAX,sizeof(int),compare)&&errno==EINVAL);
+}
+static void formats(void){
+ char text[80];
+ {
+  int8_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRId8,s_d)==3);assert(sscanf(text,"%" SCNd8,&r_d)==1&&r_d==s_d);
+  int8_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIi8,s_i)==3);assert(sscanf(text,"%" SCNi8,&r_i)==1&&r_i==s_i);
+  uint8_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIo8,u_o)>0);assert(sscanf(text,"%" SCNo8,&v_o)==1&&u_o==v_o);
+  uint8_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIu8,u_u)>0);assert(sscanf(text,"%" SCNu8,&v_u)==1&&u_u==v_u);
+  uint8_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIx8,u_x)>0);assert(sscanf(text,"%" SCNx8,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int16_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRId16,s_d)==3);assert(sscanf(text,"%" SCNd16,&r_d)==1&&r_d==s_d);
+  int16_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIi16,s_i)==3);assert(sscanf(text,"%" SCNi16,&r_i)==1&&r_i==s_i);
+  uint16_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIo16,u_o)>0);assert(sscanf(text,"%" SCNo16,&v_o)==1&&u_o==v_o);
+  uint16_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIu16,u_u)>0);assert(sscanf(text,"%" SCNu16,&v_u)==1&&u_u==v_u);
+  uint16_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIx16,u_x)>0);assert(sscanf(text,"%" SCNx16,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int32_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRId32,s_d)==3);assert(sscanf(text,"%" SCNd32,&r_d)==1&&r_d==s_d);
+  int32_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIi32,s_i)==3);assert(sscanf(text,"%" SCNi32,&r_i)==1&&r_i==s_i);
+  uint32_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIo32,u_o)>0);assert(sscanf(text,"%" SCNo32,&v_o)==1&&u_o==v_o);
+  uint32_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIu32,u_u)>0);assert(sscanf(text,"%" SCNu32,&v_u)==1&&u_u==v_u);
+  uint32_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIx32,u_x)>0);assert(sscanf(text,"%" SCNx32,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int64_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRId64,s_d)==3);assert(sscanf(text,"%" SCNd64,&r_d)==1&&r_d==s_d);
+  int64_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIi64,s_i)==3);assert(sscanf(text,"%" SCNi64,&r_i)==1&&r_i==s_i);
+  uint64_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIo64,u_o)>0);assert(sscanf(text,"%" SCNo64,&v_o)==1&&u_o==v_o);
+  uint64_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIu64,u_u)>0);assert(sscanf(text,"%" SCNu64,&v_u)==1&&u_u==v_u);
+  uint64_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIx64,u_x)>0);assert(sscanf(text,"%" SCNx64,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_least8_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdLEAST8,s_d)==3);assert(sscanf(text,"%" SCNdLEAST8,&r_d)==1&&r_d==s_d);
+  int_least8_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiLEAST8,s_i)==3);assert(sscanf(text,"%" SCNiLEAST8,&r_i)==1&&r_i==s_i);
+  uint_least8_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoLEAST8,u_o)>0);assert(sscanf(text,"%" SCNoLEAST8,&v_o)==1&&u_o==v_o);
+  uint_least8_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuLEAST8,u_u)>0);assert(sscanf(text,"%" SCNuLEAST8,&v_u)==1&&u_u==v_u);
+  uint_least8_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxLEAST8,u_x)>0);assert(sscanf(text,"%" SCNxLEAST8,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_least16_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdLEAST16,s_d)==3);assert(sscanf(text,"%" SCNdLEAST16,&r_d)==1&&r_d==s_d);
+  int_least16_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiLEAST16,s_i)==3);assert(sscanf(text,"%" SCNiLEAST16,&r_i)==1&&r_i==s_i);
+  uint_least16_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoLEAST16,u_o)>0);assert(sscanf(text,"%" SCNoLEAST16,&v_o)==1&&u_o==v_o);
+  uint_least16_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuLEAST16,u_u)>0);assert(sscanf(text,"%" SCNuLEAST16,&v_u)==1&&u_u==v_u);
+  uint_least16_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxLEAST16,u_x)>0);assert(sscanf(text,"%" SCNxLEAST16,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_least32_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdLEAST32,s_d)==3);assert(sscanf(text,"%" SCNdLEAST32,&r_d)==1&&r_d==s_d);
+  int_least32_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiLEAST32,s_i)==3);assert(sscanf(text,"%" SCNiLEAST32,&r_i)==1&&r_i==s_i);
+  uint_least32_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoLEAST32,u_o)>0);assert(sscanf(text,"%" SCNoLEAST32,&v_o)==1&&u_o==v_o);
+  uint_least32_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuLEAST32,u_u)>0);assert(sscanf(text,"%" SCNuLEAST32,&v_u)==1&&u_u==v_u);
+  uint_least32_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxLEAST32,u_x)>0);assert(sscanf(text,"%" SCNxLEAST32,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_least64_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdLEAST64,s_d)==3);assert(sscanf(text,"%" SCNdLEAST64,&r_d)==1&&r_d==s_d);
+  int_least64_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiLEAST64,s_i)==3);assert(sscanf(text,"%" SCNiLEAST64,&r_i)==1&&r_i==s_i);
+  uint_least64_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoLEAST64,u_o)>0);assert(sscanf(text,"%" SCNoLEAST64,&v_o)==1&&u_o==v_o);
+  uint_least64_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuLEAST64,u_u)>0);assert(sscanf(text,"%" SCNuLEAST64,&v_u)==1&&u_u==v_u);
+  uint_least64_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxLEAST64,u_x)>0);assert(sscanf(text,"%" SCNxLEAST64,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_fast8_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdFAST8,s_d)==3);assert(sscanf(text,"%" SCNdFAST8,&r_d)==1&&r_d==s_d);
+  int_fast8_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiFAST8,s_i)==3);assert(sscanf(text,"%" SCNiFAST8,&r_i)==1&&r_i==s_i);
+  uint_fast8_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoFAST8,u_o)>0);assert(sscanf(text,"%" SCNoFAST8,&v_o)==1&&u_o==v_o);
+  uint_fast8_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuFAST8,u_u)>0);assert(sscanf(text,"%" SCNuFAST8,&v_u)==1&&u_u==v_u);
+  uint_fast8_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxFAST8,u_x)>0);assert(sscanf(text,"%" SCNxFAST8,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_fast16_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdFAST16,s_d)==3);assert(sscanf(text,"%" SCNdFAST16,&r_d)==1&&r_d==s_d);
+  int_fast16_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiFAST16,s_i)==3);assert(sscanf(text,"%" SCNiFAST16,&r_i)==1&&r_i==s_i);
+  uint_fast16_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoFAST16,u_o)>0);assert(sscanf(text,"%" SCNoFAST16,&v_o)==1&&u_o==v_o);
+  uint_fast16_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuFAST16,u_u)>0);assert(sscanf(text,"%" SCNuFAST16,&v_u)==1&&u_u==v_u);
+  uint_fast16_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxFAST16,u_x)>0);assert(sscanf(text,"%" SCNxFAST16,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_fast32_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdFAST32,s_d)==3);assert(sscanf(text,"%" SCNdFAST32,&r_d)==1&&r_d==s_d);
+  int_fast32_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiFAST32,s_i)==3);assert(sscanf(text,"%" SCNiFAST32,&r_i)==1&&r_i==s_i);
+  uint_fast32_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoFAST32,u_o)>0);assert(sscanf(text,"%" SCNoFAST32,&v_o)==1&&u_o==v_o);
+  uint_fast32_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuFAST32,u_u)>0);assert(sscanf(text,"%" SCNuFAST32,&v_u)==1&&u_u==v_u);
+  uint_fast32_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxFAST32,u_x)>0);assert(sscanf(text,"%" SCNxFAST32,&v_x)==1&&u_x==v_x);
+ }
+ {
+  int_fast64_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdFAST64,s_d)==3);assert(sscanf(text,"%" SCNdFAST64,&r_d)==1&&r_d==s_d);
+  int_fast64_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiFAST64,s_i)==3);assert(sscanf(text,"%" SCNiFAST64,&r_i)==1&&r_i==s_i);
+  uint_fast64_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoFAST64,u_o)>0);assert(sscanf(text,"%" SCNoFAST64,&v_o)==1&&u_o==v_o);
+  uint_fast64_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuFAST64,u_u)>0);assert(sscanf(text,"%" SCNuFAST64,&v_u)==1&&u_u==v_u);
+  uint_fast64_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxFAST64,u_x)>0);assert(sscanf(text,"%" SCNxFAST64,&v_x)==1&&u_x==v_x);
+ }
+ {
+  intmax_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdMAX,s_d)==3);assert(sscanf(text,"%" SCNdMAX,&r_d)==1&&r_d==s_d);
+  intmax_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiMAX,s_i)==3);assert(sscanf(text,"%" SCNiMAX,&r_i)==1&&r_i==s_i);
+  uintmax_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoMAX,u_o)>0);assert(sscanf(text,"%" SCNoMAX,&v_o)==1&&u_o==v_o);
+  uintmax_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuMAX,u_u)>0);assert(sscanf(text,"%" SCNuMAX,&v_u)==1&&u_u==v_u);
+  uintmax_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxMAX,u_x)>0);assert(sscanf(text,"%" SCNxMAX,&v_x)==1&&u_x==v_x);
+ }
+ {
+  intptr_t s_d=-37,r_d=0;assert(snprintf(text,sizeof(text),"%" PRIdPTR,s_d)==3);assert(sscanf(text,"%" SCNdPTR,&r_d)==1&&r_d==s_d);
+  intptr_t s_i=-37,r_i=0;assert(snprintf(text,sizeof(text),"%" PRIiPTR,s_i)==3);assert(sscanf(text,"%" SCNiPTR,&r_i)==1&&r_i==s_i);
+  uintptr_t u_o=117,v_o=0;assert(snprintf(text,sizeof(text),"%" PRIoPTR,u_o)>0);assert(sscanf(text,"%" SCNoPTR,&v_o)==1&&u_o==v_o);
+  uintptr_t u_u=117,v_u=0;assert(snprintf(text,sizeof(text),"%" PRIuPTR,u_u)>0);assert(sscanf(text,"%" SCNuPTR,&v_u)==1&&u_u==v_u);
+  uintptr_t u_x=117,v_x=0;assert(snprintf(text,sizeof(text),"%" PRIxPTR,u_x)>0);assert(sscanf(text,"%" SCNxPTR,&v_x)==1&&u_x==v_x);
+ }
+}
+static void bytes(void){
+ assert(setlocale(LC_CTYPE,"C"));
+ for(int c=-1;c<=255;c++){
+  assert(!!isalnum(c)==!!reference_isalnum(c));
+  assert(!!isalpha(c)==!!reference_isalpha(c));
+  assert(!!isblank(c)==!!reference_isblank(c));
+  assert(!!iscntrl(c)==!!reference_iscntrl(c));
+  assert(!!isdigit(c)==!!reference_isdigit(c));
+  assert(!!isgraph(c)==!!reference_isgraph(c));
+  assert(!!islower(c)==!!reference_islower(c));
+  assert(!!isprint(c)==!!reference_isprint(c));
+  assert(!!ispunct(c)==!!reference_ispunct(c));
+  assert(!!isspace(c)==!!reference_isspace(c));
+  assert(!!isupper(c)==!!reference_isupper(c));
+  assert(!!isxdigit(c)==!!reference_isxdigit(c));
+  assert(tolower(c)==reference_tolower(c));
+  assert(toupper(c)==reference_toupper(c));
+  assert(isascii(c)==reference_isascii(c));
+  assert(toascii(c)==reference_toascii(c));
+ }
+ assert(imaxabs(-INTMAX_MAX)==INTMAX_MAX);
+ for(intmax_t n=-99;n<=99;n++)for(intmax_t d=-11;d<=11;d++)if(d){imaxdiv_t v=imaxdiv(n,d);assert(v.quot==n/d&&v.rem==n%d);}
 }
 static void unicode(void){
  assert(setlocale(LC_CTYPE,"C.UTF-8"));
@@ -97,4 +242,4 @@ static void unicode(void){
  assert(!c16rtomb(output,0xd800,&s));assert(c16rtomb(0,'x',&s)==(size_t)-1&&mbsinit(&s));
  assert(mbsinit(0));
 }
-int main(void){numeric();unicode();puts("native base C: numeric differential cases,sorting/search,all Unicode scalars,chunking,UTF-16 and malformed input passed");return 0;}
+int main(void){numeric();formats();bytes();unicode();puts("native base C: numeric/intmax differential cases,all integer format widths,C-locale bytes,sorting/search,all Unicode scalars,chunking,UTF-16 and malformed input passed");return 0;}

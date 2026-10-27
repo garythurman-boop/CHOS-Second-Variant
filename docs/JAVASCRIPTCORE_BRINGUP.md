@@ -120,3 +120,8 @@ and negative missing-library/import probes now have link and guest evidence.
 The upstream run still stops at missing target ICU data/i18n/uc. Threads_FOUND
 reflects the real create/join probe; the complete detach/cancel/atfork test still
 fails. Full POSIX and an engine build are not claimed.
+
+[Opt-in native RTTI](NATIVE_RTTI.md) and C byte/intmax APIs now allow194/202 actual
+ICU common units to pass native SDK syntax checks. The original LLVM dynamic_cast
+algorithm has direct/UEFI guest tests. Full ICU links/data/i18n and the JSC
+configure/build/execute gates remain open; syntax counts do not close those gates.

@@ -31,6 +31,7 @@ $(BUILD)/userland/cxx_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START)
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test-libcxx: $(BUILD)/userland/cxx_test.elf
 	python3 tools/verify_libcxx.py
+	python3 tools/verify_libcxxabi.py
 test: test-libcxx
 .PHONY: libcxx test-libcxx
 $(BUILD)/userland/cxx_guard_test.o: userland/examples/cxx_guard_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
@@ -116,3 +117,28 @@ $(BUILD)/userland/cxx_thread20_test.o: userland/examples/cxx_thread_test.cpp $(L
 $(BUILD)/userland/cxx_thread20_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx_thread20_test.o $(BUILD)/userland/cxx_thread_postkey.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test-libcxx: $(BUILD)/userland/cxx_thread20_test.elf
+
+# Original Itanium RTTI algorithm; exception throw/unwind support stays absent.
+LIBCXXABI_ROOT := third_party/libcxxabi
+RTTI_SOURCES := $(LIBCXXABI_ROOT)/src/private_typeinfo.cpp $(LIBCXXABI_ROOT)/src/stdlib_typeinfo.cpp $(LIBCXXABI_ROOT)/src/stdlib_exception.cpp $(LIBCXXABI_ROOT)/src/cxa_aux_runtime.cpp userland/libcxx/abi_abort.cpp
+RTTI_OBJECTS := $(addprefix $(BUILD)/userland/libcxx/,$(addsuffix .o,$(basename $(RTTI_SOURCES))))
+RTTI_HEADERS := $(shell rg --files $(LIBCXXABI_ROOT) -g '*.h')
+RTTI_FLAGS := $(filter-out -fno-rtti,$(LIBCPP_FLAGS)) -frtti -I$(LIBCXXABI_ROOT)/include
+$(RTTI_OBJECTS): $(RTTI_HEADERS)
+$(BUILD)/userland/libcxx/third_party/libcxxabi/%.o: third_party/libcxxabi/%.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(RTTI_FLAGS) -MMD -MP -c $< -o $@
+# The standalone diagnostic backend has no RTTI itself.
+-include $(RTTI_OBJECTS:.o=.d)
+$(LIBCPP_ARCHIVE): $(RTTI_OBJECTS)
+
+$(BUILD)/userland/rtti_test.o: userland/examples/rtti_test.cpp userland/examples/rtti_types.h $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(RTTI_FLAGS) -MMD -MP -c $< -o $@
+$(BUILD)/userland/rtti_factory.o: userland/examples/rtti_factory.cpp userland/examples/rtti_types.h $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(RTTI_FLAGS) -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/rtti_test.d $(BUILD)/userland/rtti_factory.d
+$(BUILD)/userland/rtti_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/rtti_test.o $(BUILD)/userland/rtti_factory.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
+test-libcxx: $(BUILD)/userland/rtti_test.elf

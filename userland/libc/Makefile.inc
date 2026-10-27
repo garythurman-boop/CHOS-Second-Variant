@@ -1,6 +1,6 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
+LIBC_SOURCES := userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
 LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
@@ -116,12 +116,12 @@ test-sanitize: test-emutls-runtime-sanitize
 .PHONY: test-emutls-runtime test-emutls-runtime-sanitize
 
 BASEC_HOST_FLAGS := -DCHOS_HOST_TEST -include tests/basec_host_names.h -fno-builtin $(LIBC_INCLUDES)
-$(BUILD)/test-libc-base: tests/test_libc_base.c tests/basec_host_names.h userland/libc/numeric.c userland/libc/unicode.c $(LIBC_HEADERS)
+$(BUILD)/test-libc-base: tests/test_libc_base.c tests/basec_host_names.h userland/libc/numeric.c userland/libc/unicode.c userland/libc/ctype.c userland/libc/inttypes.c $(LIBC_HEADERS)
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -DCHOS_HOST_TEST -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 $(BASEC_HOST_FLAGS) tests/test_libc_base.c userland/libc/numeric.c userland/libc/unicode.c -o $@
-$(SAN_DIR)/test-libc-base: tests/test_libc_base.c tests/basec_host_names.h userland/libc/numeric.c userland/libc/unicode.c $(LIBC_HEADERS)
+	$(CC_HOST) -DCHOS_HOST_TEST -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 $(BASEC_HOST_FLAGS) tests/test_libc_base.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/ctype.c userland/libc/inttypes.c -o $@
+$(SAN_DIR)/test-libc-base: tests/test_libc_base.c tests/basec_host_names.h userland/libc/numeric.c userland/libc/unicode.c userland/libc/ctype.c userland/libc/inttypes.c $(LIBC_HEADERS)
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -DCHOS_HOST_TEST $(SAN_FLAGS) -Wno-misleading-indentation $(BASEC_HOST_FLAGS) tests/test_libc_base.c userland/libc/numeric.c userland/libc/unicode.c -o $@
+	$(CC_HOST) -DCHOS_HOST_TEST $(SAN_FLAGS) -Wno-misleading-indentation $(BASEC_HOST_FLAGS) tests/test_libc_base.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/ctype.c userland/libc/inttypes.c -o $@
 test-libc-base: $(BUILD)/test-libc-base
 	./$(BUILD)/test-libc-base
 test-libc-base-sanitize: $(SAN_DIR)/test-libc-base

@@ -1,0 +1,439 @@
+{
+  "stage3_complete": false,
+  "engine_built": false,
+  "binary_publication": "HELD",
+  "base_commit": "3be2afcfeb78cb1db51d1e5821a5df19b642b8e5",
+  "source_sha256": {
+    "tests/basec_host_names.h": "af35c5ffb2aa87c8b7b776d6edfc4878cef4d32d0ad40eb5d376e84b2d4f426a",
+    "tests/test_libc_base.c": "92e3bb8c640d64b68dd8144dac09e9bf969f9b59e69e6df59315ae03040cb89b",
+    "tools/install_native_sdk.py": "f8ed17dc27dfc18234b6aaf20e5c17eed881fe5f97769c6b20108551dbcd36e6",
+    "userland/libc/Makefile.inc": "7513b4dd2aea16b959c247d0e0c5f50cf3c5833a30e1412650cfa7d43c4130d8",
+    "userland/libcxx/Makefile.inc": "798204678856196b81e3af3c306789840ee96adf4e478bd4487e7d100fac10e0",
+    "tests/qemu_rtti.py": "0759fe01fcaf20a805bd59079a8f58874c11f101019be56c84f8b7c8536c4bc9",
+    "tools/verify_libcxxabi.py": "a8e25c63bd1e2a4587d987caf634ef4052d3082bae3f9680dc7e173d3b61f4f9",
+    "userland/examples/rtti_factory.cpp": "31ff85e2f1501122aeb4fcf71391c7ab2352d8ae14acfe32a7718932be882d34",
+    "userland/examples/rtti_test.cpp": "d3474cad4f7971377ef8b897f2c480a891ce67471fcd200db6f7f07bfc793801",
+    "userland/examples/rtti_types.h": "bf1493864956ba34eb135da533646632771ca04f11945dea3e7db948baf3dea2",
+    "userland/libc/ctype.c": "32227d210970fecd84a868fcb89944710a8f49f3031678826e35fb2977ba6ea8",
+    "userland/libc/include/ctype.h": "fe55ddc522908f5f6b1d846ac2ce9394574b2edc62e9941e43e42c7733869df7",
+    "userland/libc/include/inttypes.h": "b887650261e33f3a5a3cb8a711e1392a81da75748367db0a251fab365b2fa577",
+    "userland/libc/inttypes.c": "c8f28c684be54fc506ea3a47a8eb4f75553c27f2de45b93386f076c73e72b699",
+    "userland/libcxx/abi_abort.cpp": "3922e1f05c81faab264040eda5002b608ac2d9ca0c334fc0c1eed18961ad045a"
+  },
+  "dependencies": [
+    "docs/dependencies/libcxxabi-rtti.json",
+    "docs/dependencies/libcxx-native.json"
+  ],
+  "sdk_manifest_sha256": "565c11a45756f54640db2f3f45841c318271e7b60dad5dec6e4d03f79024c5d8",
+  "guest_results": {
+    "native-rtti-direct1": {
+      "status": "PASS",
+      "mode": "direct",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "bad-cast",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "null-typeid",
+          "pid": 5,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 6,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "b4b7458f97dc82e45c48616d906085698dec4d8582a44416ce7a441674f5c2ec",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117550,
+      "free_pages_after": 117550,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 617,
+      "checks": [
+        "real original LLVM dynamic_cast/type_info algorithm, cross-TU identity and standard exception class RTTI",
+        "virtual diamonds, public and private bases, ambiguous and null casts, cross-casts and void-pointer adjustment",
+        "three std::thread workers, 64 graph checks each and three lifecycles per application",
+        "C-locale bytes EOF through 255, signed/unsigned intmax limits and overflow errno",
+        "failed reference cast and null polymorphic typeid terminate only their process with exit 134",
+        "six process runs, stable warm physical pages and no queued futexes"
+      ],
+      "limits": [
+        "bounded native no-exceptions libc++ subset with opt-in RTTI,not full standard library",
+        "std::thread/notify-at-exit are separately qualified; public futures and dynamic loading remain open",
+        "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+        "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "native-rtti-uefi1": {
+      "status": "PASS",
+      "mode": "uefi",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "bad-cast",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "null-typeid",
+          "pid": 5,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 6,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "b4b7458f97dc82e45c48616d906085698dec4d8582a44416ce7a441674f5c2ec",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500378,
+      "free_pages_after": 500378,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 615,
+      "checks": [
+        "real original LLVM dynamic_cast/type_info algorithm, cross-TU identity and standard exception class RTTI",
+        "virtual diamonds, public and private bases, ambiguous and null casts, cross-casts and void-pointer adjustment",
+        "three std::thread workers, 64 graph checks each and three lifecycles per application",
+        "C-locale bytes EOF through 255, signed/unsigned intmax limits and overflow errno",
+        "failed reference cast and null polymorphic typeid terminate only their process with exit 134",
+        "six process runs, stable warm physical pages and no queued futexes"
+      ],
+      "limits": [
+        "bounded native no-exceptions libc++ subset with opt-in RTTI,not full standard library",
+        "std::thread/notify-at-exit are separately qualified; public futures and dynamic loading remain open",
+        "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+        "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "native-rtti-thread-regression": {
+      "status": "PASS",
+      "mode": "uefi",
+      "cxx_standard": "23",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "join-empty",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "joinable-destructor",
+          "pid": 5,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "detach",
+          "pid": 6,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "capacity",
+          "pid": 7,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "pthread-exit",
+          "pid": 8,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "move-over-live",
+          "pid": 9,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "self-join",
+          "pid": 10,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-return",
+          "pid": 11,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-exit",
+          "pid": 12,
+          "expected_exit": 77,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-recursive",
+          "pid": 13,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-thread-exit",
+          "pid": 14,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 15,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "bfc89ae4ff38f6833bcb1560ad3ea9916f97156226eabadc98986880b3144782",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500361,
+      "free_pages_after": 500361,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 74,
+      "checks": [
+        "original LLVM thread.cpp create/move/swap/id/join lifecycle over native workers",
+        "three workers and repeated processes free native heap and kernel frames",
+        "C++ TLS and post-key TLS destructors precede original notify_all_at_thread_exit unlock/notification",
+        "per-thread standard-library exit state survives TLS and then releases its allocations before join",
+        "native nanosecond/integer-millisecond/floating-second sleep,steady sleep_until/yield and unknown hardware_concurrency hint",
+        "empty/self join,detach,capacity,joinable destruction/move and forbidden callable pthread_exit fail closed",
+        "atomic terminate handler get/set,return/reentry refusal and explicit handler process exit",
+        "successful relaunch after every refusal set and no queued futexes"
+      ],
+      "limits": [
+        "static C++20/23 -O2 no-exceptions/no-RTTI profile,three live worker/join records per process",
+        "detach and pthread_exit from a std::thread callable are unsupported; no stack unwinding/cancellation",
+        "original future.cpp supplies the private readiness callback only; public future/exception_ptr ABI is not supplied",
+        "binary128 arithmetic helpers,arbitrary duration/clock types and unoptimized compiler lowering are not qualified",
+        "full ICU/engine,memory/isolation,production TLS and real Pi5 wireless remain open; Stage3 incomplete",
+        "new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-rtti-sdk-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "applications_sha256": {
+        "/BIN/SDKC.ELF": "22dbb5e6b0411d415d322f47ef482f5990a5f50081783ebd3c16753dfe40226a",
+        "/BIN/SDKCPP.ELF": "00b3008dcbe8d567f1fa0c7fb34c2b9b446f314beb67256083c4c092d35f3d95"
+      },
+      "cases": [
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500502,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500373,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500373,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500373,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500373,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500373,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500373,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500373,
+          "status": "PASS"
+        }
+      ],
+      "cold_free_pages": 500527,
+      "warm_free_pages": 500373,
+      "checks": [
+        "actual CMake executable links against staged native CRT/static runtime",
+        "ordinary hosted-language main without extern C workaround,argc/argv and C allocation",
+        "global C++ vector constructors and three real std::thread workers,normal return/cleanup",
+        "alternating C/C++ processes after warmup retain stable PMM pages/no queued futexes"
+      ],
+      "limits": [
+        "bounded static SDK,no full hosted C/C++/POSIX or modern engine",
+        "new Fusion/Pi/laptop behavior NOT RUN; Stage3 incomplete"
+      ]
+    }
+  },
+  "checks": {
+    "native-rtti-host2.log": {
+      "status": "PASS",
+      "sha256": "a50915b4147254000732bdc852cfcfb5eebe145652c2731624834598786288ec"
+    },
+    "native-rtti-sanitize.log": {
+      "status": "PASS",
+      "sha256": "29ca5bf2a90ef287ece3564eaef648a1efb75ad7500fb9ca1db63ec8df728d5f"
+    },
+    "native-byte-tests2.log": {
+      "status": "PASS",
+      "sha256": "89db899eaa008ed3ad62fc6374feb0dbef567cc8d36b355c522e936109c671b5"
+    },
+    "native-rtti-media.log": {
+      "status": "PASS",
+      "sha256": "d00fbe8fcc47f13ec964fd6f9f470cdc254d1ec9f4caf882eca753bc366aa6d4"
+    },
+    "native-rtti-sdk-configure.log": {
+      "status": "PASS",
+      "sha256": "d496aaf1d7b3390b73692fccf6f394dd6490830f0533b09719d736f0a3e78f2b"
+    },
+    "native-rtti-sdk-build.log": {
+      "status": "PASS",
+      "sha256": "c7709e962363efbe2b2e7d17ace02b5abaf6cf51774ffea98ebc6d74c06b3d02"
+    }
+  },
+  "icu_inventory": {
+    "status": "SYNTAX_ONLY",
+    "scope": "actual original ICU common native SDK syntax inventory,not link/runtime evidence",
+    "sources": 202,
+    "syntax_pass": 194,
+    "result_sha256": "2148841a3fe22e3b4efa2fb1e8aac5e0157cbe787a6382724234d26b58a9b8e3",
+    "remaining": [
+      {
+        "source": "lstmbe.cpp",
+        "returncode": 1,
+        "missing_header": "complex",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/lstmbe.cpp:4:10: fatal error: 'complex' file not found"
+      },
+      {
+        "source": "messagepattern.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/messagepattern.cpp:999:29: error: no member named 'strtod' in the global namespace"
+      },
+      {
+        "source": "putil.cpp",
+        "returncode": 1,
+        "missing_header": "sys/time.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/putil.cpp:55:10: fatal error: 'sys/time.h' file not found"
+      },
+      {
+        "source": "umapfile.cpp",
+        "returncode": 1,
+        "missing_header": "unistd.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/umapfile.cpp:71:13: fatal error: 'unistd.h' file not found"
+      },
+      {
+        "source": "uniset_props.cpp",
+        "returncode": 1,
+        "missing_header": "ranges",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/unicode/utfiterator.h:19:10: fatal error: 'ranges' file not found"
+      },
+      {
+        "source": "uresbund.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      },
+      {
+        "source": "ustr_wcs.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      },
+      {
+        "source": "ustring.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1/wchar.h:112:6: error: \"The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled\""
+      }
+    ]
+  },
+  "retained_failures": {
+    "native-rtti-build1.log": "redundant upstream macro definition and missing original cassert; corrected without modifying upstream sources",
+    "native-rtti-fixture-build1.log": "typeid dereferenced unique_ptr expression warning; use a raw pointer for explicit evaluation",
+    "native-rtti-host.log": "duplicate objects in Make source list from an overly broad edit; corrected before final full suites"
+  },
+  "limits": [
+    "bounded LP64 static C++20/23 runtime with opt-in RTTI,no exceptions/unwinding",
+    "ICU count is syntax-only,not complete link,data/i18n or actual engine execution",
+    "C streams/formatting,wide/locale/floating parsing,larger memory/isolation,production TLS and actual Pi5 WiFi remain open",
+    "new Fusion/Pi/laptop qualification NOT RUN; release/version held"
+  ]
+}

@@ -62,3 +62,9 @@ archive decompression and a second original read were verified before replacing
 the raw file. Active QEMU directories were excluded. No test contents or failures
 were discarded; logs and boot snapshots remain available. Earlier completed
 firmware archives have their separate completed-runtime-vars-archives.json index.
+
+The subsequent [RTTI profile](NATIVE_RTTI.md) adds original LLVM type information
+and dynamic_cast to libchos-c++.a, with its upstream license in the staged SDK.
+Consumers opt in using -frtti after the default flags; exceptions stay disabled.
+Native byte C classification, intmax conversions and integer format macros are
+also staged. This extends the bounded SDK without claiming full hosted conformance.

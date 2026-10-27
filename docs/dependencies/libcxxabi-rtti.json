@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "project": "LLVM libc++abi type information subset",
+  "version": "19.1.7",
+  "commit": "cd708029e0b2869e80abe31ddb175f7c35361f90",
+  "source": "https://github.com/llvm/llvm-project/releases/download/llvmorg-19.1.7/libcxxabi-19.1.7.src.tar.xz",
+  "archive_sha256": "4d25125109e3febe1393e9e30f93153333d82b48ce7bed637bd2daf52bf40172",
+  "provenance": "Immutable HTTPS Git source anchor matched; no release signature verification claimed",
+  "scope": "Original RTTI/dynamic_cast,typeinfo/exception-value classes and terminating bad-cast helpers. No exception throwing/unwinding or full libc++abi.",
+  "files": {
+    "LICENSE.TXT": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+    "include/__cxxabi_config.h": "17143f9c5cfec39e2b741b4b319dec733eb3ba859324859f760f4ad87bd1cb09",
+    "include/cxxabi.h": "1066f782010ced5ec3b90a3dbca3ae211cecb7055fc011d3c7a8cdb9498f95d1",
+    "src/abort_message.h": "ebefbcabd5ed6b790299d740eba3ed49965072b9e77abff6f0963cf67682a064",
+    "src/cxa_aux_runtime.cpp": "05fb65ba6f3c4f559b994a6f98709ee14075756fd354ebed66d728c926c44c8f",
+    "src/private_typeinfo.cpp": "a0e6bbaef6307792a6e5b534f1bba1d114340824e00549c979ae8ebb9486c27a",
+    "src/private_typeinfo.h": "308dd443446dfa0e6972e897f575c4e379f50bbf3aee3f5126f955f44768c803",
+    "src/stdlib_exception.cpp": "d609597f8f536fec59f7afa2dbd352c69a9b50ce8aaf85082fd1fbad08c79a25",
+    "src/stdlib_typeinfo.cpp": "5d0b584b9341eb49ea5e640a475dc690d44b0770712222e2667185b1e814367f"
+  }
+}

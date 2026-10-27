@@ -306,3 +306,11 @@ libraries/imports fail real links; host libraries are excluded. The native JSC
 configuration still requires target ICU data/i18n/uc and does not build/run the
 engine. The earlier static-only probe limitations remain attached to that older
 triage profile, rather than the new executable-link mode.
+
+[Native RTTI and C byte/intmax APIs](NATIVE_RTTI.md) now have direct/isolated-UEFI
+runtime evidence, including original LLVM dynamic_cast/type_info, concurrent
+workers, terminating bad casts and clean relaunch. Actual ICU common syntax
+inventory improves from120/202 to194/202 with the native SDK and opt-in RTTI.
+This is not linked ICU/data/i18n or an engine. Exceptions, C streams/formatting,
+wide/locale/floating parsing and larger runtime/security/platform gates remain
+open; see validation/stage3-native-rtti.json. Binary publication stays held.
