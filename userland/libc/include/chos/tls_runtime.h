@@ -18,7 +18,7 @@ typedef struct {
  uint64_t initial_fpcr,initial_fpsr;
  void *cxx_destructors;unsigned cxx_destructor_count;
  unsigned cxx_cleanup_started,cxx_finalize_depth,cxx_callbacks_left;
- mbstate_t unicode_states[4];
+ mbstate_t unicode_states[9];
  pthread_once_t *active_once[8];
  uint64_t *active_cxx_once[CHOS_CXX_ONCE_DEPTH];unsigned cxx_once_depth;
  uint64_t *active_guards[CHOS_CXX_GUARD_DEPTH];unsigned guard_depth;

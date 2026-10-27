@@ -155,3 +155,11 @@ $(BUILD)/userland/ranges_complex_test.elf: $(BUILD)/userland/start.o $(NATIVE_ST
 $(BUILD)/userland/ranges_complex20_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/ranges_complex20_test.o $(LIBCPP_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
 test-libcxx: $(BUILD)/userland/ranges_complex_test.elf $(BUILD)/userland/ranges_complex20_test.elf
+
+$(BUILD)/userland/wide_test.o: userland/examples/wide_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(LIBCPP_FLAGS) -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/wide_test.d
+$(BUILD)/userland/wide_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/wide_test.o $(LIBCPP_ARCHIVE) $(WIDE_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
+test-libcxx: $(BUILD)/userland/wide_test.elf

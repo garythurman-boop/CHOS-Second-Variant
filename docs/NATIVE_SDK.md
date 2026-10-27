@@ -86,3 +86,9 @@ included in the bounded native profile. libchos-complex.a supplies actual compil
 mul/div helpers on demand; CMake performs a real complex link and its C++23
 range/complex fixture executes in UEFI CHOS. Exceptions, localization, stream I/O
 and binary128 complex support remain outside this qualified subset.
+
+[Wide strings and fixed UTF8 conversion](NATIVE_WIDE_STRINGS.md) are staged as
+libchos-wide.a with original C++ wrappers and an actual wchar_t string
+instantiation. CMake links wstring and rejects unsupported wide formatting and
+wide numeric parsing. The UEFI fixture uses the SDK executable. C-locale wide
+classification is invariant; ICU Unicode/locale data and full streams remain open.

@@ -337,3 +337,11 @@ now succeeds for197/202 original ICU common units (previously195 syntax successe
 This remains distinct from full ICU/data/i18n linking and engine integration.
 See validation/stage3-native-ranges-complex.json; all full-stage gates and the
 binary/version hold remain active.
+
+[Native wide strings and UTF8](NATIVE_WIDE_STRINGS.md) add real std::wstring,
+original wide memory/string algorithms, bounded bulk conversion and independent
+thread-local conversion states. Host exhaustive-scalar/sanitizer and direct/UEFI
+runtime checks pass, with std::thread/compiler-TLS regressions. Wide formatted/
+numeric I/O stays unsupported and fails real link probes. Actual ICU common
+object generation reaches200/202; file/time platform sources, full data/i18n/
+link/runtime and the modern engine remain open. See validation/stage3-native-wide.json.

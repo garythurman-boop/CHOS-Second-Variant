@@ -136,3 +136,9 @@ let197/202 original ICU common units generate actual native ARM64 objects. Five
 still fail on wide-character or file/time interfaces. These object files have no
 complete ICU/data/i18n link/runtime qualification and do not close the JSC engine
 gate. The C++20/23 component itself has independent direct/UEFI guest evidence.
+
+[Native wide memory/strings and UTF8 conversion](NATIVE_WIDE_STRINGS.md) let all
+three former wchar failures generate native code, bringing ICU common to200/202
+actual object-generation successes. putil.cpp and umapfile.cpp still need platform
+file/time interfaces, and no complete ICU/data/i18n link or JSC execution gate is
+closed. The updated private TCB state layout has native thread/TLS regressions.

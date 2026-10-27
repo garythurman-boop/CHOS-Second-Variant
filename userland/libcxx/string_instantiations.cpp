@@ -7,3 +7,5 @@ _LIBCPP_STRING_V1_EXTERN_TEMPLATE_LIST(CHOS_DEFINE, char)
 #undef CHOS_DEFINE
 template string operator+<char,char_traits<char>,allocator<char>>(char const*,string const&);
 _LIBCPP_END_NAMESPACE_STD
+
+template class std::__1::basic_string<wchar_t>;

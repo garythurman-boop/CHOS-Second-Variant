@@ -3,7 +3,9 @@
 #if defined(CHOS_HOST_TEST) && !defined(CHOS_FILENAME_HOST_TEST)
 #include_next <stdio.h>
 #else
-/* Filename operations only. No FILE/stream/formatting implementation yet. */
+/* Opaque FILE permits standard wide prototypes; there are no FILE objects or
+ * stream/formatting implementations in this bounded profile. */
+typedef struct __chos_FILE FILE;
 #define EOF (-1)
 #ifdef __cplusplus
 extern "C" {

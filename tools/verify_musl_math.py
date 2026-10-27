@@ -8,6 +8,10 @@ scan=json.loads((root/'docs/dependencies/musl-floatscan.json').read_text())
 for name,wanted in scan['files'].items():
     if name in manifest['files']:assert manifest['files'][name]==wanted
     manifest['files'][name]=wanted
+wide=json.loads((root/'docs/dependencies/musl-wide.json').read_text())
+for name,wanted in wide['files'].items():
+    if name in manifest['files']:assert manifest['files'][name]==wanted
+    manifest['files'][name]=wanted
 actual={str(p.relative_to(base)) for p in base.rglob('*') if p.is_file()}
 assert actual==set(manifest['files']),'musl math closure changed'
 for name,wanted in manifest['files'].items():

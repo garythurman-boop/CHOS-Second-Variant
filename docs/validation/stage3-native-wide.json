@@ -1,0 +1,324 @@
+{
+  "stage3_complete": false,
+  "engine_built": false,
+  "binary_publication": "HELD",
+  "base_commit": "03e02bcfd71d44e5e9e6f4752938fb5521c81cb6",
+  "source_sha256": {
+    "Makefile": "290b7b1fc375049eb399d5baba866eafd239586e33c7f1bad801a8f81c41d4e3",
+    "ports/native/chos-toolchain.cmake": "e3038c7ad884a4e7fb20861e72b310fb7ff0d118e7673fa68d34b066d49d81ce",
+    "tests/native_sdk/CMakeLists.txt": "3dffcea48763a752aff7dce76fdc92b37158615c2163dd097a78e87a557b909e",
+    "tools/configure_libcxx.py": "2944c4895c1a13cc9621095f9ee41e522dd46f2b48fd440437372481e5683f4e",
+    "tools/install_native_sdk.py": "59c4dbe2629eaa8ee17acf4c01cabe552409268f76c42075b5eda9b1634fc985",
+    "tools/verify_musl_math.py": "ceffc6ffa39985309986676958871ea3089f91f765cbe7020c4a6233b1617e7c",
+    "userland/libc/include/chos/tls_runtime.h": "0eb8e09613423a48419d7e48c4aa0d01c4d1ce5904a5d4634759be2496b8fa75",
+    "userland/libc/include/stdio.h": "3ad782256cc9834c32651a38548861ca9826aa0f794799ef466eac066b433578",
+    "userland/libc/include/stdlib.h": "70c44def2489daf75423eb73ddc8a34f1760e4966117c26b753f8d64c0cb53d1",
+    "userland/libcxx/Makefile.inc": "033921aa68e71768f9d2f91d06be2c2001319f593634d793cfe92ad5cb11c148",
+    "userland/libcxx/string_instantiations.cpp": "b212315034caae3c42b946822f55a423579892da52533a274f6828276fc3ee93",
+    "tests/qemu_wide.py": "c8f74e5d15c38938c73794513894ae3cf85cc50a92ef2686e025240fd62bb2fd",
+    "tests/test_wide.c": "d0a8cca708832d67b04b98a589c22e36a62f1c92f8713ebf1e2672c16edfd6ae",
+    "tests/wide_host_names.h": "5c608576a007bdf4e73727da71fcd524d242cca844fffd696878e3381360551b",
+    "userland/examples/wide_test.cpp": "b70e312da22b58f880a0e72f348f98a299c14f1694e12cc2ededb3a8e2b282dd",
+    "userland/libc/include/wchar.h": "0a454b795b83d3601d12bcdca7dee6827bda275caee09a51424dac06becbd84f",
+    "userland/libc/include/wctype.h": "96a8569fda4c9686dfa0c4ea20c796888855a9ddc3507bba94667781988e0800",
+    "userland/libc/wide.Makefile.inc": "6528d62e3f4ac23cd297cfae01ad553f98c90516e0d2a7e21d8822f01cbc907a",
+    "userland/libc/wide.c": "e166571eeb0b125849117e6129e2cfe1c752b113d6397b34fd4425aac08da137",
+    "userland/libc/wide_ctype.c": "ab3a48adbb3c572bfabfecf1c21e2a4601769bd7cc017a0008efa1b1a2c33df5"
+  },
+  "dependencies": [
+    "docs/dependencies/musl-wide.json",
+    "docs/dependencies/libcxx-native.json"
+  ],
+  "target_wchar_abi": {
+    "wchar_bits": 32,
+    "wchar_unsigned": true,
+    "wint_bits": 32,
+    "wint_unsigned": false
+  },
+  "sdk_manifest_sha256": "b77ad1c5dd277df2cb91ac7b2232103b2bcf8c57c843f9c5e12db047e0472566",
+  "guest_results": {
+    "native-wide-direct1": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "f26cb50e3b127d2e0253b40bf9b1d475d64afd2a8d3e356b8ce8bab8637f40fc",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117478,
+      "free_pages_after": 117478,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 475,
+      "checks": [
+        "real native UTF32 wide memory/strings and std::wstring allocation/copy/move/growth",
+        "UTF8 scalar boundaries,chunked decoding,bulk byte/element limits,count-only,invalid data and no partial encoding",
+        "three native std::thread workers keep wide decoder/mbrlen/encoder/bulk/C32/C16 states distinct across scheduling",
+        "main-thread incomplete scalar and wide states survive three worker lifecycles,with distinct errno per worker",
+        "three native processes,exit0,no retained user heap,stable warm physical frames and no futex waiters"
+      ],
+      "limits": [
+        "fixed UTF8 encoding and invariant C-locale classification/collation; no locale switching or Unicode UCD classification",
+        "wide numeric/time/FILE/formatted I/O have declarations but no bodies; real negative CMake links must fail",
+        "bounded libc++ wide-string profile,not complete hosted C/C++ or ICU/engine",
+        "new Fusion/Pi/laptop qualification NOT RUN; Stage3/version/binaries remain held"
+      ]
+    },
+    "native-wide-sdk-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "327067419848cf15609a433bc18be0efe1ca86b6046e4d2eaf03ae5589d29023",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500329,
+      "free_pages_after": 500329,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 477,
+      "checks": [
+        "real native UTF32 wide memory/strings and std::wstring allocation/copy/move/growth",
+        "UTF8 scalar boundaries,chunked decoding,bulk byte/element limits,count-only,invalid data and no partial encoding",
+        "three native std::thread workers keep wide decoder/mbrlen/encoder/bulk/C32/C16 states distinct across scheduling",
+        "main-thread incomplete scalar and wide states survive three worker lifecycles,with distinct errno per worker",
+        "three native processes,exit0,no retained user heap,stable warm physical frames and no futex waiters"
+      ],
+      "limits": [
+        "fixed UTF8 encoding and invariant C-locale classification/collation; no locale switching or Unicode UCD classification",
+        "wide numeric/time/FILE/formatted I/O have declarations but no bodies; real negative CMake links must fail",
+        "bounded libc++ wide-string profile,not complete hosted C/C++ or ICU/engine",
+        "new Fusion/Pi/laptop qualification NOT RUN; Stage3/version/binaries remain held"
+      ]
+    },
+    "native-wide-thread-regression": {
+      "status": "PASS",
+      "mode": "uefi",
+      "cxx_standard": "23",
+      "cases": [
+        {
+          "argument": "normal",
+          "pid": 1,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 2,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "normal",
+          "pid": 3,
+          "expected_exit": 0,
+          "status": "PASS"
+        },
+        {
+          "argument": "join-empty",
+          "pid": 4,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "joinable-destructor",
+          "pid": 5,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "detach",
+          "pid": 6,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "capacity",
+          "pid": 7,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "pthread-exit",
+          "pid": 8,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "move-over-live",
+          "pid": 9,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "self-join",
+          "pid": 10,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-return",
+          "pid": 11,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-exit",
+          "pid": 12,
+          "expected_exit": 77,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-recursive",
+          "pid": 13,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "handler-thread-exit",
+          "pid": 14,
+          "expected_exit": 134,
+          "status": "PASS"
+        },
+        {
+          "argument": "relaunch",
+          "pid": 15,
+          "expected_exit": 0,
+          "status": "PASS"
+        }
+      ],
+      "application_sha256": "41c8b3548b337b9ef4d440405e31372988ed4459dfff4c359ff80e54b093a687",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500352,
+      "free_pages_after": 500352,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 73,
+      "checks": [
+        "original LLVM thread.cpp create/move/swap/id/join lifecycle over native workers",
+        "three workers and repeated processes free native heap and kernel frames",
+        "C++ TLS and post-key TLS destructors precede original notify_all_at_thread_exit unlock/notification",
+        "per-thread standard-library exit state survives TLS and then releases its allocations before join",
+        "native nanosecond/integer-millisecond/floating-second sleep,steady sleep_until/yield and unknown hardware_concurrency hint",
+        "empty/self join,detach,capacity,joinable destruction/move and forbidden callable pthread_exit fail closed",
+        "atomic terminate handler get/set,return/reentry refusal and explicit handler process exit",
+        "successful relaunch after every refusal set and no queued futexes"
+      ],
+      "limits": [
+        "static C++20/23 -O2 no-exceptions/no-RTTI profile,three live worker/join records per process",
+        "detach and pthread_exit from a std::thread callable are unsupported; no stack unwinding/cancellation",
+        "original future.cpp supplies the private readiness callback only; public future/exception_ptr ABI is not supplied",
+        "binary128 arithmetic helpers,arbitrary duration/clock types and unoptimized compiler lowering are not qualified",
+        "full ICU/engine,memory/isolation,production TLS and real Pi5 wireless remain open; Stage3 incomplete",
+        "new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-wide-emutls-regression": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "a2960e0a1f84c4e1c29a5bb50227d6824824447858c91b7ec6fd6263e4c19f60",
+      "compiler_tls_controls": 48,
+      "elf_pt_tls": false,
+      "cold_free_pages": 117699,
+      "free_pages_before": 117651,
+      "free_pages_after": 117651,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 147,
+      "checks": [
+        "real clang -femulated-tls C11 and C++17 variables, initialization and4096-byte alignment",
+        "at least48 compiler TLS controls trigger upstream per-thread address-array growth",
+        "three workers preserve isolated TLS values across SVC/yield/preemption and repeated launches",
+        "C++ thread_local constructors once per thread, destructors in reverse order before C key callbacks",
+        "ordinary key callbacks access retained compiler TLS through all four destructor passes",
+        "compiler storage and C++ cleanup nodes reclaimed after join; user heap returns to exact main baseline",
+        "normal main return and explicit main pthread_exit run C++ TLS destructors with valid values",
+        "main pthread_exit preserves worker and join result",
+        "key/dtor quotas and recursive destructor registration fail closed with bounded exit134 and stable pages",
+        "no queued futex records, no unresolved runtime imports and no PT_TLS dependency"
+      ],
+      "limits": [
+        "explicit -femulated-tls static-link profile, not native ELF TLS relocations/dynamic loader",
+        "no full C++ standard library, exceptions or DSO unload support; this sparse fixture excludes global constructor arrays",
+        "C++ thread-local callback registration64 pending per thread, cleanup bound256 invocations",
+        "native heap, thread and key quotas remain in force",
+        "new Fusion/physical behavior NOT RUN; modern engine and Stage3 incomplete"
+      ]
+    }
+  },
+  "checks": {
+    "native-wide-host3.log": {
+      "status": "PASS",
+      "sha256": "098e4e74c89380703514a42662ffa902ec92c44e062074514e92b77ce7b331d6"
+    },
+    "native-wide-build4.log": {
+      "status": "PASS",
+      "sha256": "8f7770177188348789e996dc932b44967522713433c1882705f5be99e801b459"
+    },
+    "native-wide-fixture-build1.log": {
+      "status": "PASS",
+      "sha256": "5657131c4b0c093ed7aa8f4087d9d99ccad08fbdf5ee159ffead5064ed1c7227"
+    },
+    "native-wide-sdk-stage2.log": {
+      "status": "PASS",
+      "sha256": "1670fedc2a1d5c7bbedeb1d8a73a8a39ac34cb0a756c21c21280561c693ff05e"
+    },
+    "native-wide-sdk-configure.log": {
+      "status": "PASS",
+      "sha256": "e1664e731a3fe53c5314ade13ab90249039077cc399f251d6479938db6ec29c5"
+    },
+    "native-wide-sdk-configure2.log": {
+      "status": "PASS",
+      "sha256": "a9ce5ca4ec47efbc823f38506556234511656b31a31904251cab0602ae879d72"
+    },
+    "native-wide-sdk-build.log": {
+      "status": "PASS",
+      "sha256": "4b0298d781a0087b3c3100e00f0e8d57299cad4556265f0c3fab173b59803f6f"
+    },
+    "native-wide-full-host.log": {
+      "status": "PASS",
+      "sha256": "c45210f9e4c65fadcfb6c6e5aa1a4be111b8eb88987e63af111094d382f3769f"
+    },
+    "native-wide-full-sanitize.log": {
+      "status": "PASS",
+      "sha256": "578263652940919dbe4cd14fe8549f1a9b6f477fabc14ff6a0356e2f06e575a1"
+    },
+    "native-wide-media.log": {
+      "status": "PASS",
+      "sha256": "77a5ca48b7762779f9e6132695716f66088ebd82aa39486a750d2d7aa7f59751"
+    },
+    "native-wide-clean-build.log": {
+      "status": "PASS",
+      "sha256": "beb9872f7b95640a1575833dc9c208b6cd91c2e74f158e7daa08794d0ef48d3d"
+    },
+    "native-wide-upstream.log": {
+      "status": "PASS",
+      "sha256": "876efcc40bc8faa23338d100823c8b1bbd9cd5a0c1d724c27ee81e02a5bcba60"
+    }
+  },
+  "icu_codegen": {
+    "status": "OBJECTS_ONLY",
+    "scope": "actual original ICU common native SDK object code generation,not complete archive/link/data/runtime evidence",
+    "units": 202,
+    "codegen_pass": 200,
+    "object_bytes": 3911520,
+    "result_sha256": "832e7895148aaa932a42f2db7770b17df8e9e3b54797998e4a6e900457429440",
+    "remaining": [
+      {
+        "source": "putil.cpp",
+        "returncode": 1,
+        "missing_header": "sys/time.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/putil.cpp:55:10: fatal error: 'sys/time.h' file not found"
+      },
+      {
+        "source": "umapfile.cpp",
+        "returncode": 1,
+        "missing_header": "unistd.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/common/umapfile.cpp:71:13: fatal error: 'unistd.h' file not found"
+      }
+    ]
+  },
+  "retained_failures": {
+    "native-wide-build1.log": "WCHAR_MIN compiler macro redefinition exposed actual unsigned32 ARM64 wchar ABI; preserve compiler macros and qualify width",
+    "native-wide-build2.log": "original wcsstr pointer-distance signedness diagnostics; scoped option,upstream source unchanged",
+    "native-wide-build3.log": "signed native wint_t classification comparison diagnostics; explicitly convert to uint32 for range checks",
+    "native-wide-host1.log": "original wcscspn pointer-distance GCC diagnostic; scoped option,upstream source unchanged",
+    "native-wide-host2.log": "GCC cannot infer decoder output initialization across calls; initialize local temporaries explicitly"
+  },
+  "limits": [
+    "fixed UTF8 codec and invariant C-locale wide properties/collation,not Unicode UCD classification or locale switching",
+    "FILE is opaque; wide numeric/time/stream/formatting declarations have no bodies and fail real CMake executable probes",
+    "bounded C++ wide-string runtime; not full hosted C/C++ or ICU/data/i18n/modern engine",
+    "production browser/TLS/isolation/memory and actual Pi5 WiFi remain open; new Fusion/Pi qualification NOT RUN"
+  ]
+}

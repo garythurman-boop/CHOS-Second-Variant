@@ -785,7 +785,10 @@
     "include/__ranges/as_rvalue_view.h": "dfd7cfc90d3cb495052476940f072daa78c813ed1a1d8e90f33a0ae4e716da4a",
     "include/__ranges/chunk_by_view.h": "4cc14e95962892792f0c99e7e0a870fc32c13c9e5a21b9ecb4371720af850fee",
     "include/__ranges/to.h": "5c499d67a56510eda718a057f30ba7419732886718974dc570f63d0bf1857c3a",
-    "include/__ranges/zip_view.h": "abc08582b4dddd70556d8cf9cad094369d1e6457e95bb58fc7508942f05b9c07"
+    "include/__ranges/zip_view.h": "abc08582b4dddd70556d8cf9cad094369d1e6457e95bb58fc7508942f05b9c07",
+    "include/cwchar": "859191c0067886912f9d5b5b6e6b2583ea3f15c45188e56c5d32f02dec2397de",
+    "include/cwctype": "d3e0452aed4cc9dbc967784abc200e738ea0a33af63326c764f9fb391cc92cea",
+    "include/wctype.h": "49aeb2704c881d2bdb0fc19596b77ba1a3fb90d30d2629088ce10a45a491c838"
   },
   "scope": "Native static -O2 no-exceptions/no-RTTI allocation,containers,shared ownership,mutex/CV/once and bounded std::thread with ordered exit notification. Not full libc++,public futures,exceptions or engine runtime."
 }

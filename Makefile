@@ -1353,6 +1353,7 @@ $(BUILD)/test-process-format $(SAN_DIR)/test-process-format $(BUILD)/test-romfs 
 include userland/libc/Makefile.inc
 include userland/libm/Makefile.inc
 include userland/libc/floatscan/Makefile.inc
+include userland/libc/wide.Makefile.inc
 include userland/libcxx/Makefile.inc
 
 $(BUILD)/userland/tcp6_test.o: userland/examples/tcp6_test.c userland/libchos/include/chos/user.h include/chos/net_tcp6_api.h include/chos/syscall.h
@@ -1546,7 +1547,7 @@ test: $(BUILD)/userland/futex_test.elf
 
 # Staged native headers, CRT and actual static runtime archives for external ports.
 NATIVE_SDK_ROOT ?= $(BUILD)/native-sdk
-native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE)
+native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(WIDE_ARCHIVE)
 	python3 tools/install_native_sdk.py --build $(BUILD) --out $(NATIVE_SDK_ROOT) $(foreach obj,$(LIBC_OBJECTS),--libc-object $(obj))
 .PHONY: native-sdk
 
