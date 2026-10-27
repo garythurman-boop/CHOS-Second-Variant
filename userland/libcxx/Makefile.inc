@@ -27,7 +27,7 @@ $(BUILD)/userland/cxx_test.o: userland/examples/cxx_test.cpp $(LIBCPP_CONFIG) $(
 	@mkdir -p $(dir $@)
 	$(CC) $(LIBCPP_FLAGS) -MMD -MP -c $< -o $@
 -include $(BUILD)/userland/cxx_test.d
-$(BUILD)/userland/cxx_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx_test.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+$(BUILD)/userland/cxx_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx_test.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test-libcxx: $(BUILD)/userland/cxx_test.elf
 	python3 tools/verify_libcxx.py
@@ -37,7 +37,7 @@ $(BUILD)/userland/cxx_guard_test.o: userland/examples/cxx_guard_test.cpp $(LIBCP
 	@mkdir -p $(dir $@)
 	$(CC) $(LIBCPP_FLAGS) -MMD -MP -c $< -o $@
 -include $(BUILD)/userland/cxx_guard_test.d
-$(BUILD)/userland/cxx_guard_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx_guard_test.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+$(BUILD)/userland/cxx_guard_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx_guard_test.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test-libcxx: $(BUILD)/userland/cxx_guard_test.elf
 
@@ -45,6 +45,27 @@ $(BUILD)/userland/cxx23_test.o: userland/examples/cxx_test.cpp $(LIBCPP_CONFIG) 
 	@mkdir -p $(dir $@)
 	$(CC) $(filter-out -std=c++20,$(LIBCPP_FLAGS)) -std=c++23 -MMD -MP -c $< -o $@
 -include $(BUILD)/userland/cxx23_test.d
-$(BUILD)/userland/cxx23_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx23_test.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+$(BUILD)/userland/cxx23_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx23_test.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test-libcxx: $(BUILD)/userland/cxx23_test.elf
+$(BUILD)/userland/static_startup_test.o: userland/examples/static_startup_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
+	@mkdir -p $(dir $@)
+	$(CC) $(LIBCPP_FLAGS) -MMD -MP -c $< -o $@
+$(BUILD)/userland/static_startup_early_test.o: userland/examples/static_startup_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
+	@mkdir -p $(dir $@)
+	$(CC) $(LIBCPP_FLAGS) -DSTARTUP_EARLY_EXIT -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/static_startup_test.d $(BUILD)/userland/static_startup_early_test.d
+$(BUILD)/userland/static_startup_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/static_startup_test.o $(BUILD)/userland/static_startup_postkey.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
+$(BUILD)/userland/static_startup_early_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/static_startup_early_test.o $(BUILD)/userland/static_startup_postkey.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
+test-libcxx: $(BUILD)/userland/static_startup_test.elf $(BUILD)/userland/static_startup_early_test.elf
+test-static-startup-link: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o
+	python3 tests/test_static_startup_link.py --cc $(CC) --ld $(LD)
+test: test-static-startup-link
+.PHONY: test-static-startup-link
+
+$(BUILD)/userland/static_startup_postkey.o: userland/examples/static_startup_postkey.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
+	@mkdir -p $(dir $@)
+	$(CC) $(LIBCPP_FLAGS) -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/static_startup_postkey.d

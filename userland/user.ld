@@ -35,6 +35,8 @@ SECTIONS
         __chos_bss_end = .;
     }
     __chos_virtual_end = ALIGN(., 4096);
+    .unsupported_startup_arrays : { *(.preinit_array .preinit_array.* .init_array .init_array.* .fini_array .fini_array.* .ctors .ctors.* .dtors .dtors.*) }
+    ASSERT(SIZEOF(.unsupported_startup_arrays) == 0,"Global constructors require the dense native static-startup profile")
     /DISCARD/ : { *(.comment) *(.note*) *(.eh_frame*) *(.llvm_addrsig) }
     ASSERT(__chos_code_start == 0, "CHCX code must begin at virtual offset zero")
     ASSERT(__chos_code_end > __chos_code_start, "CHCX code is empty")

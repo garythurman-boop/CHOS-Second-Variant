@@ -56,3 +56,11 @@ UEFI compiler-TLS/destructor tests, C++ container/failure isolation and threaded
 verified TLS1.3 over IPv6 regressions cover the changed TCB and pthread exit path.
 New Fusion/Pi/laptop behavior is NOT RUN. Binary publication remains held;
 version0.50.0 and full revised Stage3 acceptance are not claimed.
+
+The subsequent [native static CRT](NATIVE_STATIC_CRT.md) adds actual global
+constructors,process atexit/selective finalization,last-pthread process cleanup
+and post-key C++ TLS destruction with a shared per-TCB cleanup budget.
+[Current evidence](validation/stage3-static-crt.json) supersedes earlier missing-
+global-startup/atexit status for the bounded dense static profile. Full C++/POSIX,
+ICU/modern engine,production security policy and wireless remain open; binaries
+stay held.

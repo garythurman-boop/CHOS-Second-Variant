@@ -98,3 +98,11 @@ container/allocation profile under C++23. Direct/UEFI C++23 tests and the engine
 integer128 type/alignment compile probe pass. Added headers are dependencies,
 not conformance evidence for every new ranges/utility facility. Full C++23/ABI
 and engine integration remain open. See validation/stage3-cxx23.json.
+
+The subsequent [native static CRT](NATIVE_STATIC_CRT.md) adds actual global
+constructors,process atexit/selective finalization,last-pthread process cleanup
+and post-key C++ TLS destruction with a shared per-TCB cleanup budget.
+[Current evidence](validation/stage3-static-crt.json) supersedes earlier missing-
+global-startup/atexit status for the bounded dense static profile. Full C++/POSIX,
+ICU/modern engine,production security policy and wireless remain open; binaries
+stay held.

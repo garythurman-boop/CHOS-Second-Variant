@@ -10,10 +10,12 @@ typedef struct {
  uint64_t magic;
  int error;unsigned main_thread;
  uint32_t tid,done,joining,once_depth,exiting;
+ unsigned exit_counted,process_exiting,process_finalizer_depth;
  void *result;void *(*start)(void *);void *argument;
  uint64_t stack_base;size_t stack_bytes;
  uint64_t initial_fpcr,initial_fpsr;
  void *cxx_destructors;unsigned cxx_destructor_count;
+ unsigned cxx_cleanup_started,cxx_finalize_depth,cxx_callbacks_left;
  mbstate_t unicode_states[4];
  pthread_once_t *active_once[8];
  uint64_t *active_guards[CHOS_CXX_GUARD_DEPTH];unsigned guard_depth;

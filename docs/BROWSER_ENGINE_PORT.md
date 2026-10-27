@@ -238,3 +238,14 @@ fallbacks are explicitly not accepted as link evidence. No engine binary,
 JavaScript execution, rendering or browser-conformance result is claimed; see
 [the retained nonzero result](validation/stage3-jsc-bringup.json). The binary hold
 and all modern-browser/wireless acceptance gates remain active.
+
+The [native static CRT](NATIVE_STATIC_CRT.md) now runs global constructors and
+real process cleanup,including last-pthread termination and nontrivial local
+statics. It fixes C++ TLS destruction after key callbacks and retains compiler
+TLS through global teardown. Direct/UEFI lifecycle,host/sanitizer and runtime/
+network/input regressions are recorded in
+[the evidence](validation/stage3-static-crt.json). This closes that bounded static
+startup/atexit gap; full C++/POSIX and engine integration remain open.
+An [actual ICU79.1 source probe](dependencies/icu-bringup.json) identifies native
+condition_variable/mutex/call_once as concrete next dependencies. No ICU library,
+modern engine or wireless runtime support is claimed. Binary publication stays held.

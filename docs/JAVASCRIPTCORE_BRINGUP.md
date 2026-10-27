@@ -64,7 +64,7 @@ make CC=clang LD=ld.lld -j4 libcxx libm
 Create a separate reference checkout (not a CHOS worktree):
 
 ```
-git clone --depth1 --single-branch --branch wpewebkit-2.54.2 \
+git clone --depth 1 --single-branch --branch wpewebkit-2.54.2 \
   --filter=blob:none --sparse --no-checkout https://github.com/WebKit/WebKit.git WEBKIT_REF
 git -C WEBKIT_REF sparse-checkout set Source/cmake Source/WTF Source/JavaScriptCore Tools/CMake
 git -C WEBKIT_REF checkout --detach 32717fabcb9dcad9aa00a54ef1f23e41ee64e849

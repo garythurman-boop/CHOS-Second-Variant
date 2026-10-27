@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "project": "Unicode ICU",
+  "version": "79.1",
+  "tag": "release-79.1",
+  "commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+  "source": "https://github.com/unicode-org/icu.git",
+  "role": "upstream reference investigation,not a built/vendored production dependency",
+  "license": "Unicode License V3; per-file notices retained in reference checkout",
+  "files_sha256": {
+    "LICENSE": "e09827667e0bb3c808b2a463548ba814a5e6249b67353234d70c8dfc2bcc417d",
+    "icu4c/source/common/unicode/uvernum.h": "c8a9be80c171aaab6ff78c8ca8c8b62ef0bd3adf0a84296c2ecf3bf1c2b9059f",
+    "icu4c/source/common/unicode/uconfig.h": "12708680c633e73fa2cbdaec82bf30f0fc104cd135f46354d39e9e9002a92514",
+    "icu4c/source/common/umutex.h": "f8f959306f96b07b19d0be8769392e9960bd78322647b010d6c94cce5c18e4b6",
+    "icu4c/source/common/umutex.cpp": "f95e9859f447f0af834cb846181537f14de9e49dfa97f6e25b560ed16a6e9897"
+  },
+  "probe": {
+    "unit": "icu4c/source/common/umutex.cpp",
+    "result": "FAIL",
+    "log": "/workspace/chos-evidence/icu79-umutex-probe.log",
+    "log_sha256": "9367905e5cda7c67e668ed4b5eed9d0737327a358ee80ede09304d4319b74267",
+    "diagnosis": "actual native C++23 compile stops at missing condition_variable header; std::mutex/CV/call_once runtime is not ported. This is not an exhaustive dependency inventory."
+  },
+  "limits": [
+    "No ICU library/data/i18n link or runtime result",
+    "No thread-disabled/data-stub substitute used to satisfy engine dependencies",
+    "Full target data generation,build,licensing and release/security qualification remain open",
+    "HTTPS Git identity recorded; release signature verification not claimed"
+  ]
+}

@@ -3,6 +3,9 @@
 .global _start
 .type _start, %function
 _start:
+    stp x0, x1, [sp, #-16]!
+    bl __chos_libc_process_init
+    ldp x0, x1, [sp], #16
     bl main
     stp x0, xzr, [sp, #-16]!
     bl __chos_libc_process_fini
@@ -21,3 +24,14 @@ _start:
 __chos_libc_process_fini:
     ret
 .size __chos_libc_process_fini, . - __chos_libc_process_fini
+
+.weak __chos_libc_process_init
+.type __chos_libc_process_init, %function
+__chos_libc_process_init:
+    ret
+.size __chos_libc_process_init, . - __chos_libc_process_init
+.weak __chos_libc_run_fini_array
+.type __chos_libc_run_fini_array, %function
+__chos_libc_run_fini_array:
+    ret
+.size __chos_libc_run_fini_array, . - __chos_libc_run_fini_array

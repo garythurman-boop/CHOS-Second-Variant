@@ -11,13 +11,13 @@ int __cxa_thread_atexit_impl(void (*destroy)(void *),void *object,void *dso){
 }
 int __cxa_thread_atexit(void (*destroy)(void *),void *object,void *dso){return __cxa_thread_atexit_impl(destroy,object,dso);}
 void __chos_cxx_thread_finalize(chos_libc_tcb_t *t){
- unsigned invoked=0;
+ if(!t->cxx_cleanup_started){t->cxx_cleanup_started=1;t->cxx_callbacks_left=256;}
+ if(t->cxx_finalize_depth>=16)abort();
+ ++t->cxx_finalize_depth;
  while(t->cxx_destructors){
-  if(++invoked>256)abort();
+  if(!t->cxx_callbacks_left)abort();--t->cxx_callbacks_left;
   cleanup_t *entry=t->cxx_destructors;void (*destroy)(void *)=entry->destroy;void *object=entry->object;
   t->cxx_destructors=entry->next;--t->cxx_destructor_count;free(entry);destroy(object);
  }
+ --t->cxx_finalize_depth;
 }
-/* Normal main return runs C++ thread-local destructors. Ordinary pthread key
- * destructors are for pthread_exit, not process exit. The OS reaps other storage. */
-void __chos_libc_process_fini(void){__chos_cxx_thread_finalize(__chos_libc_tls());}

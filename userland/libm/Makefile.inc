@@ -40,7 +40,7 @@ libm: $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC)
 $(BUILD)/userland/libm_test.o: userland/examples/libm_test.c tests/libm_vectors.h $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
 	@mkdir -p $(dir $@)
 	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) -frounding-math $(LIBC_INCLUDES) -I$(MUSL_MATH_GENERATED) -Itests -c $< -o $@
-$(BUILD)/userland/libm_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o $(BUILD)/userland/libm_test.o $(LIBC_OBJECTS) $(MUSL_MATH_ARCHIVE) userland/app.ld
+$(BUILD)/userland/libm_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/libm_test.o $(LIBC_OBJECTS) $(MUSL_MATH_ARCHIVE) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test: $(BUILD)/userland/libm_test.elf
 

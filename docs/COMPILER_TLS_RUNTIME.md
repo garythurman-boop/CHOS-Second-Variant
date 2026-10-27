@@ -114,3 +114,11 @@ drain, eight further guest dispatches and a matching presented caret before its
 stable-text check. It still fails if release/drain misses bounded deadlines or
 new repetition appears. The original failure is retained; no driver behavior was
 changed to discard legitimate queued input.
+
+The subsequent [native static CRT](NATIVE_STATIC_CRT.md) adds actual global
+constructors,process atexit/selective finalization,last-pthread process cleanup
+and post-key C++ TLS destruction with a shared per-TCB cleanup budget.
+[Current evidence](validation/stage3-static-crt.json) supersedes earlier missing-
+global-startup/atexit status for the bounded dense static profile. Full C++/POSIX,
+ICU/modern engine,production security policy and wireless remain open; binaries
+stay held.

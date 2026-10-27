@@ -12,6 +12,7 @@ extern void __chos_pthread_set_fp(uint64_t,uint64_t);
 typedef struct {uint32_t generation,live,late;void (*destroy)(void *);} key_t;
 static key_t keys[PTHREAD_KEYS_MAX];
 static pthread_mutex_t keys_lock=PTHREAD_MUTEX_INITIALIZER;
+static uint32_t active_c_threads=1;
 pthread_t pthread_self(void){return (pthread_t)(uintptr_t)__chos_libc_tls();}
 int pthread_equal(pthread_t a,pthread_t b){return a==b;}
 int pthread_attr_init(pthread_attr_t *a){if(!a)return EINVAL;*a=(pthread_attr_t){ATTR_MAGIC,32768,0};return 0;}
@@ -64,6 +65,8 @@ static void destructors(chos_libc_tcb_t *t){
   }
   if(!called)break;
  }
+}
+static void late_destructors(chos_libc_tcb_t *t){
  for(unsigned i=0;i<PTHREAD_KEYS_MAX;i++){
   void (*destroy)(void *)=0;void *value=0;
   if(pthread_mutex_lock(&keys_lock))abort();
@@ -75,9 +78,18 @@ static void destructors(chos_libc_tcb_t *t){
 }
 void pthread_exit(void *result){
  chos_libc_tcb_t *t=__chos_libc_tls();
+ if(t->process_exiting||t->process_finalizer_depth)abort();
  if(!t->exiting){t->exiting=1;__chos_once_abandon(t);__chos_cxx_guard_abandon(t);__chos_cxx_thread_finalize(t);destructors(t);}
  /* A key/TLS destructor may itself exit during a new guarded initializer. */
  __chos_cxx_guard_abandon(t);
+ /* Key destructors can construct previously unused C++ TLS objects. Their
+  * callbacks must run while compiler TLS storage is still retained. */
+ __chos_cxx_thread_finalize(t);
+ if(!t->exit_counted){
+  t->exit_counted=1;
+  if(__atomic_fetch_sub(&active_c_threads,1,__ATOMIC_ACQ_REL)==1)exit(0);
+ }
+ late_destructors(t);
  t->result=result;__atomic_store_n(&t->done,1,__ATOMIC_RELEASE);(void)chos_wake_word(&t->done,8);
  long rc=chos_syscall1(CHOS_SYS_THREAD_EXIT,(long)(uintptr_t)result);
  /* The synchronous single-task profile has no siblings to preserve. */
@@ -92,6 +104,7 @@ static void start_thread(void *p){
 }
 int pthread_create(pthread_t *out,const pthread_attr_t *a,void *(*start)(void *),void *argument){
  if(!out||!start||(a&&a->magic!=ATTR_MAGIC))return EINVAL;
+ if(!__atomic_load_n(&active_c_threads,__ATOMIC_ACQUIRE)||__chos_libc_tls()->process_exiting)return EAGAIN;
  if(a&&a->detached!=PTHREAD_CREATE_JOINABLE)return ENOTSUP;
  size_t bytes=a?a->stack_bytes:32768;if(bytes<PTHREAD_STACK_MIN||bytes>CHOS_THREAD_STACK_MAX||(bytes&4095u))return EINVAL;
  uint64_t fpcr,fpsr;__chos_pthread_get_fp(&fpcr,&fpsr);
@@ -101,8 +114,9 @@ int pthread_create(pthread_t *out,const pthread_attr_t *a,void *(*start)(void *)
  t->initial_fpcr=fpcr;t->initial_fpsr=fpsr;
  chos_thread_request_t r={.version=1,.size_bytes=sizeof(r),.entry=(uint64_t)(uintptr_t)start_thread,.stack_base=(uint64_t)base,
   .stack_bytes=bytes,.argument=(uint64_t)(uintptr_t)t,.tls=(uint64_t)(uintptr_t)t};
+ __atomic_add_fetch(&active_c_threads,1,__ATOMIC_ACQ_REL);
  long id=chos_thread_create(&r);
- if(id<0){chos_unmap_memory((void *)(uintptr_t)base,bytes);t->magic=0;free(t);return (int)-id;}
+ if(id<0){__atomic_sub_fetch(&active_c_threads,1,__ATOMIC_ACQ_REL);chos_unmap_memory((void *)(uintptr_t)base,bytes);t->magic=0;free(t);return (int)-id;}
  __atomic_store_n(&t->tid,(uint32_t)id,__ATOMIC_RELEASE);*out=(pthread_t)(uintptr_t)t;return 0;
 }
 int pthread_join(pthread_t thread,void **result){

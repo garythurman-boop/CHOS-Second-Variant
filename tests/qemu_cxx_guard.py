@@ -24,8 +24,6 @@ def free_pages():
  return int(re.findall(r'Free pages: (\d+)',g.text())[-1])
 try:
  assert not subprocess.check_output(['llvm-nm','-u',str(app)],text=True).strip(),'unresolved C++ import'
- sections=subprocess.check_output(['llvm-readelf','--sections','--wide',str(app)],text=True)
- assert not re.search(r'\.(init_array|fini_array|ctors|dtors)\b',sections),'fixture requires unimplemented global CRT'
  headers=subprocess.check_output(['llvm-readelf','-lW',str(app)],text=True)
  assert not re.search(r'^\s+TLS\s',headers,re.M)
  wait(lambda:'chos> ' in g.text(),45,'scheduled runtime')
@@ -51,7 +49,7 @@ try:
  wait(lambda:g.text().count(marker)>n or '[FAIL]' in g.text(),30,'C++ relaunch after failures')
  assert '[FAIL]' not in g.text() and free_pages()==baseline
  assert g.symbol('futex_queued_waiters')==0
- (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'application_sha256':app_sha,'cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'timer_preemptions_before':preemptions_before,'timer_preemptions_after':preemptions_after,'checks':['real compiler-emitted guard ABI and acquire-byte fast paths','three native workers contend on eight static initializers and observe fully published records exactly once','initializer pthread_exit abandons ownership and wakes contenders,including initialization entered during pthread-key destructor execution','nested16 guards pass; recursion and depth17 fail with process exit134','manual abort permits retry and release is cached','three worker lifecycles,three processes and clean relaunch after refusal reclaim all heap and PMM frames','no unresolved imports/global initarray/PT_TLS and no retained futex waiters'],'limits':['AArch64 little-endian Itanium static-guard ABI,16 active initializers per thread','no exceptions/unwinding,global constructor/atexit or dynamic loading support','not complete libc++/POSIX or JavaScriptCore execution','new Fusion/physical behavior NOT RUN; Stage3 incomplete']},indent=2)+'\n')
+ (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'application_sha256':app_sha,'cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'timer_preemptions_before':preemptions_before,'timer_preemptions_after':preemptions_after,'checks':['real compiler-emitted guard ABI and acquire-byte fast paths','three native workers contend on eight static initializers and observe fully published records exactly once','initializer pthread_exit abandons ownership and wakes contenders,including initialization entered during pthread-key destructor execution','nested16 guards pass; recursion and depth17 fail with process exit134','manual abort permits retry and release is cached','three worker lifecycles,three processes and clean relaunch after refusal reclaim all heap and PMM frames','no unresolved imports/PT_TLS and no retained futex waiters'],'limits':['AArch64 little-endian Itanium static-guard ABI,16 active initializers per thread','no exceptions/unwinding or dynamic loading support','not complete libc++/POSIX or JavaScriptCore execution','new Fusion/physical behavior NOT RUN; Stage3 incomplete']},indent=2)+'\n')
 except Exception:
  (out/'failure.txt').write_text(g.text());raise
 finally:g.close()

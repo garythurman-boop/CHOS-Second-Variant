@@ -11,6 +11,8 @@ SECTIONS {
  . = ALIGN(4096);
  .data : { *(.data .data.*) *(.got .got.*) } :writable
  .bss (NOLOAD) : { *(.bss .bss.* COMMON) } :writable
+ .unsupported_startup_arrays : { *(.preinit_array .preinit_array.* .init_array .init_array.* .fini_array .fini_array.* .ctors .ctors.* .dtors .dtors.*) }
+ ASSERT(SIZEOF(.unsupported_startup_arrays) == 0,"Global constructors require the dense native static-startup profile")
  /DISCARD/ : { *(.comment) *(.note*) *(.eh_frame*) *(.llvm_addrsig) }
  ASSERT(. <= 0x20200000,"TLS client exceeds bounded native arena")
  ASSERT(SIZEOF(.note.chos) == 24,"Native ELF requires a CHOS ABI note")

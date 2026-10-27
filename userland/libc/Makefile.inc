@@ -1,6 +1,6 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c
+LIBC_SOURCES := userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
 LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
@@ -11,7 +11,7 @@ EMUTLS_HOOKS := -Dpthread_key_create=__chos_pthread_key_create_late -Dpthread_mu
 $(BUILD)/userland/libc/compiler_rt_emutls.o: third_party/compiler-rt/lib/builtins/emutls.c $(EMUTLS_HEADERS) $(LIBC_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) -DEMUTLS_USE_POSIX_MEMALIGN=1 $(EMUTLS_HOOKS) -c $< -o $@
-$(BUILD)/userland/libc/%.o: userland/libc/%.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h
+$(BUILD)/userland/libc/%.o: userland/libc/%.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h userland/libc/internal/exit_registry.h
 	@mkdir -p $(dir $@)
 	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) -c $< -o $@
 $(BUILD)/userland/runtime_test.o: userland/examples/runtime_test.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h
@@ -163,3 +163,18 @@ test-cxx-guard-sanitize: $(SAN_DIR)/test-cxx-guard
 test: test-cxx-guard
 test-sanitize: test-cxx-guard-sanitize
 .PHONY: test-cxx-guard test-cxx-guard-sanitize
+
+NATIVE_STATIC_START := $(BUILD)/userland/libc/static_startup.o
+$(BUILD)/test-exit-registry: tests/test_exit_registry.c userland/libc/exit_registry.c userland/libc/internal/exit_registry.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 -pthread -Iuserland/libc tests/test_exit_registry.c userland/libc/exit_registry.c -o $@
+$(SAN_DIR)/test-exit-registry: tests/test_exit_registry.c userland/libc/exit_registry.c userland/libc/internal/exit_registry.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -pthread -Iuserland/libc tests/test_exit_registry.c userland/libc/exit_registry.c -o $@
+test-exit-registry: $(BUILD)/test-exit-registry
+	./$(BUILD)/test-exit-registry
+test-exit-registry-sanitize: $(SAN_DIR)/test-exit-registry
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-exit-registry
+test: test-exit-registry
+test-sanitize: test-exit-registry-sanitize
+.PHONY: test-exit-registry test-exit-registry-sanitize
