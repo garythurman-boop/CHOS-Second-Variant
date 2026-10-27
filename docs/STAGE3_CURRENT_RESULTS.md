@@ -314,3 +314,10 @@ inventory improves from120/202 to194/202 with the native SDK and opt-in RTTI.
 This is not linked ICU/data/i18n or an engine. Exceptions, C streams/formatting,
 wide/locale/floating parsing and larger runtime/security/platform gates remain
 open; see validation/stage3-native-rtti.json. Binary publication stays held.
+
+[Native binary128 compiler helpers](NATIVE_BINARY128.md) now link through the SDK
+and pass exact-rational arithmetic/conversion and per-worker addition-rounding
+fixtures in direct/isolated UEFI QEMU. Those tests found an upstream19.1.7 multiply
+carry defect; the pinned original20.1.8 helper header fixes it without weakening
+the oracle. Complete dynamic-FENV semantics, floating parsing/formatting and full
+ICU/engine integration remain open. See validation/stage3-native-binary128.json.

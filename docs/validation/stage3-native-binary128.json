@@ -1,0 +1,146 @@
+{
+  "stage3_complete": false,
+  "engine_built": false,
+  "binary_publication": "HELD",
+  "base_commit": "960ff40cb0a266b67257b92d9b8fa6a3d9d0ff2f",
+  "source_sha256": {
+    "Makefile": "2aa823faf993ef1e5db8daaeda8294f4ee9dd5a4241dc5a087645833905556c4",
+    "tools/verify_compiler_rt.py": "b4c7c68ba7736b1510d6b9024a161f0c9de2eb91b8594d1f5436be3697953d57",
+    "tools/generate_quad_vectors.py": "5b3a4376794739992fa429261bced7f6db230e2829b8f9d92b950eb027ae034e",
+    "userland/libm/Makefile.inc": "e97f7d346902fbfb3fdbc66dab85cbf41b0923f73e8e02c26e1e28573af7cd0a",
+    "tools/install_native_sdk.py": "6b259224f095b5a4c2e1dd0b850376ac4e8361c8f429a730ac4962b82b4b4b84",
+    "ports/native/chos-toolchain.cmake": "1272b67a2081040dbf595b79b63ed6f4142eb7f267ae28a6788804eed77f7266",
+    "tests/native_sdk/CMakeLists.txt": "b37601c501173c713122f9d240b9d871f5c9062312862408426b3aff6ebf3f37",
+    "tests/qemu_quad.py": "c0a4cc9255b495b3b64642f0b5c8cb82352d9277bf93e5c51e922f8f3a255a9d",
+    "tests/quad_vectors.h": "868a2b9a2fd211cdb407750644109c76af4146100de3c91378291d7d10eafc8c",
+    "userland/examples/quad_test.c": "44891660106d424528bd80010c5b1a6f04ed0d1553224013fd65edabc6c61ccd"
+  },
+  "dependencies": [
+    "docs/dependencies/compiler-rt-quad.json",
+    "docs/dependencies/compiler-rt-emutls.json"
+  ],
+  "sdk_manifest_sha256": "f71e759385d1a3a4e3478e359cd041ea99953315c3a9b1549c90ff3c8a40a6fd",
+  "guest_results": {
+    "native-quad-final-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "41a2da2fe1cfada6f9ac0c98c2e7fa4e7f08e17d4900c7b2d7b74c463652ec41",
+      "cold_free_pages": 117699,
+      "free_pages_before": 117631,
+      "free_pages_after": 117631,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 687,
+      "checks": [
+        "192 exact-rational binary128 arithmetic fixtures,each add/sub/mul/div and binary32/64 narrowing",
+        "signed/unsigned32/64/128 conversions,float/double extension,NaN/infinity/signed zero",
+        "real AArch64 FPCR/FPSR addition rounding and inexact with three isolated native workers",
+        "three worker lifecycles/process and three repeated processes,stable warm physical pages/no futex waiters"
+      ],
+      "limits": [
+        "binary128 compiler-helper subset; mul/div/narrowing use upstream nearest-even rather than full dynamic-FENV semantics",
+        "exact rational fixtures are regression coverage,not exhaustive IEC60559/C/ECMAScript conformance",
+        "long-double libm transcendental functions and complete formatted I/O remain absent",
+        "not full C++ or browser integration",
+        "new Fusion/physical behavior NOT RUN",
+        "modern engine and Stage3 remain incomplete"
+      ]
+    },
+    "native-quad-sdk-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "5d2ffb3ca6d221eed5f41fa8ca3203c680c501a366b5e58c21b4d177cb416e67",
+      "cold_free_pages": 500527,
+      "free_pages_before": 500472,
+      "free_pages_after": 500472,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 687,
+      "checks": [
+        "192 exact-rational binary128 arithmetic fixtures,each add/sub/mul/div and binary32/64 narrowing",
+        "signed/unsigned32/64/128 conversions,float/double extension,NaN/infinity/signed zero",
+        "real AArch64 FPCR/FPSR addition rounding and inexact with three isolated native workers",
+        "three worker lifecycles/process and three repeated processes,stable warm physical pages/no futex waiters"
+      ],
+      "limits": [
+        "binary128 compiler-helper subset; mul/div/narrowing use upstream nearest-even rather than full dynamic-FENV semantics",
+        "exact rational fixtures are regression coverage,not exhaustive IEC60559/C/ECMAScript conformance",
+        "long-double libm transcendental functions and complete formatted I/O remain absent",
+        "not full C++ or browser integration",
+        "new Fusion/physical behavior NOT RUN",
+        "modern engine and Stage3 remain incomplete"
+      ]
+    },
+    "native-quad-emutls-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "fabea70487dceffceaa2b3c03b4d134081a5126cd9e83c0de8d632225b1b144a",
+      "compiler_tls_controls": 48,
+      "elf_pt_tls": false,
+      "cold_free_pages": 500527,
+      "free_pages_before": 500479,
+      "free_pages_after": 500479,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 150,
+      "checks": [
+        "real clang -femulated-tls C11 and C++17 variables, initialization and4096-byte alignment",
+        "at least48 compiler TLS controls trigger upstream per-thread address-array growth",
+        "three workers preserve isolated TLS values across SVC/yield/preemption and repeated launches",
+        "C++ thread_local constructors once per thread, destructors in reverse order before C key callbacks",
+        "ordinary key callbacks access retained compiler TLS through all four destructor passes",
+        "compiler storage and C++ cleanup nodes reclaimed after join; user heap returns to exact main baseline",
+        "normal main return and explicit main pthread_exit run C++ TLS destructors with valid values",
+        "main pthread_exit preserves worker and join result",
+        "key/dtor quotas and recursive destructor registration fail closed with bounded exit134 and stable pages",
+        "no queued futex records, no unresolved runtime imports and no PT_TLS dependency"
+      ],
+      "limits": [
+        "explicit -femulated-tls static-link profile, not native ELF TLS relocations/dynamic loader",
+        "no full C++ standard library, exceptions or DSO unload support; this sparse fixture excludes global constructor arrays",
+        "C++ thread-local callback registration64 pending per thread, cleanup bound256 invocations",
+        "native heap, thread and key quotas remain in force",
+        "new Fusion/physical behavior NOT RUN; modern engine and Stage3 incomplete"
+      ]
+    }
+  },
+  "checks": {
+    "native-quad-fixture-build4.log": {
+      "status": "PASS",
+      "sha256": "68de6bb4540ac98efdbc5699a995b1dbcbc0735b592d8e67d7a922f35eb1a579"
+    },
+    "native-quad-sdk-stage1.log": {
+      "status": "PASS",
+      "sha256": "9e70d5de35beecf83449462cb290e963e22b863dd16b8cf632d968f215c17b39"
+    },
+    "native-quad-sdk-configure.log": {
+      "status": "PASS",
+      "sha256": "d0477034a47fc3dfc9e7bd6e6a9f9715f226e8e853413f07ebe3da2d06294346"
+    },
+    "native-quad-sdk-build.log": {
+      "status": "PASS",
+      "sha256": "da55fde4315db820c3d55f270216682210192fead996f1eff5a086f16781118c"
+    },
+    "native-quad-host.log": {
+      "status": "PASS",
+      "sha256": "aab4bb52febe7505df5cd92606330c9127ff638745ab5fb99ac4c4e60ae9400a"
+    },
+    "native-quad-sanitize.log": {
+      "status": "PASS",
+      "sha256": "62374121a7ae77860571cc432560c102ff68f06611325a169948d949209927b1"
+    },
+    "native-quad-media.log": {
+      "status": "PASS",
+      "sha256": "77a5ca48b7762779f9e6132695716f66088ebd82aa39486a750d2d7aa7f59751"
+    }
+  },
+  "retained_failures": {
+    "native-quad-fixture-build1.log": "int128 conversion closure needs original __clzti2; imported pinned source before final links",
+    "native-quad-direct1": "FAIL: original LLVM19.1.7 lost carry in wideMultiply; 1ULP at arithmetic vector51 multiplication",
+    "native-quad-direct2": "FAIL: diagnostic rerun confirms actual c000fffffffffffffffffffffffffffc vs exact c000fffffffffffffffffffffffffffd",
+    "native-quad-direct3": "PASS after original LLVM20.1.8 header override; final fixture additionally improves an int128 fractional truncation case"
+  },
+  "limits": [
+    "nearest-even mul/div/narrowing/integer-to-float; incomplete dynamic-FENV/exception conformance",
+    "bounded compiler runtime,not complete long-double math/formatting/parsing or an engine",
+    "ICU/data/i18n,engine runtime/memory/isolation,production TLS and Pi5 wireless remain open",
+    "QEMU does not qualify new Fusion/Pi/laptop behavior; no release publication"
+  ]
+}

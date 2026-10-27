@@ -1545,7 +1545,7 @@ test: $(BUILD)/userland/futex_test.elf
 
 # Staged native headers, CRT and actual static runtime archives for external ports.
 NATIVE_SDK_ROOT ?= $(BUILD)/native-sdk
-native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC)
+native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE)
 	python3 tools/install_native_sdk.py --build $(BUILD) --out $(NATIVE_SDK_ROOT) $(foreach obj,$(LIBC_OBJECTS),--libc-object $(obj))
 .PHONY: native-sdk
 

@@ -24,3 +24,12 @@ if(WRONG_IMPORT_ACCEPTED)
 endif()
 add_executable(sdk_c main.c)
 add_executable(sdk_cpp main.cpp)
+
+# Compiler helpers must link through the same native SDK used by dependencies.
+check_c_source_compiles("#include <float.h>\n__attribute__((noinline)) long double divide(long double a,long double b){return a/b;}int main(void){volatile long double x=3.L;return divide(x,2.L)==1.5L?0:1;}" HAVE_NATIVE_BINARY128)
+if(NOT HAVE_NATIVE_BINARY128)
+ message(FATAL_ERROR "real native binary128 link failed")
+endif()
+add_executable(sdk_quad ../../userland/examples/quad_test.c)
+target_include_directories(sdk_quad PRIVATE ..)
+target_compile_options(sdk_quad PRIVATE -frounding-math)

@@ -60,3 +60,30 @@ test-libm-sanitize: $(SAN_DIR)/test-libm
 test: test-libm
 test-sanitize: test-libm-sanitize
 .PHONY: test-libm test-libm-sanitize
+
+# Original compiler-rt binary128 arithmetic, using real AArch64 FPCR/FPSR.
+QUAD_ROOT := third_party/compiler-rt
+QUAD_SOURCES := $(shell python3 -c 'import json;print(" ".join("third_party/compiler-rt/"+p for p in json.load(open("docs/dependencies/compiler-rt-quad.json"))["sources"]))')
+QUAD_OBJECTS := $(addprefix $(BUILD)/userland/libquad/,$(addsuffix .o,$(basename $(QUAD_SOURCES))))
+QUAD_HEADERS := $(shell rg --files $(QUAD_ROOT) -g '*.h' -g '*.inc')
+QUAD_ARCHIVE := $(BUILD)/userland/libquad/libchos-quad.a
+$(BUILD)/userland/libquad/%.o: %.c $(QUAD_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) $(LIBC_INCLUDES) -ffunction-sections -fdata-sections -MMD -MP -c $< -o $@
+-include $(QUAD_OBJECTS:.o=.d)
+$(QUAD_ARCHIVE): $(QUAD_OBJECTS)
+	rm -f $@
+	llvm-ar rcs $@ $^
+libquad: $(QUAD_ARCHIVE)
+.PHONY: libquad
+$(BUILD)/userland/quad_test.o: userland/examples/quad_test.c tests/quad_vectors.h $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) $(LIBC_INCLUDES) -I$(MUSL_MATH_GENERATED) -Itests -frounding-math -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/quad_test.d
+$(BUILD)/userland/quad_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/quad_test.o $(QUAD_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
+test-libquad: $(BUILD)/userland/quad_test.elf
+	python3 tools/verify_compiler_rt.py
+	python3 tools/generate_quad_vectors.py --check
+test: test-libquad
+.PHONY: test-libquad

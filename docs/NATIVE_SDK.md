@@ -68,3 +68,9 @@ and dynamic_cast to libchos-c++.a, with its upstream license in the staged SDK.
 Consumers opt in using -frtti after the default flags; exceptions stay disabled.
 Native byte C classification, intmax conversions and integer format macros are
 also staged. This extends the bounded SDK without claiming full hosted conformance.
+
+[Binary128 compiler helpers](NATIVE_BINARY128.md) are now staged as
+libchos-quad.a and linked on demand in the same static runtime group. An actual
+CMake long-double divide probe and the full native arithmetic fixture link and
+run through the SDK. This does not supply complete long-double libm or dynamic
+floating-environment conformance.
