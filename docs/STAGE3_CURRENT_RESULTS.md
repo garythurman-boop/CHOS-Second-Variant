@@ -299,3 +299,10 @@ with ordered post-key TLS cleanup and real termination handlers. It preserves th
 three-worker budget and no-exceptions boundary; detached threads, public futures,
 experimental jthread and complete engine runtime remain open. This supersedes
 previously missing std::thread status only for the documented bounded profile.
+
+The [native external-build SDK](NATIVE_SDK.md) now links ordinary CMake C/C++ main
+programs against the actual CRT/static runtime and executes them in CHOS. Missing
+libraries/imports fail real links; host libraries are excluded. The native JSC
+configuration still requires target ICU data/i18n/uc and does not build/run the
+engine. The earlier static-only probe limitations remain attached to that older
+triage profile, rather than the new executable-link mode.

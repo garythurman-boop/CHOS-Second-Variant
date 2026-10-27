@@ -1,0 +1,242 @@
+{
+  "stage3_complete": false,
+  "engine_built": false,
+  "binary_publication": "HELD",
+  "base_commit": "b9ffec15cb514e54629a0e65c5cf24b5da5af273",
+  "source_sha256": {
+    "Makefile": "92a7d8bfe6dff2c098051728ed6cfed428592a8752d5db060ebd8e440b0543bd",
+    "tools/install_native_sdk.py": "27ec5623e7e2627d4f992c9ebbcc39a691249cf1e73d5aac6f47d9b5f0da1eb1",
+    "tools/verify_native_sdk.py": "aca63c2cecbf5386f13622c306f714f86fabc3f20fcc078fdefcd88759327ae6",
+    "tools/preflight_javascriptcore.py": "e57cda382f3ef970a800cd63b547121e75628fbb723b6ddf548ff509fb7c7d7d",
+    "ports/native/chos-toolchain.cmake": "202e03eb958a64d403e711769fd6df3406b8145b4ea554256384ec79a74cdebb",
+    "ports/webkit/cmake/Platform/CHOS.cmake": "9c5a913c5b3931dd0e985783e0cb8b722e92416f2e129faf75b9b0d6dd8e4b02",
+    "tests/test_native_sdk_installer.py": "870ee1ee990343dbc390631f203f13d248116b5af418a9f27f65a878673536b1",
+    "tests/qemu_native_sdk.py": "2085a7761e5656ec7a6e6f12745a082a18beed87b25cdce3dee06809e6abbfe7",
+    "tests/native_sdk/CMakeLists.txt": "f3d1dd5049cff4bfa26f9de0cc666ebb1c23c9c53f3e93f9b2565e4c51a3cca9",
+    "tests/native_sdk/main.c": "7072684a8a7b0231b880e01fa7d91cc1656a27c0900c4f975b1407ae1605177f",
+    "tests/native_sdk/main.cpp": "288380ccede1a86d1bc638cdbc9f463676bda8b02de4f89182eae7b49ad5e953"
+  },
+  "sdk_manifest_sha256": "ae3a2859c947b32b6507814a8ac5cbb70597faecdbc9bda35ac1acc5d9da5b16",
+  "guest_results": {
+    "native-sdk-final-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "applications_sha256": {
+        "/BIN/SDKC.ELF": "a278858ca3cf8ecb1ccee9ae01a6ff1ed48b0b9aeaefbdbcb0e09112b57a30e0",
+        "/BIN/SDKCPP.ELF": "898ee5fd33b87580b96a697e6291a90d498481f886e06ce91a3cbebfaeb85346"
+      },
+      "cases": [
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 117674,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 117567,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 117567,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 117567,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 117567,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 117567,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 117567,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 117567,
+          "status": "PASS"
+        }
+      ],
+      "cold_free_pages": 117699,
+      "warm_free_pages": 117567,
+      "checks": [
+        "actual CMake executable links against staged native CRT/static runtime",
+        "ordinary hosted-language main without extern C workaround,argc/argv and C allocation",
+        "global C++ vector constructors and three real std::thread workers,normal return/cleanup",
+        "alternating C/C++ processes after warmup retain stable PMM pages/no queued futexes"
+      ],
+      "limits": [
+        "bounded static SDK,no full hosted C/C++/POSIX or modern engine",
+        "new Fusion/Pi/laptop behavior NOT RUN; Stage3 incomplete"
+      ]
+    },
+    "native-sdk-final-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "applications_sha256": {
+        "/BIN/SDKC.ELF": "a278858ca3cf8ecb1ccee9ae01a6ff1ed48b0b9aeaefbdbcb0e09112b57a30e0",
+        "/BIN/SDKCPP.ELF": "898ee5fd33b87580b96a697e6291a90d498481f886e06ce91a3cbebfaeb85346"
+      },
+      "cases": [
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500502,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500395,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500395,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500395,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500395,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500395,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKC.ELF",
+          "expected_exit": 19,
+          "free_pages": 500395,
+          "status": "PASS"
+        },
+        {
+          "path": "/BIN/SDKCPP.ELF",
+          "expected_exit": 23,
+          "free_pages": 500395,
+          "status": "PASS"
+        }
+      ],
+      "cold_free_pages": 500527,
+      "warm_free_pages": 500395,
+      "checks": [
+        "actual CMake executable links against staged native CRT/static runtime",
+        "ordinary hosted-language main without extern C workaround,argc/argv and C allocation",
+        "global C++ vector constructors and three real std::thread workers,normal return/cleanup",
+        "alternating C/C++ processes after warmup retain stable PMM pages/no queued futexes"
+      ],
+      "limits": [
+        "bounded static SDK,no full hosted C/C++/POSIX or modern engine",
+        "new Fusion/Pi/laptop behavior NOT RUN; Stage3 incomplete"
+      ]
+    }
+  },
+  "checks": {
+    "native-sdk-cmake-final.log": {
+      "status": "PASS",
+      "sha256": "ab5a9b74bea09c99ec23e618e087fcbdf9d3bf7cb27eab9b27fbf3b54551b7d9"
+    },
+    "native-sdk-build-final.log": {
+      "status": "PASS",
+      "sha256": "c7709e962363efbe2b2e7d17ace02b5abaf6cf51774ffea98ebc6d74c06b3d02"
+    },
+    "native-sdk-relocated-configure.log": {
+      "status": "PASS",
+      "sha256": "c1dcee68d60271f65b7a3c4dcf39a1b16017b27d66bbc3abddfdac431782bc0f"
+    },
+    "native-sdk-relocated-build.log": {
+      "status": "PASS",
+      "sha256": "c7709e962363efbe2b2e7d17ace02b5abaf6cf51774ffea98ebc6d74c06b3d02"
+    },
+    "native-sdk-installer-guards.log": {
+      "status": "PASS",
+      "sha256": "757b37deb3a9285592330bbc0c97db310e4bcb4bea70b6ba5f6bd6c7c18b3b36"
+    },
+    "native-sdk-media.log": {
+      "status": "PASS",
+      "sha256": "62512f3e458af470c6aec692f7bee3ded8abda22d1522c35976bf0c76d378a07"
+    }
+  },
+  "jsc_result": {
+    "status": "CONFIGURATION_INCOMPLETE",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "source_manifest": "docs/dependencies/webkit-jsc-bringup.json",
+    "command": [
+      "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+      "-S",
+      "/workspace/chos-reference/webkit-2.54.2",
+      "-B",
+      "/workspace/chos-evidence/jsc-native-sdk-final/cmake",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+      "-DRuby_EXECUTABLE=/workspace/chos-tools/root/usr/bin/ruby3.3",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DPORT=JSCOnly",
+      "-DENABLE_STATIC_JSC=ON",
+      "-DENABLE_JIT=OFF",
+      "-DUSE_SYSTEM_MALLOC=ON",
+      "-DENABLE_TOOLS=OFF",
+      "-DCHOS_SDK_ROOT=/workspace/CHOS-Second-Variant/build/native-sdk"
+    ],
+    "returncode": 1,
+    "seconds": 8.91602553499979,
+    "log_sha256": "6aa623531786eb391ca8ae019386a2d290000089842749a94967fd4639f34094",
+    "tool_versions": {
+      "cmake": "cmake version 3.31.6",
+      "ninja": "1.11.1.git.kitware.jobserver-1",
+      "ruby": "ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]",
+      "clang": "Debian clang version 19.1.7 (3+b1)",
+      "clang++": "Debian clang version 19.1.7 (3+b1)"
+    },
+    "int128_type_compile_probe": "PASS",
+    "compile_only_cmake_checks": false,
+    "native_sdk": "/workspace/CHOS-Second-Variant/build/native-sdk",
+    "threads_missing": false,
+    "target_library_search": "CHOS sysroot only; host executables permitted",
+    "icu_missing": true,
+    "limits": [
+      "Real executable links are used; failed native POSIX thread checks remain failures.",
+      "CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.",
+      "The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.",
+      "No WebCore/WPE rendering,JavaScript execution,browser or conformance result."
+    ]
+  },
+  "limits": [
+    "bounded static native SDK,not full hosted/POSIX or complete engine runtime",
+    "full ICU/data,stdio/locale/numeric APIs,engine memory/isolation,production TLS and Pi5 wireless remain open",
+    "QEMU evidence is not new Fusion/Pi/laptop qualification"
+  ]
+}

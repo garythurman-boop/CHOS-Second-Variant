@@ -1542,3 +1542,14 @@ $(BUILD)/userland/futex_test.o: userland/examples/futex_test.c userland/libchos/
 $(BUILD)/userland/futex_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o $(BUILD)/userland/futex_test.o userland/native.ld
 	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(filter %.o,$^)
 test: $(BUILD)/userland/futex_test.elf
+
+# Staged native headers, CRT and actual static runtime archives for external ports.
+NATIVE_SDK_ROOT ?= $(BUILD)/native-sdk
+native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC)
+	python3 tools/install_native_sdk.py --build $(BUILD) --out $(NATIVE_SDK_ROOT) $(foreach obj,$(LIBC_OBJECTS),--libc-object $(obj))
+.PHONY: native-sdk
+
+test-native-sdk-installer:
+	python3 tests/test_native_sdk_installer.py
+test: test-native-sdk-installer
+.PHONY: test-native-sdk-installer

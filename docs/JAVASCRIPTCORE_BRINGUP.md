@@ -112,3 +112,11 @@ lifecycles and ordered exit notifications in the bounded C++20/23 profile. This
 is another runtime prerequisite, not an ICU library installation or passed JSC
 configure/execute gate. Existing engine-sized memory, full runtime/isolation,
 ICU data/i18n/uc and production security requirements remain active.
+
+The [native SDK](NATIVE_SDK.md) now supplies a real executable-link profile.
+`tools/preflight_javascriptcore.py --native-sdk build/native-sdk ...` selects it
+without changing the preserved compiler-only triage mode. Actual native C++ thread
+and negative missing-library/import probes now have link and guest evidence.
+The upstream run still stops at missing target ICU data/i18n/uc. Threads_FOUND
+reflects the real create/join probe; the complete detach/cancel/atfork test still
+fails. Full POSIX and an engine build are not claimed.

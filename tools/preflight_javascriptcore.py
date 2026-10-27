@@ -8,7 +8,7 @@ root=pathlib.Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--source',type=pathlib.Path,required=True)
 p.add_argument('--out',type=pathlib.Path,required=True)
-p.add_argument('--cmake',default='cmake');p.add_argument('--ninja',default='ninja');p.add_argument('--ruby',default='ruby')
+p.add_argument('--native-sdk',type=pathlib.Path,help='use real executable links against this staged SDK');p.add_argument('--cmake',default='cmake');p.add_argument('--ninja',default='ninja');p.add_argument('--ruby',default='ruby')
 o=p.parse_args();source=o.source.resolve();out=o.out.resolve()
 m=json.loads((root/'docs/dependencies/webkit-jsc-bringup.json').read_text())
 def git(*args):return subprocess.check_output(['git',*args],cwd=source)
@@ -38,9 +38,12 @@ for name in ['libcxx/include/__config_site','libm/include/math.h']:
 out.mkdir(parents=True,exist_ok=False)
 command=[programs['cmake'],'-S',str(source),'-B',str(out/'cmake'),'-G','Ninja',
  '-DCMAKE_MAKE_PROGRAM='+programs['ninja'],'-DRuby_EXECUTABLE='+programs['ruby'],
- '-DCMAKE_TOOLCHAIN_FILE='+str(root/'ports/webkit/chos-compile-preflight.cmake'),
+ '-DCMAKE_TOOLCHAIN_FILE='+str(root/('ports/native/chos-toolchain.cmake' if o.native_sdk else 'ports/webkit/chos-compile-preflight.cmake')),
  '-DCMAKE_BUILD_TYPE=Release','-DPORT=JSCOnly','-DENABLE_STATIC_JSC=ON',
  '-DENABLE_JIT=OFF','-DUSE_SYSTEM_MALLOC=ON','-DENABLE_TOOLS=OFF']
+if o.native_sdk:
+ subprocess.run([sys.executable,str(root/'tools/verify_native_sdk.py'),str(o.native_sdk.resolve())],check=True)
+ command.append('-DCHOS_SDK_ROOT='+str(o.native_sdk.resolve()))
 start=time.monotonic()
 with (out/'configure.log').open('wb') as log:r=subprocess.run(command,cwd=root,stdout=log,stderr=subprocess.STDOUT)
 log=(out/'configure.log').read_text(errors='replace')
@@ -58,9 +61,11 @@ report={'status':'CONFIGURED_NOT_BUILT' if r.returncode==0 else 'CONFIGURATION_I
  'source_manifest':'docs/dependencies/webkit-jsc-bringup.json','command':command,'returncode':r.returncode,
  'seconds':time.monotonic()-start,'log_sha256':sha((out/'configure.log').read_bytes()),
  'tool_versions':versions,'int128_type_compile_probe':('PASS' if int128[1]=='1' else 'FAIL') if int128 else 'NOT_RUN',
- 'compile_only_cmake_checks':True,'target_library_search':'CHOS sysroot only; host executables permitted',
+ 'compile_only_cmake_checks':not bool(o.native_sdk),
+ 'native_sdk':str(o.native_sdk.resolve()) if o.native_sdk else None,
+ 'threads_missing':'Could NOT find Threads' in log,'target_library_search':'CHOS sysroot only; host executables permitted',
  'icu_missing':'Failed to find all ICU components' in log,
- 'limits':['Static try-compile results do not prove executable linking or runtime support.',
+ 'limits':(['Real executable links are used; failed native POSIX thread checks remain failures.'] if o.native_sdk else ['Static try-compile results do not prove executable linking or runtime support.'])+[
  'CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.',
  'The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.',
  'No WebCore/WPE rendering,JavaScript execution,browser or conformance result.']}
