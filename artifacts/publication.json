@@ -1,13 +1,13 @@
 {
   "latest": {
-    "source_commit": "d91d135f4e5b14078384b954ccb10cdec590cc53",
-    "directory": "artifacts/d91d135",
-    "tag": "build-d91d135"
+    "source_commit": "cc29ea83a73e3cb2d6b753645360fd769f921890",
+    "directory": "artifacts/cc29ea8",
+    "tag": "build-cc29ea8"
   },
   "schema": 1,
   "artifact_interval": 2,
-  "iterations_since_artifacts": 1,
-  "last_counted_source_commit": "c889daac7346e05ff95d3ffcff9013e73fb92585",
+  "iterations_since_artifacts": 0,
+  "last_counted_source_commit": "cc29ea83a73e3cb2d6b753645360fd769f921890",
   "release_hold": {
     "active": false,
     "reason": "Superseded by user authorization for critical interim user-test binaries; Stage 3 completion remains gated",

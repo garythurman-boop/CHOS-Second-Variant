@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "source_commit": "cc29ea83a73e3cb2d6b753645360fd769f921890",
+  "tag": "build-cc29ea8",
+  "inputs": {
+    "iso_sha256": "b6e04990e122355c45c35e58db4593bbeb4d80e30c5b984c2536870535626562"
+  },
+  "assets": [
+    {
+      "name": "CHOS-Fusion-cc29ea8.iso",
+      "sha256": "b6e04990e122355c45c35e58db4593bbeb4d80e30c5b984c2536870535626562",
+      "bytes": 33603584
+    },
+    {
+      "name": "CHOS-cc29ea8-prepared.img.gz",
+      "sha256": "3f0328337bc8cd2f8644d0043038818f180c5ab67ddbcdc9196d292a8a1da280",
+      "bytes": 2056927,
+      "uncompressed_sha256": "70e6ead416ecab87cc769b4adc5af05bce43d6ba9042e1aeea794bfd29ef9619",
+      "uncompressed_bytes": 268435456
+    },
+    {
+      "name": "CHOS-cc29ea8-kernel-direct.elf.gz",
+      "sha256": "1b3e59440631716b8310cba0170a511de6fb9b0dcb3bc6b985d0a645b4a1ee4c",
+      "bytes": 1690970,
+      "uncompressed_sha256": "2c00fde3a65c425d9ebe101a7ce92a17bca2989d3565c2b849c329b6b498340a",
+      "uncompressed_bytes": 6867024
+    },
+    {
+      "name": "CHOS-cc29ea8-kernel-uefi.elf.gz",
+      "sha256": "16e48dadcdf829d84e55da54583e3a97715520b20f593f2bcd2e5d3e997716dc",
+      "bytes": 1692831,
+      "uncompressed_sha256": "77d683caef32e98f445635b75751d3c31daa3bd7a76366844cf1ba9c548ca5bf",
+      "uncompressed_bytes": 6875664
+    },
+    {
+      "name": "BOOTAA64.EFI",
+      "sha256": "d9a88eebb270261a3e29eac00fe5f534e66dcc7bd09e187506f8172fb3046bb6",
+      "bytes": 16896
+    },
+    {
+      "name": "CHOS-cc29ea8-source.zip",
+      "sha256": "cd3075710af43c0dbe09a42db3bce3525a625948ee9adfcdd5c43e5379a6f0b6",
+      "bytes": 6159875
+    },
+    {
+      "name": "TESTING.md",
+      "sha256": "49a5ea42623f9299b4c500d1ea02b03fbfd6445e9e0175367c855ebefbe7a7ab",
+      "bytes": 1867
+    }
+  ],
+  "milestone": "native read streams and runtime Fusion qualification",
+  "stage3_complete": false,
+  "testing": "TESTING.md"
+}

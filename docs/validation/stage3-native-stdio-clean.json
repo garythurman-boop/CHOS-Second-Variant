@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "source_commit": "cc29ea83a73e3cb2d6b753645360fd769f921890",
+  "scope": "clean committed interim runtime user-test milestone; not full Stage3",
+  "stage3_complete": false,
+  "version": "0.30.0 development",
+  "guest_results": {
+    "native-stdio-clean-romfs": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "6ae3a626ef3797c518e46e9ba8f764db8ab967a0a8081af0d2910e353713b852",
+      "source": "embedded ROMFS",
+      "cold_free_pages": 500222,
+      "free_pages_before": 500222,
+      "free_pages_after": 500222,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 95,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-stdio-clean-console": {
+      "status": "PASS",
+      "checks": [
+        "actual USB Console command launches embedded native ELF",
+        "completed diagnostic output visible in desktop Console",
+        "three separate processes exit and clean up",
+        "screenshot retained"
+      ],
+      "limits": [
+        "QEMU UEFI e1000e,not Fusion validation"
+      ]
+    },
+    "native-stdio-clean-typing": {
+      "status": "PASS",
+      "mode": "uefi",
+      "ordinary_tap_down_ms": 50,
+      "console_lengths": [
+        26,
+        19
+      ],
+      "browser_lengths": [
+        36,
+        29
+      ],
+      "document_lengths": [
+        36,
+        29
+      ],
+      "editor_sha256": "44a3cc7803fdac6c40a7a2ca04e445f3532bb6393f16769c33730ef418d6bd2f",
+      "checks": [
+        "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+        "plain I leaves Setup closed",
+        "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+        "actual isolated Console held Backspace/letters and visible caret pixels",
+        "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+        "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+        "native editor auto-saves on Escape; USB keyboard removal releases held key",
+        "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+        "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+      ]
+    },
+    "native-stdio-clean-installed": {
+      "mode": "installed",
+      "checks": [
+        "32 fast USB keypress/release pairs",
+        "PCI VirtIO CHFS write/flush/read",
+        "PCI VirtIO hardware RNG",
+        "82574L e1000e DHCP/ARP/ICMP",
+        "keyboard shortcut",
+        "absolute tablet",
+        "wheel reports through hardware transport to shared input",
+        "window maximize/restore",
+        "title-bar drag",
+        "20 USB hot-unplug/reconnect cycles with ring wraps",
+        "2-second idle observation",
+        "storage persistence after fresh guest boot"
+      ],
+      "kernel_ready_seconds": 6.781,
+      "desktop_ready_seconds": 9.777,
+      "keyboard_visible_ms": 26.61,
+      "pointer_visible_ms": 45.61,
+      "maximize_visible_ms": 182.36,
+      "drag_visible_ms": 229.05,
+      "idle_cpu_percent": 9.5,
+      "status": "PASS"
+    }
+  },
+  "inputs": {
+    "build/chos.elf": "2c00fde3a65c425d9ebe101a7ce92a17bca2989d3565c2b849c329b6b498340a",
+    "build/uefi-kernel/chos.elf": "77d683caef32e98f445635b75751d3c31daa3bd7a76366844cf1ba9c548ca5bf",
+    "build/chos-0.30.0.iso": "b6e04990e122355c45c35e58db4593bbeb4d80e30c5b984c2536870535626562",
+    "build/chos-0.30.0-installed.img": "70e6ead416ecab87cc769b4adc5af05bce43d6ba9042e1aeea794bfd29ef9619"
+  },
+  "fusion_status": "NOT RUN for this new build; user testing requested",
+  "preceding_component_and_regression_report": "stage3-native-stdio.json"
+}

@@ -367,3 +367,9 @@ MAP_STDIO backend; putil and full ICU/data/i18n/runtime remain unfinished.
 See [scope and Fusion checklist](NATIVE_READ_STREAMS.md) and
 [machine-readable evidence](validation/stage3-native-stdio.json). An interim
 runtime qualification binary is authorized; it is not Stage 3 completion.
+
+Interim user-test build **cc29ea8** is prepared from a clean committed source.
+Clean UEFI ROMFS runtime/desktop Console/typing and installed-image regressions
+pass; see [exact clean input hashes](validation/stage3-native-stdio-clean.json)
+and the [Fusion checklist](../artifacts/cc29ea8/TESTING.md). New Fusion validation
+is pending. This supersedes d91d135 as the current test download after publication.
