@@ -97,3 +97,9 @@ CLOCK_MONOTONIC/REALTIME pthread_cond_clockwait and independently tracks16 neste
 64-bit libc++ once flags. It supersedes the earlier absence of C++ mutex/CV/once
 bindings, while preserving the distinct32-bit pthread_once ABI and its8-level
 bound. Detached threads, C timed-lock APIs and the other listed POSIX limits remain.
+
+The subsequent [standard C++ thread binding](NATIVE_CXX_THREADS.md) adds a private
+final-notification key phase after ordinary keys and post-key C++ TLS cleanup,
+before compiler TLS release. A marked std::thread callable cannot call pthread_exit
+without forced unwinding; it aborts134. Existing raw pthread exit/once semantics
+remain qualified. General POSIX cancellation/unwinding and detach remain absent.

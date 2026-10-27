@@ -249,3 +249,12 @@ startup/atexit gap; full C++/POSIX and engine integration remain open.
 An [actual ICU79.1 source probe](dependencies/icu-bringup.json) identifies native
 condition_variable/mutex/call_once as concrete next dependencies. No ICU library,
 modern engine or wireless runtime support is claimed. Binary publication stays held.
+
+The subsequent [synchronization component](NATIVE_CXX_SYNCHRONIZATION.md) closes
+the concrete mutex/CV/call_once gap and runs original ICU79.1 umutex.cpp in a
+bounded native test fixture, with its cleanup recorder explicitly test-only.
+[Native std::thread](NATIVE_CXX_THREADS.md) now supplies upstream C++20/23
+create/move/join/exit-notification lifecycles and real termination handlers. Full
+ICU data/i18n/uc, public futures/exception ABI, detach, engine-sized memory/runtime,
+WTF/JavaScriptCore/WebCore platform integration and modern browser conformance
+remain open. These are tested prerequisites, not an engine rendered in CHOS.

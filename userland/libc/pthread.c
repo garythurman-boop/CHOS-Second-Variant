@@ -36,6 +36,8 @@ static int key_create(pthread_key_t *out,void (*destroy)(void *),unsigned late){
 int pthread_key_create(pthread_key_t *out,void (*destroy)(void *)){return key_create(out,destroy,0);}
 /* Compiler TLS storage must survive every ordinary pthread destructor pass. */
 int __chos_pthread_key_create_late(pthread_key_t *out,void (*destroy)(void *)){return key_create(out,destroy,1);}
+/* libc++ exit notifications follow both C++ TLS and ordinary key destructors. */
+int __chos_pthread_key_create_final(pthread_key_t *out,void (*destroy)(void *)){return key_create(out,destroy,2);}
 int pthread_key_delete(pthread_key_t key){
  int rc=pthread_mutex_lock(&keys_lock);if(rc)return rc;unsigned slot;
  if(!key_lookup(key,&slot)){pthread_mutex_unlock(&keys_lock);return EINVAL;}
@@ -66,11 +68,11 @@ static void destructors(chos_libc_tcb_t *t){
   if(!called)break;
  }
 }
-static void late_destructors(chos_libc_tcb_t *t){
+static void phase_destructors(chos_libc_tcb_t *t,unsigned phase){
  for(unsigned i=0;i<PTHREAD_KEYS_MAX;i++){
   void (*destroy)(void *)=0;void *value=0;
   if(pthread_mutex_lock(&keys_lock))abort();
-  if(keys[i].live&&keys[i].late&&t->specific[i].generation==keys[i].generation&&t->specific[i].value){
+  if(keys[i].live&&keys[i].late==phase&&t->specific[i].generation==keys[i].generation&&t->specific[i].value){
    destroy=keys[i].destroy;value=t->specific[i].value;t->specific[i].value=0;
   }
   pthread_mutex_unlock(&keys_lock);if(destroy)destroy(value);
@@ -78,18 +80,19 @@ static void late_destructors(chos_libc_tcb_t *t){
 }
 void pthread_exit(void *result){
  chos_libc_tcb_t *t=__chos_libc_tls();
- if(t->process_exiting||t->process_finalizer_depth)abort();
+ if(t->process_exiting||t->process_finalizer_depth||t->cxx_worker_active||t->finalizing_keys||t->terminating)abort();
  if(!t->exiting){t->exiting=1;__chos_once_abandon(t);__chos_cxx_guard_abandon(t);__chos_cxx_thread_finalize(t);destructors(t);}
  /* A key/TLS destructor may itself exit during a new guarded/once initializer. */
  __chos_once_abandon(t);__chos_cxx_guard_abandon(t);
  /* Key destructors can construct previously unused C++ TLS objects. Their
   * callbacks must run while compiler TLS storage is still retained. */
  __chos_cxx_thread_finalize(t);
+ t->finalizing_keys=1;phase_destructors(t,2);t->finalizing_keys=0;
  if(!t->exit_counted){
   t->exit_counted=1;
   if(__atomic_fetch_sub(&active_c_threads,1,__ATOMIC_ACQ_REL)==1)exit(0);
  }
- late_destructors(t);
+ phase_destructors(t,1);
  t->result=result;__atomic_store_n(&t->done,1,__ATOMIC_RELEASE);(void)chos_wake_word(&t->done,8);
  long rc=chos_syscall1(CHOS_SYS_THREAD_EXIT,(long)(uintptr_t)result);
  /* The synchronous single-task profile has no siblings to preserve. */

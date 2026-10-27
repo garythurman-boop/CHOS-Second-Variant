@@ -104,3 +104,10 @@ identity DMA with data caching off. See [runtime contract and QEMU evidence](UEF
 This does not establish Fusion qualification for these new changes, native IOMMU
 ownership, a modern browser, verified TLS or live wireless support. The binary
 publication hold remains active until the complete revised Stage 3 passes.
+
+Current runtime source now has tested [C++ synchronization](NATIVE_CXX_SYNCHRONIZATION.md)
+and bounded [standard C++ threads](NATIVE_CXX_THREADS.md), in addition to the prior
+native TLS, floating-point and static CRT profiles. The actual ICU threading
+component runs; full target ICU and the modern engine still do not. Follow
+STAGE3_CURRENT_RESULTS.md and BROWSER_ENGINE_PORT.md for current acceptance gates;
+these component results do not complete the engine, security or wireless scope.

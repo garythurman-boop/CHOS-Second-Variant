@@ -112,3 +112,8 @@ extends the original dependency closure to716 files and supplies mutex/CV/timed
 wait/call_once/shared ownership runtime. That document supersedes this historical
 profile's declaration-only threading status. std::thread and the other full
 standard-library/engine limits remain open.
+
+The subsequent [native thread profile](NATIVE_CXX_THREADS.md) supplies bounded
+C++20/23 std::thread create/move/join and ordered exit notifications. That profile
+supersedes the earlier absent std::thread runtime status; full futures, exceptions,
+engine-sized runtime and the other Stage3 requirements remain open.

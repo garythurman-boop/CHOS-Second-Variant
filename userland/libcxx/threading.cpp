@@ -6,6 +6,7 @@
 #include <__verbose_abort>
 #include <cerrno>
 #include <cstdint>
+#include <cstdlib>
 #include "chos/tls_runtime.h"
 #include "chos/user.h"
 _LIBCPP_BEGIN_NAMESPACE_STD
@@ -31,7 +32,19 @@ int __libcpp_execute_once(__libcpp_exec_once_flag *f,void(*fn)()){return pthread
 bool __libcpp_thread_id_equal(__libcpp_thread_id a,__libcpp_thread_id b){return pthread_equal(a,b);}
 bool __libcpp_thread_id_less(__libcpp_thread_id a,__libcpp_thread_id b){return a<b;}
 bool __libcpp_thread_isnull(const __libcpp_thread_t *t){return !*t;}
-int __libcpp_thread_create(__libcpp_thread_t *t,void*(*fn)(void*),void *p){return pthread_create(t,nullptr,fn,p);}
+namespace {
+struct NativeStart {void *(*function)(void *);void *argument;};
+void *native_start(void *p){
+ auto value=*static_cast<NativeStart *>(p);::free(p);
+ auto *t=__chos_libc_tls();t->cxx_worker_active=1;
+ void *result=value.function(value.argument);t->cxx_worker_active=0;return result;
+}
+}
+int __libcpp_thread_create(__libcpp_thread_t *t,void*(*fn)(void*),void *p){
+ if(!t||!fn)return EINVAL;
+ auto *start=static_cast<NativeStart *>(::malloc(sizeof(NativeStart)));if(!start)return ENOMEM;
+ *start={fn,p};int rc=pthread_create(t,nullptr,native_start,start);if(rc)::free(start);return rc;
+}
 __libcpp_thread_id __libcpp_thread_get_current_id(){return pthread_self();}
 __libcpp_thread_id __libcpp_thread_get_id(const __libcpp_thread_t *t){return *t;}
 int __libcpp_thread_join(__libcpp_thread_t *t){return pthread_join(*t,nullptr);}
@@ -48,7 +61,7 @@ void __libcpp_thread_sleep_for(const chrono::nanoseconds& ns){
   long rc=chos_sleep_ticks(ticks);if(rc<0&&rc!=-EINTR)__throw_system_error((int)-rc,"native thread sleep failed");
  }
 }
-int __libcpp_tls_create(__libcpp_tls_key *k,void(*f)(void*)){return pthread_key_create(k,f);}
+int __libcpp_tls_create(__libcpp_tls_key *k,void(*f)(void*)){return __chos_pthread_key_create_final(k,f);}
 void* __libcpp_tls_get(__libcpp_tls_key k){return pthread_getspecific(k);}
 int __libcpp_tls_set(__libcpp_tls_key k,void *p){return pthread_setspecific(k,p);}
 // No exceptions: errors terminate, without claiming error_category/unwinding ABI.

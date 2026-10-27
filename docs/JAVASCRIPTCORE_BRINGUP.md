@@ -106,3 +106,9 @@ with debug assertions. This closes the specific missing threading prerequisite;
 no target ICU uc/i18n/data libraries have been built or installed for FindICU, so
 the upstream configure gate is not marked passed. Larger runtime/memory and
 production engine/security qualification remain required.
+
+[Native std::thread](NATIVE_CXX_THREADS.md) now supplies actual upstream worker
+lifecycles and ordered exit notifications in the bounded C++20/23 profile. This
+is another runtime prerequisite, not an ICU library installation or passed JSC
+configure/execute gate. Existing engine-sized memory, full runtime/isolation,
+ICU data/i18n/uc and production security requirements remain active.

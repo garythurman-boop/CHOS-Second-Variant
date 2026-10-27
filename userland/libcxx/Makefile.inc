@@ -6,7 +6,7 @@ LIBCPP_HEADERS := $(shell rg --files $(LIBCPP_ROOT) userland/libcxx/include)
 # C++ wrappers must precede C headers, including for their include_next contracts.
 LIBCPP_INCLUDES := -nostdinc++ -isystem $(LIBCPP_GENERATED) -isystem userland/libcxx/include -isystem $(LIBCPP_ROOT)/include -isystem userland/libc/include -isystem $(MUSL_MATH_GENERATED)
 LIBCPP_FLAGS := $(filter-out -std=c11 -mgeneral-regs-only,$(USER_CFLAGS)) -std=c++20 -fno-exceptions -fno-rtti -femulated-tls -ffunction-sections -fdata-sections $(LIBCPP_INCLUDES)
-LIBCPP_SOURCES := $(LIBCPP_ROOT)/src/new.cpp $(LIBCPP_ROOT)/src/new_handler.cpp $(LIBCPP_ROOT)/src/new_helpers.cpp $(LIBCPP_ROOT)/src/algorithm.cpp userland/libcxx/string_instantiations.cpp userland/libcxx/verbose_abort.cpp userland/libcxx/threading.cpp userland/libcxx/clocks.cpp $(LIBCPP_ROOT)/src/mutex.cpp $(LIBCPP_ROOT)/src/mutex_destructor.cpp $(LIBCPP_ROOT)/src/condition_variable.cpp $(LIBCPP_ROOT)/src/condition_variable_destructor.cpp $(LIBCPP_ROOT)/src/memory.cpp
+LIBCPP_SOURCES := $(LIBCPP_ROOT)/src/new.cpp $(LIBCPP_ROOT)/src/new_handler.cpp $(LIBCPP_ROOT)/src/new_helpers.cpp $(LIBCPP_ROOT)/src/algorithm.cpp userland/libcxx/string_instantiations.cpp userland/libcxx/verbose_abort.cpp userland/libcxx/threading.cpp userland/libcxx/clocks.cpp $(LIBCPP_ROOT)/src/mutex.cpp $(LIBCPP_ROOT)/src/mutex_destructor.cpp $(LIBCPP_ROOT)/src/condition_variable.cpp $(LIBCPP_ROOT)/src/condition_variable_destructor.cpp $(LIBCPP_ROOT)/src/memory.cpp $(LIBCPP_ROOT)/src/thread.cpp $(LIBCPP_ROOT)/src/future.cpp userland/libcxx/termination.cpp
 LIBCPP_OBJECTS := $(addprefix $(BUILD)/userland/libcxx/,$(addsuffix .o,$(basename $(LIBCPP_SOURCES))))
 LIBCPP_ARCHIVE := $(BUILD)/userland/libcxx/libchos-c++.a
 $(LIBCPP_GENERATED)/__config_site: tools/configure_libcxx.py $(LIBCPP_ROOT)/include/__config_site.in $(LIBCPP_ROOT)/vendor/llvm/default_assertion_handler.in
@@ -94,3 +94,25 @@ test-icu-threading: $(BUILD)/userland/icu_threading_test.elf
 	python3 tools/verify_icu_threading.py
 test: test-icu-threading
 .PHONY: test-icu-threading
+
+# Preserve upstream's warning for the standard's unknown CPU-count hint (0).
+$(BUILD)/userland/libcxx/third_party/libcxx/src/thread.o: LIBCPP_FLAGS += -Wno-error=cpp
+
+$(BUILD)/userland/cxx_thread_test.o: userland/examples/cxx_thread_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -std=c++20,$(LIBCPP_FLAGS)) -std=c++23 -MMD -MP -c $< -o $@
+$(BUILD)/userland/cxx_thread_postkey.o: userland/examples/cxx_thread_postkey.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -std=c++20,$(LIBCPP_FLAGS)) -std=c++23 -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/cxx_thread_test.d $(BUILD)/userland/cxx_thread_postkey.d
+$(BUILD)/userland/cxx_thread_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx_thread_test.o $(BUILD)/userland/cxx_thread_postkey.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
+test-libcxx: $(BUILD)/userland/cxx_thread_test.elf
+
+$(BUILD)/userland/cxx_thread20_test.o: userland/examples/cxx_thread_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(LIBCPP_FLAGS) -MMD -MP -c $< -o $@
+-include $(BUILD)/userland/cxx_thread20_test.d
+$(BUILD)/userland/cxx_thread20_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/cxx_thread20_test.o $(BUILD)/userland/cxx_thread_postkey.o $(LIBCPP_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
+test-libcxx: $(BUILD)/userland/cxx_thread20_test.elf

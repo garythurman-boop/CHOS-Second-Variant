@@ -97,3 +97,8 @@ ASan/UBSan, local ISO/prepared-image builds and direct smoke checks also pass.
 Completed firmware-variable copies are losslessly gzip-archived with original
 SHA256/mode/restoration entries in completed-runtime-vars-archives.json; logs,
 disposable disks and boot snapshots remain available. No binary was published.
+
+The subsequent [native thread iteration](NATIVE_CXX_THREADS.md) qualifies a bounded
+std::thread/notification/termination profile and extends the original closure
+to720 files. Its scope and evidence supersede the earlier absent-thread-runtime
+status here. Public futures, exceptions and the other full-stage gates remain open.

@@ -13,12 +13,14 @@
     "src/algorithm.cpp",
     "src/condition_variable.cpp",
     "src/condition_variable_destructor.cpp",
+    "src/future.cpp",
     "src/memory.cpp",
     "src/mutex.cpp",
     "src/mutex_destructor.cpp",
     "src/new.cpp",
     "src/new_handler.cpp",
-    "src/new_helpers.cpp"
+    "src/new_helpers.cpp",
+    "src/thread.cpp"
   ],
   "files": {
     "LICENSE.TXT": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
@@ -520,10 +522,11 @@
     "include/__thread/id.h": "1f10484d7c839e642733f3a3653c7841d78f5b46967f00798bfc34f85e383fd8",
     "include/__thread/jthread.h": "0c5f5ad68d9fbf2040356ffbc0e3ca2613a1152626ab14279eced4dfc544c92f",
     "include/__thread/poll_with_backoff.h": "53059cee059f0f899577f2b59167f9d1ce6a97127e05735dd9c8da00834c20d8",
-    "include/__thread/support.h": "1d707fdc0f3183924e3d4209c47089846360857ec2f8cbf15085d4340e9f1709",
     "include/__thread/support/external.h": "a88ed2c3aed78fb93a159418a7a7aa3ed3383e7cf747be2e902841497adb1c3e",
+    "include/__thread/support.h": "1d707fdc0f3183924e3d4209c47089846360857ec2f8cbf15085d4340e9f1709",
     "include/__thread/this_thread.h": "31fdecd06a18a7c55111d06ddce5b514aec008f096995d84be0970f586b43872",
     "include/__thread/thread.h": "4546e46667e40f8655d0e694b846a5e86c4205731f634b2b4e14e3f58f7da2fa",
+    "include/__thread/timed_backoff_policy.h": "7139b093eb1df35fcbc9d0b9041ffefba4b042bd616b7ef5381a25a9c95214b9",
     "include/__tuple/find_index.h": "532287e6940c6dd25772eb3dc9b3b2d3cee6013e9650e95513e0fc0d6488b0f6",
     "include/__tuple/ignore.h": "f24c3bf22b5ed77c419fa69b9f23004e72420e1909aa860a74b36634b8d77553",
     "include/__tuple/make_tuple_types.h": "88ac45060dcd47292bba30d73734bbe94b3af6daaa0f198ff27ebe3ba98da252",
@@ -696,6 +699,7 @@
     "include/errno.h": "93b5251149cc2ff8d4929388c73311d4b55bd55b38dd39b9f08fcd840899544e",
     "include/exception": "dd962f87a84e6598a4ab099b2e1d8fd84cd92fcdc835ac61f80044c93be00d4f",
     "include/functional": "c9fd255a9882be3803f3b2f6a8d07f2ee769986922128f46da1486e5ae7c81f9",
+    "include/future": "6d4423f8a82907348a629a0513c588a9639e4219e67d48b98c4247ec731a1bd0",
     "include/initializer_list": "d086159666a295e1470912defc7509862e5f51ae48b6031cb93965374aa18361",
     "include/iosfwd": "8caac51a3b6dc3943007b862274df8e9564ae5893ba296aa9db9acf08dab0687",
     "include/iterator": "a7977bce1423b4231310114eef355b92663c86aed28631e60df8daae55939713",
@@ -728,6 +732,7 @@
     "src/algorithm.cpp": "5965a2ccb91e21d3dbeaa659299e43566a8128d9648743395d1dd14d592ec8a7",
     "src/condition_variable.cpp": "2c2daa42f90592fcd085bec73a99b3db1d4dc0f228622401a25b630f4a2cf57d",
     "src/condition_variable_destructor.cpp": "5ffc3496ccaafcc01a57c854a6e8e9fc15f2ed18008b8a96382603f674f79e08",
+    "src/future.cpp": "81d9672773eee216b5150cb6004c54a04c30d22c71a3402a25bb9eac1551f8e9",
     "src/include/atomic_support.h": "7e5a7311db59bccc9e7dc3061c335605ebecfc12df3d4f5427f410c8f9bd34db",
     "src/include/overridable_function.h": "5ed15eca760adb82c08c7f85cfb1dfd380fa214da61f69a122c8a2a21d707924",
     "src/memory.cpp": "f5dd019603cdbe6a03c2caabad2a85a2ff6782f276f5c69ab1c523ab40fa1551",
@@ -736,7 +741,8 @@
     "src/new.cpp": "485038913e3a0360e953174bdaa68e25dc9137c328c981b1d78b4aa5001a40b4",
     "src/new_handler.cpp": "0b17697b569d4a4cc9b3c2f97ef69fdf8d6cac72de9871489456c5d9235b1bbf",
     "src/new_helpers.cpp": "745bd190f8e82539b9896aef7f9a6a32948f2c5313bcbdc836a5f45b518a1399",
+    "src/thread.cpp": "74acf68a6c8eb1701e166fc48b4c40a39cf09d29af95bee63d6bbd56401f6a45",
     "vendor/llvm/default_assertion_handler.in": "0d4352df8a3fedb2435aba9dd090ee0d6d8cb38f4c23ca5ee195e536d33e0dc3"
   },
-  "scope": "Native static no-exceptions/no-RTTI allocation,containers,shared/weak ownership,mutex/CV/timed waits and 64-bit call_once. Not full libc++,libc++abi,std::thread or engine runtime."
+  "scope": "Native static -O2 no-exceptions/no-RTTI allocation,containers,shared ownership,mutex/CV/once and bounded std::thread with ordered exit notification. Not full libc++,public futures,exceptions or engine runtime."
 }

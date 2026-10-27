@@ -292,3 +292,10 @@ ICU79.1 mutex/init-once code as a bounded component with a test-only cleanup
 recorder. This supersedes the missing C++ mutex/CV/once runtime status; it does
 not supply full ICU common/i18n/data, std::thread, JavaScriptCore or web rendering.
 All remaining full-stage acceptance gates and the binary hold stay active.
+
+The [native C++ thread profile](NATIVE_CXX_THREADS.md) adds original libc++
+std::thread move/join/ID/sleep and notify_all_at_thread_exit over native workers,
+with ordered post-key TLS cleanup and real termination handlers. It preserves the
+three-worker budget and no-exceptions boundary; detached threads, public futures,
+experimental jthread and complete engine runtime remain open. This supersedes
+previously missing std::thread status only for the documented bounded profile.

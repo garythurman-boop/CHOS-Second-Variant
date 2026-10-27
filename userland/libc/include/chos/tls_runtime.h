@@ -12,6 +12,7 @@ typedef struct {
  int error;unsigned main_thread;
  uint32_t tid,done,joining,once_depth,exiting;
  unsigned exit_counted,process_exiting,process_finalizer_depth;
+ unsigned cxx_worker_active,finalizing_keys,terminating;
  void *result;void *(*start)(void *);void *argument;
  uint64_t stack_base;size_t stack_bytes;
  uint64_t initial_fpcr,initial_fpsr;
@@ -31,6 +32,7 @@ void __chos_once_abandon(chos_libc_tcb_t *);
 int __chos_cxx_execute_once(volatile uint64_t *,void *,void (*)(void *));
 void __chos_cxx_guard_abandon(chos_libc_tcb_t *);
 int __chos_pthread_key_create_late(pthread_key_t *,void (*)(void *));
+int __chos_pthread_key_create_final(pthread_key_t *,void (*)(void *));
 void __chos_cxx_thread_finalize(chos_libc_tcb_t *);
 #ifdef __cplusplus
 }
