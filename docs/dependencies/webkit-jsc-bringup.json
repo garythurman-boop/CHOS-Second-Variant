@@ -23,7 +23,7 @@
     "Source/bmalloc/bmalloc/VMAllocate.h": "d92807c17e34eabf574afd4f14504e8707e49f0dfe1ca8d0e709d2594a043eca"
   },
   "patch": "ports/webkit/patches/0001-chos-platform-bringup.patch",
-  "patch_sha256": "4536bf8fe2ca5c3e6e4de6384e886f50e1e3495eb4238154417a01efc3c1bc74",
+  "patch_sha256": "9b605d16b7a7b3697226ae655c0d140b0a3d0bb0d45e18e68cafca21da595617",
   "patched_files_sha256": {
     "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c",
     "Source/bmalloc/bmalloc/BPlatform.h": "7eace90386576643b0cfca4377a9a61794763bf6e933a32b122c8f4700150216",

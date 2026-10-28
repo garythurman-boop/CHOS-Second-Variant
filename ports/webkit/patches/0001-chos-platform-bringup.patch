@@ -5,7 +5,7 @@ index b5612278..c9d76f38 100644
 @@ -66,6 +66,10 @@
  #define BOS_LINUX 1
  #endif
- 
+
 +#if defined(__CHOS__)
 +#define BOS_CHOS 1
 +#endif
@@ -20,7 +20,7 @@ index 036636ce..01efa3b5 100644
 @@ -303,7 +303,9 @@ inline void vmZeroAndPurge(void* p, size_t vmSize, VMTag usage)
          return;
  #endif // BENABLE(MTE) && BOS(DARWIN)
- 
+
 -#if BOS(LINUX)
 +#if BOS(LINUX) || BOS(CHOS)
 +    // CHOS discards owned anonymous pages without MAP_FIXED replacement and
