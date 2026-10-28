@@ -412,3 +412,19 @@ number_decimalquantity.cpp and plurrule.cpp still require a real snprintf. This
 is object-level dependency evidence, not a complete i18n/data library or engine.
 The [container profile](NATIVE_ORDERED_CONTAINERS.md) records the method. The
 cc29ea8 test binaries remain the current download; version0.50.0 stays reserved.
+
+## Native bounded string formatter
+
+Real snprintf/vsnprintf now link through the SDK and pass native direct and
+isolated UEFI execution. Original musl formatting uses a private per-invocation
+memory sink; public read-stream FILE and unsupported output APIs are unchanged.
+A checked source copy rejects signed INT_MIN width overflow and positional slot0.
+Normal/ASan/UBSan host comparisons cover4,000 integer and1,500 floating inputs at
+ten capacities and four rounding modes. Native tests cover120 independent exact
+Decimal binary64/binary128 fixtures, six capacities, mixed/copied arguments,
+wide UTF8, per-thread errno/rounding, heap0 and stable repeated-process frames.
+Full host and configured sanitizer suites pass. See
+[profile and retained diagnoses](NATIVE_STRING_FORMATTING.md) and
+[evidence](validation/stage3-native-format.json). This supplies the real formatter
+required by the three remaining i18n compile failures; a complete i18n/data/engine
+build and runtime still need separate qualification.

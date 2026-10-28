@@ -84,4 +84,25 @@ int *__chos_errno_location(void);
 #define ETXTBSY 26
 #define EWOULDBLOCK 11
 #define EXDEV 18
+/* Additional standard error-message vocabulary; constants do not add services. */
+#define EBADFD 77
+#define EDQUOT 122
+#define EHOSTDOWN 112
+#define EKEYEXPIRED 127
+#define EKEYREJECTED 129
+#define EKEYREVOKED 128
+#define EMEDIUMTYPE 124
+#define EMULTIHOP 72
+#define ENODATA 61
+#define ENOKEY 126
+#define ENOMEDIUM 123
+#define ENOSR 63
+#define ENOSTR 60
+#define ENOTBLK 15
+#define EPFNOSUPPORT 96
+#define EREMOTEIO 121
+#define ESHUTDOWN 108
+#define ESOCKTNOSUPPORT 94
+#define ESTALE 116
+#define ETIME 62
 #endif

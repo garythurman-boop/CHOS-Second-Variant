@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "project": "musl bounded string formatting",
+  "version": "1.2.5",
+  "commit": "0784374d561435f7c787a555aeab8ede699ed298",
+  "source": "https://git.musl-libc.org/cgit/musl",
+  "scope": "Original snprintf/vsnprintf/vfprintf and C error-message source over a private per-call memory sink,not public writable FILE streams. Fixed C locale; internal C error messages only.",
+  "sources": [
+    "src/stdio/vfprintf.c",
+    "src/stdio/vsnprintf.c",
+    "src/stdio/snprintf.c",
+    "src/errno/strerror.c"
+  ],
+  "files": {
+    "src/stdio/vfprintf.c": "5ae7748a197b3c334f2b6791f8613940f27d3bac6f27bcfa73706222fff4ffa8",
+    "src/stdio/vsnprintf.c": "999811bfd545bdd6f953b71893ad9b6075b1784d7debc53abda6f3d6129fb50b",
+    "src/stdio/snprintf.c": "be661cb258170863a1372b8e5998ef345bb8ef8e3f06d38a603dfda77eed4d4d",
+    "src/errno/strerror.c": "b8f04516efae18ed1d474523e0c019229a957c791012ffe9283a5e11315e2a8d",
+    "src/errno/__strerror.h": "51d12862eda1600b2d89648f866b2fe0b0a3b24def3ccd91bef710bb12d25cbe"
+  }
+}

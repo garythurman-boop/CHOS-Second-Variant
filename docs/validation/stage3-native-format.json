@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "scope": "real native bounded snprintf/vsnprintf and independent numeric/ABI qualification",
+  "stage3_complete": false,
+  "sources": "docs/dependencies/musl-format.json",
+  "generated_formatter_sha256": "9435c200a16beb135fce6969fd01ce1a4004d4592f27959049ae528265d62bef",
+  "reference_corpus": {
+    "path": "tests/format_vectors.h",
+    "cases": 120,
+    "precision_decimal_digits": 20000,
+    "sha256": "84b84487067cbd84bd752c3b62309ef9461919c67b2a3dcbb5e2e88e09755ff0"
+  },
+  "guest_results": {
+    "native-format-direct2": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "c8e58b2bc1351e9a03a6162eedde9432364a25253d36940d37f3bca4b4566ffb",
+      "standard": "23",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117543,
+      "free_pages_before": 117363,
+      "free_pages_after": 117363,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 359,
+      "checks": [
+        "actual original musl string formatter over private per-invocation memory sinks",
+        "120 exact independent Decimal binary64/binary128 output fixtures at six buffer capacities",
+        "null/count-only,truncation,NUL/guard bytes,positional and wide formats,mixed variadic arguments",
+        "INT_MIN width and invalid argument slot0 errors; invalid UTF32 reports EILSEQ",
+        "three native threads keep errno and FP rounding distinct across three lifecycles",
+        "three processes,exit0,heap0,stable warm frames and no futex waiters"
+      ],
+      "limits": [
+        "bounded string formatting;no public writable FILE streams or locale translation",
+        "not complete ICU/i18n/data,modern engine or browser security",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-format-sdk-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "fdff861870463987323291be302966ddff3eb8b953b79148197e9365e6221c5d",
+      "standard": "23",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500221,
+      "free_pages_before": 500057,
+      "free_pages_after": 500057,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 357,
+      "checks": [
+        "actual original musl string formatter over private per-invocation memory sinks",
+        "120 exact independent Decimal binary64/binary128 output fixtures at six buffer capacities",
+        "null/count-only,truncation,NUL/guard bytes,positional and wide formats,mixed variadic arguments",
+        "INT_MIN width and invalid argument slot0 errors; invalid UTF32 reports EILSEQ",
+        "three native threads keep errno and FP rounding distinct across three lifecycles",
+        "three processes,exit0,heap0,stable warm frames and no futex waiters"
+      ],
+      "limits": [
+        "bounded string formatting;no public writable FILE streams or locale translation",
+        "not complete ICU/i18n/data,modern engine or browser security",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    }
+  },
+  "host_suites": {
+    "native-format-full-host": {
+      "exit": 0,
+      "sha256": "ac2ea303c655602bd89c90bbcac420fbab8633eaddc940d0a952a5c9cb664152"
+    },
+    "native-format-full-sanitize": {
+      "exit": 0,
+      "sha256": "78b3ebbcd197ef2a2fcce2a750b51463cdbab668bf817f9b40fc656bafed0d87"
+    }
+  },
+  "host_formatter_comparison": {
+    "integer_inputs": 4000,
+    "floating_inputs": 1500,
+    "capacities": 10,
+    "rounding_modes": 4,
+    "normal_and_sanitizer_log_sha256": "e3bab23e5d50872df4aa445ddeb06ab0f538de39bc3a6904cbbc092cb50e613f"
+  },
+  "sdk_manifest_sha256": "137bd9542a14406c60214decb202af7abe604f86da3113b332b8a67806aaf2e2",
+  "known_failures": [
+    "original negative INT_MIN width caused signed-negation UBSan failure; checked native copy returns EOVERFLOW",
+    "invalid positional slot0 rejected before an uninitialized reserved slot can be consumed",
+    "initial harness diagnostic read an unterminated zero-capacity buffer; replaced by bounded separately rendered diagnostics",
+    "glibc hexadecimal subnormal normalization differs legally from musl; numeric round-trip now checks value preservation",
+    "initial Decimal zero retained a quantum exponent; oracle explicitly applies C zero conventions",
+    "initial native fixture string-length constants were corrected before accepted direct/UEFI qualification"
+  ],
+  "limits": [
+    "bounded string formatting only,no public writable FILE/stdio console streams or wide formatting",
+    "fixed UTF8/C-locale profile and existing binary128 helper limits",
+    "not full ICU/i18n/data,modern browser or browser TLS security",
+    "new Fusion/Pi/laptop qualification NOT RUN"
+  ]
+}

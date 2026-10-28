@@ -4,10 +4,11 @@
 #include_next <stdio.h>
 #else
 #include <stddef.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include "chos/file_api.h"
-/* Bounded read-only binary streams. Formatting and output streams are not
- * provided; unsupported imports must fail at link time. */
+/* Read-only binary streams and bounded string formatting. Writable FILE
+ * streams/standard output objects remain unprovided. */
 typedef struct __chos_FILE FILE;
 typedef struct { int64_t __position; } fpos_t;
 #define EOF (-1)
@@ -19,6 +20,8 @@ typedef struct { int64_t __position; } fpos_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
+int snprintf(char *,size_t,const char *,...);
+int vsnprintf(char *,size_t,const char *,va_list);
 FILE *fopen(const char *, const char *);
 int fclose(FILE *);
 size_t fread(void *, size_t, size_t, FILE *);
