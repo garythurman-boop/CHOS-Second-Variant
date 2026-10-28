@@ -114,3 +114,18 @@ endif()
 add_executable(sdk_icu_data ../../userland/examples/icu_data_test.cpp)
 target_link_libraries(sdk_icu_data PRIVATE CHOS::ICUCommon CHOS::ICUBootstrapData)
 target_compile_options(sdk_icu_data PRIVATE -frtti)
+
+find_package(CHOSICUData REQUIRED CONFIG)
+try_compile(FULL_ICU_EMBEDDED_IMAGE_ACCEPTED
+ SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/icu_full_data.cpp"
+ LINK_LIBRARIES CHOS::ICUCommon CHOS::ICUData
+ OUTPUT_VARIABLE _chos_full_data_link_output)
+if(FULL_ICU_EMBEDDED_IMAGE_ACCEPTED)
+ message(FATAL_ERROR "current2MiB image bound unexpectedly accepted the full ICU package")
+endif()
+if(NOT _chos_full_data_link_output MATCHES "Native application exceeds bounded2MiB arena"
+   OR _chos_full_data_link_output MATCHES "undefined symbol|undefined reference|fatal error:")
+ message(FATAL_ERROR "unexpected full ICU data link failure: ${_chos_full_data_link_output}")
+endif()
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/icu-full-data-budget.log" "${_chos_full_data_link_output}")
+message(STATUS "Full ICU data archive is available;embedded image correctly refused by current2MiB budget")

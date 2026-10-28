@@ -15,6 +15,7 @@ if out.exists():
  if actual!=set(old['files']):p.error('SDK output contains added/removed files')
  for name,wanted in old['files'].items():
   if '..' in pathlib.Path(name).parts or hashlib.sha256((out/name).read_bytes()).hexdigest()!=wanted:p.error('SDK output was modified: '+name)
+subprocess.run(['python3',str(root/'tools/verify_icu_full_data.py'),'--build-dir',str(build/'icu-data')],check=True)
 out.parent.mkdir(parents=True,exist_ok=True)
 final=out;out=pathlib.Path(tempfile.mkdtemp(prefix=out.name+'.stage-',dir=out.parent))
 inc=out/'include';cpp=inc/'c++/v1';lib=out/'lib';lib.mkdir()
@@ -28,6 +29,9 @@ config=lib/'cmake/CHOSICUCommon';config.mkdir(parents=True)
 shutil.copyfile(root/'ports/icu/CHOSICUCommonConfig.cmake',config/'CHOSICUCommonConfig.cmake')
 i18n_config=lib/'cmake/CHOSICUI18n';i18n_config.mkdir(parents=True)
 shutil.copyfile(root/'ports/icu/CHOSICUI18nConfig.cmake',i18n_config/'CHOSICUI18nConfig.cmake')
+shutil.copyfile(build/'icu-data/libicudata.a',lib/'libicudata.a')
+full_data_config=lib/'cmake/CHOSICUData';full_data_config.mkdir(parents=True)
+shutil.copyfile(root/'ports/icu/CHOSICUDataConfig.cmake',full_data_config/'CHOSICUDataConfig.cmake')
 data_config=lib/'cmake/CHOSICUNormalizationData';data_config.mkdir(parents=True)
 shutil.copyfile(root/'ports/icu/CHOSICUNormalizationDataConfig.cmake',data_config/'CHOSICUNormalizationDataConfig.cmake')
 data_dir=out/'share/icu-normalization/icudt79l';data_dir.mkdir(parents=True)
@@ -43,7 +47,7 @@ archive=lib/'libchos-c.a'
 if archive.exists():archive.unlink()
 subprocess.run(['llvm-ar','rcs',str(archive),*map(str,objects)],check=True)
 files={str(p.relative_to(out)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.rglob('*')) if p.is_file() and p.name!='chos-sdk.json'}
-manifest={'schema':1,'target':'aarch64-none-elf','format':'CHOS native static ELF','profile':'bounded static C/C++20/23,normal main startup,opt-in RTTI,no exceptions/dynamic linking','icu_common':{'version':'79.1','scope':'common archive only; bootstrap data is separately named and deliberately empty; complete data package absent'},'icu_i18n':{'version':'79.1','translation_units':254,'scope':'i18n archive and selected native API tests;complete CLDR/data package absent'},'icu_normalization_data':{'version':'79.1','unicode_version':'18.0.0','resources':['nfkc','nfkc_cf','nfkc_scf','uts46'],'scope':'selected original normalization/IDNA resources;not full ICU data/CLDR'},'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'files':files,'limits':['not full hosted C/C++/POSIX; unsupported imports must fail to link','2MiB native image and existing tiny heap/thread budgets','no Linux or host library compatibility; real engine not yet built']}
+manifest={'schema':1,'target':'aarch64-none-elf','format':'CHOS native static ELF','profile':'bounded static C/C++20/23,normal main startup,opt-in RTTI,no exceptions/dynamic linking','icu_common':{'version':'79.1','scope':'common archive only; bootstrap data is separately named and deliberately empty; default data archive is separately staged;full native execution remains unqualified'},'icu_i18n':{'version':'79.1','translation_units':254,'scope':'i18n archive and selected native API tests;default data archive separately staged;full Intl execution remains unqualified'},'icu_normalization_data':{'version':'79.1','unicode_version':'18.0.0','resources':['nfkc','nfkc_cf','nfkc_scf','uts46'],'scope':'selected original normalization/IDNA resources;not full ICU data/CLDR'},'icu_data':{'version':'79.1','resources':4321,'scope':'real default ARM64 data archive;full embedded native execution not qualified under current image/frame limits'},'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'files':files,'limits':['not full hosted C/C++/POSIX; unsupported imports must fail to link','2MiB native image and existing tiny heap/thread budgets','no Linux or host library compatibility; real engine not yet built']}
 (out/'chos-sdk.json').write_text(json.dumps(manifest,indent=2)+'\n')
 backup=final.with_name(final.name+'.previous-'+str(os.getpid()))
 assert not backup.exists()

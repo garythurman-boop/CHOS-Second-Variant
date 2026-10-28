@@ -459,3 +459,19 @@ and [accepted evidence](validation/stage3-icu-data.json).
 The SDK exports selected-resource paths explicitly; full ICU data/CLDR, Intl,
 JavaScriptCore/WebKit, the modern browser, production security and live WiFi
 remain unfinished. No new binary replaces cc29ea8 and version0.50.0 is not released.
+
+## Default ICU package and successful JSCOnly configuration
+
+Original verified host generators now produce4,321 default ICU resources and a
+real AArch64 libicudata.a. Three independent builds match byte-for-byte. All
+resource offsets/lengths/hashes and malformed-package tests pass; full host
+regression passes. The SDK finds data+i18n+uc, and a complete pinned JSCOnly
+checkout now configures successfully against it. See [generation, limits and
+retained failures](ICU_DEFAULT_DATA.md) and [evidence](validation/stage3-icu-default-data.json).
+
+The full-data u_init executable remains correctly refused by the existing2MiB
+linker bound; no larger profile is substituted. The first actual engine build
+fails on missing libc++ bit-operation headers and sys/mman.h. This is a genuine
+configuration milestone, not a built/running engine or modern browser. Full
+runtime/memory integration, browser security/rendering/features, live WiFi and
+independent target qualification remain open. No new ISO or0.50.0 release.

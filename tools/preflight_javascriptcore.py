@@ -14,6 +14,11 @@ m=json.loads((root/'docs/dependencies/webkit-jsc-bringup.json').read_text())
 def git(*args):return subprocess.check_output(['git',*args],cwd=source)
 def sha(data):return hashlib.sha256(data).hexdigest()
 if git('rev-parse','HEAD').decode().strip()!=m['commit']:p.error('source HEAD differs from the pinned inspected commit')
+for name in m['required_source_roots']:
+ if not (source/name).is_dir():p.error('incomplete JSCOnly checkout; missing source root: '+name)
+closure=git('ls-tree','-r','--name-only',m['commit'],'--',*m['required_source_roots']).decode().splitlines()
+missing=[name for name in closure if not (source/name).exists() and not (source/name).is_symlink()]
+if missing:p.error('incomplete JSCOnly checkout; missing tracked source: '+missing[0])
 for name,wanted in m['source_files_sha256'].items():
  if sha(git('show',m['commit']+':'+name))!=wanted:p.error('upstream source identity mismatch: '+name)
 patch=root/m['patch']
@@ -63,6 +68,7 @@ report={'status':'CONFIGURED_NOT_BUILT' if r.returncode==0 else 'CONFIGURATION_I
  'tool_versions':versions,'int128_type_compile_probe':('PASS' if int128[1]=='1' else 'FAIL') if int128 else 'NOT_RUN',
  'compile_only_cmake_checks':not bool(o.native_sdk),
  'native_sdk':str(o.native_sdk.resolve()) if o.native_sdk else None,
+ 'source_closure_files_checked':len(closure),
  'threads_missing':'Could NOT find Threads' in log,'target_library_search':'CHOS sysroot only; host executables permitted',
  'icu_missing':'Failed to find all ICU components' in log,
  'limits':(['Real executable links are used; failed native POSIX thread checks remain failures.'] if o.native_sdk else ['Static try-compile results do not prove executable linking or runtime support.'])+[

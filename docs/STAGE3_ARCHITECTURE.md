@@ -125,3 +125,11 @@ resources are exported explicitly; they do not satisfy the full ICU data/CLDR
 component. The last actual pinned JSCOnly preflight finds uc+i18n and fails for
 missing data. Full data generation/packaging, engine-sized bounded memory and
 subsequent engine/platform integration remain open; no engine execution is claimed.
+
+The [default ICU data milestone](ICU_DEFAULT_DATA.md) now supplies an actual native
+libicudata.a with4,321 generated resources. The complete pinned JSCOnly source
+closure configures successfully against the SDK. Full embedded data is still
+refused by the current2MiB executable limit; actual engine compilation stops at
+missing libc++ bit-operation headers and sys/mman.h. This supersedes the earlier
+missing-ICU-data configuration diagnosis. No engine execution, modern browser,
+production security, live wireless or full Stage3/version0.50.0 success is claimed.

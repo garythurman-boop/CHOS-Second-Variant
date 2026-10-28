@@ -112,3 +112,11 @@ Native ICU i18n is also exported through CHOSICUI18n; consult the
 The SDK additionally stages four original normalization/UTS46 data resources
 through CHOSICUNormalizationData. See [deployment and native corpus qualification](ICU_NORMALIZATION_DATA_NATIVE.md).
 This is explicit selected data, not the complete ICU data/CLDR component.
+
+The [default ICU data milestone](ICU_DEFAULT_DATA.md) now supplies an actual native
+libicudata.a with4,321 generated resources. The complete pinned JSCOnly source
+closure configures successfully against the SDK. Full embedded data is still
+refused by the current2MiB executable limit; actual engine compilation stops at
+missing libc++ bit-operation headers and sys/mman.h. This supersedes the earlier
+missing-ICU-data configuration diagnosis. No engine execution, modern browser,
+production security, live wireless or full Stage3/version0.50.0 success is claimed.

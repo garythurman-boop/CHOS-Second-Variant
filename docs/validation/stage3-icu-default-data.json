@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "scope": "default ICU data generation/native archive and actual successful native SDK JSCOnly configuration;not engine execution",
+  "source_commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+  "source_members": 7171,
+  "source_archive_sha256": "c024e5b2cdac7dc18ce61b56bcd036a873a002f9104494c2933ac3ecbc91a6b2",
+  "package_bytes": 33558160,
+  "package_sha256": "208a8392975e81a351fd9e3759f7a2c7a5659c97ef258c7a7435e2d9c31a61ce",
+  "resource_count": 4321,
+  "native_archive_sha256": "d55b6fddb07d9ec364a40f36aaefdb2939f9b0f81e12c0e80d07e5fe96068a44",
+  "independent_matching_builds": 3,
+  "resource_inventory_sha256": "90cb00aa86e4ba523b8b86b4265baedad70690e109540faf9ea4ff5f6da83752",
+  "native_payload_matches_package": true,
+  "host_package_tests": {
+    "status": "PASS",
+    "cases": 8,
+    "log_sha256": "ed327b7dd4cc5aa38d179734c97fbdf4b6e19ac968717f9ad3cb163a59ec9246"
+  },
+  "full_host_suite": {
+    "exit": 0,
+    "sha256": "476b443bb8e6aa477cd2e69c367df4a904f35df1ec781deb4d2054d898634df5"
+  },
+  "native_sdk": {
+    "files": 1109,
+    "manifest_sha256": "ab3bbc1dac56662f382fa39f34c7e68f9f86b2b96cf58de38ad672a32a6e843a"
+  },
+  "native_full_data_execution": {
+    "status": "NOT_RUN",
+    "reason": "full-data executable is refused by existing2MiB linker assertion;4MiB frame budget is also insufficient",
+    "guard_diagnostic_sha256": "ae706d5ded98c792064b514504de5acffd763168fb430a2c579feaddbd0883d1"
+  },
+  "jsc_preflight": {
+    "status": "CONFIGURED_NOT_BUILT",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "source_manifest": "docs/dependencies/webkit-jsc-bringup.json",
+    "command": [
+      "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+      "-S",
+      "/tmp/chos-webkit-jsc-source",
+      "-B",
+      "/tmp/chos-jsc-full-data-preflight4/cmake",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+      "-DRuby_EXECUTABLE=/workspace/chos-tools/root/usr/bin/ruby3.3",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DPORT=JSCOnly",
+      "-DENABLE_STATIC_JSC=ON",
+      "-DENABLE_JIT=OFF",
+      "-DUSE_SYSTEM_MALLOC=ON",
+      "-DENABLE_TOOLS=OFF",
+      "-DCHOS_SDK_ROOT=/tmp/chos-native-sdk-full-data"
+    ],
+    "returncode": 0,
+    "seconds": 10.872870776998752,
+    "log_sha256": "8d6e384b0ad3e597536a57db4d9ffa6167d5b34d42e4e7b3aeb2317d0edb4d4c",
+    "tool_versions": {
+      "cmake": "cmake version 3.31.6",
+      "ninja": "1.11.1.git.kitware.jobserver-1",
+      "ruby": "ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]",
+      "clang": "Debian clang version 19.1.7 (3+b1)",
+      "clang++": "Debian clang version 19.1.7 (3+b1)"
+    },
+    "int128_type_compile_probe": "PASS",
+    "compile_only_cmake_checks": false,
+    "native_sdk": "/tmp/chos-native-sdk-full-data",
+    "source_closure_files_checked": 10010,
+    "threads_missing": false,
+    "target_library_search": "CHOS sysroot only; host executables permitted",
+    "icu_missing": false,
+    "limits": [
+      "Real executable links are used; failed native POSIX thread checks remain failures.",
+      "CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.",
+      "The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.",
+      "No WebCore/WPE rendering,JavaScript execution,browser or conformance result."
+    ]
+  },
+  "actual_engine_build": {
+    "status": "FAIL",
+    "exit": 1,
+    "engine_built": false,
+    "engine_executed": false,
+    "log_sha256": "7d94180d2cc0b3120a7f66850e21578a70ca9b50a46c7771aa63b37203de9633",
+    "first_missing_interfaces": [
+      "__bit/byteswap.h",
+      "sys/mman.h"
+    ]
+  },
+  "retained_investigations": [
+    "original configure requires test-data rules/templates even with tests disabled;complete source archive now supplied",
+    "Git archive default0664 modes normalized using original executable bits and tar.umask0022",
+    "initial complete-data SDK link correctly hit image limit;accepted regression requires that specific failure",
+    "initial engine configuration failures after resolving ICU were incomplete sparse source checkouts,not target-library failures",
+    "upstream warns about missing optional lstm_res/adaboost_res resources"
+  ],
+  "sanitizers": "native/product C code unchanged in this milestone;prior sanitizer evidence retained;no native ICU/engine sanitizer claim",
+  "binary_publication": "source only;cc29ea8 test ISO unchanged;no0.50.0",
+  "remaining": [
+    "engine-sized bounded runtime/memory and required OS interfaces",
+    "actual JavaScriptCore/WTF/WebKit build and execution",
+    "rendering/browser features and production security",
+    "real Pi5 wireless host/firmware/authentication",
+    "independent Fusion/Pi/laptop qualification"
+  ]
+}
