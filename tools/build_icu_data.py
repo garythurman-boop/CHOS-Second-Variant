@@ -111,7 +111,7 @@ try:
               'configure_warnings': [line for line in (work/'configure.log').read_text().splitlines() if 'Warning:' in line],
               'limits': ['host executables are data generators only',
                          'upstream default dataset,not full ICU conformance or every optional neural break model',
-                         'full32MiB data image cannot run within current2MiB native image/4MiB frame budgets',
+                         'full32MiB data execution needs a separately qualified larger native runtime profile',
                          'no JavaScriptCore/WebKit/browser or live WiFi success inferred'],
               'files': {f.name: sha(f) for f in stage.iterdir()}}
     (stage/'build-report.json').write_text(json.dumps(report, indent=2)+'\n')

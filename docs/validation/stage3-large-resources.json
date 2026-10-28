@@ -1,0 +1,771 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "scope": "bounded1MiB mappings,4MiB images,8MiB frames;original generated ICU resources and C++20/23 bit algorithms",
+  "host_suite": {
+    "status": "PASS",
+    "log_sha256": "7bd44c28062a85ee6148ef5e03b64586dd8e3567591319f5a82332a36d59f115"
+  },
+  "sanitizers": {
+    "status": "PASS",
+    "log_sha256": "8f15649757b05798409704928cc23071960423741390f13b7611803113ea7ce3"
+  },
+  "sdk_manifest_sha256": "bbe3ad1ef5bbfdd264d39f0980b9586f4e8a53259bbb63cbdeafe4ec1e252bdf",
+  "guest_profiles": [
+    {
+      "name": "user_memory-direct",
+      "command": [
+        "python3",
+        "tests/qemu_user_memory.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-large-profile-evidence/user_memory-direct"
+      ],
+      "exit": 0,
+      "seconds": 4.826504211996507,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "c4c8cea2d274a4c5656ecc39fbded1d598f918354385af4760db81081b4cbda1",
+        "free_pages_before": 117523,
+        "free_pages_after": 117523,
+        "checks": [
+          "real EL0 anonymous zeroed RW/XN mappings up to1MiB",
+          "invalid/overflow sizes and nonzero high flags refused;total2MiB aperture exhaustion",
+          "exact unmap and double-unmap rejection",
+          "small/large guard-page data abort contained to process",
+          "small/large execute-never instruction abort contained to process",
+          "normal/fault/scheduled exit cleans abandoned mappings; no physical-page leak"
+        ]
+      },
+      "result_sha256": "c13c340640d9dc357ac32958703e09d35c23c3852382b34aff31a5592901b625",
+      "boot_manifest": {
+        "kernel_sha256": "ddd0eb7c302610944dbed4253555fef911f6fbedcb99ac7d1607b74dad83478f"
+      }
+    },
+    {
+      "name": "user_memory-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_user_memory.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/user_memory-uefi"
+      ],
+      "exit": 0,
+      "seconds": 11.571076450003602,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "c4c8cea2d274a4c5656ecc39fbded1d598f918354385af4760db81081b4cbda1",
+        "free_pages_before": 500205,
+        "free_pages_after": 500205,
+        "checks": [
+          "real EL0 anonymous zeroed RW/XN mappings up to1MiB",
+          "invalid/overflow sizes and nonzero high flags refused;total2MiB aperture exhaustion",
+          "exact unmap and double-unmap rejection",
+          "small/large guard-page data abort contained to process",
+          "small/large execute-never instruction abort contained to process",
+          "normal/fault/scheduled exit cleans abandoned mappings; no physical-page leak"
+        ]
+      },
+      "result_sha256": "acf1132e8e7234cdd8b1d20492af8614e5b56decaa5fdd6b953aa59ba6adfdbc",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "large_image-direct",
+      "command": [
+        "python3",
+        "tests/qemu_large_image.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-large-profile-evidence/large_image-direct"
+      ],
+      "exit": 0,
+      "seconds": 6.092455625999719,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "bee158f0575a9df66cc1b3d5be12fd88290d269ad44d23b3fab0211c836aee9b",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117527,
+        "free_pages_before": 116752,
+        "free_pages_after": 116752,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 32,
+        "checks": [
+          "actual3MiB readonly native segment crosses previous2MiB image bound and multiple L3 tables",
+          "actual1MiB private mapping plus image/stack exceeds old4MiB owned-frame budget",
+          "every readonly payload byte and zeroed private byte checked;initial writable data/BSS preserved",
+          "write-to-RO and execute-from-RO above2MiB fault at exact expected address and correct architectural class",
+          "normal/abandoned/faulted application cleanup,recovery,stable warm frames and zero private futex waiters"
+        ],
+        "contained_faults": [
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 538976256
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 538976256
+          }
+        ],
+        "limits": [
+          "4MiB image/8MiB owned-frame profile,not the larger footprint required by the full engine/data",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "4e92d43c687a91f6609f9287ced8ed8cdc1ee66844ab8f1194c096ad36b31103",
+      "boot_manifest": {
+        "kernel_sha256": "ddd0eb7c302610944dbed4253555fef911f6fbedcb99ac7d1607b74dad83478f"
+      }
+    },
+    {
+      "name": "large_image-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_large_image.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/large_image-uefi"
+      ],
+      "exit": 0,
+      "seconds": 12.930240646994207,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "bee158f0575a9df66cc1b3d5be12fd88290d269ad44d23b3fab0211c836aee9b",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500205,
+        "free_pages_before": 499430,
+        "free_pages_after": 499430,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 30,
+        "checks": [
+          "actual3MiB readonly native segment crosses previous2MiB image bound and multiple L3 tables",
+          "actual1MiB private mapping plus image/stack exceeds old4MiB owned-frame budget",
+          "every readonly payload byte and zeroed private byte checked;initial writable data/BSS preserved",
+          "write-to-RO and execute-from-RO above2MiB fault at exact expected address and correct architectural class",
+          "normal/abandoned/faulted application cleanup,recovery,stable warm frames and zero private futex waiters"
+        ],
+        "contained_faults": [
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 538976256
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 538976256
+          }
+        ],
+        "limits": [
+          "4MiB image/8MiB owned-frame profile,not the larger footprint required by the full engine/data",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "ecf4289ff3637b400ad5ff32dec02cf4043c9a2007080d9ebc0c05b0df8fa358",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "bit-direct",
+      "command": [
+        "python3",
+        "tests/qemu_bit.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-large-profile-evidence/bit-direct"
+      ],
+      "exit": 0,
+      "seconds": 4.836358786000346,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "9176d42b06f6d05ed1f299a5482cbb191bf41bad5a854c613a9aec1790cbf082",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117527,
+        "free_pages_before": 117368,
+        "free_pages_after": 117368,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 41,
+        "checks": [
+          "model-checked zero/count/popcount,width/floor/ceil and positive/negative rotations through128bits",
+          "C++23 SDK also executes original byteswap for unsigned/signed8/16/32/64/128-bit values",
+          "three native workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+        ],
+        "cxx23_byteswap_observed": false,
+        "limits": [
+          "qualified bit algorithms,not complete C++23 or an engine build",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "9343d46e217d28f64ed55d1d3fbbcd32b055418590df18c3edec03196a3b717d",
+      "boot_manifest": {
+        "kernel_sha256": "ddd0eb7c302610944dbed4253555fef911f6fbedcb99ac7d1607b74dad83478f"
+      }
+    },
+    {
+      "name": "bit-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_bit.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/bit-uefi",
+        "--application",
+        "build/native-large-profile-sdk-check/sdk_bit"
+      ],
+      "exit": 0,
+      "seconds": 12.697495669999626,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "ea93faae307c7cdf2ba005cccbe36415a2452c1612a90d2bfd9c5ee051cdb2ba",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500205,
+        "free_pages_before": 500066,
+        "free_pages_after": 500066,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 129,
+        "checks": [
+          "model-checked zero/count/popcount,width/floor/ceil and positive/negative rotations through128bits",
+          "C++23 SDK also executes original byteswap for unsigned/signed8/16/32/64/128-bit values",
+          "three native workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+        ],
+        "cxx23_byteswap_observed": true,
+        "limits": [
+          "qualified bit algorithms,not complete C++23 or an engine build",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "b31c29c97e2c3fcf94453a92720511ba004c399eae0f6ed1b16d304345f2f435",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "icu_resources-direct",
+      "command": [
+        "python3",
+        "tests/qemu_icu_resources.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-large-profile-evidence/icu_resources-direct"
+      ],
+      "exit": 0,
+      "seconds": 15.425920895999297,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "8c24dbc98b5190a2e49267256af258c480d3870481fddc9aa252150a7231ca99",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117527,
+        "free_pages_before": 116935,
+        "free_pages_after": 116935,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 421,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,stable warm frames and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "76f60bbe670c13d0f99586699bf0ffc15ced059e5fe4ed4bb215500533853d6e",
+      "boot_manifest": {
+        "kernel_sha256": "ddd0eb7c302610944dbed4253555fef911f6fbedcb99ac7d1607b74dad83478f"
+      }
+    },
+    {
+      "name": "icu_resources-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_icu_resources.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/icu_resources-uefi",
+        "--application",
+        "build/native-large-profile-sdk-check/sdk_icu_resources.app.elf"
+      ],
+      "exit": 0,
+      "seconds": 22.412829585999134,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "efa535fdde8f58a6cf7fb3f09a6850a6925763d7ebf58c2500654865d688a791",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500205,
+        "free_pages_before": 499609,
+        "free_pages_after": 499609,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 422,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,stable warm frames and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "7b8b06dcc1e3f3129f3d16dcc069810df9e3c15544a03c2bbb7095a9183fc05d",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "user_allocator-direct",
+      "command": [
+        "python3",
+        "tests/qemu_user_allocator.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-large-profile-evidence/user_allocator-direct"
+      ],
+      "exit": 0,
+      "seconds": 6.8011415129949455,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "e7748c88d54cd195429747fba7213499fd7228d894e70bc6cf601c57952b2985",
+        "free_pages_before": 117479,
+        "free_pages_after": 117479,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "result_sha256": "3d67be747a1c3974059a2ab7569b226a2b24ee7198e2d971ac10767cc91c6378",
+      "boot_manifest": {
+        "kernel_sha256": "ddd0eb7c302610944dbed4253555fef911f6fbedcb99ac7d1607b74dad83478f"
+      }
+    },
+    {
+      "name": "user_allocator-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_user_allocator.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/user_allocator-uefi"
+      ],
+      "exit": 0,
+      "seconds": 13.612584920003428,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "e7748c88d54cd195429747fba7213499fd7228d894e70bc6cf601c57952b2985",
+        "free_pages_before": 500157,
+        "free_pages_after": 500157,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "result_sha256": "f585e0d395a4deafc1027cb0fb46108e14e94c472a8da3a9dc399d2368bbad0b",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "native_elf-direct",
+      "command": [
+        "python3",
+        "tests/qemu_native_elf.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-large-profile-evidence/native_elf-direct"
+      ],
+      "exit": 0,
+      "seconds": 4.600475455001288,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "ddd37c65dff686e2584b24c095d631c8b360c25599538d4ab29cfc7b279ebe61",
+        "free_pages_before": 117520,
+        "free_pages_after": 117520,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "result_sha256": "c9db7e2a10d9b77a58d6a6860727a0b0c149690801a9e2c91074a87bf6f38850",
+      "boot_manifest": {
+        "kernel_sha256": "ddd0eb7c302610944dbed4253555fef911f6fbedcb99ac7d1607b74dad83478f"
+      }
+    },
+    {
+      "name": "native_elf-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_native_elf.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/native_elf-uefi"
+      ],
+      "exit": 0,
+      "seconds": 11.295790427000611,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "ddd37c65dff686e2584b24c095d631c8b360c25599538d4ab29cfc7b279ebe61",
+        "free_pages_before": 500198,
+        "free_pages_after": 500198,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "result_sha256": "e1e1a63cedf4340c94a7492f81667e0c0bfafd6d1e6367a773166e2992afa936",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "threads-direct",
+      "command": [
+        "python3",
+        "tests/qemu_threads.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-large-profile-evidence/threads-direct"
+      ],
+      "exit": 0,
+      "seconds": 13.122661716006405,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "ee020efb441d6f7fe3e7dfcb88392852c39f925cea41ebf7bbec6ec69a7f841f",
+        "cold_free_pages": 117527,
+        "free_pages_before": 117494,
+        "free_pages_after": 117494,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 234,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "00b6bf7794b1ac90c4c031d418bb1a78a4258257a65f3952ad7c1a23e7ac316e",
+      "boot_manifest": {
+        "kernel_sha256": "ddd0eb7c302610944dbed4253555fef911f6fbedcb99ac7d1607b74dad83478f"
+      }
+    },
+    {
+      "name": "threads-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_threads.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/threads-uefi"
+      ],
+      "exit": 0,
+      "seconds": 19.8623913420015,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "ee020efb441d6f7fe3e7dfcb88392852c39f925cea41ebf7bbec6ec69a7f841f",
+        "cold_free_pages": 500205,
+        "free_pages_before": 500172,
+        "free_pages_after": 500172,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 229,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "a0db9756c09d89bf09fdbc5390824399d7013e099009b85fccb31bf23a347834",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "typing-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_typing.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-large-profile-evidence/typing-uefi"
+      ],
+      "exit": 0,
+      "seconds": 38.50514915899839,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "38755c291d792151a4f18001b8da5bad4e1ffe968ffc935d86c2b690fd817567",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "result_sha256": "af9e73a35efbd65e218a2daa8dd4e4d00b01dab50d36d84af9ed9e7d399b4b36",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "ethernet-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_platform.py",
+        "--mode",
+        "uefi",
+        "--memory",
+        "2G",
+        "--pci-virtio",
+        "--net-model",
+        "e1000e",
+        "--tablet",
+        "--clock-test",
+        "--qemu-data",
+        "/workspace/chos-tools/root/usr/share/qemu",
+        "--firmware",
+        "/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd",
+        "--out",
+        "/tmp/chos-large-profile-evidence/ethernet-uefi"
+      ],
+      "exit": 0,
+      "seconds": 92.95268661299633,
+      "result": {
+        "mode": "uefi",
+        "checks": [
+          "32 fast USB keypress/release pairs",
+          "UEFI clock snapshot/counter progress and visible minute rollover",
+          "PCI VirtIO CHFS write/flush/read",
+          "PCI VirtIO hardware RNG",
+          "82574L e1000e DHCP/ARP/ICMP",
+          "keyboard shortcut",
+          "absolute tablet",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "20 USB hot-unplug/reconnect cycles with ring wraps",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 6.839,
+        "desktop_ready_seconds": 9.857,
+        "keyboard_visible_ms": 25.05,
+        "pointer_visible_ms": 44.16,
+        "maximize_visible_ms": 182.77,
+        "drag_visible_ms": 230.29,
+        "idle_cpu_percent": 10.0,
+        "status": "PASS"
+      },
+      "result_sha256": "c9702cf5264cc068579d1208844b429f99e5d886044e6b9a04ef832a85d746ee",
+      "boot_manifest": {
+        "kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "iso_sha256": "e4f0fe6460b881f9632da9424caab0c2fe45119968068feb65e11b143b4b2234",
+        "iso_embedded_kernel_sha256": "fa6faddf469ec43d743d8592ca0352393840c89212e33dfb5bdf9ff685bd16a7",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "jsc_configuration": {
+    "status": "CONFIGURED_NOT_BUILT",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "source_manifest": "docs/dependencies/webkit-jsc-bringup.json",
+    "command": [
+      "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+      "-S",
+      "/tmp/chos-webkit-jsc-source",
+      "-B",
+      "/tmp/chos-jsc-large-profile/cmake",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+      "-DRuby_EXECUTABLE=/workspace/chos-tools/root/usr/bin/ruby3.3",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DPORT=JSCOnly",
+      "-DENABLE_STATIC_JSC=ON",
+      "-DENABLE_JIT=OFF",
+      "-DUSE_SYSTEM_MALLOC=ON",
+      "-DENABLE_TOOLS=OFF",
+      "-DCHOS_SDK_ROOT=/tmp/chos-stage3-build/native-sdk"
+    ],
+    "returncode": 0,
+    "seconds": 10.86593210799765,
+    "log_sha256": "3c63b53b20cbc1f8a9e07507389ce9410562e0e20012f37f3c447c146c5ad918",
+    "tool_versions": {
+      "cmake": "cmake version 3.31.6",
+      "ninja": "1.11.1.git.kitware.jobserver-1",
+      "ruby": "ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]",
+      "clang": "Debian clang version 19.1.7 (3+b1)",
+      "clang++": "Debian clang version 19.1.7 (3+b1)"
+    },
+    "int128_type_compile_probe": "PASS",
+    "compile_only_cmake_checks": false,
+    "native_sdk": "/tmp/chos-stage3-build/native-sdk",
+    "source_closure_files_checked": 10010,
+    "threads_missing": false,
+    "target_library_search": "CHOS sysroot only; host executables permitted",
+    "icu_missing": false,
+    "limits": [
+      "Real executable links are used; failed native POSIX thread checks remain failures.",
+      "CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.",
+      "The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.",
+      "No WebCore/WPE rendering,JavaScript execution,browser or conformance result."
+    ]
+  },
+  "actual_engine_build": {
+    "status": "FAIL",
+    "exit": 1,
+    "engine_built": false,
+    "engine_executed": false,
+    "log_sha256": "077fc4c5ea3b845372a146ee46792232bda0c0d91f0c076988f91801a27730c7",
+    "missing_interface": "sys/mman.h",
+    "byteswap_missing": false
+  },
+  "retained_investigations": [
+    {
+      "path": "/workspace/chos-evidence/large-map-uefi1",
+      "diagnosis": "runtime-exit abandoned the persistent desktop serial loop;no boot shell exists in that profile;fixed and direct/UEFI requalified"
+    },
+    {
+      "path": "/workspace/chos-evidence/large-image-direct1",
+      "diagnosis": "sandbox denied local QMP socket before boot;rerun with permitted local socket access"
+    },
+    {
+      "path": "/workspace/chos-evidence/icu-resources-direct2",
+      "diagnosis": "fixture omitted base ShiftJIS converter referenced by extension data;added original verified base file;product package already contained it"
+    },
+    {
+      "path": "/tmp/chos-large-profile-build1.log",
+      "diagnosis": "initial generated-resource file exceeded old Python file-size guard;not the ELF virtual span assertion;bounded file budget now matches4MiB profile"
+    }
+  ],
+  "limits": [
+    "No actual JavaScriptCore or WebKit execution/modern rendering",
+    "full32MiB embedded ICU data intentionally refused by4MiB executable assertion",
+    "No complete ICU/Intl/C++23/POSIX conformance",
+    "production browser TLS/trust/entropy/time and sandbox integration incomplete",
+    "Pi5 SDIO host/firmware/authentication/live radio unavailable and unimplemented",
+    "new Fusion/Pi/laptop runs NOT RUN"
+  ],
+  "binary_publication": "source-only;cc29ea8 ISO unchanged;version0.30.0 remains"
+}

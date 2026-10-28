@@ -12,7 +12,7 @@ in UEFI_PROCESS_RUNTIME.md and has QEMU evidence; Fusion validation remains open
 * An explicit CHOS ABI v1 PT_NOTE: type 0x43484f53, name `CHOS` including NUL,
   four-byte little-endian version 1. This identifies ABI intent, not authenticity.
   A plain Linux/System V executable without the note is rejected.
-* At most eight program headers, two MiB virtual span and two MiB plus 4 KiB file.
+* At most eight program headers, four MiB virtual span and four MiB plus 4 KiB file.
   LOAD offsets/virtual addresses are page-aligned with checked alignment/congruence.
   File/memory bounds, arithmetic overflow, header sizes, version, machine and entry
   alignment are checked before allocating process pages.
@@ -24,14 +24,14 @@ in UEFI_PROCESS_RUNTIME.md and has QEMU evidence; Fusion validation remains open
   CHOS startup convention. Interpreter, dynamic, TLS, executable-stack and
   unsupported RELRO requests are rejected. Section headers are not a loader API.
 
-The four-MiB owned-frame quota and four-process limit remain. Native image span is
+The owned-frame quota is eight MiB; the four-process limit remains. Native image span is
 larger than CHCX's preserved 64 KiB bound, but it is still insufficient for WebKit.
 Larger heaps/images, threads/futexes, IPC, events, complete libc/C++ and native IOMMU/device
 isolation remain separate requirements. See NATIVE_C_RUNTIME.md for allocation
 and string primitives already implemented. No constant increase is represented
 as a working browser runtime.
 
-The process reaper uses a bounded 512-bit mapping ledger rather than a 32-bit mask.
+The process reaper uses a bounded image-page mapping ledger rather than a 32-bit mask.
 It unmaps only pages actually loaded, then destroys the owner and zeroes/frees its
 frames. This also handles images spanning holes and high page indexes. Mapping
 counts are checked against actual loaded pages rather than the sparse address
@@ -67,3 +67,10 @@ pass with equal free-page counts and contain all three deliberate faults.
 All builds here are local test inputs. Publication remains held until every revised
 Stage 3 acceptance gate is satisfied and thoroughly tested. No new ISO/build tag
 is published for this prerequisite.
+
+The subsequent [larger native profile and generated ICU resource execution](NATIVE_LARGE_RESOURCES.md)
+qualifies1MiB allocations,4MiB images and8MiB owned frames in both QEMU boot
+modes. C++23 byteswap is now supplied and tested. The historical2MiB/4MiB and
+missing-byteswap limits above describe earlier snapshots. The full32MiB embedded
+data package remains over budget; JavaScriptCore still requires real virtual
+memory APIs and further platform work. This is not Stage3 completion.

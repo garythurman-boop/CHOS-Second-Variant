@@ -12,7 +12,7 @@
 #define CHOS_AS_USER_L2_LIMIT ((uint32_t)(CHOS_AS_USER_VA_LIMIT >> 21))
 #define CHOS_AS_USER_L2_SLOTS (CHOS_AS_USER_L2_LIMIT - CHOS_AS_USER_L2_FIRST)
 #define CHOS_AS_USER_PAGE_LIMIT ((CHOS_AS_USER_VA_LIMIT - CHOS_AS_USER_VA_BASE) / VMM_PAGE_SIZE)
-#define CHOS_AS_MAX_USER_FRAMES 1024u /* 4 MiB of zero-filled frames per address space. */
+#define CHOS_AS_MAX_USER_FRAMES 2048u /* 8 MiB of zero-filled frames per address space. */
 
 typedef struct {
     uint32_t slot;

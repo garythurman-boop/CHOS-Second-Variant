@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "chos/address_space.h"
 #define CHOS_ELF_MAX_SEGMENTS 8u
-#define CHOS_ELF_MAX_SPAN (2u*1024u*1024u)
+#define CHOS_ELF_MAX_SPAN (4u*1024u*1024u)
 #define CHOS_ELF_MAX_FILE (CHOS_ELF_MAX_SPAN+4096u)
 typedef struct {
     uint32_t offset,virtual_offset,file_size,memory_size;

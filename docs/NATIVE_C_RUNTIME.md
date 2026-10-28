@@ -16,7 +16,7 @@ pointer to size zero frees it and returns NULL. `posix_memalign` leaves its outp
 and errno unchanged on failure. Power-of-two alignments that cannot fit a backing
 region fail with ENOMEM.
 
-The current kernel caps one mapping at 128 KiB and all mappings at 16 regions
+The current kernel caps one mapping at 1 MiB and all mappings at 16 regions
 within a guarded two-MiB virtual arena. The allocator usually maps 64 KiB and
 splits/coalesces aligned in-mapping blocks. It checks all block ranges before
 following metadata, recognizes only exact live payload pointers, and releases
@@ -79,3 +79,7 @@ publication remains held under the user's Stage 3 completion instruction.
 See [native clocks](NATIVE_CLOCK_API.md) for the subsequent read-only clock API
 and limited C/C++ time conversion implementation. Full POSIX/timezone/thread
 support remains separate.
+
+The larger bounded profile is qualified in [NATIVE_LARGE_RESOURCES.md](NATIVE_LARGE_RESOURCES.md).
+It retains the2MiB aperture and guards while testing1MiB allocations,4MiB images
+and8MiB owned frames; these remain below the complete modern engine footprint.

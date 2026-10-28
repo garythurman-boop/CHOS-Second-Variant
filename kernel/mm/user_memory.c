@@ -1,6 +1,7 @@
 #include "chos/user_memory.h"
 #include "chos/syscall.h"
 #include "chos/spinlock.h"
+_Static_assert(CHOS_USER_MAP_MAX_BYTES+2u*VMM_PAGE_SIZE<=CHOS_USER_MAP_BYTES,"mapping cap must retain both guards");
 typedef struct {uint64_t first;uint32_t pages,state,pins;} region_t;
 typedef struct {uint32_t generation,id;region_t regions[CHOS_USER_MAP_REGIONS];} map_owner_t;
 static map_owner_t owners[CHOS_AS_MAX_SPACES];

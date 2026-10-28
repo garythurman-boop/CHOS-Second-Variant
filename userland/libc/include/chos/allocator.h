@@ -2,12 +2,13 @@
 #define CHOS_LIBC_ALLOCATOR_H
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/user_memory_limits.h"
 
 /* Each backing mapping is private RW/XN. This core requires caller serialization;
  * the native libc wrapper supplies a process-local mutex. The caller owns this
  * metadata; callbacks must not re-enter the allocator. */
 #define CHOS_HEAP_REGIONS 16u
-#define CHOS_HEAP_MAP_MAX (128u*1024u)
+#define CHOS_HEAP_MAP_MAX CHOS_USER_MAP_MAX_BYTES
 #define CHOS_HEAP_PAGE 4096u
 #define CHOS_HEAP_ALIGNMENT 16u
 #define CHOS_HEAP_EIO 5

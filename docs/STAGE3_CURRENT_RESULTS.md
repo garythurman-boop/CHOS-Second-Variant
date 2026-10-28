@@ -5,6 +5,14 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
+The latest [larger native resource milestone](NATIVE_LARGE_RESOURCES.md) passes
+16 live QEMU profiles across direct and UEFI boot, plus the full host/sanitizer
+suites. It qualifies1MiB private mappings,4MiB native images,8MiB owned frames,
+actual generated ICU locale/converter/break data and original C++23 byteswap.
+The full embedded ICU package remains over budget; actual JavaScriptCore
+compilation now stops on sys/mman.h. No engine execution or new target-hardware
+qualification is claimed. The test ISO remains cc29ea8; this is source-only.
+
 Stage 3 is **not complete**. The revised prompt's modern browser, integrated
 production TLS policy, complete isolation/runtime and real Pi 5 wireless
 requirements remain active. Native TLS certificate validation has separate

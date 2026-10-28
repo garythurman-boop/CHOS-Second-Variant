@@ -29,6 +29,12 @@ int main(void){
     assert(chos_elf_page(&plan,0x80000,&page)&&page.permissions==AS_PERM_USER_RW&&page.file_bytes==7);
     assert(chos_elf_page(&plan,0x81000,&page)&&page.file_bytes==0&&!chos_elf_page(&plan,0x30000,&page));
     assert(!chos_elf_page(&plan,1,&page));
+    valid();segment(1,4,8192,CHOS_AS_USER_VA_BASE+0x210000,17,17);
+    segment(2,6,12288,CHOS_AS_USER_VA_BASE+CHOS_ELF_MAX_SPAN-4096u,7,4096u);
+    assert(chos_elf_validate(bytes,sizeof(bytes),&plan)&&plan.virtual_size==CHOS_ELF_MAX_SPAN);
+    assert(chos_elf_page(&plan,0x210000,&page)&&page.permissions==AS_PERM_USER_RO&&page.file_bytes==17);
+    assert(!chos_elf_page(&plan,0x200000,&page));
+    assert(chos_elf_page(&plan,CHOS_ELF_MAX_SPAN-4096u,&page)&&page.permissions==AS_PERM_USER_RW&&page.file_bytes==7);
     for(size_t n=0;n<64;n++)assert(!chos_elf_validate(bytes,n,&plan));
     valid();w64(bytes+32,UINT64_MAX);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
     valid();w16(bytes+56,9);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));

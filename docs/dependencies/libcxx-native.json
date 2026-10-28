@@ -250,6 +250,7 @@
     "include/__bit/bit_log2.h": "6ccf7bd7f62ce5b52522bc805dc18191f98b3363c4962c57dbc2ddf751585631",
     "include/__bit/bit_width.h": "1fca3b1d83d57173a501a8b47d8547e51d81d2917fce70033e4ab562f7b2493e",
     "include/__bit/blsr.h": "651cc6eb75d4af07c242689ddc1396cd53e2cb541102e6d9aa0926f7c72ffc40",
+    "include/__bit/byteswap.h": "77a291f514686a3de1166927831e3b7e3086caa928b83e7b1b71d44d6e40a0bf",
     "include/__bit/countl.h": "c936a971017aab9c922599fe7f388e1e4647a34fa3c68b9547e8d174ed634de1",
     "include/__bit/countr.h": "ca1fcc5ebae11720a06713465504a0399c9842d6821786a84f869d58acabf80f",
     "include/__bit/endian.h": "7951789b2a2fdaacd7ca371531bdb6b9775119387107522bf428482989507a67",

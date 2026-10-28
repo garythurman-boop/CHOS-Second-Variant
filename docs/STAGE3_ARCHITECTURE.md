@@ -11,7 +11,7 @@ Direct and UEFI now have bounded isolated EL0 applications and a single-CPU
 preemptive scheduler. UEFI retains its relocated PIE kernel, native PCI USB/NVMe/
 GOP, identity DMA and disabled data caching, with CPU MMU isolation enabled in its
 scheduled profile. New source still needs independent Fusion qualification.
-CHCX retains its64KiB bound; static native ELF has a2MiB image span and4MiB owned
+CHCX retains its64KiB bound; static native ELF has a4MiB image span and8MiB owned
 frame quota. There are four processes,32KiB main stacks and up to three secondary
 join records per process. Native C allocation/errno, pthread synchronization,
 private futexes, bounded process messages and explicit compiler-emulated C/C++ TLS
@@ -133,3 +133,10 @@ refused by the current2MiB executable limit; actual engine compilation stops at
 missing libc++ bit-operation headers and sys/mman.h. This supersedes the earlier
 missing-ICU-data configuration diagnosis. No engine execution, modern browser,
 production security, live wireless or full Stage3/version0.50.0 success is claimed.
+
+The subsequent [larger native profile and generated ICU resource execution](NATIVE_LARGE_RESOURCES.md)
+qualifies1MiB allocations,4MiB images and8MiB owned frames in both QEMU boot
+modes. C++23 byteswap is now supplied and tested. The historical2MiB/4MiB and
+missing-byteswap limits above describe earlier snapshots. The full32MiB embedded
+data package remains over budget; JavaScriptCore still requires real virtual
+memory APIs and further platform work. This is not Stage3 completion.

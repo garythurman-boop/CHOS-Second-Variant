@@ -35,6 +35,7 @@
 
 static volatile int shell_runtime_active;
 static volatile int shell_runtime_exit_requested;
+static int shell_runtime_can_return;
 static void shell_loop(const fdt_info_t *device_tree, int runtime_mode);
 static void enter_runtime_session(const fdt_info_t *device_tree);
 static void runtime_shell_task_entry(void *argument);
@@ -1828,7 +1829,7 @@ static void print_help(void) {
     uart_puts("  spawn PATH Queue a CHCX process and return a PID immediately\n");
     uart_puts("  runqueue   Run queued processes and return when the batch exits\n");
     uart_puts("  runtime    Enter interactive preemptive runtime; spawn processes in background\n");
-    uart_puts("  runtime-exit Leave runtime after scheduled processes finish\n");
+    uart_puts("  runtime-exit Return to boot console when that session exists\n");
     uart_puts("  async-test Test GETPID/WRITE/YIELD/SLEEP/EXIT syscalls and memory cleanup\n");
     uart_puts("  romfs-test Validate and run packaged programs; includes an isolated user-fault test\n");
     uart_puts("  echo TEXT  Print TEXT\n");
@@ -2245,8 +2246,12 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         else enter_runtime_session(tree);
     } else if (strings_equal(line, "runtime-exit")) {
         if (shell_runtime_active) {
-            uart_puts("Leaving runtime; waiting for queued processes to finish...\n");
-            shell_runtime_exit_requested = 1;
+            if (!shell_runtime_can_return) {
+                uart_puts("This desktop runtime is persistent; serial recovery remains active. Use desktop power controls to leave.\n");
+            } else {
+                uart_puts("Leaving runtime; waiting for queued processes to finish...\n");
+                shell_runtime_exit_requested = 1;
+            }
         } else {
             uart_puts("Not in runtime mode. Enter 'runtime' first.\n");
         }
@@ -2296,7 +2301,9 @@ static void execute_command(char *line, const fdt_info_t *tree) {
 static void shell_loop(const fdt_info_t *device_tree, int runtime_mode) {
     char line[LINE_CAPACITY];
     uart_puts(runtime_mode
-        ? "CHOS scheduled runtime console. 'spawn PATH' starts a background process; 'runtime-exit' returns.\n"
+        ? (shell_runtime_can_return
+           ? "CHOS scheduled runtime console. 'spawn PATH' starts a background process; 'runtime-exit' returns.\n"
+           : "CHOS scheduled runtime console. Persistent desktop session; serial recovery stays available.\n")
         : "CHOS command console. Type 'help' for commands.\n");
     for (;;) {
         size_t length = 0;
@@ -2382,9 +2389,11 @@ static void enter_runtime_session(const fdt_info_t *device_tree) {
         uart_puts("[FAIL] could not enable timer preemption for runtime\n");
         return;
     }
+    shell_runtime_can_return = 1;
     if (!scheduler_create_task("runtime-shell", runtime_shell_task_entry,
                                (void *)device_tree, &task_id)) {
         (void)scheduler_set_preemption_enabled(0);
+        shell_runtime_can_return = 0;
         uart_puts("[FAIL] could not create runtime shell task\n");
         return;
     }
@@ -2397,10 +2406,14 @@ static void enter_runtime_session(const fdt_info_t *device_tree) {
         uart_puts("[ OK ] runtime shell and scheduled processes finished; returned to boot shell.\n");
     }
     process_reap_pending();
+    shell_runtime_can_return = 0;
 }
 
 void shell_run_scheduled(const fdt_info_t *device_tree){
-    if(scheduler_current_is_kernel_task())runtime_shell_task_entry((void *)device_tree);
+    if(scheduler_current_is_kernel_task()){
+        shell_runtime_can_return = 0;
+        runtime_shell_task_entry((void *)device_tree);
+    }
 }
 
 void shell_run(const fdt_info_t *device_tree) {

@@ -34,6 +34,20 @@ int main(void){
  assert(chos_user_memory_unmap(a,(uint64_t)va,8192)==0&&!used(0));assert(chos_user_memory_unmap(a,(uint64_t)va,8192)==-CHOS_ERRNO_EINVAL);
  reset();allocation_fail=2;assert(chos_user_memory_map(a,8192,0)==-CHOS_ERRNO_ENOMEM&&!used(0));
  reset();map_fail=2;assert(chos_user_memory_map(a,8192,0)==-CHOS_ERRNO_ENOMEM&&!used(0));
+ /* Full-size mappings retain aperture guards and failure rollback at every
+  * representative allocation/map boundary, including beyond the old32pages. */
+ reset();assert(chos_user_memory_map(a,CHOS_USER_MAP_MAX_BYTES+1u,0)==-CHOS_ERRNO_EINVAL);
+ va=chos_user_memory_map(a,CHOS_USER_MAP_MAX_BYTES,0);assert(va>0&&used(0)==CHOS_USER_MAP_MAX_BYTES/4096u);
+ assert(chos_user_memory_map(a,CHOS_USER_MAP_MAX_BYTES,0)==-CHOS_ERRNO_ENOMEM);
+ assert(!chos_user_memory_unmap(a,(uint64_t)va,CHOS_USER_MAP_MAX_BYTES)&&!used(0));
+ const unsigned boundaries[]={1,32,33,CHOS_USER_MAP_MAX_BYTES/4096u};
+ for(unsigned sample=0;sample<sizeof(boundaries)/sizeof(boundaries[0]);sample++){
+  unsigned boundary=boundaries[sample];
+  reset();allocation_fail=boundary;assert(chos_user_memory_map(a,CHOS_USER_MAP_MAX_BYTES,0)==-CHOS_ERRNO_ENOMEM&&!used(0));
+  for(unsigned i=0;i<512;i++)assert(!mappings[0][i]);
+  reset();map_fail=boundary;assert(chos_user_memory_map(a,CHOS_USER_MAP_MAX_BYTES,0)==-CHOS_ERRNO_ENOMEM&&!used(0));
+  for(unsigned i=0;i<512;i++)assert(!mappings[0][i]);
+ }
  reset();va=chos_user_memory_map(a,8192,0);unmap_fail=1;assert(chos_user_memory_unmap(a,(uint64_t)va,8192)==-CHOS_ERRNO_EIO&&used(0)==2);
  assert(chos_user_memory_unmap(a,(uint64_t)va,8192)==-CHOS_ERRNO_EINVAL);unmap_fail=0;assert(chos_user_memory_release(a));
  for(unsigned i=0;i<512;i++)assert(!mappings[0][i]);

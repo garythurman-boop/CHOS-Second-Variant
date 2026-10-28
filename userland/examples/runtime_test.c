@@ -51,6 +51,11 @@ int main(int argc,char **argv){
     p=aligned_alloc(4096,4096);CHECK(p&&!((uintptr_t)p%4096));memset(p,0x53,4096);free(p);
     p=calloc(97,11);CHECK(p);for(unsigned i=0;i<1067;i++)CHECK(!p[i]);free(p);
     p=malloc(0);CHECK(p);free(p);free(0);
+    p=malloc(CHOS_HEAP_MAP_MAX-64u);CHECK(p);memset(p,0x93,CHOS_HEAP_MAP_MAX-64u);
+    errno=0;CHECK(!malloc(CHOS_HEAP_MAP_MAX-64u)&&errno==ENOMEM);
+    for(size_t i=0;i<CHOS_HEAP_MAP_MAX-64u;i++)CHECK(p[i]==0x93);free(p);
+    p=calloc(1,CHOS_HEAP_MAP_MAX-64u);CHECK(p);
+    for(size_t i=0;i<CHOS_HEAP_MAP_MAX-64u;i++)CHECK(!p[i]);free(p);
     void *large[CHOS_HEAP_REGIONS];
     for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++){large[i]=malloc(100000);CHECK(large[i]);memset(large[i],(int)i,100000);}
     errno=0;CHECK(!malloc(100000)&&errno==ENOMEM);

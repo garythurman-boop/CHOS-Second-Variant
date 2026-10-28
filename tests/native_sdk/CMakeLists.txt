@@ -121,11 +121,19 @@ try_compile(FULL_ICU_EMBEDDED_IMAGE_ACCEPTED
  LINK_LIBRARIES CHOS::ICUCommon CHOS::ICUData
  OUTPUT_VARIABLE _chos_full_data_link_output)
 if(FULL_ICU_EMBEDDED_IMAGE_ACCEPTED)
- message(FATAL_ERROR "current2MiB image bound unexpectedly accepted the full ICU package")
+ message(FATAL_ERROR "current4MiB image bound unexpectedly accepted the full ICU package")
 endif()
-if(NOT _chos_full_data_link_output MATCHES "Native application exceeds bounded2MiB arena"
+if(NOT _chos_full_data_link_output MATCHES "Native application exceeds bounded4MiB arena"
    OR _chos_full_data_link_output MATCHES "undefined symbol|undefined reference|fatal error:")
  message(FATAL_ERROR "unexpected full ICU data link failure: ${_chos_full_data_link_output}")
 endif()
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/icu-full-data-budget.log" "${_chos_full_data_link_output}")
-message(STATUS "Full ICU data archive is available;embedded image correctly refused by current2MiB budget")
+message(STATUS "Full ICU data archive is available;embedded image correctly refused by current4MiB budget")
+
+check_cxx_source_compiles("#include <bit>\n#include <cstdint>\nint main(){volatile uint64_t x=0x123456789abcdef0ULL;return std::byteswap(x)==0xf0debc9a78563412ULL?0:1;}" HAVE_NATIVE_BYTESWAP)
+if(NOT HAVE_NATIVE_BYTESWAP)
+ message(FATAL_ERROR "real native C++23 byteswap link failed")
+endif()
+add_executable(sdk_bit ../../userland/examples/bit_test.cpp)
+add_executable(sdk_icu_resources ../../userland/examples/icu_resource_test.cpp)
+target_link_libraries(sdk_icu_resources PRIVATE CHOS::ICUI18n CHOS::ICUBootstrapData)

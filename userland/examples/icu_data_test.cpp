@@ -40,8 +40,7 @@ static int read_exact(FILE *f,void *out,size_t bytes){return fread(out,1,bytes,f
 static int normalization(){
  FILE *f=fopen("/ICU/NORM.BIN","rb");CHECK(f);char magic[8];uint32_t count;
  CHECK(!read_exact(f,magic,8)&&!memcmp(magic,"CHOSN18\0",8)&&!read_exact(f,&count,4)&&count==20171);
- // The fixed corpus membership bitmap belongs to this test's bounded BSS;
- // individual native heap mappings remain capped at128KiB.
+ // The fixed corpus membership bitmap belongs to this test's bounded BSS.
  static unsigned char excluded[0x110000/8];CHECK(!read_exact(f,excluded,sizeof(excluded)));
  UErrorCode status=U_ZERO_ERROR;const UNormalizer2 *forms[]={unorm2_getNFCInstance(&status),unorm2_getNFDInstance(&status),unorm2_getNFKCInstance(&status),unorm2_getNFKDInstance(&status)};
  CHECK(U_SUCCESS(status)&&forms[0]&&forms[1]&&forms[2]&&forms[3]);

@@ -3,7 +3,7 @@ build/
 *.elf
 *.img
 .DS_Store
-/build/
+/build
 
 /chos-disk.img
 

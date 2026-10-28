@@ -18,6 +18,6 @@ SECTIONS {
  .data : { *(.data .data.*) *(.got .got.*) } :writable
  .bss (NOLOAD) : { *(.bss .bss.* COMMON) } :writable
  /DISCARD/ : { *(.comment) *(.note*) *(.eh_frame*) *(.llvm_addrsig) }
- ASSERT(. <= 0x20200000,"Native application exceeds bounded2MiB arena")
+ ASSERT(. <= 0x20400000,"Native application exceeds bounded4MiB arena")
  ASSERT(SIZEOF(.note.chos) == 24,"Native ELF requires a CHOS ABI note")
 }

@@ -87,3 +87,10 @@ open. Neither the modern engine nor Stage3/version0.50.0 is complete.
 See [machine-readable evidence](validation/stage3-icu-default-data.json).
 The cc29ea8 Fusion test ISO is unchanged. New source/runtime qualification in
 Fusion, Pi and laptops remains separate from QEMU and host build evidence.
+
+The subsequent [larger native profile and generated ICU resource execution](NATIVE_LARGE_RESOURCES.md)
+qualifies1MiB allocations,4MiB images and8MiB owned frames in both QEMU boot
+modes. C++23 byteswap is now supplied and tested. The historical2MiB/4MiB and
+missing-byteswap limits above describe earlier snapshots. The full32MiB embedded
+data package remains over budget; JavaScriptCore still requires real virtual
+memory APIs and further platform work. This is not Stage3 completion.

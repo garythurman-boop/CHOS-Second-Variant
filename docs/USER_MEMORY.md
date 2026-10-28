@@ -1,14 +1,15 @@
 # Bounded EL0 anonymous memory: revised Stage 3 runtime groundwork
 
 This implementation supplies real zero-filled private memory to direct-boot EL0
-applications through CHOS syscalls 35/36. It is not a full POSIX mmap/malloc layer,
-an engine port, shared-memory IPC, or a working isolated UEFI runtime.
+applications through CHOS syscalls 35/36. It is not a full POSIX mmap layer,
+an engine port or shared-memory IPC. Both direct/UEFI isolated profiles now have
+component evidence; the initial direct-only results below are historical.
 
-`chos_map_memory(bytes)` accepts 1..128 KiB and returns a process-private base or
+`chos_map_memory(bytes)` accepts 1..1 MiB and returns a process-private base or
 negative errno. Nonzero flags, including high 64-bit flag bits, are rejected.
 Mappings round to 4 KiB pages, are read/write and execute-never, and have unmapped
 guards. There are at most 16 tracked regions in a bounded two-MiB arena per address
-space; the existing four-MiB owned-frame limit remains. The caller cannot select a
+space; the eight-MiB owned-frame limit is independent. The caller cannot select a
 physical address, overwrite its image/stack or request executable heap memory.
 
 `chos_unmap_memory(base, bytes)` requires the exact region base and matching rounded
@@ -21,7 +22,7 @@ quarantine the region; uncertain pages are never reused as someone else's storag
 The process reaper unmaps all abandoned/quarantined regions before destroying the
 address space, where the existing owner allocator zeroes/frees remaining frames.
 The lock order is user-memory metadata → address-space → PMM, with IRQs masked and
-no allocation-time yields. Each request handles at most 32 pages, rather than a
+no allocation-time yields. Each request handles at most 256 pages, rather than a
 browser-sized unbounded mapping or full RAM scan. This is single-core support.
 
 ## Evidence
@@ -65,3 +66,10 @@ follow-up follows the next source-only iteration. It does not change the stated
 modern-engine, TLS, Wi-Fi, IPv6 or Fusion-validation gates. Larger heaps/images,
 robust multithreading/futex/event APIs, read-only/file/shared mappings and UEFI MMU/
 DMA integration still require separate implementation and security tests.
+
+The subsequent [larger native profile and generated ICU resource execution](NATIVE_LARGE_RESOURCES.md)
+qualifies1MiB allocations,4MiB images and8MiB owned frames in both QEMU boot
+modes. C++23 byteswap is now supplied and tested. The historical2MiB/4MiB and
+missing-byteswap limits above describe earlier snapshots. The full32MiB embedded
+data package remains over budget; JavaScriptCore still requires real virtual
+memory APIs and further platform work. This is not Stage3 completion.

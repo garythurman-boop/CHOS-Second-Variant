@@ -1276,9 +1276,9 @@ $(BUILD)/userland/network_policy_test.chcx: $(BUILD)/userland/network_policy_tes
 test-userland: $(BUILD)/userland/network_policy_test.chcx
 test: $(BUILD)/userland/network_policy_test.chcx
 
-$(BUILD)/test-user-memory: tests/test_user_memory.c kernel/mm/user_memory.c include/chos/user_memory.h
+$(BUILD)/test-user-memory: tests/test_user_memory.c kernel/mm/user_memory.c include/chos/user_memory.h include/chos/user_memory_limits.h
 	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude tests/test_user_memory.c -o $@
-$(SAN_DIR)/test-user-memory: tests/test_user_memory.c kernel/mm/user_memory.c include/chos/user_memory.h
+$(SAN_DIR)/test-user-memory: tests/test_user_memory.c kernel/mm/user_memory.c include/chos/user_memory.h include/chos/user_memory_limits.h
 	@mkdir -p $(dir $@)
 	$(CC_HOST) $(SAN_FLAGS) tests/test_user_memory.c -o $@
 test-user-memory: $(BUILD)/test-user-memory
@@ -1357,10 +1357,12 @@ include userland/libc/wide.Makefile.inc
 include userland/libc/stdio.Makefile.inc
 include userland/libc/format/Makefile.inc
 include userland/libcxx/Makefile.inc
+include userland/libcxx/bit.Makefile.inc
 include ports/icu/Makefile.inc
 include ports/icu/i18n.Makefile.inc
 include ports/icu/data.Makefile.inc
 include ports/icu/full_data.Makefile.inc
+include userland/large_image.Makefile.inc
 
 $(BUILD)/userland/tcp6_test.o: userland/examples/tcp6_test.c userland/libchos/include/chos/user.h include/chos/net_tcp6_api.h include/chos/syscall.h
 	@mkdir -p $(dir $@)
