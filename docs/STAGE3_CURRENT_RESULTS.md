@@ -428,3 +428,17 @@ Full host and configured sanitizer suites pass. See
 [evidence](validation/stage3-native-format.json). This supplies the real formatter
 required by the three remaining i18n compile failures; a complete i18n/data/engine
 build and runtime still need separate qualification.
+
+## Genuine native ICU i18n runtime
+
+All **254/254** i18n sources now form a real native archive. Direct and SDK UEFI
+fixtures pass original regex/capture/Unicode property behavior, bounded regex
+stack and adversarial timeout, custom plural/select/choice rules, serialization
+through snprintf, Latin/Hangul NFC/NFD, native threading and actual cleanup.
+User heap returns to zero and repeated processes retain stable warm frames.
+Full host regression passes. The SDK exports public i18n headers/library through
+an explicit native package. The pinned JSCOnly preflight now finds uc+i18n79.1
+and retains a nonzero failure for **missing data only**. The bootstrap archive
+stays empty and separately named. See [scope and limits](ICU_I18N_NATIVE.md) and
+[evidence](validation/stage3-icu-i18n.json). Full data/Intl, the real browser engine,
+production security, wireless and physical/Fusion qualification remain open.

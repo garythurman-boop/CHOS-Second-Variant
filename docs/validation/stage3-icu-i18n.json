@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "scope": "real native ICU i18n archive and selected data-independent APIs; not full ICU data/Intl or engine",
+  "stage3_complete": false,
+  "original_source_commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+  "original_files": 541,
+  "translation_units": 254,
+  "archive": {
+    "path": "build/icu-i18n/libicui18n.a",
+    "bytes": 32745212,
+    "sha256": "e92e6cd917b76a734ed160238b6e9a1ac0f4d9cedc3f2cc2ff3373426a5b77cc"
+  },
+  "native_decimal_header": {
+    "original_header_sha256": "50103f4fb1481307a89a1a90d279f393d120b1a014f559e4e1528e89f9838447",
+    "original_source_sha256": "2e8ac07bed092bb7027bc6579c9b6630beb5cc281f194a992f5ab9633817038d",
+    "generated_header_sha256": "406d02b0eb5ee93f33109fea09bc53f05f372f1c9eaa3fe0448e9f98d248d871",
+    "change": "remove unused signal.h only; original ICU signal raising is already disabled"
+  },
+  "guest_results": {
+    "native-icu-i18n-direct2": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "b3bcf9815d5ee9cd912c5d78f6679c1d4c5bf7850639b1ad63eeffd6f159071a",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117543,
+      "free_pages_before": 117195,
+      "free_pages_after": 117195,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 133,
+      "checks": [
+        "genuine original254-unit native ICU i18n archive linked with202-unit common and explicit bootstrap data",
+        "Unicode regular expressions,captures,syntax errors,stack bound and actual match timeout",
+        "custom plural/select/choice rules and serialization through real snprintf",
+        "NFC/NFD composition,decomposition and Hangul using original compiled NFC data",
+        "three native threads and three lifecycles with real ICU u_cleanup,heap0,stable warm frames",
+        "absent external resource fails;no complete data-package inference"
+      ],
+      "limits": [
+        "selected data-independent i18n APIs and built-in NFC data,not complete ICU data/CLDR/i18n conformance",
+        "not WebKit/JavaScriptCore execution,modern browser or production TLS policy",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-icu-i18n-sdk-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "c35163b9c3049912f2c1f527b5abf957239b7a0becaa90dfa178b313ad155987",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500221,
+      "free_pages_before": 499867,
+      "free_pages_after": 499867,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 129,
+      "checks": [
+        "genuine original254-unit native ICU i18n archive linked with202-unit common and explicit bootstrap data",
+        "Unicode regular expressions,captures,syntax errors,stack bound and actual match timeout",
+        "custom plural/select/choice rules and serialization through real snprintf",
+        "NFC/NFD composition,decomposition and Hangul using original compiled NFC data",
+        "three native threads and three lifecycles with real ICU u_cleanup,heap0,stable warm frames",
+        "absent external resource fails;no complete data-package inference"
+      ],
+      "limits": [
+        "selected data-independent i18n APIs and built-in NFC data,not complete ICU data/CLDR/i18n conformance",
+        "not WebKit/JavaScriptCore execution,modern browser or production TLS policy",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    }
+  },
+  "full_host_suite": {
+    "exit": 0,
+    "sha256": "71f6d7062f352d66e65682f4b6562eb2a761f05e8dd4efcd9e7bd2ee33787ec9"
+  },
+  "sanitizer_scope": "unchanged C runtime and formatter retain native-format-full-sanitize PASS; no native C++ i18n ASan claim",
+  "sdk_manifest_sha256": "cd24cad0108f380dc6070affc8bfa940e6da8f553a33154bbc09946ff6f2fe8c",
+  "javascriptcore_preflight": {
+    "status": "CONFIGURATION_INCOMPLETE",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "source_manifest": "docs/dependencies/webkit-jsc-bringup.json",
+    "command": [
+      "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+      "-S",
+      "/workspace/chos-reference/webkit-2.54.2",
+      "-B",
+      "/workspace/chos-evidence/native-icu-i18n-jsc-preflight/cmake",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+      "-DRuby_EXECUTABLE=/workspace/chos-tools/root/usr/bin/ruby3.3",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DPORT=JSCOnly",
+      "-DENABLE_STATIC_JSC=ON",
+      "-DENABLE_JIT=OFF",
+      "-DUSE_SYSTEM_MALLOC=ON",
+      "-DENABLE_TOOLS=OFF",
+      "-DCHOS_SDK_ROOT=/workspace/CHOS-Second-Variant/build/native-sdk"
+    ],
+    "returncode": 1,
+    "seconds": 9.442259014002047,
+    "log_sha256": "2e7a445521da4cc7337178d630cc4a7208dee9346de9ac7d72343c6c9cba7f79",
+    "tool_versions": {
+      "cmake": "cmake version 3.31.6",
+      "ninja": "1.11.1.git.kitware.jobserver-1",
+      "ruby": "ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]",
+      "clang": "Debian clang version 19.1.7 (3+b1)",
+      "clang++": "Debian clang version 19.1.7 (3+b1)"
+    },
+    "int128_type_compile_probe": "PASS",
+    "compile_only_cmake_checks": false,
+    "native_sdk": "/workspace/CHOS-Second-Variant/build/native-sdk",
+    "threads_missing": false,
+    "target_library_search": "CHOS sysroot only; host executables permitted",
+    "icu_missing": true,
+    "limits": [
+      "Real executable links are used; failed native POSIX thread checks remain failures.",
+      "CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.",
+      "The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.",
+      "No WebCore/WPE rendering,JavaScript execution,browser or conformance result."
+    ]
+  },
+  "known_failures": [
+    "first fixture required explicit UnicodeString construction for APIs taking const references",
+    "first link omitted existing read-stream archive; adding the genuine archive resolved the file-loader imports",
+    "initial truncated plural negative case was tolerated by the original parser; accepted invalid-keyword case reports failure"
+  ],
+  "limits": [
+    "selected custom-rule and built-in NFC APIs; complete external CLDR,locale,converter,collation,normalization data unqualified",
+    "empty upstream bootstrap library is separately named,not libicudata",
+    "JSC configuration still fails for missing data; no engine/browser success",
+    "production browser security,real WiFi and independent Fusion/Pi/laptop qualification remain open"
+  ]
+}

@@ -105,3 +105,6 @@ Original ordered associative containers and cstdarg are now available; see the
 
 The SDK now exports real bounded snprintf/vsnprintf through libchos-format.a;
 see [the native profile and numerical/ABI checks](NATIVE_STRING_FORMATTING.md).
+
+Native ICU i18n is also exported through CHOSICUI18n; consult the
+[qualified APIs and missing data gate](ICU_I18N_NATIVE.md).

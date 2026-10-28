@@ -162,3 +162,8 @@ The subsequent [ordered-container/variadic milestone](NATIVE_ORDERED_CONTAINERS.
 and checked removal of ICU's unused signal include raise actual i18n object code
 generation to251/254. The remaining three units need real snprintf. No i18n
 archive/data or engine gate is claimed from that inventory.
+
+The [native i18n milestone](ICU_I18N_NATIVE.md) now builds254/254 units and runs
+selected APIs under direct and SDK UEFI. Actual JSCOnly configuration now finds
+uc+i18n79.1 and fails for **missing data only**. No bootstrap library is substituted
+for that missing component; no engine configuration/build/execution is claimed.
