@@ -4,13 +4,16 @@ import argparse, hashlib, json, pathlib, re, subprocess, tarfile
 root=pathlib.Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--archive',type=pathlib.Path,required=True)
-p.add_argument('--header',action='append',required=True)
-o=p.parse_args();manifest=root/'docs/dependencies/libcxx-native.json'
+p.add_argument('--header',action='append',default=[])
+p.add_argument('--source-file',action='append',default=[])
+o=p.parse_args()
+if not o.header and not o.source_file:p.error('select at least one original header/source')
+manifest=root/'docs/dependencies/libcxx-native.json'
 m=json.loads(manifest.read_text())
 assert hashlib.sha256(o.archive.read_bytes()).hexdigest()==m['release_archive_sha256']['libcxx.tar.xz']
 subprocess.run(['python3',str(root/'tools/verify_libcxx.py')],check=True)
 generated={'__config_site','__assertion_handler','__external_threading'}
-base=root/'third_party/libcxx';pending=['include/'+name for name in o.header];seen=set();added=[]
+base=root/'third_party/libcxx';pending=['include/'+name for name in o.header]+['src/'+name for name in o.source_file];seen=set();added=[]
 with tarfile.open(o.archive) as archive:
     members={member.name.removeprefix('libcxx-'+m['version']+'.src/'):member
              for member in archive if member.isfile()}
@@ -24,6 +27,7 @@ with tarfile.open(o.archive) as archive:
         else:
             target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data);added.append(name)
             m['files'][name]=hashlib.sha256(data).hexdigest()
+            if name.startswith('src/') and name.endswith('.cpp'):m['sources'].append(name)
         for include in re.findall(rb'^\s*#\s*include\s*<([^>]+)>',data,re.M):
             dependency=include.decode();path='include/'+dependency
             if dependency in generated:continue
@@ -34,4 +38,4 @@ with tarfile.open(o.archive) as archive:
                 assert path in members,'missing private header: '+path
                 pending.append(path)
 manifest.write_text(json.dumps(m,indent=2)+'\n')
-print('Imported',len(added),'original libc++ headers:',', '.join(sorted(added)))
+print('Imported',len(added),'original libc++ files:',', '.join(sorted(added)))

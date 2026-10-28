@@ -2,7 +2,7 @@
 """Build a real upstream VM header integration fixture with verified source/SDK."""
 import argparse,pathlib,hashlib,json,subprocess,shutil,time
 root=pathlib.Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source',type=pathlib.Path,required=True);p.add_argument('--native-sdk',type=pathlib.Path,required=True);p.add_argument('--out',type=pathlib.Path,required=True);p.add_argument('--cmake',default='cmake');p.add_argument('--ninja',default='ninja');o=p.parse_args()
+p=argparse.ArgumentParser(description=__doc__);p.add_argument('--bmalloc-archive',type=pathlib.Path);p.add_argument('--source',type=pathlib.Path,required=True);p.add_argument('--native-sdk',type=pathlib.Path,required=True);p.add_argument('--out',type=pathlib.Path,required=True);p.add_argument('--cmake',default='cmake');p.add_argument('--ninja',default='ninja');o=p.parse_args()
 source=o.source.resolve();sdk=o.native_sdk.resolve();out=o.out.resolve();m=json.loads((root/'docs/dependencies/webkit-jsc-bringup.json').read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def git(*args):return subprocess.check_output(['git',*args],cwd=source)
@@ -15,10 +15,30 @@ assert sha(root/m['patch'])==m['patch_sha256']
 subprocess.run(['python3',str(root/'tools/verify_native_sdk.py'),str(sdk)],check=True)
 out.mkdir(parents=True,exist_ok=False)
 commands=[[o.cmake,'-S',str(root/'tests/bmalloc_vm'),'-B',str(out/'cmake'),'-G','Ninja','-DCMAKE_MAKE_PROGRAM='+str(pathlib.Path(shutil.which(o.ninja)).resolve()),'-DCMAKE_TOOLCHAIN_FILE='+str(root/'ports/native/chos-toolchain.cmake'),'-DCHOS_SDK_ROOT='+str(sdk),'-DWEBKIT_SOURCE='+str(source),'-DCMAKE_BUILD_TYPE=Release'],[o.cmake,'--build',str(out/'cmake'),'-j4']]
+library=None
+if o.bmalloc_archive:
+ original=o.bmalloc_archive.resolve();library=out/'libbmalloc.a'
+ assert '\n' not in str(library) and '"' not in str(library)
+ assert original.is_file() and '\n' not in str(original) and '"' not in str(original)
+ thin_input=original.read_bytes().startswith(b'!<thin>\n')
+ if thin_input:
+  recipe='CREATE "'+str(library)+'"\nADDLIB "'+str(original)+'"\nSAVE\nEND\n'
+  subprocess.run(['llvm-ar','-M'],input=recipe,text=True,check=True)
+ else:shutil.copyfile(original,library)
+ assert library.read_bytes().startswith(b'!<arch>\n')
+ members=subprocess.check_output(['llvm-ar','t',str(library)],text=True).splitlines()
+ headers=subprocess.check_output(['llvm-readelf','-h',str(library)],text=True)
+ assert headers.count('Machine:                           AArch64')==len(members)
+ assert headers.count('Type:                              REL (Relocatable file)')==len(members)
+ commands[0].append('-DBMALLOC_NATIVE_ARCHIVE='+str(library))
 start=time.monotonic();code=0
 for i,command in enumerate(commands):
  with (out/('configure.log' if not i else 'build.log')).open('wb') as f:r=subprocess.run(command,stdout=f,stderr=subprocess.STDOUT,cwd=root)
  code=r.returncode
  if code:break
 report={'status':'BUILT_NOT_EXECUTED' if not code else 'BUILD_FAILED','returncode':code,'stage3_complete':False,'engine_built':False,'engine_executed':False,'upstream_commit':m['commit'],'patch_sha256':m['patch_sha256'],'sdk_manifest_sha256':sha(sdk/'chos-sdk.json'),'commands':commands,'seconds':time.monotonic()-start,'application_sha256':sha(out/'cmake/bmalloc_vm') if not code else None,'scope':'original inline VM helpers plus checked CHOS identity/discard adaptation;not bmalloc allocator or JavaScriptCore','limits':['bounded private anonymous subset;fixed/file/shared/executable maps unsupported','real guest tests are required separately;no full engine or browser/conformance claim']}
+if library:
+ report['bmalloc_archive']={'source':str(o.bmalloc_archive.resolve()),'source_sha256':sha(o.bmalloc_archive.resolve()),'regular_archive_sha256':sha(library),'members':len(subprocess.check_output(['llvm-ar','t',str(library)],text=True).splitlines()),'thin_input_converted':thin_input}
+ report['services_application_sha256']=sha(out/'cmake/bmalloc_services') if not code else None
+ report['scope']='VM helpers and selected bmalloc system-malloc/entropy/logging/mutex services linked from the actual upstream library;not WTF/JavaScriptCore or browser'
 (out/'result.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2));raise SystemExit(code)

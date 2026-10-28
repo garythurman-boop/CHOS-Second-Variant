@@ -13,6 +13,152 @@ index b5612278..c9d76f38 100644
  #if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
  #define BOS_FREEBSD 1
  #endif
+diff --git a/Source/bmalloc/bmalloc/CryptoRandom.cpp b/Source/bmalloc/bmalloc/CryptoRandom.cpp
+index 4724cad6..de3447c2 100644
+--- a/Source/bmalloc/bmalloc/CryptoRandom.cpp
++++ b/Source/bmalloc/bmalloc/CryptoRandom.cpp
+@@ -37,7 +37,11 @@
+ #include "VMAllocate.h"
+ #include <mutex>
+
+-#if !BOS(DARWIN) && !BOS(WINDOWS)
++#if BOS(CHOS)
++#include <chos/user.h>
++#endif
++
++#if !BOS(DARWIN) && !BOS(WINDOWS) && !BOS(CHOS)
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -50,6 +54,30 @@
+
+ namespace bmalloc {
+
++#if BOS(CHOS)
++// Use the OS-owned entropy service directly. No local generator, time seed or
++// plaintext device fallback. This void API must fail closed on unavailability.
++void cryptoRandom(void* buffer, size_t length)
++{
++    auto* cursor = static_cast<unsigned char*>(buffer);
++    unsigned retries = 0;
++    while (length) {
++        size_t request = length < CHOS_SYS_MAX_RANDOM_BYTES ? length : CHOS_SYS_MAX_RANDOM_BYTES;
++        long count = chos_random_bytes(cursor, request);
++        if (count > 0 && static_cast<size_t>(count) <= request) {
++            cursor += count;
++            length -= static_cast<size_t>(count);
++            continue;
++        }
++        if ((count == -CHOS_ERRNO_EAGAIN || count == -CHOS_ERRNO_EINTR) && retries++ < 32) {
++            if (!chos_sleep_ticks(1))
++                continue;
++        }
++        BCRASH();
++    }
++}
++#else
++
+ class ARC4Stream {
+ public:
+     ARC4Stream();
+@@ -185,5 +213,7 @@ void cryptoRandom(void* buffer, size_t length)
+     ARC4RandomNumberGenerator::get()->randomValues(buffer, length);
+ }
+
++#endif // BOS(CHOS)
++
+ } // namespace bmalloc
+
+diff --git a/Source/bmalloc/bmalloc/Logging.cpp b/Source/bmalloc/bmalloc/Logging.cpp
+index d6fe46e5..62dc2a23 100644
+--- a/Source/bmalloc/bmalloc/Logging.cpp
++++ b/Source/bmalloc/bmalloc/Logging.cpp
+@@ -31,16 +31,58 @@
+ #include <stdio.h>
+ #endif
+
++#if BOS(CHOS)
++#include <chos/user.h>
++#endif
++
+ namespace bmalloc {
+
++#if BOS(CHOS)
++static void nativeLog(const char* text, size_t length)
++{
++    while (length) {
++        size_t request = length < CHOS_SYS_MAX_WRITE ? length : CHOS_SYS_MAX_WRITE;
++        long written = chos_write(text, request);
++        if (written <= 0 || static_cast<size_t>(written) > request)
++            return;
++        text += written;
++        length -= static_cast<size_t>(written);
++    }
++}
++static void nativeFormattedLog(const char* text, int count, size_t capacity)
++{
++    if (count < 0) {
++        constexpr char failed[] = "[diagnostic format failed]\n";
++        nativeLog(failed, sizeof(failed) - 1);
++        return;
++    }
++    size_t bytes = static_cast<size_t>(count);
++    bool truncated = bytes >= capacity;
++    nativeLog(text, truncated ? capacity - 1 : bytes);
++    if (truncated) {
++        constexpr char marker[] = "[truncated]\n";
++        nativeLog(marker, sizeof(marker) - 1);
++    }
++}
++#endif
++
+ #if !BUSE(OS_LOG)
+ void reportAssertionFailureWithMessage(const char* file, int line, const char* function, const char* format, ...)
+ {
+     va_list args;
+     va_start(args, format);
++#if BOS(CHOS)
++    char message[512];
++    int count = vsnprintf(message, sizeof(message), format, args);
++    va_end(args);
++    nativeFormattedLog(message, count, sizeof(message));
++    count = snprintf(message, sizeof(message), "%s(%d) : %s\n", file, line, function);
++    nativeFormattedLog(message, count, sizeof(message));
++#else
+     vfprintf(stderr, format, args);
+     va_end(args);
+     fprintf(stderr, "%s(%d) : %s\n", file, line, function);
++#endif
+ }
+ #endif
+
+diff --git a/Source/bmalloc/bmalloc/SpinBackoff.h b/Source/bmalloc/bmalloc/SpinBackoff.h
+index 7939429f..9f0d5ebd 100644
+--- a/Source/bmalloc/bmalloc/SpinBackoff.h
++++ b/Source/bmalloc/bmalloc/SpinBackoff.h
+@@ -31,6 +31,11 @@
+
+ #include "BPlatform.h"
+
++#if BOS(CHOS)
++#include "BAssert.h"
++#include <chos/user.h>
++#endif
++
+ #if BOS(DARWIN)
+ #include <mach/mach_traps.h>
+ #include <mach/thread_switch.h>
+@@ -74,6 +79,10 @@ public:
+ #if BOS(DARWIN)
+         constexpr mach_msg_timeout_t timeoutInMS = 1;
+         thread_switch(MACH_PORT_NULL, SWITCH_OPTION_DEPRESS, timeoutInMS);
++#elif BOS(CHOS)
++        // Yield to the native scheduled runtime instead of claiming nanosleep.
++        if (chos_yield() < 0)
++            BCRASH();
+ #elif BOS(WINDOWS)
+         // SwitchToThread only yields to threads on the same processor
+         if (!SwitchToThread())
 diff --git a/Source/bmalloc/bmalloc/VMAllocate.h b/Source/bmalloc/bmalloc/VMAllocate.h
 index 036636ce..01efa3b5 100644
 --- a/Source/bmalloc/bmalloc/VMAllocate.h

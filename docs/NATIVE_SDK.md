@@ -134,3 +134,11 @@ unistd operations. Original WebKit VM helpers execute against the SDK with a
 checked CHOS discard adaptation. Actual JavaScriptCore compilation moves past
 the missing memory headers to fcntl.h and stderr stream APIs; no complete engine,
 modern browser or Stage3 completion is claimed.
+
+The subsequent [native bmalloc service milestone](NATIVE_BMALLOC_SERVICES.md)
+builds the actual upstream system-malloc library and executes allocation, entropy,
+diagnostics and mutex paths in CHOS. Original C++23 expected/hash facilities also
+run; the original numbers header's widened-double precision limitation is explicit.
+Actual engine compilation now reaches WTF threading/numeric dependencies beyond
+the earlier fcntl/stderr blocker. This is component evidence, not JavaScript,
+rendering, production entropy, new hardware qualification or Stage3 completion.

@@ -1,0 +1,1198 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "base_source_commit": "f87bd4d77d87b515375725a614751ef7264e0228",
+  "scope": "actual upstream system-malloc bmalloc native allocation/OS entropy/bounded logging/scheduled mutexes and original expected/hash dependency closure",
+  "changed_source_files_sha256": {
+    "tests/bmalloc_services/main.cpp": "a42dcd74ca26f9a4c27f4c05c27f409b53974790ebb2222aee68bb721e6ba1ea",
+    "tests/bmalloc_services_host/chos/user.h": "eaec44473f2b0c162a037e714e3059311c7153689164e09174cad9d975adb0bc",
+    "tests/bmalloc_services_host/main.cpp": "ad67092a23bfcd5a1c4be28d667d5aa61c06f4641914fee27524c96d25f4f798",
+    "tests/qemu_bmalloc_services.py": "8cbec035a2bf65751619c8b104b1d8d0ca81df2ac1f65b650d0dd9830c9aad1f",
+    "tests/qemu_expected_hash.py": "f10689864ae2f2d593dc09421d3fa8c243b4ca3495cc48e02bc7e47f92b82eb9",
+    "third_party/libcxx/include/__chrono/convert_to_timespec.h": "5355457b09a689ad3c9bbb47ea6babe7b2fe6110515fc3a5c230bebd94cdec13",
+    "third_party/libcxx/include/__expected/bad_expected_access.h": "03d1ab297e7f403ef00e1c37bd93cef6935b1837e63e86e581d1131d6a066c9f",
+    "third_party/libcxx/include/__expected/expected.h": "6303ca3a3135167cc2660d2228941fb4d1fe34d5866730cb75c25c58d9285688",
+    "third_party/libcxx/include/__expected/unexpect.h": "f78b461d4dd156d54b4a3631e4efa58382662fbb5cc7b078c00683b2773e067a",
+    "third_party/libcxx/include/__expected/unexpected.h": "dbb8afe39d8864793a08803df750dd66256a42f7e2f6988691dc3008d94cc7c3",
+    "third_party/libcxx/include/__iterator/cpp17_iterator_concepts.h": "558d5f126755e59e14ebed5fad758aaa4de649087650f9270270abfd4e11038c",
+    "third_party/libcxx/include/__numeric/reduce.h": "6c47d327fea3ecbf9f870db2b3eb4ab6165171f094537a89fc99272b27f1078d",
+    "third_party/libcxx/include/__numeric/transform_reduce.h": "26a1dbc9b44276b1c1c7b5a9bce37389ce793d87b448283c963ec58afcd6e07d",
+    "third_party/libcxx/include/__pstl/backend.h": "22b72546c581973261ebe631f6b7ae104353c1a7f9223ea507b96433776ffb9a",
+    "third_party/libcxx/include/__pstl/backend_fwd.h": "9941a218f717461a20a4203c273ec4534e7b12458ba27489484d584502457643",
+    "third_party/libcxx/include/__pstl/backends/default.h": "8a8c7f0c04d2224e3d9a2783509466cb3a712f521cabb6bb193183dbe839d9bf",
+    "third_party/libcxx/include/__pstl/backends/libdispatch.h": "dd0f7912158f640ddd77af4180e99dc4b2ad6cb4feb89478dccf338fc98b7dae",
+    "third_party/libcxx/include/__pstl/backends/serial.h": "05ef30f31350efd1a1769c84ec9af980a44e195f031cc6299190761cbd8b0846",
+    "third_party/libcxx/include/__pstl/backends/std_thread.h": "169758cb12abffefccd600ae5b4294799ff563bec9d62f2d94ea33c721332e7d",
+    "third_party/libcxx/include/__pstl/cpu_algos/any_of.h": "f34564700306c9fe10c57c184ecd0ee213d22c3f515ef8d0b5d534acec851227",
+    "third_party/libcxx/include/__pstl/cpu_algos/cpu_traits.h": "ec33ff4094a060cde2cc71e1007c71a5dfa9d262a77dd6ced13302d3b00eadab",
+    "third_party/libcxx/include/__pstl/cpu_algos/fill.h": "783a1ee176b5ef888da684fa5aa9a95b759dc5615be2f46ac82ba322ed283c1c",
+    "third_party/libcxx/include/__pstl/cpu_algos/find_if.h": "ccc6e1c3e8429ee561a2f929da75ed93ca4d955a29bbb5fbf026fce2c4c4e69b",
+    "third_party/libcxx/include/__pstl/cpu_algos/for_each.h": "5ee798654490a99d61bc64f1db9ff24115383f782d912d8bd803678b8cc4c9cd",
+    "third_party/libcxx/include/__pstl/cpu_algos/merge.h": "710877c9e28d46cbc87dadd43928ccd4a3efc7f419c4c33765d7a6ddd8b58d04",
+    "third_party/libcxx/include/__pstl/cpu_algos/stable_sort.h": "d62e340ad07781c790b09d75beb22b47e404efeba2f22bad827d605600c5e8f4",
+    "third_party/libcxx/include/__pstl/cpu_algos/transform.h": "da1b89743454bf52e3dad53a33ae1d0ae162d2d7bcb6755e5080b7f26698b7f5",
+    "third_party/libcxx/include/__pstl/cpu_algos/transform_reduce.h": "31b752e63465886e18c45c8cb225e9d964ed90dce9b97e090d461cdb69877968",
+    "third_party/libcxx/include/__pstl/dispatch.h": "e890c05bb11c94c124ab02f3480490249868d50af1f6bb0edcf5c459d3fadf58",
+    "third_party/libcxx/include/__pstl/handle_exception.h": "adfcd6a85a5ee6fe36702de641e9616e352948962ed19ba117f4338a4082a1e4",
+    "third_party/libcxx/include/__support/ibm/nanosleep.h": "42c329ceab82baaaba29a0f6489d63eb91a4c84e05ff9ef6ca1e103c9b53dd0f",
+    "third_party/libcxx/include/__thread/support/c11.h": "1ee09b31801f6ce31b627aa05ec0de9fdea0cc39b119e1081bd16287f028b72a",
+    "third_party/libcxx/include/__thread/support/pthread.h": "ac1b0ce0e9d1ff7c9027958dd9ab0bcea20c2f2e75591923a6b67d906f77df19",
+    "third_party/libcxx/include/__thread/support/windows.h": "57644b0acdb48971acc76e761a717bd9b0b2085ed3bf88a1facce058cfa3c5ee",
+    "third_party/libcxx/include/__type_traits/is_execution_policy.h": "0552ab80cc3c7e09931f290c6ed583e817e0ab0a2dcdba04d53ab6671ec4f94a",
+    "third_party/libcxx/include/expected": "a74d57e973981a1f1baa9b56ec6d10c505c478a224f240acfd23610ebc2cd65f",
+    "third_party/libcxx/include/numbers": "66379e936294194b9437cd9a797d9b999932946269e67adfa4b07ab9ff2f5813",
+    "third_party/libcxx/src/hash.cpp": "63890063c9f5b28bdfe5168bc2777ccc19586d27a05465f25dfa04ef51e1a6e4",
+    "tools/test_bmalloc_services_host.py": "54465b842c80950622b2c14468ce2855c031d0659756577b95d9701977af0b8d",
+    "userland/examples/expected_hash_test.cpp": "e23d839da191ebcd89185f9c26ba46d53c61a95bf0f070ba1760b5ff401fa419",
+    "userland/libcxx/expected_hash.Makefile.inc": "00e32681b71cabb531e2fefde74bc2e4fc2b2d8a0b746e8da92854a2148f7be1",
+    "Makefile": "de91a4a2c9db15fdd4ae2768767702fa689f9aa948e7a80e5fdcde009d855b72",
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "1ea46ef59662a16aa7a6f52be2712c3bb659b3a59d2de589fa868d807ce3c0ba",
+    "tests/bmalloc_vm/CMakeLists.txt": "f719bd90611a9688a8371aa455de486d5a7a154efdd8a033b808b3c172219e61",
+    "tests/native_sdk/CMakeLists.txt": "f752bc86a20149385d0d04435177b0bcbb04c9d14b41b9a224e7c8dde54c6957",
+    "tools/build_bmalloc_vm.py": "335a03d03de4adee382f8affb8b2ba4cd48577705feea063bbfc865cccc7222f",
+    "tools/import_libcxx_headers.py": "19dfb6e81becd61414441c4a022cd71e34b339e4beca73ca2d565b67ef054b6d",
+    "userland/libcxx/Makefile.inc": "dab42d209f9896d6ac5a79fb016f3cefb6b4c9fb8ec2c229e9ec7affc2d31594"
+  },
+  "upstream_library": {
+    "status": "BUILT_NOT_EXECUTED",
+    "returncode": 0,
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "1ea46ef59662a16aa7a6f52be2712c3bb659b3a59d2de589fa868d807ce3c0ba",
+    "sdk_manifest_sha256": "b71c88949b85e0367459a74c5cebf7ecdd6eb6dedc3622048791c7c9d2f2cb16",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/bmalloc_vm",
+        "-B",
+        "/tmp/chos-bmalloc-services5/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/tmp/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/tmp/chos-webkit-jsc-source",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DBMALLOC_NATIVE_ARCHIVE=/tmp/chos-bmalloc-services5/libbmalloc.a"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/tmp/chos-bmalloc-services5/cmake",
+        "-j4"
+      ]
+    ],
+    "seconds": 1.3154427779954858,
+    "application_sha256": "777401f8e586d47bd9374372ec4370ebb4b77cebef555539f08f203d05b5d4ef",
+    "scope": "VM helpers and selected bmalloc system-malloc/entropy/logging/mutex services linked from the actual upstream library;not WTF/JavaScriptCore or browser",
+    "limits": [
+      "bounded private anonymous subset;fixed/file/shared/executable maps unsupported",
+      "real guest tests are required separately;no full engine or browser/conformance claim"
+    ],
+    "bmalloc_archive": {
+      "source": "/tmp/chos-jsc-services/cmake/lib/libbmalloc.a",
+      "source_sha256": "4d23708bd1fdad4a124d39f77c095e2cbcf438c05acc48414512f2effef6d499",
+      "regular_archive_sha256": "a727c803cf5c1a0a607f9c88a18572f9e0a96516809dac5b2652ea0e531ea930",
+      "members": 168,
+      "thin_input_converted": true
+    },
+    "services_application_sha256": "23d398dd3e3323aafccf4bc63a9ad1bb90f274ae2b9a978d2b19232dd8841656"
+  },
+  "host_transport_model": {
+    "status": "PASS",
+    "stage3_complete": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "1ea46ef59662a16aa7a6f52be2712c3bb659b3a59d2de589fa868d807ce3c0ba",
+    "runs": [
+      {
+        "name": "normal",
+        "exit": 0,
+        "seconds": 3.195446860001539,
+        "command": [
+          "g++",
+          "-std=c++23",
+          "-D__CHOS__=1",
+          "-DUSE_SYSTEM_MALLOC=1",
+          "-DNDEBUG=1",
+          "-I/workspace/CHOS-Second-Variant/tests/bmalloc_services_host",
+          "-I/workspace/CHOS-Second-Variant/include",
+          "-I/tmp/chos-webkit-jsc-source/Source/bmalloc",
+          "-pthread",
+          "-O1",
+          "-g",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-Wno-misleading-indentation",
+          "-Wno-expansion-to-defined",
+          "/workspace/CHOS-Second-Variant/tests/bmalloc_services_host/main.cpp",
+          "/tmp/chos-webkit-jsc-source/Source/bmalloc/bmalloc/CryptoRandom.cpp",
+          "/tmp/chos-webkit-jsc-source/Source/bmalloc/bmalloc/Logging.cpp",
+          "/tmp/chos-webkit-jsc-source/Source/bmalloc/bmalloc/Mutex.cpp",
+          "-o",
+          "/tmp/chos-bmalloc-services-host3/normal"
+        ],
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "sanitize",
+        "exit": 0,
+        "seconds": 3.381013958991389,
+        "command": [
+          "g++",
+          "-std=c++23",
+          "-D__CHOS__=1",
+          "-DUSE_SYSTEM_MALLOC=1",
+          "-DNDEBUG=1",
+          "-I/workspace/CHOS-Second-Variant/tests/bmalloc_services_host",
+          "-I/workspace/CHOS-Second-Variant/include",
+          "-I/tmp/chos-webkit-jsc-source/Source/bmalloc",
+          "-pthread",
+          "-O1",
+          "-g",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-Wno-misleading-indentation",
+          "-Wno-expansion-to-defined",
+          "/workspace/CHOS-Second-Variant/tests/bmalloc_services_host/main.cpp",
+          "/tmp/chos-webkit-jsc-source/Source/bmalloc/bmalloc/CryptoRandom.cpp",
+          "/tmp/chos-webkit-jsc-source/Source/bmalloc/bmalloc/Logging.cpp",
+          "/tmp/chos-webkit-jsc-source/Source/bmalloc/bmalloc/Mutex.cpp",
+          "-o",
+          "/tmp/chos-bmalloc-services-host3/sanitize",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer"
+        ],
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "scope": "actual ported source with modeled syscall transports and host formatter;partial writes,guard bytes,retry boundary,log truncation/errors,real host-thread mutex contention",
+    "limits": [
+      "not native hardware entropy or a cryptographic test;native formatter policy and fatal paths require guest checks",
+      "no browser,JavaScript or full POSIX/engine success"
+    ]
+  },
+  "host_suite": {
+    "status": "PASS",
+    "log_sha256": "be06a4a89718ce82a1064eae4c4821e4cc0f6f45c2be593b3431b5a79b7fa74f"
+  },
+  "sanitizers": {
+    "status": "PASS",
+    "log_sha256": "257d0d77ebcd181289978cc48d36ad6cf95c6e8714924c0dff8707512935fd3c"
+  },
+  "libcxx": {
+    "original_files_verified": 804,
+    "manifest_sha256": "3fdfcc39f4a0d4247af019563d3557f5862bd04e16a3c1618e0c2824f13b57c2",
+    "upstream_numbers_limit": "original unsuffixed double literals widen to long double; fixture detects lost quad precision"
+  },
+  "sdk": {
+    "files": 1147,
+    "manifest_sha256": "b71c88949b85e0367459a74c5cebf7ecdd6eb6dedc3622048791c7c9d2f2cb16",
+    "fresh_real_link_probes": "PASS",
+    "negative_import/library_probes": "PASS_SPECIFIC_REJECTION",
+    "full_embedded_ICU_4MiB_guard": "PASS_SPECIFIC_REJECTION"
+  },
+  "matrix": [
+    {
+      "name": "bmalloc_services-direct",
+      "command": [
+        "python3",
+        "tests/qemu_bmalloc_services.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-services-evidence2/bmalloc_services-direct",
+        "--application",
+        "/tmp/chos-bmalloc-services5/cmake/bmalloc_services"
+      ],
+      "exit": 0,
+      "seconds": 9.842566499006352
+    },
+    {
+      "name": "bmalloc_services-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_bmalloc_services.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-services-evidence2/bmalloc_services-uefi",
+        "--application",
+        "/tmp/chos-bmalloc-services5/cmake/bmalloc_services"
+      ],
+      "exit": 0,
+      "seconds": 17.31319826199615
+    },
+    {
+      "name": "bmalloc_vm-direct",
+      "command": [
+        "python3",
+        "tests/qemu_bmalloc_vm.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-services-evidence2/bmalloc_vm-direct",
+        "--application",
+        "/tmp/chos-bmalloc-services5/cmake/bmalloc_vm"
+      ],
+      "exit": 0,
+      "seconds": 4.8013635219977004
+    },
+    {
+      "name": "bmalloc_vm-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_bmalloc_vm.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-services-evidence2/bmalloc_vm-uefi",
+        "--application",
+        "/tmp/chos-bmalloc-services5/cmake/bmalloc_vm"
+      ],
+      "exit": 0,
+      "seconds": 12.060772402997827
+    },
+    {
+      "name": "expected_hash-direct",
+      "command": [
+        "python3",
+        "tests/qemu_expected_hash.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-services-evidence2/expected_hash-direct"
+      ],
+      "exit": 0,
+      "seconds": 6.272917652007891
+    },
+    {
+      "name": "expected_hash-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_expected_hash.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-services-evidence2/expected_hash-uefi",
+        "--application",
+        "/tmp/chos-services-sdk-check/sdk_expected_hash"
+      ],
+      "exit": 0,
+      "seconds": 24.648351969008218
+    },
+    {
+      "name": "no-entropy-direct",
+      "command": [
+        "python3",
+        "tests/qemu_bmalloc_services.py",
+        "--mode",
+        "direct",
+        "--missing-entropy",
+        "--application",
+        "/tmp/chos-bmalloc-services5/cmake/bmalloc_services",
+        "--out",
+        "/tmp/chos-services-evidence2/no-entropy-direct"
+      ],
+      "exit": 0,
+      "seconds": 4.299552861004486
+    },
+    {
+      "name": "icu-resources-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_icu_resources.py",
+        "--mode",
+        "uefi",
+        "--application",
+        "/tmp/chos-services-sdk-check/sdk_icu_resources.app.elf",
+        "--out",
+        "/tmp/chos-services-evidence2/icu-resources-uefi"
+      ],
+      "exit": 0,
+      "seconds": 22.188890151999658
+    },
+    {
+      "name": "ethernet-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_platform.py",
+        "--mode",
+        "uefi",
+        "--memory",
+        "2G",
+        "--pci-virtio",
+        "--net-model",
+        "e1000e",
+        "--tablet",
+        "--clock-test",
+        "--qemu-data",
+        "/workspace/chos-tools/root/usr/share/qemu",
+        "--firmware",
+        "/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd",
+        "--out",
+        "/tmp/chos-services-evidence2/ethernet-uefi"
+      ],
+      "exit": 0,
+      "seconds": 98.91397749799944
+    },
+    {
+      "name": "tls-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_tls.py",
+        "--mode",
+        "uefi",
+        "--tls-version",
+        "1.3",
+        "--out",
+        "/tmp/chos-services-evidence2/tls-uefi"
+      ],
+      "exit": 0,
+      "seconds": 42.538062299994635
+    }
+  ],
+  "guest_results": {
+    "bmalloc_services-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "missing_entropy": false,
+      "application_sha256": "23d398dd3e3323aafccf4bc63a9ad1bb90f274ae2b9a978d2b19232dd8841656",
+      "cold_free_pages": 117523,
+      "free_pages_before": 117523,
+      "free_pages_after": 117523,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 152,
+      "contained_failures": [
+        {
+          "mode": "read-only-entropy-buffer",
+          "record": [
+            "0000000092000045",
+            "00000000BBADBEEF"
+          ]
+        }
+      ],
+      "checks": [
+        "actual native bmalloc library out-of-line allocation/reallocation/zero/alignment/free and larger virtual helpers",
+        "OS-broker entropy spans multiple256byte chunks;canaries and independent-sample transport sanity",
+        "native Console formatting,truncation and invalid-wide-character error;denied output returns without spinning",
+        "three concurrent native mutex workers held behind real scheduled yields;three lifecycles",
+        "denied entropy permission and read-only output kill only the process;process-lifetime small cache reaped"
+      ],
+      "limits": [
+        "transport sanity is not cryptographic-strength certification;production reseed/trust policy remains open",
+        "configured system-malloc library;libpas/mimalloc not enabled;not WTF/JavaScriptCore/browser",
+        "one upstream allocation-map bucket cache may live until process exit;strict post-reap PMM equality holds",
+        "new Fusion/Pi/laptop NOT RUN;Stage3 remains incomplete"
+      ]
+    },
+    "bmalloc_services-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "missing_entropy": false,
+      "application_sha256": "23d398dd3e3323aafccf4bc63a9ad1bb90f274ae2b9a978d2b19232dd8841656",
+      "cold_free_pages": 500196,
+      "free_pages_before": 500196,
+      "free_pages_after": 500196,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 150,
+      "contained_failures": [
+        {
+          "mode": "read-only-entropy-buffer",
+          "record": [
+            "000000009200004E",
+            "00000000BBADBEEF"
+          ]
+        }
+      ],
+      "checks": [
+        "actual native bmalloc library out-of-line allocation/reallocation/zero/alignment/free and larger virtual helpers",
+        "OS-broker entropy spans multiple256byte chunks;canaries and independent-sample transport sanity",
+        "native Console formatting,truncation and invalid-wide-character error;denied output returns without spinning",
+        "three concurrent native mutex workers held behind real scheduled yields;three lifecycles",
+        "denied entropy permission and read-only output kill only the process;process-lifetime small cache reaped"
+      ],
+      "limits": [
+        "transport sanity is not cryptographic-strength certification;production reseed/trust policy remains open",
+        "configured system-malloc library;libpas/mimalloc not enabled;not WTF/JavaScriptCore/browser",
+        "one upstream allocation-map bucket cache may live until process exit;strict post-reap PMM equality holds",
+        "new Fusion/Pi/laptop NOT RUN;Stage3 remains incomplete"
+      ]
+    },
+    "bmalloc_vm-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "777401f8e586d47bd9374372ec4370ebb4b77cebef555539f08f203d05b5d4ef",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117523,
+      "free_pages_before": 117523,
+      "free_pages_after": 117523,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 39,
+      "checks": [
+        "actual pinned upstream VMAllocate inline helpers with checked CHOS identity/discard adaptation",
+        "64KiB aligned allocation with prefix/suffix trim,zero-and-purge,deallocate/reallocate physical advice,permission revocation and restoration",
+        "three native C++ workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+      ],
+      "limits": [
+        "qualified VM helpers,not a complete allocator,engine,C++23 or POSIX implementation",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "bmalloc_vm-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "777401f8e586d47bd9374372ec4370ebb4b77cebef555539f08f203d05b5d4ef",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500196,
+      "free_pages_before": 500196,
+      "free_pages_after": 500196,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 39,
+      "checks": [
+        "actual pinned upstream VMAllocate inline helpers with checked CHOS identity/discard adaptation",
+        "64KiB aligned allocation with prefix/suffix trim,zero-and-purge,deallocate/reallocate physical advice,permission revocation and restoration",
+        "three native C++ workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+      ],
+      "limits": [
+        "qualified VM helpers,not a complete allocator,engine,C++23 or POSIX implementation",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "expected_hash-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "e656cfb2aff8aa0385c5f7c6b79b6b927e875be793f75f91d2110133e6f5b306",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117523,
+      "free_pages_before": 117523,
+      "free_pages_after": 117523,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 75,
+      "checks": [
+        "original numbers binary32/64 constants; long double widening and lost quad precision explicitly detected",
+        "original next-prime helper compared with independent primality model through4096 and larger boundaries",
+        "collision-heavy unordered insert/update/erase/find,reserve,copy/move,node extraction and reinsert",
+        "original C++23 expected value/error/void,swap,move-only values and monadic callbacks",
+        "three native C++ workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+      ],
+      "limits": [
+        "LLVM19 original numbers long-double constants widen double literals; no binary128 precision claim",
+        "qualified hash/expected subset,not complete C++23 or an engine build",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "expected_hash-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "ee7664d1d540970d05644008ea73208b7105b00e5c629d93d92f141ba0e9a6cf",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500196,
+      "free_pages_before": 500196,
+      "free_pages_after": 500196,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 977,
+      "checks": [
+        "original numbers binary32/64 constants; long double widening and lost quad precision explicitly detected",
+        "original next-prime helper compared with independent primality model through4096 and larger boundaries",
+        "collision-heavy unordered insert/update/erase/find,reserve,copy/move,node extraction and reinsert",
+        "original C++23 expected value/error/void,swap,move-only values and monadic callbacks",
+        "three native C++ workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+      ],
+      "limits": [
+        "LLVM19 original numbers long-double constants widen double literals; no binary128 precision claim",
+        "qualified hash/expected subset,not complete C++23 or an engine build",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "no-entropy-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "missing_entropy": true,
+      "application_sha256": "23d398dd3e3323aafccf4bc63a9ad1bb90f274ae2b9a978d2b19232dd8841656",
+      "cold_free_pages": 117523,
+      "free_pages_before": 117523,
+      "free_pages_after": 117523,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 36,
+      "contained_failures": [
+        {
+          "mode": "missing-entropy",
+          "observed_seconds": 0.7495488730055513,
+          "record": [
+            "0000000092000045",
+            "00000000BBADBEEF"
+          ]
+        }
+      ],
+      "checks": [
+        "no hardware or EFI seed: bounded fail-closed entropy path;no weak fallback"
+      ],
+      "limits": [
+        "transport sanity is not cryptographic-strength certification;production reseed/trust policy remains open",
+        "configured system-malloc library;libpas/mimalloc not enabled;not WTF/JavaScriptCore/browser",
+        "one upstream allocation-map bucket cache may live until process exit;strict post-reap PMM equality holds",
+        "new Fusion/Pi/laptop NOT RUN;Stage3 remains incomplete"
+      ]
+    },
+    "icu-resources-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "efa535fdde8f58a6cf7fb3f09a6850a6925763d7ebf58c2500654865d688a791",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500196,
+      "free_pages_before": 500196,
+      "free_pages_after": 500196,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 419,
+      "checks": [
+        "selected files extracted with individual hashes from actual upstream default4321-resource package",
+        "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+        "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+        "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+        "three native workers and three lifecycles,u_cleanup,heap0,stable warm frames and zero private futex waiters"
+      ],
+      "limits": [
+        "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+        "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+        "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+      ]
+    },
+    "ethernet-uefi": {
+      "mode": "uefi",
+      "checks": [
+        "32 fast USB keypress/release pairs",
+        "UEFI clock snapshot/counter progress and visible minute rollover",
+        "PCI VirtIO CHFS write/flush/read",
+        "PCI VirtIO hardware RNG",
+        "82574L e1000e DHCP/ARP/ICMP",
+        "keyboard shortcut",
+        "absolute tablet",
+        "wheel reports through hardware transport to shared input",
+        "window maximize/restore",
+        "title-bar drag",
+        "20 USB hot-unplug/reconnect cycles with ring wraps",
+        "2-second idle observation",
+        "storage persistence after fresh guest boot"
+      ],
+      "kernel_ready_seconds": 6.777,
+      "desktop_ready_seconds": 9.787,
+      "keyboard_visible_ms": 25.59,
+      "pointer_visible_ms": 43.8,
+      "maximize_visible_ms": 179.79,
+      "drag_visible_ms": 227.93,
+      "idle_cpu_percent": 9.5,
+      "status": "PASS"
+    },
+    "tls-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+      "application_sha256": "2eb4287a5e9a947288345541a5cd707ee0ea70aca356002c765a3048dcd23e0e",
+      "ipv6": false,
+      "tcp6_wire_frames": 0,
+      "missing_clock": false,
+      "missing_entropy": false,
+      "cold_free_pages": 500196,
+      "free_pages_before": 500196,
+      "free_pages_after": 500196,
+      "cases": [
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6875124770012917,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "chain",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.7490102110023145,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "bad-chain",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5869987319892971,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5659514620056143,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5664267160027521,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "aes256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.7689705019874964,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 4,
+          "hostname": "wrong.chos.test",
+          "seconds": 0.48561956999765243,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.40432735699869227,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "wrong-purpose",
+          "expected": 4096,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.4451083490130259,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "expired",
+          "expected": 1,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.4248434570035897,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "future",
+          "expected": 512,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.44501215199125,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "malformed",
+          "expected": 998,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.2833085210004356,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "truncated",
+          "expected": 997,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6278557369951159,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "stall",
+          "expected": 996,
+          "hostname": "fixture.chos.test",
+          "seconds": 15.198452990996884,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 993,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.18423953501041979,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 995,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.22328441399440635,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 994,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.8314481849956792,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6500798800116172,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 989,
+          "hostname": "fixture.chos.test",
+          "seconds": 2.203088326001307,
+          "stalled_network_gui_response_seconds": 0.042996574004064314,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 988,
+          "hostname": "fixture.chos.test",
+          "seconds": 1.7786814879946178,
+          "stalled_network_gui_response_seconds": 0.0428897680103546,
+          "result": "PASS"
+        }
+      ],
+      "server_events": [
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 34822)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "chain",
+          "accepted": true
+        },
+        {
+          "kind": "chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "chain",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 48136)"
+        },
+        {
+          "kind": "chain",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "bad-chain",
+          "accepted": true
+        },
+        {
+          "kind": "bad-chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "bad-chain",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "rsa",
+          "accepted": true
+        },
+        {
+          "kind": "rsa",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 50424)"
+        },
+        {
+          "kind": "rsa",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "rsa256",
+          "accepted": true
+        },
+        {
+          "kind": "rsa256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 55064)"
+        },
+        {
+          "kind": "rsa256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "aes256",
+          "accepted": true
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 55968)"
+        },
+        {
+          "kind": "aes256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: SSLV3_ALERT_BAD_CERTIFICATE] ssl/tls alert bad certificate (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "wrong-purpose",
+          "accepted": true
+        },
+        {
+          "kind": "wrong-purpose",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "wrong-purpose",
+          "server_error": "[SSL: SSLV3_ALERT_UNSUPPORTED_CERTIFICATE] ssl/tls alert unsupported certificate (_ssl.c:1010)"
+        },
+        {
+          "kind": "expired",
+          "accepted": true
+        },
+        {
+          "kind": "expired",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "expired",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "future",
+          "accepted": true
+        },
+        {
+          "kind": "future",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "future",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "malformed",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "truncated",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 35838)"
+        },
+        {
+          "kind": "truncated",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "stall",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 48524)"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 48532)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 48546)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 51910)"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 51922)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 51916)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 51938)"
+        },
+        {
+          "kind": "threaded",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 51964)"
+        },
+        {
+          "kind": "threaded",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        }
+      ],
+      "limits": [
+        "ephemeral test root only; production trust store/update policy still open",
+        "firmware/RTC clock availability is not authenticated time",
+        "browser integration, full modern engine and live Wi-Fi remain open",
+        "QEMU evidence; Fusion/physical TLS NOT RUN"
+      ]
+    }
+  },
+  "archives": {
+    "accepted-matrix": {
+      "source": "/tmp/chos-services-evidence2",
+      "archive": "/workspace/chos-evidence/bmalloc-services/accepted-matrix.tar.gz",
+      "archive_sha256": "f16621c2dc9a776f48f82e0adb34ae3cb7ed73091b347a4ec6ec860408d9c0c3",
+      "archive_bytes": 55846481,
+      "verification": "all restored members hash/length/mode verified; original tree retained"
+    },
+    "build-records": {
+      "source": "/tmp/chos-services-records",
+      "archive": "/workspace/chos-evidence/bmalloc-services/build-records.tar.gz",
+      "archive_sha256": "bf274b857aa72f077a86b3ce9386122d0014ed2c7afb38a0c672c78872644d64",
+      "archive_bytes": 65616,
+      "verification": "all restored members hash/length/mode verified; original tree retained"
+    }
+  },
+  "retained_failures": [
+    {
+      "case": "initial expected/hash quad comparison",
+      "diagnosis": "unmodified LLVM19 numbers uses double literals; exact widening and lost precision are now explicit; upstream bytes unchanged"
+    },
+    {
+      "case": "initial bmalloc services line61",
+      "diagnosis": "fixture incorrectly assumed standard %n unsupported; native formatter unchanged, invalid Unicode scalar now tests true encoding failure"
+    },
+    {
+      "case": "initial upstream link",
+      "diagnosis": "missing original __next_prime implementation; verified original src/hash.cpp imported and built"
+    },
+    {
+      "case": "initial host Clang ASan",
+      "diagnosis": "installed Clang lacks sanitizer runtimes; GCC normal and ASan/UBSan runs pass"
+    },
+    {
+      "case": "first import follow-up",
+      "diagnosis": "verifier caught missing manifest sources entry for hash.cpp; importer now updates both sets"
+    }
+  ],
+  "engine_build": {
+    "bmalloc": "BUILT_SYSTEM_MALLOC_PROFILE",
+    "WTF": "NOT_BUILT",
+    "JavaScriptCore": "NOT_BUILT_NOT_EXECUTED",
+    "next_actual_failures": [
+      "WTF PlatformMutex/threading primitives unsupported",
+      "numeric public header missing"
+    ],
+    "build_log_sha256": "711584b558ae89b89aee442d4348820714d83a3eeb695048ee6f433f37184b6d"
+  },
+  "publication": {
+    "source_only": true,
+    "latest_test_iso": "cc29ea8",
+    "version": "0.30.0"
+  },
+  "open_stage3_gates": [
+    "real JavaScriptCore/WebCore/WPE build and execution",
+    "engine-sized memory and remaining OS services",
+    "native rendering,desktop browser features and conformance",
+    "integrated production browser TLS,entropy/trust/update/isolation policy",
+    "live Pi5 SDIO host,firmware,radio,authentication and wireless profile qualification",
+    "full IPv6/multi-interface/platform requirements and independent target qualification"
+  ]
+}

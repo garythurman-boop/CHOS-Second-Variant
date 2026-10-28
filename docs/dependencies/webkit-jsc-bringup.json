@@ -20,14 +20,20 @@
     "Source/ThirdParty/gtest/CMakeLists.txt": "fa2b4aa25345f62a68b54cb44289077d5f4a32193f134d2ff66438b112a2a620",
     "Tools/Scripts/hmaptool": "1a63ae37f1ecd083eebf73bc052ca72d83f54b481dab8639e296a206515e60e4",
     "Source/bmalloc/bmalloc/BPlatform.h": "fbe02c44510089478036a02f2fd83a758b40339dee9b9a56ac7f40e5b9de54a5",
-    "Source/bmalloc/bmalloc/VMAllocate.h": "d92807c17e34eabf574afd4f14504e8707e49f0dfe1ca8d0e709d2594a043eca"
+    "Source/bmalloc/bmalloc/VMAllocate.h": "d92807c17e34eabf574afd4f14504e8707e49f0dfe1ca8d0e709d2594a043eca",
+    "Source/bmalloc/bmalloc/CryptoRandom.cpp": "3da4769087b253e77bda51f9395ccb4da5309c0bf68a0b28fcf346febc608740",
+    "Source/bmalloc/bmalloc/Logging.cpp": "5d6c8aac3acb90176adf707aadbea0ff7623d655b527c019bc361f92aa3ff240",
+    "Source/bmalloc/bmalloc/SpinBackoff.h": "6507c758d6eb52b70d69899f116ccf8e76c95282b7d3656145e434b8d8a9d124"
   },
   "patch": "ports/webkit/patches/0001-chos-platform-bringup.patch",
-  "patch_sha256": "9b605d16b7a7b3697226ae655c0d140b0a3d0bb0d45e18e68cafca21da595617",
+  "patch_sha256": "1ea46ef59662a16aa7a6f52be2712c3bb659b3a59d2de589fa868d807ce3c0ba",
   "patched_files_sha256": {
     "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c",
     "Source/bmalloc/bmalloc/BPlatform.h": "7eace90386576643b0cfca4377a9a61794763bf6e933a32b122c8f4700150216",
-    "Source/bmalloc/bmalloc/VMAllocate.h": "3d9584bd0f2508171c4adfa1095ad08891e572aa8cc8de594db506f437862b80"
+    "Source/bmalloc/bmalloc/VMAllocate.h": "3d9584bd0f2508171c4adfa1095ad08891e572aa8cc8de594db506f437862b80",
+    "Source/bmalloc/bmalloc/CryptoRandom.cpp": "6c370c7d03b4b79625bccafa2b5c60015b6a7187ad4cfcbb809db0f389093c6a",
+    "Source/bmalloc/bmalloc/Logging.cpp": "f91d598a3b78dcd741bf58e7b698f8b6f05d68f73070f5d57eb97b1af4060a34",
+    "Source/bmalloc/bmalloc/SpinBackoff.h": "24670fa44672030e4127389fb87456bf8c92f5dbcf6e93ae46b639bd10e37880"
   },
   "signature_verification": "Not claimed; HTTPS Git object identity and exact inspected file/patch hashes recorded. Full license/dependency/release qualification remains open.",
   "required_source_roots": [
@@ -40,5 +46,5 @@
     "Tools/Scripts",
     "Tools/TestWebKitAPI"
   ],
-  "patch_scope": "Explicit CHOS CMake/bmalloc identity and real anonymous-page discard instead of unsupported MAP_FIXED;no allocator/engine/security/conformance success inferred."
+  "patch_scope": "Explicit CHOS CMake/bmalloc identity;owned-page discard;OS-brokered entropy with bounded retries and fail-closed errors;bounded native Console diagnostics. No local RNG,device fallback or full engine/security/conformance success inferred. Native mutex backoff uses the real scheduled YIELD service,not an unimplemented nanosleep API."
 }

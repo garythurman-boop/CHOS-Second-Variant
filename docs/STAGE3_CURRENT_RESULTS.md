@@ -5,14 +5,14 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [native virtual-memory milestone](NATIVE_VIRTUAL_MEMORY.md) passes
-20 live QEMU profiles across direct/UEFI boot, plus full host/sanitizer suites.
-It adds real anonymous protection/discard/partial unmap and runs upstream WebKit
-VM helpers through the native SDK. Empty kernel heap arenas now return to PMM;
-ICU's strict page equality passes. Existing1MiB/4MiB/8MiB budgets remain bounded.
-Actual JavaScriptCore configuration succeeds; compilation next stops at fcntl.h
-and stderr stream APIs. No engine execution or new target-hardware qualification
-is claimed. This is source-only; the test ISO remains cc29ea8/version0.30.0.
+The latest [native bmalloc service milestone](NATIVE_BMALLOC_SERVICES.md) builds
+and executes the actual upstream system-malloc library, including native entropy,
+bounded diagnostics and contended mutexes. Original C++23 expected/hash support
+also runs. Full host/sanitizer suites and the recorded guest matrix pass. The next
+actual engine blockers are WTF threading primitives and the missing numeric header;
+no JavaScript or modern rendering executes yet. This is source-only; the test ISO
+remains cc29ea8/version0.30.0. The earlier [virtual-memory milestone](NATIVE_VIRTUAL_MEMORY.md)
+retains its separate 20-profile evidence and bounded memory limits.
 
 Stage 3 is **not complete**. The revised prompt's modern browser, integrated
 production TLS policy, complete isolation/runtime and real Pi 5 wireless
