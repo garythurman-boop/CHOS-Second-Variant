@@ -6,3 +6,4 @@
 third_party/mbedtls/** -whitespace
 # Preserve original ICU dependency whitespace and its verified upstream hashes.
 /third_party/icu-threading/** -whitespace
+/third_party/icu-normalization-data/** -whitespace

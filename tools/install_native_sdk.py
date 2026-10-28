@@ -3,6 +3,7 @@
 import argparse,hashlib,json,pathlib,shutil,subprocess,tempfile,os
 root=pathlib.Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--build',type=pathlib.Path,default=root/'build');p.add_argument('--out',type=pathlib.Path,required=True);p.add_argument('--libc-object',type=pathlib.Path,action='append',required=True);o=p.parse_args();build=o.build.resolve();out=o.out.resolve()
+subprocess.run(['python3',str(root/'tools/verify_icu_normalization_data.py')],check=True)
 # Only replace an intact tree previously produced by this installer. Refuse
 # user additions/edits and build in a fresh sibling so stale files cannot persist.
 if out==root or out==build or out.is_relative_to(root/'.git'):p.error('unsafe SDK output')
@@ -27,6 +28,12 @@ config=lib/'cmake/CHOSICUCommon';config.mkdir(parents=True)
 shutil.copyfile(root/'ports/icu/CHOSICUCommonConfig.cmake',config/'CHOSICUCommonConfig.cmake')
 i18n_config=lib/'cmake/CHOSICUI18n';i18n_config.mkdir(parents=True)
 shutil.copyfile(root/'ports/icu/CHOSICUI18nConfig.cmake',i18n_config/'CHOSICUI18nConfig.cmake')
+data_config=lib/'cmake/CHOSICUNormalizationData';data_config.mkdir(parents=True)
+shutil.copyfile(root/'ports/icu/CHOSICUNormalizationDataConfig.cmake',data_config/'CHOSICUNormalizationDataConfig.cmake')
+data_dir=out/'share/icu-normalization/icudt79l';data_dir.mkdir(parents=True)
+for name in ('nfkc','nfkc_cf','nfkc_scf','uts46'):
+ shutil.copyfile(root/'third_party/icu-normalization-data/source/data/in'/(name+'.nrm'),data_dir/(name+'.nrm'))
+shutil.copyfile(root/'docs/dependencies/icu-normalization-data.json',data_dir.parent/'source-manifest.json')
 licenses=out/'licenses';licenses.mkdir()
 for source,name in [(root/'third_party/libcxx/LICENSE.TXT','libcxx.txt'),(root/'third_party/libcxxabi/LICENSE.TXT','libcxxabi.txt'),(root/'third_party/compiler-rt/LICENSE.TXT','compiler-rt.txt'),(root/'third_party/musl/COPYRIGHT','musl.txt'),(root/'third_party/icu-common/LICENSE','icu.txt')]:shutil.copyfile(source,licenses/name)
 objects=[p.resolve() for p in o.libc_object]
@@ -36,7 +43,7 @@ archive=lib/'libchos-c.a'
 if archive.exists():archive.unlink()
 subprocess.run(['llvm-ar','rcs',str(archive),*map(str,objects)],check=True)
 files={str(p.relative_to(out)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.rglob('*')) if p.is_file() and p.name!='chos-sdk.json'}
-manifest={'schema':1,'target':'aarch64-none-elf','format':'CHOS native static ELF','profile':'bounded static C/C++20/23,normal main startup,opt-in RTTI,no exceptions/dynamic linking','icu_common':{'version':'79.1','scope':'common archive only; bootstrap data is separately named and deliberately empty; complete data package absent'},'icu_i18n':{'version':'79.1','translation_units':254,'scope':'i18n archive and selected native API tests;complete CLDR/data package absent'},'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'files':files,'limits':['not full hosted C/C++/POSIX; unsupported imports must fail to link','2MiB native image and existing tiny heap/thread budgets','no Linux or host library compatibility; real engine not yet built']}
+manifest={'schema':1,'target':'aarch64-none-elf','format':'CHOS native static ELF','profile':'bounded static C/C++20/23,normal main startup,opt-in RTTI,no exceptions/dynamic linking','icu_common':{'version':'79.1','scope':'common archive only; bootstrap data is separately named and deliberately empty; complete data package absent'},'icu_i18n':{'version':'79.1','translation_units':254,'scope':'i18n archive and selected native API tests;complete CLDR/data package absent'},'icu_normalization_data':{'version':'79.1','unicode_version':'18.0.0','resources':['nfkc','nfkc_cf','nfkc_scf','uts46'],'scope':'selected original normalization/IDNA resources;not full ICU data/CLDR'},'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'files':files,'limits':['not full hosted C/C++/POSIX; unsupported imports must fail to link','2MiB native image and existing tiny heap/thread budgets','no Linux or host library compatibility; real engine not yet built']}
 (out/'chos-sdk.json').write_text(json.dumps(manifest,indent=2)+'\n')
 backup=final.with_name(final.name+'.previous-'+str(os.getpid()))
 assert not backup.exists()

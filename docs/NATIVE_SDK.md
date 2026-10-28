@@ -108,3 +108,7 @@ see [the native profile and numerical/ABI checks](NATIVE_STRING_FORMATTING.md).
 
 Native ICU i18n is also exported through CHOSICUI18n; consult the
 [qualified APIs and missing data gate](ICU_I18N_NATIVE.md).
+
+The SDK additionally stages four original normalization/UTS46 data resources
+through CHOSICUNormalizationData. See [deployment and native corpus qualification](ICU_NORMALIZATION_DATA_NATIVE.md).
+This is explicit selected data, not the complete ICU data/CLDR component.

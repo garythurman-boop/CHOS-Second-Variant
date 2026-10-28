@@ -117,3 +117,11 @@ and executes Unicode/file/thread/clock-error checks in direct and isolated UEFI
 applications. Full data/i18n and the real engine remain open. The user now
 authorizes selected verified interim test binaries; this supersedes the historical
 binary-hold statements above, while full Stage3/version0.50.0 stays gated.
+
+The [native i18n library](ICU_I18N_NATIVE.md) now builds all254 units alongside
+common. Four original [normalization/UTS46 resources](ICU_NORMALIZATION_DATA_NATIVE.md)
+add native Unicode18 normalization and domain-data qualification. These selected
+resources are exported explicitly; they do not satisfy the full ICU data/CLDR
+component. The last actual pinned JSCOnly preflight finds uc+i18n and fails for
+missing data. Full data generation/packaging, engine-sized bounded memory and
+subsequent engine/platform integration remain open; no engine execution is claimed.

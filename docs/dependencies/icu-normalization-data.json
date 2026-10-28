@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "project": "ICU selected normalization and UTS46 data",
+  "version": "79.1",
+  "unicode_version": "18.0.0",
+  "commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+  "source": "https://github.com/unicode-org/icu",
+  "license": "Unicode License V3",
+  "scope": "Four original little-endian Nrm2 resources and two complete original test corpora. Not a full ICU/CLDR data package.",
+  "files": {
+    "LICENSE": {
+      "bytes": 27718,
+      "sha256": "e09827667e0bb3c808b2a463548ba814a5e6249b67353234d70c8dfc2bcc417d",
+      "git_blob": "fec99457b941a38283b6b2f6e128470182c73dc0"
+    },
+    "source/data/in/nfkc.nrm": {
+      "bytes": 56900,
+      "sha256": "49caeb176de6cfa6be7f3bd39cd67864f84a61e0900fdc0bf4f775365d5ce653",
+      "git_blob": "75291135895fbf0cd743646749b5b3140f87b45a"
+    },
+    "source/data/in/nfkc_cf.nrm": {
+      "bytes": 54096,
+      "sha256": "9f77a64ee641d4e508c886a93ebf13515077b933e9e91988bb2ec37972c22638",
+      "git_blob": "a9b6545ca61a2272fc8319e61d294907a5f0d8e5"
+    },
+    "source/data/in/nfkc_scf.nrm": {
+      "bytes": 53636,
+      "sha256": "8d2df346249c2d6a15f1b4b62b09922be814645fb7566c16138816e6b72afbd9",
+      "git_blob": "76a2ac4496af84614dff5807013754c8d8c1d3cd"
+    },
+    "source/data/in/uts46.nrm": {
+      "bytes": 61644,
+      "sha256": "9b1b708e050bfd2a34983ea6b52e0739177cea4d4f23808e1df5f5ea394ef2c2",
+      "git_blob": "6ce363c8d74d6d1b8039357712aec6dff585940b"
+    },
+    "source/data/unidata/NormalizationTest.txt": {
+      "bytes": 1069127,
+      "sha256": "790fa1d646580b8e303a5d7184a54a477e59948f8ff993176f253c396635cfd9",
+      "git_blob": "cec0de328048d56c0e850e43bc525475b514ebf0"
+    },
+    "source/test/testdata/IdnaTestV2.txt": {
+      "bytes": 776565,
+      "sha256": "0236b75c5b20dfd857b3b5cf75509887959d6ab00d6c7bda9b7dc3df518c1fde",
+      "git_blob": "721043f98cac1ed76a9fdb7481a71159ea20b143"
+    }
+  }
+}

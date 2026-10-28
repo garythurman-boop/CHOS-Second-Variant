@@ -264,3 +264,11 @@ Current native ICU common progress and remaining data/i18n gate are recorded in
 native guests; the original threading-only/compile-only limits above are historical.
 The user now authorizes critical interim test builds; full Stage3/version0.50.0
 acceptance remains separate and open.
+
+The [native i18n library](ICU_I18N_NATIVE.md) now builds all254 units alongside
+common. Four original [normalization/UTS46 resources](ICU_NORMALIZATION_DATA_NATIVE.md)
+add native Unicode18 normalization and domain-data qualification. These selected
+resources are exported explicitly; they do not satisfy the full ICU data/CLDR
+component. The last actual pinned JSCOnly preflight finds uc+i18n and fails for
+missing data. Full data generation/packaging, engine-sized bounded memory and
+subsequent engine/platform integration remain open; no engine execution is claimed.

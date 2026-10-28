@@ -442,3 +442,20 @@ and retains a nonzero failure for **missing data only**. The bootstrap archive
 stays empty and separately named. See [scope and limits](ICU_I18N_NATIVE.md) and
 [evidence](validation/stage3-icu-i18n.json). Full data/Intl, the real browser engine,
 production security, wireless and physical/Fusion qualification remain open.
+
+## Original external Unicode normalization and IDNA data
+
+Four pinned original ICU79.1 resources now load natively for NFKC/NFKD, full
+and simple NFKC case folding and UTS46 domain processing. Tests cover all20,171
+Unicode18 normalization rows, all20 transformations per row and293,187 further
+assigned scalar identities. All6,396 IDNA rows execute19,188 operations under
+the original ICU79 error/success-string policy, including its documented trailing
+root-dot exception. Another19,182 UTF8/UTF16 API comparisons and malformed-UTF8
+checks pass. Missing/malformed headers and denied file access fail.
+Repeated native workers and cleanup return heap allocations to zero and retain
+stable warm process frames. Direct Make and SDK/isolated UEFI executions pass;
+full host regression passes. See [profile, provenance and precise oracle limits](ICU_NORMALIZATION_DATA_NATIVE.md)
+and [accepted evidence](validation/stage3-icu-data.json).
+The SDK exports selected-resource paths explicitly; full ICU data/CLDR, Intl,
+JavaScriptCore/WebKit, the modern browser, production security and live WiFi
+remain unfinished. No new binary replaces cc29ea8 and version0.50.0 is not released.

@@ -167,3 +167,11 @@ The [native i18n milestone](ICU_I18N_NATIVE.md) now builds254/254 units and runs
 selected APIs under direct and SDK UEFI. Actual JSCOnly configuration now finds
 uc+i18n79.1 and fails for **missing data only**. No bootstrap library is substituted
 for that missing component; no engine configuration/build/execution is claimed.
+
+The [native i18n library](ICU_I18N_NATIVE.md) now builds all254 units alongside
+common. Four original [normalization/UTS46 resources](ICU_NORMALIZATION_DATA_NATIVE.md)
+add native Unicode18 normalization and domain-data qualification. These selected
+resources are exported explicitly; they do not satisfy the full ICU data/CLDR
+component. The last actual pinned JSCOnly preflight finds uc+i18n and fails for
+missing data. Full data generation/packaging, engine-sized bounded memory and
+subsequent engine/platform integration remain open; no engine execution is claimed.

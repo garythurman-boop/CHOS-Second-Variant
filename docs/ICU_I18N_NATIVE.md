@@ -59,3 +59,8 @@ locale resources, engine integration, production browser security and real WiFi
 remain open. These are QEMU results; new Fusion/Pi/laptop qualification is NOT RUN.
 The cc29ea8 ISO remains the selected Fusion test build. Version0.50.0 is reserved
 for complete revised Stage3 acceptance.
+
+Four original external normalization/UTS46 resources are now separately staged
+and qualified through [the selected native data profile](ICU_NORMALIZATION_DATA_NATIVE.md).
+This advances compatibility normalization and domain processing without supplying
+the complete ICU/CLDR data library required by the engine.

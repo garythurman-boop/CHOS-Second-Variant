@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "scope": "selected original ICU normalization/UTS46 resources and complete Unicode18 normalization/IDNA corpus tests;not full ICU/CLDR or engine",
+  "stage3_complete": false,
+  "original_data_commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+  "original_manifest_sha256": "3605fc75872b72c5246c99f4efe04b203aac55a8cb4a312bc984ac0397ad26b9",
+  "test_oracle": "original normalization invariants and ICU79 UTS46 status/success-string policy,including its documented ICU-22882 trailing-root exception;UTF8/UTF16 equivalence is separately compared",
+  "upstream_uts46_harness": "https://github.com/unicode-org/icu/blob/ddc6b66926bfac6036144ca9902992a0d6d50af9/icu4c/source/test/intltest/uts46test.cpp",
+  "guest_results": {
+    "native-icu-data-direct4": {
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "62fda09fef8f947f5e580a48db9676e383232972a24c183a8a613ee7e65b1fbb",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117543,
+        "free_pages_before": 116942,
+        "free_pages_after": 116942,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 1648,
+        "checks": [
+          "four hash-pinned original little-endian ICU normalization/UTS46 resources loaded through actual native filesystem",
+          "20171 complete Unicode18 normalization corpus rows,all20 transformations per row and all other assigned scalar identities",
+          "6396 complete UTS46 corpus rows,19188 operations with original ICU79 status and success-string policy including documented ICU-22882 exception",
+          "missing and malformed resource headers fail;no invented locale/data success",
+          "three native workers,three cleanup lifecycles,heap0,stable warm frames and zero queued futex waiters"
+        ],
+        "normalization_identity_counts": [
+          "293187",
+          "293187",
+          "293187"
+        ],
+        "limits": [
+          "selected data resources,not full ICU/CLDR data library or complete IDNA error-bit conformance",
+          "no JavaScriptCore/WebKit/modern browser or production TLS policy inference",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "e477baab777ff136a5ae4d8ab3af3b77363969da888a47a083cf8c9219a0474b"
+      },
+      "serial_sha256": "da8324b1ce5cf1bb2ec6a608b43e0cf4fd555a0284d8a65fe3bdc759f36d1ea3",
+      "verified_permission_markers": 3,
+      "verified_utf8_equivalence_markers": 3,
+      "fixture_metadata": {
+        "schema": 1,
+        "normalization_rows": 20171,
+        "normalization_max_utf16": 18,
+        "idna_rows": 6396,
+        "idna_max_utf16": 254,
+        "files": {
+          "NORM.BIN": {
+            "bytes": 856980,
+            "sha256": "fc52724ab08f76fc6cf1370d8a1dd1c3ccf22a98a2d44cdd63d80fe592a23089"
+          },
+          "IDNA.BIN": {
+            "bytes": 1133718,
+            "sha256": "f0394734551362179d6c75c893c2f2e121002c3da9bc75e7e12873f9e9f133be"
+          }
+        }
+      }
+    },
+    "native-icu-data-sdk-uefi3": {
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "a1f7a10b27c838bc9e9fefb75ee96a486d52d388331096dfcb7e27f6c4232053",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500221,
+        "free_pages_before": 499616,
+        "free_pages_after": 499616,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 1657,
+        "checks": [
+          "four hash-pinned original little-endian ICU normalization/UTS46 resources loaded through actual native filesystem",
+          "20171 complete Unicode18 normalization corpus rows,all20 transformations per row and all other assigned scalar identities",
+          "6396 complete UTS46 corpus rows,19188 UTF16 operations with original ICU79 status and success-string policy including documented ICU-22882 exception",
+          "19182 UTF8/UTF16 API equivalents including error bits and outputs;two ill-formed UTF16 source rows remain tested in UTF16 only",
+          "malformed UTF8 is flagged disallowed;missing/malformed resource headers and denied OPEN/READ fail",
+          "three native workers,three cleanup lifecycles,heap0,stable warm frames and zero queued futex waiters"
+        ],
+        "normalization_identity_counts": [
+          "293187",
+          "293187",
+          "293187"
+        ],
+        "limits": [
+          "selected data resources,not full ICU/CLDR data library or complete IDNA error-bit conformance",
+          "no JavaScriptCore/WebKit/modern browser or production TLS policy inference",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "artifacts": {
+        "kernel_sha256": "1271601d2dacc816bb0b0159597b13b7762eb6768e3a02a2445a98f95afe00ef",
+        "iso_sha256": "509a8c7bb3d17a6b3ff9622551d38b45b07d61b9d6b5702edc3be2cabf91f145",
+        "iso_embedded_kernel_sha256": "1271601d2dacc816bb0b0159597b13b7762eb6768e3a02a2445a98f95afe00ef",
+        "kernel_symbols_match_iso": true
+      },
+      "serial_sha256": "8995d129eecd32651735b2868e5faaefe34546058600daa827ed20975470f738",
+      "verified_permission_markers": 3,
+      "verified_utf8_equivalence_markers": 3,
+      "fixture_metadata": {
+        "schema": 1,
+        "normalization_rows": 20171,
+        "normalization_max_utf16": 18,
+        "idna_rows": 6396,
+        "idna_max_utf16": 254,
+        "idna_utf8_rows": 6394,
+        "idna_ill_formed_utf16_rows": 2,
+        "files": {
+          "NORM.BIN": {
+            "bytes": 856980,
+            "sha256": "fc52724ab08f76fc6cf1370d8a1dd1c3ccf22a98a2d44cdd63d80fe592a23089"
+          },
+          "IDNA.BIN": {
+            "bytes": 1133718,
+            "sha256": "f0394734551362179d6c75c893c2f2e121002c3da9bc75e7e12873f9e9f133be"
+          }
+        }
+      }
+    }
+  },
+  "full_host_suite": {
+    "exit": 0,
+    "sha256": "1ecba612f5c33d92323c58ce23493bc57b1ca2a38c9af715134880260ea6dd7a",
+    "scope": "unchanged product runtime and full host suite;extended UTF8 fixture subsequently built/run in final accepted guests"
+  },
+  "sdk": {
+    "manifest_sha256": "b4c8922668e7be51f7b6240a282231fa3a16dc706464dcbab024f1a23cdbd868",
+    "verified_staged_files": 1107,
+    "data_package": "CHOSICUNormalizationData",
+    "libicudata_supplied": false
+  },
+  "retained_failures": [
+    {
+      "path": "native-icu-data-direct1",
+      "diagnosis": "test attempted139264-byte bitmap allocation above128KiB per-map limit;use bounded test BSS without widening quotas"
+    },
+    {
+      "path": "native-icu-data-sdk-uefi",
+      "diagnosis": "test wrongly expected OPEN denied after removing only READ;remove both separately defined permissions;kernel unchanged"
+    }
+  ],
+  "sanitizers": "product C runtime unchanged;prior configured sanitizer suite PASS retained;no native C++ data/ICU ASan claim",
+  "remaining": [
+    "full ICU/CLDR resources and generation/packaging",
+    "JavaScriptCore/WebKit configuration,build and native execution",
+    "engine-sized bounded memory and rendering/application services",
+    "production browser TLS/trust/time/isolation/update integration",
+    "Pi5 SDIO host/firmware/radio/authentication and live WiFi",
+    "new Fusion/Pi/laptop qualification"
+  ],
+  "binary_publication": "source-only;cc29ea8 remains selected Fusion test build;no0.50.0 release"
+}

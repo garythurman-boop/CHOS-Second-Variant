@@ -1359,6 +1359,7 @@ include userland/libc/format/Makefile.inc
 include userland/libcxx/Makefile.inc
 include ports/icu/Makefile.inc
 include ports/icu/i18n.Makefile.inc
+include ports/icu/data.Makefile.inc
 
 $(BUILD)/userland/tcp6_test.o: userland/examples/tcp6_test.c userland/libchos/include/chos/user.h include/chos/net_tcp6_api.h include/chos/syscall.h
 	@mkdir -p $(dir $@)
