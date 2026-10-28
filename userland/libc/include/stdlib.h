@@ -10,6 +10,10 @@ typedef struct {long long quot,rem;} lldiv_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
+/* Native spawn has no environment inheritance yet. Each process starts empty;
+ * an application may supply its own NULL-terminated table through environ. */
+extern char **environ;
+char *getenv(const char *);
 void *malloc(size_t);
 void free(void *);
 void *calloc(size_t,size_t);

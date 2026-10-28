@@ -1,4 +1,5 @@
 #include <time.h>
+#include <sys/time.h>
 #include <errno.h>
 #include "chos/clock_api.h"
 #ifdef CHOS_HOST_TEST
@@ -36,4 +37,12 @@ struct tm *gmtime_r(const time_t *input,struct tm *out){
     *out=(struct tm){.tm_sec=(int)(part%60),.tm_min=(int)((part/60)%60),.tm_hour=(int)(part/3600),
         .tm_mday=(int)remain+1,.tm_mon=m,.tm_year=y-1900,.tm_wday=(int)((days+4)%7),.tm_yday=day_of_year,.tm_isdst=0};
     return out;
+}
+
+struct tm *localtime_r(const time_t *input,struct tm *out){return gmtime_r(input,out);}
+int gettimeofday(struct timeval *out,void *zone){
+    if(!out){errno=EINVAL;return -1;}
+    if(zone){errno=ENOTSUP;return -1;}
+    struct timespec value;if(clock_gettime(CLOCK_REALTIME,&value))return -1;
+    *out=(struct timeval){value.tv_sec,value.tv_nsec/1000};return 0;
 }

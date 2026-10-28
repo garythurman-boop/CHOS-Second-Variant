@@ -1,7 +1,7 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
-LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h)
+LIBC_SOURCES := userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
+LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h)
 LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
 	@mkdir -p $(dir $@)
@@ -178,3 +178,18 @@ test-exit-registry-sanitize: $(SAN_DIR)/test-exit-registry
 test: test-exit-registry
 test-sanitize: test-exit-registry-sanitize
 .PHONY: test-exit-registry test-exit-registry-sanitize
+
+PLATFORM_HOST_FLAGS := -DCHOS_HOST_TEST -include tests/platform_host_names.h $(LIBC_INCLUDES) -Iinclude -Wno-misleading-indentation -fno-builtin
+$(BUILD)/test-libc-platform: tests/test_libc_platform.c tests/platform_host_names.h userland/libc/platform.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror $(PLATFORM_HOST_FLAGS) tests/test_libc_platform.c userland/libc/platform.c userland/libc/time.c -o $@
+$(SAN_DIR)/test-libc-platform: tests/test_libc_platform.c tests/platform_host_names.h userland/libc/platform.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $(PLATFORM_HOST_FLAGS) tests/test_libc_platform.c userland/libc/platform.c userland/libc/time.c -o $@
+test-libc-platform: $(BUILD)/test-libc-platform
+	./$(BUILD)/test-libc-platform
+test-libc-platform-sanitize: $(SAN_DIR)/test-libc-platform
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-libc-platform
+test: test-libc-platform
+test-sanitize: test-libc-platform-sanitize
+.PHONY: test-libc-platform test-libc-platform-sanitize

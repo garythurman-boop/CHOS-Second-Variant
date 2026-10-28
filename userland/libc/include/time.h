@@ -13,6 +13,8 @@ extern "C" {
 int clock_gettime(clockid_t,struct timespec *);
 time_t time(time_t *);
 struct tm *gmtime_r(const time_t *,struct tm *);
+struct tm *localtime_r(const time_t *,struct tm *);
+extern char *tzname[2];
 #ifdef __cplusplus
 }
 #endif

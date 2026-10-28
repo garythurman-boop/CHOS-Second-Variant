@@ -111,3 +111,9 @@ native TLS, floating-point and static CRT profiles. The actual ICU threading
 component runs; full target ICU and the modern engine still do not. Follow
 STAGE3_CURRENT_RESULTS.md and BROWSER_ENGINE_PORT.md for current acceptance gates;
 these component results do not complete the engine, security or wireless scope.
+
+The native [ICU common library](ICU_COMMON_NATIVE.md) now builds all 202 units
+and executes Unicode/file/thread/clock-error checks in direct and isolated UEFI
+applications. Full data/i18n and the real engine remain open. The user now
+authorizes selected verified interim test binaries; this supersedes the historical
+binary-hold statements above, while full Stage3/version0.50.0 stays gated.

@@ -146,3 +146,14 @@ closed. The updated private TCB state layout has native thread/TLS regressions.
 The native read-stream milestone code-generates original ICU umapfile.cpp with
 its MAP_STDIO backend. See [read-stream scope](NATIVE_READ_STREAMS.md); platform
 putil, full ICU data/i18n/runtime and engine execution remain open.
+
+## Native common library now linked and executed
+
+The [ICU common port](ICU_COMMON_NATIVE.md) builds all 202 translation units and
+runs actual Unicode/file/thread/clock-error/cleanup checks in native direct and
+isolated UEFI applications. SDK CMake executable links pass. The real pinned
+JSCOnly preflight now finds ICU uc version79.1 and fails with its original
+nonzero status for missing **data and i18n**. No bootstrap archive is renamed to
+libicudata; no complete ICU dataset, JSC configure/build/execution or browser
+result is claimed. Interim user-test binaries are now authorized separately
+from the still-open Stage3/version0.50.0 completion gates.

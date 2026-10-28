@@ -1,0 +1,1024 @@
+{
+  "schema": 1,
+  "scope": "genuine native ICU common archive and core Unicode/file/thread runtime; not full ICU data/i18n or browser",
+  "stage3_complete": false,
+  "original_source_commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+  "original_files": 428,
+  "common_translation_units": 202,
+  "archive": {
+    "path": "build/icu-common/libicuuc.a",
+    "bytes": 18745388,
+    "sha256": "0874d1515e91ef0a80df0db87749e1f5d2503295c013af11efa88c2f70f08f69"
+  },
+  "bootstrap_data": {
+    "path": "build/icu-common/libicustubdata.a",
+    "purpose": "original upstream deliberately empty data-tool bootstrap only; no complete data package",
+    "sha256": "51afd63a87251657aca531fdeae4800d1a7577d3f9b628cbc7b319e14b864108"
+  },
+  "explicit_platform_patch": {
+    "original_putil_sha256": "0e79c38ac63b83106c322510cc98f080210def8a7fe66f4dcbdbbe9744379c96",
+    "generated_putil_sha256": "f66e2a49ddd9376c88281a9875801306446a41890d4d6641477d2ce0bc19b6b7",
+    "change": "both real and optional diagnostic gettimeofday call sites return NaN on clock-query failure"
+  },
+  "corpus": {
+    "generator": "tests/generate_icu_fold_vectors.py",
+    "database": "Python Unicode15.0.0",
+    "full_case_fold_mappings": 1530,
+    "sha256": "39133759068d69d8f1715217544e82dde0aac75406f0fb9fb3e0efbf0b1154c2"
+  },
+  "guest_results": {
+    "native-icu-common-direct1": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "04cba2fa52186381142b9cf447c2b19565032ea3fb3911071a53eaff366a388e",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117543,
+      "free_pages_before": 117421,
+      "free_pages_after": 117421,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 96,
+      "checks": [
+        "genuine full ICU common archive and separate original bootstrap data library",
+        "Unicode UTF8/UTF16 conversions,invalid input,case folding and UnicodeString operations",
+        "1530 independent Unicode15 case-fold mappings,including expansions and supplementary scalars",
+        "actual original ICU MAP_STDIO loader reads snapshots; absent/short resources fail",
+        "child without CLOCK_INFO permission receives NaN from patched real ICU clock function",
+        "three native std::thread workers,three lifecycles and actual ICU u_cleanup,heap0,stable warm frames"
+      ],
+      "limits": [
+        "bootstrap data archive is deliberately empty and is not a complete ICU data library",
+        "i18n,normalization and locale-resource datasets/full ICU conformance not qualified",
+        "not WPEWebKit/JavaScriptCore integration or production browser/TLS",
+        "fixed UTC native calendar and C locale metadata; no IANA zone bridge",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-icu-common-sdk-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "bf0004fc0db794e404a96a51538b94bb002ecc17daead7c314f1681092e5e615",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500221,
+      "free_pages_before": 500093,
+      "free_pages_after": 500093,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 100,
+      "checks": [
+        "genuine full ICU common archive and separate original bootstrap data library",
+        "Unicode UTF8/UTF16 conversions,invalid input,case folding and UnicodeString operations",
+        "1530 independent Unicode15 case-fold mappings,including expansions and supplementary scalars",
+        "actual original ICU MAP_STDIO loader reads snapshots; absent/short resources fail",
+        "child without CLOCK_INFO permission receives NaN from patched real ICU clock function",
+        "three native std::thread workers,three lifecycles and actual ICU u_cleanup,heap0,stable warm frames"
+      ],
+      "limits": [
+        "bootstrap data archive is deliberately empty and is not a complete ICU data library",
+        "i18n,normalization and locale-resource datasets/full ICU conformance not qualified",
+        "not WPEWebKit/JavaScriptCore integration or production browser/TLS",
+        "fixed UTC native calendar and C locale metadata; no IANA zone bridge",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-icu-common-stdio-regression": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "95772e5b494f6980710c6f3750a4973fffda475f5238a4f66e8573283d539437",
+      "source": "embedded ROMFS",
+      "cold_free_pages": 500221,
+      "free_pages_before": 500221,
+      "free_pages_after": 500221,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 94,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-icu-common-tls-regression": {
+      "status": "PASS",
+      "mode": "direct",
+      "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+      "application_sha256": "c0ff864016528cc6f5d2154ad752eeec8233285e068de9457f817edad014b604",
+      "ipv6": false,
+      "tcp6_wire_frames": 0,
+      "missing_clock": false,
+      "missing_entropy": false,
+      "cold_free_pages": 117543,
+      "free_pages_before": 117183,
+      "free_pages_after": 117183,
+      "cases": [
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6266320949998772,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "chain",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.7080433999999514,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "bad-chain",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5063395209999726,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5668763419998868,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5665757759998087,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "aes256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.7488789109993377,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 4,
+          "hostname": "wrong.chos.test",
+          "seconds": 0.4454251529987232,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.3643259649998072,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "wrong-purpose",
+          "expected": 4096,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.44535139899926435,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "expired",
+          "expected": 1,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.4655075750015385,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "future",
+          "expected": 512,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.445695082000384,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "malformed",
+          "expected": 998,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.2632353150002018,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "truncated",
+          "expected": 997,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6082149829999253,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "stall",
+          "expected": 996,
+          "hostname": "fixture.chos.test",
+          "seconds": 15.15503830399939,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 993,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.16221743399910338,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 995,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.18243969900140655,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 994,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.8514706360001583,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6288006169997971,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 989,
+          "hostname": "fixture.chos.test",
+          "seconds": 1.9794261480001296,
+          "stalled_network_gui_response_seconds": 0.04345346899935976,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 988,
+          "hostname": "fixture.chos.test",
+          "seconds": 1.6975526010010071,
+          "stalled_network_gui_response_seconds": 0.022123545999420458,
+          "result": "PASS"
+        }
+      ],
+      "server_events": [
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 47906)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "chain",
+          "accepted": true
+        },
+        {
+          "kind": "chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "chain",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 48792)"
+        },
+        {
+          "kind": "chain",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "bad-chain",
+          "accepted": true
+        },
+        {
+          "kind": "bad-chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "bad-chain",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "rsa",
+          "accepted": true
+        },
+        {
+          "kind": "rsa",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 42760)"
+        },
+        {
+          "kind": "rsa",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "rsa256",
+          "accepted": true
+        },
+        {
+          "kind": "rsa256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 37334)"
+        },
+        {
+          "kind": "rsa256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "aes256",
+          "accepted": true
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 44148)"
+        },
+        {
+          "kind": "aes256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "wrong-purpose",
+          "accepted": true
+        },
+        {
+          "kind": "wrong-purpose",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "wrong-purpose",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "expired",
+          "accepted": true
+        },
+        {
+          "kind": "expired",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "expired",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "future",
+          "accepted": true
+        },
+        {
+          "kind": "future",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "future",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "malformed",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "truncated",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 43608)"
+        },
+        {
+          "kind": "truncated",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "stall",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 59620)"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 59636)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 59638)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 44908)"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 44924)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 44916)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 35924)"
+        },
+        {
+          "kind": "threaded",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 35942)"
+        },
+        {
+          "kind": "threaded",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        }
+      ],
+      "limits": [
+        "ephemeral test root only; production trust store/update policy still open",
+        "firmware/RTC clock availability is not authenticated time",
+        "browser integration, full modern engine and live Wi-Fi remain open",
+        "QEMU evidence; Fusion/physical TLS NOT RUN"
+      ]
+    },
+    "native-icu-common-tls-no-clock": {
+      "status": "PASS",
+      "mode": "uefi",
+      "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+      "application_sha256": "c0ff864016528cc6f5d2154ad752eeec8233285e068de9457f817edad014b604",
+      "ipv6": false,
+      "tcp6_wire_frames": 0,
+      "missing_clock": true,
+      "missing_entropy": false,
+      "cold_free_pages": 500221,
+      "free_pages_before": null,
+      "free_pages_after": 499861,
+      "cases": [
+        {
+          "kind": "valid",
+          "expected": 991,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.18235491899940826,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        }
+      ],
+      "server_events": [],
+      "limits": [
+        "ephemeral test root only; production trust store/update policy still open",
+        "firmware/RTC clock availability is not authenticated time",
+        "browser integration, full modern engine and live Wi-Fi remain open",
+        "QEMU evidence; Fusion/physical TLS NOT RUN"
+      ]
+    }
+  },
+  "host_suites": {
+    "native-icu-common-full-host": {
+      "exit": 0,
+      "sha256": "272fb6d00c0f163590a797d3c8df0d4bd4a21d9a46ba3d715be80e1a2c3e6043"
+    },
+    "native-icu-common-full-sanitize": {
+      "exit": 0,
+      "sha256": "a2e5a0c8ccb5f551d4dc68a7778848b349cc2eb2c4c9c9f69bf68c11d9dab180"
+    }
+  },
+  "sdk_manifest_sha256": "581a219c0254c61131c1ca68af112cec1e7566164e84623105593b86d11f0219",
+  "javascriptcore_preflight": {
+    "status": "CONFIGURATION_INCOMPLETE",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "source_manifest": "docs/dependencies/webkit-jsc-bringup.json",
+    "command": [
+      "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+      "-S",
+      "/workspace/chos-reference/webkit-2.54.2",
+      "-B",
+      "/workspace/chos-evidence/native-icu-common-jsc-preflight/cmake",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+      "-DRuby_EXECUTABLE=/workspace/chos-tools/root/usr/bin/ruby3.3",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DPORT=JSCOnly",
+      "-DENABLE_STATIC_JSC=ON",
+      "-DENABLE_JIT=OFF",
+      "-DUSE_SYSTEM_MALLOC=ON",
+      "-DENABLE_TOOLS=OFF",
+      "-DCHOS_SDK_ROOT=/workspace/CHOS-Second-Variant/build/native-sdk"
+    ],
+    "returncode": 1,
+    "seconds": 9.498027429999638,
+    "log_sha256": "2aca8fba3bde25ad16d7ace2d265d2337d47e8435f1484d3c87f4a1db8ba1643",
+    "tool_versions": {
+      "cmake": "cmake version 3.31.6",
+      "ninja": "1.11.1.git.kitware.jobserver-1",
+      "ruby": "ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]",
+      "clang": "Debian clang version 19.1.7 (3+b1)",
+      "clang++": "Debian clang version 19.1.7 (3+b1)"
+    },
+    "int128_type_compile_probe": "PASS",
+    "compile_only_cmake_checks": false,
+    "native_sdk": "/workspace/CHOS-Second-Variant/build/native-sdk",
+    "threads_missing": false,
+    "target_library_search": "CHOS sysroot only; host executables permitted",
+    "icu_missing": true,
+    "limits": [
+      "Real executable links are used; failed native POSIX thread checks remain failures.",
+      "CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.",
+      "The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.",
+      "No WebCore/WPE rendering,JavaScript execution,browser or conformance result."
+    ]
+  },
+  "i18n_next_gate": {
+    "sources": 254,
+    "code_generated": 210,
+    "not_generated": [
+      {
+        "source": "choicfmt.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/choicfmt.cpp:178:5: error: use of undeclared identifier 'snprintf'"
+      },
+      {
+        "source": "decContext.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "decNumber.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "decimfmt.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "double-conversion-cached-powers.cpp",
+        "returncode": 1,
+        "missing_header": "cstdarg",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/double-conversion-cached-powers.cpp:39:10: fatal error: 'cstdarg' file not found"
+      },
+      {
+        "source": "double-conversion-strtod.cpp",
+        "returncode": 1,
+        "missing_header": "cstdarg",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/double-conversion-strtod.cpp:38:10: fatal error: 'cstdarg' file not found"
+      },
+      {
+        "source": "formattedval_sbimpl.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "measfmt.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "messageformat2.cpp",
+        "returncode": 1,
+        "missing_header": "map",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/unicode/messageformat2_formattable.h:24:10: fatal error: 'map' file not found"
+      },
+      {
+        "source": "messageformat2_arguments.cpp",
+        "returncode": 1,
+        "missing_header": "map",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/unicode/messageformat2_formattable.h:24:10: fatal error: 'map' file not found"
+      },
+      {
+        "source": "messageformat2_checker.cpp",
+        "returncode": 1,
+        "missing_header": "map",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/unicode/messageformat2_formattable.h:24:10: fatal error: 'map' file not found"
+      },
+      {
+        "source": "messageformat2_evaluation.cpp",
+        "returncode": 1,
+        "missing_header": "map",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/unicode/messageformat2_formattable.h:24:10: fatal error: 'map' file not found"
+      },
+      {
+        "source": "messageformat2_formatter.cpp",
+        "returncode": 1,
+        "missing_header": "map",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/unicode/messageformat2_formattable.h:24:10: fatal error: 'map' file not found"
+      },
+      {
+        "source": "messageformat2_formattable.cpp",
+        "returncode": 1,
+        "missing_header": "map",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/unicode/messageformat2_formattable.h:24:10: fatal error: 'map' file not found"
+      },
+      {
+        "source": "messageformat2_function_registry.cpp",
+        "returncode": 1,
+        "missing_header": "map",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/unicode/messageformat2_formattable.h:24:10: fatal error: 'map' file not found"
+      },
+      {
+        "source": "number_asformat.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_capi.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_compact.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_decimalquantity.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_fluent.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_formatimpl.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_longnames.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_mapper.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_multiplier.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_output.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_patternmodifier.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_patternstring.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_rounding.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_scientific.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_simple.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_skeletons.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_symbolswrapper.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_usageprefs.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "number_utils.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "numfmt.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "numparse_affixes.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "numrange_capi.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "numrange_fluent.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "numrange_impl.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "pluralranges.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "plurfmt.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "plurrule.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "reldatefmt.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      },
+      {
+        "source": "upluralrules.cpp",
+        "returncode": 1,
+        "missing_header": "signal.h",
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/decContext.h:64:12: fatal error: 'signal.h' file not found"
+      }
+    ],
+    "result_sha256": "de0fadcc70a4de3edc0d775e4453a3b6a4e138a42a9fa74336f28db66ec31362",
+    "scope": "actual original i18n native SDK object generation only,not library or runtime"
+  },
+  "known_failures": [
+    "upstream self-use of deprecated APIs failed blanket Werror; dependency build preserves warnings without blanket Werror,own adapters/fixture remain strict",
+    "first fixture used an internal default-codepage symbol excluded by UTF8 configuration; replaced by original public ucnv_getDefaultName API",
+    "generator initially required Unicode14; actual prepared Python uses15.0.0,which is now explicitly pinned; no expected case-fold results changed to fit ICU"
+  ],
+  "limits": [
+    "full ICU data and i18n are not built or qualified",
+    "no production TLS trust/time/update/reseed service or modern engine execution",
+    "native UTC calendar,C/POSIX metadata,empty spawn environment; no full POSIX locale/TZ or environment inheritance",
+    "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+  ]
+}

@@ -95,3 +95,7 @@ classification is invariant; ICU Unicode/locale data and full streams remain ope
 
 Read-only buffered C streams and owned signed-64-bit file positions are now available
 in the SDK through libchos-stdio.a. See [profile, evidence and limitations](NATIVE_READ_STREAMS.md).
+
+The SDK also stages ICU common with a separately named bootstrap data target.
+Use the [explicit native ICU package/profile](ICU_COMMON_NATIVE.md); real i18n and
+complete data libraries remain absent, so the full engine dependency gate stays open.

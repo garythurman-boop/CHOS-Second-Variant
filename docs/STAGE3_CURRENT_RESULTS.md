@@ -373,3 +373,25 @@ Clean UEFI ROMFS runtime/desktop Console/typing and installed-image regressions
 pass; see [exact clean input hashes](validation/stage3-native-stdio-clean.json)
 and the [Fusion checklist](../artifacts/cc29ea8/TESTING.md). New Fusion validation
 is pending. This supersedes d91d135 as the current test download after publication.
+
+## Genuine native ICU common runtime
+
+The [native ICU common port](ICU_COMMON_NATIVE.md) now builds all **202/202**
+original common units into libicuuc.a and executes original Unicode conversion,
+case folding/properties, UnicodeString, file loading, threading, clock failure
+and actual cleanup paths in direct and isolated UEFI. The independent corpus
+contains **1,530 Unicode15 full case-fold mappings**. Native SDK/CMake executable
+links and UEFI execution pass; full host and ASan/UBSan suites and retained
+read-stream/TLS/no-clock regressions pass. The separate original bootstrap data
+archive remains explicitly empty and is never substituted for a full data library.
+The real JSCOnly preflight now finds uc/version79.1 and retains its nonzero
+failure for **data and i18n**. Actual next-step i18n code generation passes
+210/254 sources; gaps are snprintf, signal.h, cstdarg and map. See
+[exact evidence and failures](validation/stage3-icu-common.json). Modern engine,
+complete data/i18n, production browser security and Pi radio remain unfinished.
+
+The cc29ea8 interim ISO/source/image/kernel files and Fusion checklist are now
+published with tag build-cc29ea8. All ten GitHub files were downloaded back and
+matched local SHA256SUMS; evidence is retained in
+/workspace/chos-evidence/native-stdio-github-downloads.json. This new ICU source
+work does not replace that published test build or claim Stage3/version0.50.0.

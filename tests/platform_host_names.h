@@ -1,0 +1,10 @@
+#define getenv chos_test_getenv
+#define environ chos_test_environ
+#define setlocale chos_test_setlocale
+#define localeconv chos_test_localeconv
+#define tzname chos_test_tzname
+#define clock_gettime chos_test_clock_gettime
+#define time chos_test_time
+#define gmtime_r chos_test_gmtime_r
+#define localtime_r chos_test_localtime_r
+#define gettimeofday chos_test_gettimeofday

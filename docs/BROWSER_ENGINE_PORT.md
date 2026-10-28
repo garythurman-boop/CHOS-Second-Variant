@@ -258,3 +258,9 @@ create/move/join/exit-notification lifecycles and real termination handlers. Ful
 ICU data/i18n/uc, public futures/exception ABI, detach, engine-sized memory/runtime,
 WTF/JavaScriptCore/WebCore platform integration and modern browser conformance
 remain open. These are tested prerequisites, not an engine rendered in CHOS.
+
+Current native ICU common progress and remaining data/i18n gate are recorded in
+[ICU_COMMON_NATIVE.md](ICU_COMMON_NATIVE.md). The common library now executes in
+native guests; the original threading-only/compile-only limits above are historical.
+The user now authorizes critical interim test builds; full Stage3/version0.50.0
+acceptance remains separate and open.
