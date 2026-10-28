@@ -1,0 +1,44 @@
+diff --git a/Source/bmalloc/bmalloc/BPlatform.h b/Source/bmalloc/bmalloc/BPlatform.h
+index b5612278..c9d76f38 100644
+--- a/Source/bmalloc/bmalloc/BPlatform.h
++++ b/Source/bmalloc/bmalloc/BPlatform.h
+@@ -66,6 +66,10 @@
+ #define BOS_LINUX 1
+ #endif
+ 
++#if defined(__CHOS__)
++#define BOS_CHOS 1
++#endif
++
+ #if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__FreeBSD_kernel__)
+ #define BOS_FREEBSD 1
+ #endif
+diff --git a/Source/bmalloc/bmalloc/VMAllocate.h b/Source/bmalloc/bmalloc/VMAllocate.h
+index 036636ce..01efa3b5 100644
+--- a/Source/bmalloc/bmalloc/VMAllocate.h
++++ b/Source/bmalloc/bmalloc/VMAllocate.h
+@@ -303,7 +303,9 @@ inline void vmZeroAndPurge(void* p, size_t vmSize, VMTag usage)
+         return;
+ #endif // BENABLE(MTE) && BOS(DARWIN)
+ 
+-#if BOS(LINUX)
++#if BOS(LINUX) || BOS(CHOS)
++    // CHOS discards owned anonymous pages without MAP_FIXED replacement and
++    // retains their existing protection. No executable mapping is introduced.
+     BUNUSED(flags);
+     BUNUSED(tag);
+     int result = madvise(p, vmSize, MADV_DONTNEED);
+diff --git a/Source/cmake/WebKitCommon.cmake b/Source/cmake/WebKitCommon.cmake
+index d96e1850..f258145e 100644
+--- a/Source/cmake/WebKitCommon.cmake
++++ b/Source/cmake/WebKitCommon.cmake
+@@ -209,6 +209,9 @@ if (NOT HAS_RUN_WEBKIT_COMMON)
+         set(WTF_OS_WINDOWS 1)
+     elseif (CMAKE_SYSTEM_NAME MATCHES "Fuchsia")
+         set(WTF_OS_FUCHSIA 1)
++    elseif (CMAKE_SYSTEM_NAME STREQUAL "CHOS")
++        # Explicit bring-up identity; do not inherit Linux/UNIX feature claims.
++        set(WTF_OS_CHOS 1)
+     else ()
+         message(FATAL_ERROR "Unknown OS '${CMAKE_SYSTEM_NAME}'")
+     endif ()

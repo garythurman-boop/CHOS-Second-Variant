@@ -23,7 +23,8 @@ typedef struct {
 typedef enum {
     AS_PERM_USER_RO = 0,       /* EL0 read-only, execute-never */
     AS_PERM_USER_RW = 1,       /* EL0 read/write, execute-never */
-    AS_PERM_USER_RX = 2        /* EL0 read/execute, EL1 execute-never */
+    AS_PERM_USER_RX = 2,       /* EL0 read/execute, EL1 execute-never */
+    AS_PERM_USER_NONE = 3      /* Owned normal storage, no EL0 access, PXN/UXN */
 } address_space_user_permissions_t;
 
 typedef enum {
@@ -100,6 +101,14 @@ address_space_error_t address_space_map_user_page(address_space_handle_t handle,
 address_space_error_t address_space_unmap_user_page(address_space_handle_t handle,
                                                      uint64_t virtual_address,
                                                      uint64_t *physical_address_out);
+/* Atomic, allocation-free changes to at most 256 already-owned normal pages.
+ * Protection never promotes data to executable. Caller must establish its
+ * anonymous-region ownership/pin policy before invoking these primitives. */
+address_space_error_t address_space_protect_user_range(address_space_handle_t,
+                                                       uint64_t, size_t,
+                                                       address_space_user_permissions_t);
+address_space_error_t address_space_discard_user_range(address_space_handle_t,
+                                                       uint64_t, size_t);
 int address_space_query(address_space_handle_t handle, uint64_t virtual_address,
                         vmm_mapping_info_t *out);
 /* Copies only from currently mapped EL0-accessible normal pages owned by handle. */

@@ -10,6 +10,7 @@
 _Alignas(CHOS_PAGE_SIZE) static uint8_t fake_ram[FAKE_PAGE_COUNT * CHOS_PAGE_SIZE];
 static uint8_t fake_allocated[FAKE_PAGE_COUNT];
 static int fake_pmm_ready = 1;
+static int fake_free_failure;
 
 int pmm_alloc_pages(size_t count, uint64_t *physical_address) {
     size_t start, i;
@@ -30,6 +31,7 @@ int pmm_free_pages(uint64_t physical_address, size_t count) {
     uintptr_t base = (uintptr_t)fake_ram;
     uintptr_t value = (uintptr_t)physical_address;
     size_t start, i;
+    if (fake_free_failure) return 0;
     if (count == 0u || value < base || value >= base + sizeof(fake_ram) ||
         ((value - base) % CHOS_PAGE_SIZE) != 0u) return 0;
     start = (size_t)((value - base) / CHOS_PAGE_SIZE);
@@ -50,6 +52,7 @@ static void reset_fake_pmm(void) {
     memset(fake_allocated, 0, sizeof(fake_allocated));
     memset(fake_ram, 0, sizeof(fake_ram));
     fake_pmm_ready = 1;
+    fake_free_failure = 0;
 }
 
 static void test_bootstrap_to_runtime_transition(void) {
@@ -129,6 +132,30 @@ static void test_heap_lifecycle(void) {
     assert(!kheap_is_bootstrap_mode());
 }
 
+static unsigned owned_pages(void){unsigned n=0;for(unsigned i=0;i<FAKE_PAGE_COUNT;i++)n+=fake_allocated[i];return n;}
+static void test_empty_arena_return(void){
+    reset_fake_pmm();kheap_begin_bootstrap();assert(kheap_init());kheap_enable_runtime_locking();
+    uint8_t *anchor=kheap_alloc(128);assert(anchor);anchor[0]=0x73;
+    unsigned baseline=owned_pages();uint8_t *large=kheap_alloc(20000);assert(large);
+    unsigned peak=owned_pages();assert(peak>baseline);
+    fake_free_failure=1;assert(kheap_free(large));assert(owned_pages()==peak&&anchor[0]==0x73);
+    kheap_stats_t quarantined;kheap_get_stats(&quarantined);
+    assert(quarantined.quarantined_arenas==1&&quarantined.quarantined_pages==peak-baseline);
+    uint8_t *again=kheap_alloc(20000);assert(again&&again!=large); /* uncertain physical ownership never reused */
+    fake_free_failure=0;assert(kheap_free(again));assert(owned_pages()==peak&&anchor[0]==0x73);
+    assert(!kheap_free(again)); /* released arena is no longer in the heap list */
+    assert(kheap_free(anchor));
+    /* A fresh simulated boot resets the deliberately quarantined PMM model. */
+    reset_fake_pmm();kheap_begin_bootstrap();assert(kheap_init());kheap_enable_runtime_locking();
+    anchor=kheap_alloc(128);assert(anchor);baseline=owned_pages();large=kheap_alloc(20000);assert(large);
+    assert(kheap_free(large)&&owned_pages()==baseline&&kheap_free(anchor));
+    void *a=kheap_alloc(8192),*b=kheap_alloc(8192),*c=kheap_alloc(8192);assert(a&&b&&c);
+    assert(kheap_free(a)&&kheap_free(b)&&kheap_free(c));
+    kheap_stats_t stats;kheap_get_stats(&stats);
+    assert(!stats.allocated_blocks&&stats.arena_count==1&&stats.total_pages==KHEAP_MIN_ARENA_PAGES);
+    assert(owned_pages()==KHEAP_MIN_ARENA_PAGES);
+}
+
 #define KHEAP_STRESS_THREADS 4u
 #define KHEAP_STRESS_ITERATIONS 300u
 
@@ -196,12 +223,14 @@ static void test_uninitialized_pmm(void) {
     assert(!kheap_init());
     assert(kheap_alloc(16u) == NULL);
     fake_pmm_ready = 1;
+    fake_free_failure = 0;
 }
 
 int main(void) {
     test_uninitialized_pmm();
     test_bootstrap_to_runtime_transition();
     test_heap_lifecycle();
+    test_empty_arena_return();
     test_concurrent_alloc_free();
     puts("Kernel heap lifecycle and concurrent alloc/free stress tests passed");
     return 0;

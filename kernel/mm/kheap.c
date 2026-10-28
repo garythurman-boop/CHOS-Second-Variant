@@ -121,8 +121,8 @@ static int arena_grow(size_t minimum_payload) {
     arena_bytes = pages * CHOS_PAGE_SIZE;
 
     if (!pmm_alloc_pages(pages, &physical_base)) return 0;
-    /* Current CHOS boot stage runs with the MMU off, so RAM addresses are
-       identity-addressable. This conversion must change with virtual memory. */
+    /* Supported kernel roots retain the privileged identity RAM alias.
+       Revisit this conversion before removing that address-space contract. */
     arena = (kheap_arena_t *)(uintptr_t)physical_base;
     arena->magic = KHEAP_ARENA_MAGIC;
     arena->reserved = 0u;
@@ -178,6 +178,7 @@ static void *kheap_alloc_unlocked(size_t size) {
         for (arena = arena_list; arena != NULL; arena = arena->next) {
             kheap_block_t *block;
             if (arena->magic != KHEAP_ARENA_MAGIC) return NULL;
+            if (arena->reserved) continue; /* PMM ownership refusal: never reuse. */
             for (block = arena->first_block; block != NULL; block = block->next) {
                 if (block->magic != KHEAP_BLOCK_MAGIC || block->arena != arena) return NULL;
                 if (block->is_free && block->size >= requested) {
@@ -215,6 +216,33 @@ static void coalesce_with_next(kheap_block_t *block) {
     next->next = NULL;
 }
 
+static int arena_is_empty(const kheap_arena_t *arena) {
+    const kheap_block_t *block=arena->first_block;
+    return block && block->magic==KHEAP_BLOCK_MAGIC && block->arena==arena &&
+        block->is_free && !block->prev && !block->next &&
+        block->size==ALIGN_DOWN_VALUE(arena->bytes-ARENA_HEADER_SIZE-BLOCK_HEADER_SIZE,KHEAP_ALIGNMENT);
+}
+static void return_empty_arena(kheap_arena_t *arena) {
+    if(!arena_is_empty(arena))return;
+    /* Keep one completely free minimum arena for small allocations. Large
+     * executable/file snapshots must not become a permanent high-water cost. */
+    if(arena->pages==KHEAP_MIN_ARENA_PAGES){
+        int another=0;
+        for(kheap_arena_t *other=arena_list;other;other=other->next)
+            if(other!=arena && !other->reserved && other->pages==KHEAP_MIN_ARENA_PAGES && arena_is_empty(other)){another=1;break;}
+        if(!another)return;
+    }
+    kheap_arena_t **link=&arena_list;
+    while(*link && *link!=arena)link=&(*link)->next;
+    if(!*link)return;
+    kheap_arena_t *next=arena->next;
+    /* PMM validates the entire original allocation before freeing anything.
+     * On refusal quarantine intact metadata because physical ownership is
+     * uncertain. Never touch a returned arena after successful release. */
+    if(pmm_free_pages((uint64_t)(uintptr_t)arena,arena->pages))*link=next;
+    else arena->reserved=1u;
+}
+
 static int kheap_free_unlocked(void *ptr) {
     kheap_arena_t *arena;
     if (!heap_initialized || ptr == NULL) return 0;
@@ -234,6 +262,7 @@ static int kheap_free_unlocked(void *ptr) {
                 block = block->prev;
                 coalesce_with_next(block);
             }
+            return_empty_arena(arena);
             return 1;
         }
     }
@@ -261,6 +290,8 @@ static void kheap_get_stats_unlocked(kheap_stats_t *out) {
     out->free_payload_bytes = 0u;
     out->allocated_blocks = 0u;
     out->free_blocks = 0u;
+    out->quarantined_arenas = 0u;
+    out->quarantined_pages = 0u;
 
     if (!heap_initialized) return;
     for (arena = arena_list; arena != NULL; arena = arena->next) {
@@ -268,6 +299,7 @@ static void kheap_get_stats_unlocked(kheap_stats_t *out) {
         ++out->arena_count;
         out->total_pages += arena->pages;
         out->total_bytes += arena->bytes;
+        if(arena->reserved){++out->quarantined_arenas;out->quarantined_pages+=arena->pages;continue;}
         for (block = arena->first_block; block != NULL; block = block->next) {
             if (block->is_free) {
                 out->free_payload_bytes += block->size;

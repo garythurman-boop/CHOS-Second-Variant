@@ -1,7 +1,7 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iinclude -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
-LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h) include/chos/user_memory_limits.h
+LIBC_SOURCES := userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
+LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h) include/chos/user_memory_limits.h include/chos/memory_api.h
 LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
 	@mkdir -p $(dir $@)

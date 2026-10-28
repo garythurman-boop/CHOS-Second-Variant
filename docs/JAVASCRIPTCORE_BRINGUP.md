@@ -11,7 +11,8 @@ security-release qualification remain open. No WebKit binaries are distributed.
 The [source/patch manifest](dependencies/webkit-jsc-bringup.json) records Git object
 identity, inspected file hashes, the sole port patch and its exact post-image.
 A partial HTTPS Git checkout supplied the actual root files, Source/cmake,
-Source/WTF, Source/JavaScriptCore and Tools/CMake sources. This is not a mocked
+Source/WTF and Source/JavaScriptCore sources. The complete required JSCOnly
+closure is now listed in the dependency manifest. This is not a mocked
 folder tree or a host JavaScript engine linked into CHOS. GitHub archive retrieval
 was unavailable and the official release site returned403 in this environment;
 HTTPS Git retrieval succeeded. No TLS/signature bypass was used and no release
@@ -58,7 +59,7 @@ Prepare the compiler and native SDK first:
 
 ```
 source /workspace/chos-tools/activate
-make CC=clang LD=ld.lld -j4 libcxx libm
+make CC=clang LD=ld.lld -j4 native-sdk
 ```
 
 Create a separate reference checkout (not a CHOS worktree):
@@ -66,9 +67,9 @@ Create a separate reference checkout (not a CHOS worktree):
 ```
 git clone --depth 1 --single-branch --branch wpewebkit-2.54.2 \
   --filter=blob:none --sparse --no-checkout https://github.com/WebKit/WebKit.git WEBKIT_REF
-git -C WEBKIT_REF sparse-checkout set Source/cmake Source/WTF Source/JavaScriptCore Tools/CMake
+git -C WEBKIT_REF sparse-checkout set Source/cmake Source/WTF Source/JavaScriptCore Source/bmalloc Source/ThirdParty/unifdef Source/ThirdParty/gtest Tools/Scripts Tools/TestWebKitAPI
 git -C WEBKIT_REF checkout --detach 32717fabcb9dcad9aa00a54ef1f23e41ee64e849
-python3 tools/preflight_javascriptcore.py --source WEBKIT_REF --out FRESH_OUTPUT
+python3 tools/preflight_javascriptcore.py --source WEBKIT_REF --out FRESH_OUTPUT --native-sdk build/native-sdk
 ```
 
 The runner verifies the pin, source and patch bytes, refuses unexpected source
@@ -183,3 +184,10 @@ refused by the current2MiB executable limit; actual engine compilation stops at
 missing libc++ bit-operation headers and sys/mman.h. This supersedes the earlier
 missing-ICU-data configuration diagnosis. No engine execution, modern browser,
 production security, live wireless or full Stage3/version0.50.0 success is claimed.
+
+The subsequent [native virtual-memory component](NATIVE_VIRTUAL_MEMORY.md) now
+supplies owned anonymous protection/discard/partial unmap and bounded native
+unistd operations. Original WebKit VM helpers execute against the SDK with a
+checked CHOS discard adaptation. Actual JavaScriptCore compilation moves past
+the missing memory headers to fcntl.h and stderr stream APIs; no complete engine,
+modern browser or Stage3 completion is claimed.

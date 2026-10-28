@@ -1012,6 +1012,15 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
                 if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
                 frame->x[0]=(uint64_t)(int64_t)chos_user_memory_unmap(fault_space,frame->x[0],(size_t)frame->x[1]);return frame;
             }
+            case CHOS_SYS_UNMAP_RANGE: {
+                if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_user_memory_unmap_range(fault_space,frame->x[0],(size_t)frame->x[1]);return frame;
+            }
+            case CHOS_SYS_MEMORY_CONTROL: {
+                if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[2]>UINT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_user_memory_control(fault_space,frame->x[0],(size_t)frame->x[1],(unsigned)frame->x[2]);return frame;
+            }
             case CHOS_SYS_NET_INFO: {
                 chos_net_status_t status;
                 if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}

@@ -2051,7 +2051,8 @@ static void execute_command(char *line, const fdt_info_t *tree) {
             uart_puts("Allocated block payload: "); print_decimal((size_t)stats.allocated_payload_bytes); uart_puts(" bytes\n");
             uart_puts("Free block payload: "); print_decimal((size_t)stats.free_payload_bytes); uart_puts(" bytes\n");
             uart_puts("Allocated blocks: "); print_decimal(stats.allocated_blocks); uart_puts("; free blocks: "); print_decimal(stats.free_blocks); uart_puts("\n");
-            uart_puts("Alignment: 16 bytes; arena pages are retained for reuse\n");
+            uart_puts("Quarantined arenas: "); print_decimal(stats.quarantined_arenas); uart_puts("; pages: "); print_decimal((size_t)stats.quarantined_pages); uart_puts("\n");
+            uart_puts("Alignment: 16 bytes; one free minimum arena retained, other empty arenas returned\n");
         }
     } else if (strings_equal(line, "heap-test")) {
         kheap_stats_t before, after;

@@ -95,3 +95,66 @@ static int pin_change(address_space_handle_t h,uint64_t base,size_t bytes,int ad
 }
 int chos_user_memory_pin(address_space_handle_t h,uint64_t base,size_t bytes){return pin_change(h,base,bytes,1);}
 int chos_user_memory_unpin(address_space_handle_t h,uint64_t base,size_t bytes){return pin_change(h,base,bytes,0);}
+
+static region_t *containing_region(map_owner_t *o,uint64_t address,uint32_t pages){
+ if(!o || address>UINT64_MAX-(uint64_t)pages*VMM_PAGE_SIZE)return NULL;
+ uint64_t end=address+(uint64_t)pages*VMM_PAGE_SIZE;
+ for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+  region_t *r=&o->regions[i];
+  if(r->state==1 && address>=r->first && end<=r->first+(uint64_t)r->pages*VMM_PAGE_SIZE)return r;
+ }
+ return NULL;
+}
+int chos_user_memory_control(address_space_handle_t h,uint64_t address,size_t bytes,unsigned operation){
+ uint32_t pages;
+ if((address&(VMM_PAGE_SIZE-1u))||!length_pages(bytes,&pages))return -CHOS_ERRNO_EINVAL;
+ if(operation!=CHOS_MEMORY_PROTECT_NONE && operation!=CHOS_MEMORY_PROTECT_READ &&
+    operation!=CHOS_MEMORY_PROTECT_RW && operation!=CHOS_MEMORY_DISCARD && operation!=CHOS_MEMORY_VALIDATE)return -CHOS_ERRNO_EINVAL;
+ uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);
+ if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
+ region_t *r=containing_region(o,address,pages);
+ if(!r){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EINVAL;}
+ if(r->pins){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EBUSY;}
+ address_space_error_t error=AS_OK;
+ if(operation==CHOS_MEMORY_VALIDATE){
+  for(uint32_t p=0;p<pages;p++){
+   vmm_mapping_info_t m;
+   if(!address_space_query(h,address+(uint64_t)p*VMM_PAGE_SIZE,&m)||
+      m.memory_type!=VMM_MEMORY_NORMAL||m.executable_at_el0||m.executable_at_el1){error=AS_ERR_BAD_DESCRIPTOR;break;}
+  }
+ }else if(operation==CHOS_MEMORY_DISCARD)error=address_space_discard_user_range(h,address,(size_t)pages*VMM_PAGE_SIZE);
+ else error=address_space_protect_user_range(h,address,(size_t)pages*VMM_PAGE_SIZE,
+     operation==CHOS_MEMORY_PROTECT_NONE?AS_PERM_USER_NONE:
+     operation==CHOS_MEMORY_PROTECT_READ?AS_PERM_USER_RO:AS_PERM_USER_RW);
+ chos_spin_unlock_irqrestore(&memory_lock,irq);return error==AS_OK?0:-CHOS_ERRNO_EIO;
+}
+int chos_user_memory_unmap_range(address_space_handle_t h,uint64_t address,size_t bytes){
+ uint32_t pages;
+ if((address&(VMM_PAGE_SIZE-1u))||!length_pages(bytes,&pages))return -CHOS_ERRNO_EINVAL;
+ uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);
+ if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
+ region_t *r=containing_region(o,address,pages);
+ if(!r){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EINVAL;}
+ if(r->pins){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EBUSY;}
+ uint32_t left=(uint32_t)((address-r->first)/VMM_PAGE_SIZE),right=r->pages-left-pages;
+ region_t *tail=NULL;
+ if(left&&right){
+  for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++)if(!o->regions[i].state){tail=&o->regions[i];break;}
+  if(!tail){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOMEM;}
+ }
+ /* Preflight and reserve metadata before modifying any page. On an unexpected
+  * table/free failure quarantine the entire original region until process reap. */
+ for(uint32_t p=0;p<pages;p++){
+  vmm_mapping_info_t m;
+  if(!address_space_query(h,address+(uint64_t)p*VMM_PAGE_SIZE,&m)){
+   r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;
+  }
+ }
+ region_t part={.first=address,.pages=pages,.state=1};
+ if(!remove_pages(h,&part,1)){r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;}
+ uint64_t after=address+(uint64_t)pages*VMM_PAGE_SIZE;
+ if(left){r->pages=left;if(right)*tail=(region_t){.first=after,.pages=right,.state=1};}
+ else if(right){r->first=after;r->pages=right;}
+ else *r=(region_t){0};
+ chos_spin_unlock_irqrestore(&memory_lock,irq);return 0;
+}

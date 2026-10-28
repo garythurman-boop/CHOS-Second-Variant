@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Run actual pinned JavaScriptCore CMake dependency triage, not an engine build.
-The sole source patch is applied to the provided reference checkout if clean.
+The checked platform patch is applied to the provided reference checkout if clean.
 Missing dependencies return the original nonzero CMake status with an honest report.
 """
 import argparse,hashlib,json,pathlib,re,shutil,subprocess,sys,time

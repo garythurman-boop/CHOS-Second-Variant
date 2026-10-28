@@ -49,6 +49,9 @@ int address_space_user_descriptor_matches(uint64_t descriptor,
                                           uint64_t physical_address,
                                           address_space_user_permissions_t permissions) {
     int writable;
+    if (permissions == AS_PERM_USER_NONE) {
+        return vmm_validate_user_inaccessible_page_descriptor(descriptor, physical_address);
+    }
     if (permissions == AS_PERM_USER_RX) {
         return vmm_validate_user_code_page_descriptor(descriptor, physical_address);
     }

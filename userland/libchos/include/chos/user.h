@@ -8,6 +8,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/syscall.h"
+#include "chos/memory_api.h"
 #include "chos/net_status_api.h"
 #include "chos/net6_api.h"
 #include "chos/net_tcp6_api.h"
@@ -53,6 +54,13 @@ static inline long chos_syscall3(long number, long arg0, long arg1, long arg2) {
 
 static inline long chos_write(const void *buffer, size_t length) {
     return chos_syscall2((long)CHOS_SYS_WRITE, (long)(uintptr_t)buffer, (long)length);
+}
+
+static inline long chos_memory_control(void *base,size_t bytes,unsigned operation) {
+    return chos_syscall3(CHOS_SYS_MEMORY_CONTROL,(long)(uintptr_t)base,(long)bytes,(long)operation);
+}
+static inline long chos_unmap_range(void *base,size_t bytes) {
+    return chos_syscall2(CHOS_SYS_UNMAP_RANGE,(long)(uintptr_t)base,(long)bytes);
 }
 
 static inline long chos_getpid(void) {

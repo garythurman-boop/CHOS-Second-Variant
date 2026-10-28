@@ -44,8 +44,8 @@ try:
  symbols={line.split()[-1]:int(line.split()[0],16) for line in subprocess.check_output(['llvm-nm','--defined-only',str(app)],text=True).splitlines() if len(line.split())==3}
  expected_far=symbols['chos_large_read_only']+2*1024*1024
  for mode,ec in [('write-ro',0x24),('execute-ro',0x20)]:
-  before=g.text().count('[USER FAULT]');g.serial('exec /BIN/LARGE.ELF '+mode)
-  wait(lambda:g.text().count('[USER FAULT]')>before,15,'large image '+mode+' isolation')
+  offset=len(g.text());g.serial('exec /BIN/LARGE.ELF '+mode)
+  wait(lambda:re.search(r'\[USER FAULT\][^\r\n]*ESR=0x[0-9A-Fa-f]{16}[^\r\n]*FAR=0x[0-9A-Fa-f]{16}[\r\n]',g.text()[offset:]),15,'complete large image '+mode+' fault record')
   matches=re.findall(r'\[USER FAULT\][^\r\n]*ESR=0x([0-9A-Fa-f]+)[^\r\n]*FAR=0x([0-9A-Fa-f]+)',g.text())
   esr,far=map(lambda v:int(v,16),matches[-1]);assert esr>>26==ec and far==expected_far,(mode,hex(esr),hex(far))
   assert '[FATAL]' not in g.text();free_pages();faults.append({'mode':mode,'esr':esr,'far':far})

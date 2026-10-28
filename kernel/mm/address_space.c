@@ -495,6 +495,73 @@ address_space_error_t address_space_unmap_user_page(address_space_handle_t handl
     return AS_OK;
 }
 
+/* Single-CPU, IRQ-masked transactions: validate the complete range before any
+ * PTE/data changes. No allocations, scheduling or partial successful result. */
+typedef struct { uint64_t *pte, physical; } user_range_page_t;
+#define USER_RANGE_MAX_PAGES 256u
+static address_space_error_t collect_owned_data_range(address_space_handle_t handle,
+        uint64_t start, size_t bytes, address_space_slot_t **owner_out,
+        user_range_page_t *pages, uint32_t *count_out) {
+    address_space_slot_t *slot;
+    if (!bytes || bytes > USER_RANGE_MAX_PAGES * VMM_PAGE_SIZE ||
+        (bytes & (VMM_PAGE_SIZE-1u)) || (start & (VMM_PAGE_SIZE-1u)) ||
+        !address_space_user_range_valid(start, bytes)) return AS_ERR_ARGUMENT;
+    if (!handle_slot(handle, &slot)) return AS_ERR_BAD_HANDLE;
+    uint32_t count=(uint32_t)(bytes/VMM_PAGE_SIZE);
+    for (uint32_t i=0;i<count;i++) {
+        uint64_t va=start+(uint64_t)i*VMM_PAGE_SIZE;
+        uint64_t pa=slot->user_l3_pa[address_space_user_l2_index(va)-CHOS_AS_USER_L2_FIRST];
+        if (!pa) return AS_ERR_PAGE_NOT_MAPPED;
+        uint64_t *l2=(uint64_t *)(uintptr_t)slot->device_l2_pa;
+        if(l2[address_space_user_l2_index(va)]!=vmm_make_table_descriptor(pa))return AS_ERR_BAD_DESCRIPTOR;
+        uint64_t *pte=&((uint64_t *)(uintptr_t)pa)[address_space_user_l3_index(va)];
+        uint64_t physical=*pte&DESC_ADDR_MASK;uint32_t owned_index;
+        if (!find_owned_frame(slot,physical,&owned_index) ||
+            slot->user_frames[owned_index].mapped_virtual_address!=va ||
+            !(address_space_user_descriptor_matches(*pte,physical,AS_PERM_USER_RW) ||
+              address_space_user_descriptor_matches(*pte,physical,AS_PERM_USER_RO) ||
+              address_space_user_descriptor_matches(*pte,physical,AS_PERM_USER_NONE)))
+            return AS_ERR_BAD_DESCRIPTOR;
+        pages[i]=(user_range_page_t){.pte=pte,.physical=physical};
+    }
+    *owner_out=slot;*count_out=count;return AS_OK;
+}
+address_space_error_t address_space_protect_user_range(address_space_handle_t handle,
+        uint64_t start,size_t bytes,address_space_user_permissions_t permissions) {
+    if (permissions!=AS_PERM_USER_RO && permissions!=AS_PERM_USER_RW &&
+        permissions!=AS_PERM_USER_NONE) return AS_ERR_ARGUMENT;
+    user_range_page_t pages[USER_RANGE_MAX_PAGES];address_space_slot_t *slot;uint32_t count;
+    uint64_t irq=chos_spin_lock_irqsave(&address_space_lock);
+    address_space_error_t error=collect_owned_data_range(handle,start,bytes,&slot,pages,&count);
+    if (error!=AS_OK) {chos_spin_unlock_irqrestore(&address_space_lock,irq);return error;}
+    int active=vmm_current_root_table_address()==slot->root_pa;
+    /* Break before make, with cache maintenance and architected TLB barriers.
+     * The data frames/ownership counts remain intact even for PROT_NONE. */
+    for (uint32_t i=0;i<count;i++) {
+        *pages[i].pte=0;vmm_clean_page_table_range(pages[i].pte,sizeof(uint64_t));
+        if (active) vmm_tlb_invalidate_page(start+(uint64_t)i*VMM_PAGE_SIZE);
+    }
+    for (uint32_t i=0;i<count;i++) {
+        *pages[i].pte=permissions==AS_PERM_USER_NONE
+            ?vmm_make_user_inaccessible_page_descriptor(pages[i].physical)
+            :vmm_make_user_page_descriptor(pages[i].physical,permissions==AS_PERM_USER_RW);
+        vmm_clean_page_table_range(pages[i].pte,sizeof(uint64_t));
+        if (active) vmm_tlb_invalidate_page(start+(uint64_t)i*VMM_PAGE_SIZE);
+    }
+    chos_spin_unlock_irqrestore(&address_space_lock,irq);return AS_OK;
+}
+address_space_error_t address_space_discard_user_range(address_space_handle_t handle,
+        uint64_t start,size_t bytes) {
+    user_range_page_t pages[USER_RANGE_MAX_PAGES];address_space_slot_t *slot;uint32_t count;
+    uint64_t irq=chos_spin_lock_irqsave(&address_space_lock);
+    address_space_error_t error=collect_owned_data_range(handle,start,bytes,&slot,pages,&count);
+    if (error==AS_OK) for (uint32_t i=0;i<count;i++) {
+        void *alias=(void *)(uintptr_t)pages[i].physical;
+        zero_bytes(alias,VMM_PAGE_SIZE);vmm_clean_page_table_range(alias,VMM_PAGE_SIZE);
+    }
+    chos_spin_unlock_irqrestore(&address_space_lock,irq);return error;
+}
+
 address_space_error_t address_space_destroy(address_space_handle_t handle) {
     address_space_slot_t *slot;
     uint64_t irq_flags, root_pa, device_pa, ram_pa, low_pa;

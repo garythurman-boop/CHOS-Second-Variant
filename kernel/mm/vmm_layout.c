@@ -78,6 +78,16 @@ int vmm_validate_user_code_page_descriptor(uint64_t descriptor, uint64_t physica
     return expected != 0u && descriptor == expected;
 }
 
+uint64_t vmm_make_user_inaccessible_page_descriptor(uint64_t physical_address) {
+    uint64_t descriptor = vmm_make_user_page_descriptor(physical_address, 1);
+    return descriptor ? descriptor & ~DESC_AP_MASK : 0u;
+}
+
+int vmm_validate_user_inaccessible_page_descriptor(uint64_t descriptor, uint64_t physical_address) {
+    uint64_t expected = vmm_make_user_inaccessible_page_descriptor(physical_address);
+    return expected != 0u && descriptor == expected;
+}
+
 uint64_t vmm_make_page_descriptor(uint64_t physical_address,
                                   vmm_memory_type_t memory_type,
                                   vmm_page_permissions_t permissions) {

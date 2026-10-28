@@ -1,0 +1,1799 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "scope": "real owned anonymous protection/discard/partial unmap,native unistd subset,upstream VM helpers and kernel empty-arena reclamation",
+  "base_source_commit": "7acb77319149f38350b0bbfa59d4cbd548ef8124",
+  "changed_source_files_sha256": {
+    "Makefile": "8748c5b156c18c42b48ee57e8138d638a77793567487be4d99ea90039bee9fe8",
+    "docs/dependencies/webkit-jsc-bringup.json": "0398b671ee1a5bc1858069fd1a9ab0f0650d48897497268d1b3f717676e24f16",
+    "include/chos/address_space.h": "3905febc79deea20ef2f209691578cf5895e1fb084bd75a0704f8711e24bc34f",
+    "include/chos/kheap.h": "8120549e785dd93611ebd04dd3d3767688ac6d70b05e236a7710fb1272c39ebf",
+    "include/chos/memory_api.h": "4111b3e558de26b7db37e330eb369fb4003ec3c6679cea3ed55003dd40a6d6bc",
+    "include/chos/process_caps.h": "d9523b0dee50ff09f70119a5138493219a3990f4a2683820f88c415557b2b26a",
+    "include/chos/syscall.h": "942eeeadde48d090c32d830d4c6686c6d0749f732e6bfb9998f3c7f0d6b28f93",
+    "include/chos/user_memory.h": "fbea8dfeb41d374b57834c473a618825642c24d356aa7b2f9eeec470c83d5133",
+    "include/chos/vmm.h": "415cd8f4abcddb7eb35bb169f32e4e95209c29d9272d8fbd0d37cbd50980ec9c",
+    "kernel/core/shell.c": "0504634adfd00795b7b44eca522da04e818faf76c81c223b6b2679b4121a3ee0",
+    "kernel/core/syscall.c": "d9a22f42ba33499b441b8313d3d3f87036a8f4aa5f0b680d11178501fe741387",
+    "kernel/mm/address_space.c": "a58f5babeaa48ae92b04e5b7c3af91851051994e5b109de4a7200b0c0407ab89",
+    "kernel/mm/address_space_layout.c": "6e8976c7cb62c9e268d0c2dfa066e1287caa74d70040e91c45abdcdb09fba3c4",
+    "kernel/mm/kheap.c": "fa9f144a19807b580db8e00cc69e3c6404c7279b9182e1d6ee14ea9011914f07",
+    "kernel/mm/user_memory.c": "11fce66fedabd5b368dbb77ae46c3031352be1f53e22c6e2a90ae42676473fcc",
+    "kernel/mm/vmm_layout.c": "eb8a95af64b3e8aa2487c3cd6e731130eb917d67e64f8815eb1465a81b6adbf5",
+    "ports/native/chos-toolchain.cmake": "792b030c5e75b7b340cc1b7216af43d51573453a9d11a289f6e86493f3e94707",
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "4536bf8fe2ca5c3e6e4de6384e886f50e1e3495eb4238154417a01efc3c1bc74",
+    "tests/bmalloc_vm/CMakeLists.txt": "8f4d0a0288fd1f4969cd502ace63d9c91d23bac8bfe332a83935001ed31ace2d",
+    "tests/bmalloc_vm/main.cpp": "1288593cf0662997d0654452d86106e780919d952ea908f8415d25b7d32a8952",
+    "tests/mman_host_names.h": "2730b92fbca75967fe2f2019a5ee1b9586b2e4a18367be77419d9c28ecf0aeb3",
+    "tests/native_sdk/CMakeLists.txt": "fa2b2e6b033f2432057e33b69ed3633a612d3aa02c3674556c49b14d9a5a927e",
+    "tests/qemu_bmalloc_vm.py": "aff5dba2ab2c27e238290d8cfadcd9a390207d2ea6b8954d4ac2717a3aca97af",
+    "tests/qemu_large_image.py": "65d02f84576924f4825237d389c55745d4728ed62eef1da54dc431ba8e109354",
+    "tests/qemu_virtual_memory.py": "e90e7467beb499683c8e306bc386310f67147b0583ab89c4aa2f8a82480cb409",
+    "tests/test_address_space.c": "c9e747f4519f29406f82499523c6f40e36784cb434ceddd493541958c3066b24",
+    "tests/test_kheap.c": "e4291cfaa3d25d24b5fb7ae182d4841ea8b815937cfb6f4f3a7833cf72f8679c",
+    "tests/test_libc_mman.c": "2b0e57d20689e0495bebae738015c5ecdf370496deb2e147d0f9d725a63fd994",
+    "tests/test_process_caps.c": "32ca8edfe32fe35613db06deb0741926d70b4ab6d09903ff5d194823079fde8c",
+    "tests/test_user_abi.c": "5e3929bc67b989b1d042ffa252421a99fb5237c19efb6ded3e1ae5c7ce85f260",
+    "tests/test_user_memory.c": "02b66bef28095ab433d05d4f48c282dfd4a622b56a7be0a2d943f4ebb88e3cec",
+    "tools/build_bmalloc_vm.py": "bec07852f6d3d78d88bfd78efcbef1b9e14e50ea7221729a3211845ff6fce923",
+    "tools/preflight_javascriptcore.py": "f7d003c970ce7f61bfef1d8f6bd257d582f9424d1cf3206b20ee67c60d61e023",
+    "userland/examples/thread_test.c": "28ad18931846dcdeac13ba49badb888997025d9b7266e38e3b8fd642c2f7125f",
+    "userland/examples/vm_test.c": "63cb903202dc2569923004087a5929c64c7b8c8d58156f5ca7e1eb44d01ed9c2",
+    "userland/libc/Makefile.inc": "ef61daaa3b293bde00278b00fd67d7b15e465f7f7cab46f1c0b72557b8ea76d6",
+    "userland/libc/include/sys/mman.h": "112e392bbac0f2dac50ddac71d308c1fc3d0e03aa9c488671b04ceda385a8728",
+    "userland/libc/include/sys/types.h": "7ba0c359b718af8b18d4b78f54c2362ad6d4aa1f8a1d04ebbfb0b9e9d260130b",
+    "userland/libc/include/unistd.h": "17c03080adc64b0f73f0227f0973addc08545b09c2429977558f770fec68e3b6",
+    "userland/libc/mman.Makefile.inc": "920c13431f14aa259c9426feec8fd8c10c85a1f3ad99fc9bcbca500a21b12f66",
+    "userland/libc/mman.c": "a0d790824524711821a538ecacc47111a6aa5d8a036ce154dc16ae8276218fde",
+    "userland/libc/unistd.c": "ad6e28f61c41217864ef115e50c704d1395311d07020488e681be71a0506047e",
+    "userland/libchos/include/chos/user.h": "b64d4af81df01077a5d7a8bc428a16a053352822876e5c594fa792ed0011b9ae"
+  },
+  "host_suite": {
+    "status": "PASS",
+    "log_sha256": "705a502b0300fffcadb478311d52fe4336766f9f5396819acd725f9e551a8473"
+  },
+  "sanitizers": {
+    "status": "PASS",
+    "log_sha256": "a5c968bccc5fe6208371c5b268f457aa9589b6cdde82a9fa4ea22a21cf6cf0bf"
+  },
+  "sdk": {
+    "files": 1115,
+    "manifest_sha256": "8d6753051ceb4b7903d45ec145063026192ec19ef88509c5177ab91362678939",
+    "real_native_link_and_negative_probes": "PASS",
+    "full_embedded_ICU_4MiB_budget_guard": "PASS_SPECIFIC_REJECTION"
+  },
+  "bmalloc_vm_build": {
+    "status": "BUILT_NOT_EXECUTED",
+    "returncode": 0,
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "4536bf8fe2ca5c3e6e4de6384e886f50e1e3495eb4238154417a01efc3c1bc74",
+    "sdk_manifest_sha256": "8d6753051ceb4b7903d45ec145063026192ec19ef88509c5177ab91362678939",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/bmalloc_vm",
+        "-B",
+        "/tmp/chos-bmalloc-vm3/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/tmp/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/tmp/chos-webkit-jsc-source",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/tmp/chos-bmalloc-vm3/cmake",
+        "-j4"
+      ]
+    ],
+    "seconds": 1.1873378309974214,
+    "application_sha256": "777401f8e586d47bd9374372ec4370ebb4b77cebef555539f08f203d05b5d4ef",
+    "scope": "original inline VM helpers plus checked CHOS identity/discard adaptation;not bmalloc allocator or JavaScriptCore",
+    "limits": [
+      "bounded private anonymous subset;fixed/file/shared/executable maps unsupported",
+      "real guest tests are required separately;no full engine or browser/conformance claim"
+    ]
+  },
+  "guest_profiles": [
+    {
+      "name": "virtual_memory-direct",
+      "command": [
+        "python3",
+        "tests/qemu_virtual_memory.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/virtual_memory-direct"
+      ],
+      "exit": 0,
+      "seconds": 5.597653647004336,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "7b0870a78932744d69986a330654be6dd6340e8590fc02004794b81041480f95",
+        "cold_free_pages": 117523,
+        "free_pages_before": 117523,
+        "free_pages_after": 117523,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 72,
+        "contained_faults": [
+          {
+            "mode": "read-none",
+            "esr": 2449473551,
+            "far": 553652224
+          },
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 553652224
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 553652224
+          },
+          {
+            "mode": "unmapped-middle",
+            "esr": 2449473543,
+            "far": 553656320
+          }
+        ],
+        "operation_timings_ns": [
+          {
+            "operation": "map-none",
+            "nanoseconds": 14426896
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 917232
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 2100976
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 2889904
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 3585984
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 527424
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1786784
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 13010304
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 3604480
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 561728
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1854608
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 2822224
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 3844448
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 647904
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1743088
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 2914144
+          }
+        ],
+        "checks": [
+          "real owned anonymous mmap at NONE/R/RW;zero-on-discard with protection retained;RW restoration",
+          "partial middle unmap/prefix/suffix trim;split-quota failure changes no live data",
+          "three concurrent native worker lifecycles;all cleanup returns heap and warm physical pages",
+          "actual foreign address-space and reduced syscall-permission attempts denied;code permissions cannot be promoted",
+          "architectural read-NONE/write-RO/execute-XN/unmapped-hole faults at exact announced addresses;subsequent execution works",
+          "real sysconf/getpagesize/getpid and bounded process-owned read/lseek/close;write invalid fd fails"
+        ],
+        "limits": [
+          "bounded private anonymous subset;no fixed/file/shared/executable mappings;no sparse demand paging or swap",
+          "munmap/mprotect/madvise must fit one live owned region;unsupported holes/multiple regions fail",
+          "1MiB mapping,2MiB aperture,16 regions,4MiB image,8MiB owned frames;not engine-sized",
+          "not full POSIX,JavaScriptCore/browser or Stage3 completion;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "93a64d9b2ca212bf2b11cf803aa7ee95dd252ee99673824cfbd24941708818cf",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "virtual_memory-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_virtual_memory.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/virtual_memory-uefi",
+        "--application",
+        "/tmp/chos-vm-sdk-check3/sdk_vm"
+      ],
+      "exit": 0,
+      "seconds": 13.104466057004174,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "7fb0f376e184abd4acc92546602b3760b886aa242e36140d6e56d11f1899d7e8",
+        "cold_free_pages": 500196,
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 106,
+        "contained_faults": [
+          {
+            "mode": "read-none",
+            "esr": 2449473551,
+            "far": 553652224
+          },
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 553652224
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 553652224
+          },
+          {
+            "mode": "unmapped-middle",
+            "esr": 2449473543,
+            "far": 553656320
+          }
+        ],
+        "operation_timings_ns": [
+          {
+            "operation": "map-none",
+            "nanoseconds": 3702064
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 829120
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 2043856
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 2880560
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 3853648
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 605168
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 12762256
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3583296
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 3554880
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 566464
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1784192
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 13243920
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 3511296
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 538368
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1766016
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 13215344
+          }
+        ],
+        "checks": [
+          "real owned anonymous mmap at NONE/R/RW;zero-on-discard with protection retained;RW restoration",
+          "partial middle unmap/prefix/suffix trim;split-quota failure changes no live data",
+          "three concurrent native worker lifecycles;all cleanup returns heap and warm physical pages",
+          "actual foreign address-space and reduced syscall-permission attempts denied;code permissions cannot be promoted",
+          "architectural read-NONE/write-RO/execute-XN/unmapped-hole faults at exact announced addresses;subsequent execution works",
+          "real sysconf/getpagesize/getpid and bounded process-owned read/lseek/close;write invalid fd fails"
+        ],
+        "limits": [
+          "bounded private anonymous subset;no fixed/file/shared/executable mappings;no sparse demand paging or swap",
+          "munmap/mprotect/madvise must fit one live owned region;unsupported holes/multiple regions fail",
+          "1MiB mapping,2MiB aperture,16 regions,4MiB image,8MiB owned frames;not engine-sized",
+          "not full POSIX,JavaScriptCore/browser or Stage3 completion;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "eb28f74efdbfc4d55e262efbe7e9eab67732035d778ac38f3a0baa6b2dd1acb3",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "bmalloc_vm-direct",
+      "command": [
+        "python3",
+        "tests/qemu_bmalloc_vm.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/bmalloc_vm-direct",
+        "--application",
+        "/tmp/chos-bmalloc-vm3/cmake/bmalloc_vm"
+      ],
+      "exit": 0,
+      "seconds": 4.990267934001167,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "777401f8e586d47bd9374372ec4370ebb4b77cebef555539f08f203d05b5d4ef",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117523,
+        "free_pages_before": 117523,
+        "free_pages_after": 117523,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 39,
+        "checks": [
+          "actual pinned upstream VMAllocate inline helpers with checked CHOS identity/discard adaptation",
+          "64KiB aligned allocation with prefix/suffix trim,zero-and-purge,deallocate/reallocate physical advice,permission revocation and restoration",
+          "three native C++ workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+        ],
+        "limits": [
+          "qualified VM helpers,not a complete allocator,engine,C++23 or POSIX implementation",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "4bfeb40dbe02b28440e54fc54e478e77c925b0b0be926feaa10b05f58e5f19a2",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "bmalloc_vm-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_bmalloc_vm.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/bmalloc_vm-uefi",
+        "--application",
+        "/tmp/chos-bmalloc-vm3/cmake/bmalloc_vm"
+      ],
+      "exit": 0,
+      "seconds": 12.092244601000857,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "777401f8e586d47bd9374372ec4370ebb4b77cebef555539f08f203d05b5d4ef",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500196,
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 39,
+        "checks": [
+          "actual pinned upstream VMAllocate inline helpers with checked CHOS identity/discard adaptation",
+          "64KiB aligned allocation with prefix/suffix trim,zero-and-purge,deallocate/reallocate physical advice,permission revocation and restoration",
+          "three native C++ workers,three lifecycles,heap0,stable warm frames and no private futex waiters"
+        ],
+        "limits": [
+          "qualified VM helpers,not a complete allocator,engine,C++23 or POSIX implementation",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "c2926c8bf8e48d6d937d01562207c17370cf20b6bba3f48eaaaa7bfa43d4fd70",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "user_memory-direct",
+      "command": [
+        "python3",
+        "tests/qemu_user_memory.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/user_memory-direct"
+      ],
+      "exit": 0,
+      "seconds": 4.685532980001881,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "c4c8cea2d274a4c5656ecc39fbded1d598f918354385af4760db81081b4cbda1",
+        "free_pages_before": 117519,
+        "free_pages_after": 117519,
+        "checks": [
+          "real EL0 anonymous zeroed RW/XN mappings up to1MiB",
+          "invalid/overflow sizes and nonzero high flags refused;total2MiB aperture exhaustion",
+          "exact unmap and double-unmap rejection",
+          "small/large guard-page data abort contained to process",
+          "small/large execute-never instruction abort contained to process",
+          "normal/fault/scheduled exit cleans abandoned mappings; no physical-page leak"
+        ]
+      },
+      "result_sha256": "becd18800489119c8d8b4be78afb777a79f5d7710e48ae8e31e8502d88fcdae7",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "user_memory-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_user_memory.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/user_memory-uefi"
+      ],
+      "exit": 0,
+      "seconds": 12.093569204000232,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "c4c8cea2d274a4c5656ecc39fbded1d598f918354385af4760db81081b4cbda1",
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "checks": [
+          "real EL0 anonymous zeroed RW/XN mappings up to1MiB",
+          "invalid/overflow sizes and nonzero high flags refused;total2MiB aperture exhaustion",
+          "exact unmap and double-unmap rejection",
+          "small/large guard-page data abort contained to process",
+          "small/large execute-never instruction abort contained to process",
+          "normal/fault/scheduled exit cleans abandoned mappings; no physical-page leak"
+        ]
+      },
+      "result_sha256": "dbae6f5d7db7194689d337df2dd339310b4bf6e423160e67e32749725ee42d76",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "native_elf-direct",
+      "command": [
+        "python3",
+        "tests/qemu_native_elf.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/native_elf-direct"
+      ],
+      "exit": 0,
+      "seconds": 4.638100230993587,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "77af097691bfb5881cbf8533f6e4d37fdf3c6675b643dd978084547edc60a77a",
+        "free_pages_before": 117523,
+        "free_pages_after": 117523,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "result_sha256": "dbe662ea8572dea445c70b53f4d20afe06b3ee88f02bb51d5bf339a9a59e840d",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "native_elf-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_native_elf.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/native_elf-uefi"
+      ],
+      "exit": 0,
+      "seconds": 11.812196944003517,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "77af097691bfb5881cbf8533f6e4d37fdf3c6675b643dd978084547edc60a77a",
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "result_sha256": "bdd0c4c6e0520590f4b8295a4216f3d0966d76d6a8697b72d27e460445685c24",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "threads-direct",
+      "command": [
+        "python3",
+        "tests/qemu_threads.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/threads-direct"
+      ],
+      "exit": 0,
+      "seconds": 13.159050581001793,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "dd161ee3c608faf6a3a6cddf4cdf8d759b905c8060944ed546960467dd0832ba",
+        "cold_free_pages": 117523,
+        "free_pages_before": 117523,
+        "free_pages_after": 117523,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 232,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "40a804dd83d8700d13d1508d07a7c14335ad9b1f528696ca49b314a68f464d75",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "threads-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_threads.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/threads-uefi"
+      ],
+      "exit": 0,
+      "seconds": 19.994134300999576,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "dd161ee3c608faf6a3a6cddf4cdf8d759b905c8060944ed546960467dd0832ba",
+        "cold_free_pages": 500196,
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 234,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "953650b323ea45224d909fcbd3dd95f498cd8ae7451e02442473c4b3dc809c38",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "icu_resources-direct",
+      "command": [
+        "python3",
+        "tests/qemu_icu_resources.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/icu_resources-direct"
+      ],
+      "exit": 0,
+      "seconds": 15.525043977002497,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "d5bc5674151343a052ee29db2828cc0d6b7005a1d419c9af2fd9607efbf265d2",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117523,
+        "free_pages_before": 117519,
+        "free_pages_after": 117519,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 423,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,stable warm frames and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "79b47f9d717c3e07e5764b48b8ad3d0f7fd67cc64e7510138dfb32b9ea570469",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "icu_resources-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_icu_resources.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/icu_resources-uefi",
+        "--application",
+        "/tmp/chos-vm-sdk-check3/sdk_icu_resources.app.elf"
+      ],
+      "exit": 0,
+      "seconds": 22.588119129002735,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "efa535fdde8f58a6cf7fb3f09a6850a6925763d7ebf58c2500654865d688a791",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500196,
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 433,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,stable warm frames and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "71681c7cae9962083ece78bf6ecb242135653abdaad556c92385634b41d99f06",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "user_allocator-direct",
+      "command": [
+        "python3",
+        "tests/qemu_user_allocator.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/user_allocator-direct"
+      ],
+      "exit": 0,
+      "seconds": 6.965948220997234,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "f643d399d8244ab82e842be9cb51e7b81d41a55347fc4eda202fac262cbb82c8",
+        "free_pages_before": 117523,
+        "free_pages_after": 117523,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "result_sha256": "563bec41aa61d58512133a3b43347db4a4ebc03377809f7805b758af16b26935",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "user_allocator-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_user_allocator.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/user_allocator-uefi"
+      ],
+      "exit": 0,
+      "seconds": 13.663923749001697,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "f643d399d8244ab82e842be9cb51e7b81d41a55347fc4eda202fac262cbb82c8",
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "checks": [
+          "actual read-only clock ABI pointer/capacity/guard checks, C/C++ monotonic and UTC conversion",
+          "native C and freestanding C++ objects call standard allocation and string symbols in isolated EL0",
+          "MAP/UNMAP-backed malloc/calloc/realloc, overflow preservation and aligned allocations",
+          "all16 mapping regions are exhausted, next allocation fails ENOMEM and live data survives",
+          "mixed live allocation patterns, string overlap and complete region release",
+          "abandoned mappings are reclaimed by actual process reaper",
+          "repeated exec/spawn launches preserve free physical pages"
+        ]
+      },
+      "result_sha256": "6b7591e0407be9a58fd0efd1ec918ad34ce1314d2b8cea5f2e13871364d0d67d",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "large_image-direct",
+      "command": [
+        "python3",
+        "tests/qemu_large_image.py",
+        "--mode",
+        "direct",
+        "--out",
+        "/tmp/chos-vm-evidence3/large_image-direct"
+      ],
+      "exit": 0,
+      "seconds": 5.9315177259995835,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "9092172a4a6eb424ccfbbf660ed2a60b8768b85f4ac4d0b9d50f39ceac544b5d",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117523,
+        "free_pages_before": 117523,
+        "free_pages_after": 117523,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 28,
+        "checks": [
+          "actual3MiB readonly native segment crosses previous2MiB image bound and multiple L3 tables",
+          "actual1MiB private mapping plus image/stack exceeds old4MiB owned-frame budget",
+          "every readonly payload byte and zeroed private byte checked;initial writable data/BSS preserved",
+          "write-to-RO and execute-from-RO above2MiB fault at exact expected address and correct architectural class",
+          "normal/abandoned/faulted application cleanup,recovery,stable warm frames and zero private futex waiters"
+        ],
+        "contained_faults": [
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 538976256
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 538976256
+          }
+        ],
+        "limits": [
+          "4MiB image/8MiB owned-frame profile,not the larger footprint required by the full engine/data",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "0db883e5299ce71fd6df0c9b3c566f0c744396fb2bed71e4cc9d25bee64841b4",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "large_image-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_large_image.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/large_image-uefi"
+      ],
+      "exit": 0,
+      "seconds": 13.29343480800162,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "9092172a4a6eb424ccfbbf660ed2a60b8768b85f4ac4d0b9d50f39ceac544b5d",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500196,
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 32,
+        "checks": [
+          "actual3MiB readonly native segment crosses previous2MiB image bound and multiple L3 tables",
+          "actual1MiB private mapping plus image/stack exceeds old4MiB owned-frame budget",
+          "every readonly payload byte and zeroed private byte checked;initial writable data/BSS preserved",
+          "write-to-RO and execute-from-RO above2MiB fault at exact expected address and correct architectural class",
+          "normal/abandoned/faulted application cleanup,recovery,stable warm frames and zero private futex waiters"
+        ],
+        "contained_faults": [
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 538976256
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 538976256
+          }
+        ],
+        "limits": [
+          "4MiB image/8MiB owned-frame profile,not the larger footprint required by the full engine/data",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "385f023fa53ee3ff92eb03fbed0265c7dd477f8ce98ae197960e0413e50dd4fe",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "typing-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_typing.py",
+        "--mode",
+        "uefi",
+        "--out",
+        "/tmp/chos-vm-evidence3/typing-uefi"
+      ],
+      "exit": 0,
+      "seconds": 38.83699570099998,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "b3ddcb7fd93e01cea3633b4bd9e6cbb4dd961c50fccd63d2e5bf355c8db4c58a",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "result_sha256": "40ebc2508f7075e4d54fff7f461dba34d999a9e5d3953da806a6c604a832a327",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "ethernet-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_platform.py",
+        "--mode",
+        "uefi",
+        "--memory",
+        "2G",
+        "--pci-virtio",
+        "--net-model",
+        "e1000e",
+        "--tablet",
+        "--clock-test",
+        "--qemu-data",
+        "/workspace/chos-tools/root/usr/share/qemu",
+        "--firmware",
+        "/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd",
+        "--out",
+        "/tmp/chos-vm-evidence3/ethernet-uefi"
+      ],
+      "exit": 0,
+      "seconds": 75.33942955800012,
+      "result": {
+        "mode": "uefi",
+        "checks": [
+          "32 fast USB keypress/release pairs",
+          "UEFI clock snapshot/counter progress and visible minute rollover",
+          "PCI VirtIO CHFS write/flush/read",
+          "PCI VirtIO hardware RNG",
+          "82574L e1000e DHCP/ARP/ICMP",
+          "keyboard shortcut",
+          "absolute tablet",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "20 USB hot-unplug/reconnect cycles with ring wraps",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 6.816,
+        "desktop_ready_seconds": 9.867,
+        "keyboard_visible_ms": 25.07,
+        "pointer_visible_ms": 44.22,
+        "maximize_visible_ms": 181.57,
+        "drag_visible_ms": 233.13,
+        "idle_cpu_percent": 9.5,
+        "status": "PASS"
+      },
+      "result_sha256": "4b39302ad3ac3700b3a4992025764424900df5b41ade8e30007c55dc0bb06754",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "name": "ethernet-direct",
+      "command": [
+        "python3",
+        "tests/qemu_platform.py",
+        "--mode",
+        "direct",
+        "--clock-test",
+        "--qemu-data",
+        "/workspace/chos-tools/root/usr/share/qemu",
+        "--out",
+        "/tmp/chos-vm-evidence3/ethernet-direct"
+      ],
+      "exit": 0,
+      "seconds": 35.83472282100411,
+      "result": {
+        "mode": "direct",
+        "checks": [
+          "EL0 RNG invalid pointers, length bound, guard bytes and hardware receipt",
+          "CHFS write/flush/read",
+          "DHCP/ARP/ICMP",
+          "MMU permissions, guard pages and dynamic aliases with 512 MiB RAM",
+          "FDT RTC progress and visible minute rollover",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 0.145,
+        "desktop_ready_seconds": 3.226,
+        "keyboard_visible_ms": 71.04,
+        "pointer_visible_ms": 43.07,
+        "maximize_visible_ms": 182.63,
+        "drag_visible_ms": 223.75,
+        "idle_cpu_percent": 4.0,
+        "status": "PASS"
+      },
+      "result_sha256": "74e6c4b9b2d8d475af0d92dd8d14e979f7092110055a1e25736263c05b6ad21d",
+      "boot_manifest": {
+        "kernel_sha256": "045cb7e738c37c5015c4c2c1d539dc247688d605a189dbfb46126869ab7ed112"
+      }
+    },
+    {
+      "name": "tls-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_tls.py",
+        "--mode",
+        "uefi",
+        "--tls-version",
+        "1.3",
+        "--out",
+        "/tmp/chos-vm-evidence3/tls-uefi"
+      ],
+      "exit": 0,
+      "seconds": 42.453006232004554,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "2eb4287a5e9a947288345541a5cd707ee0ea70aca356002c765a3048dcd23e0e",
+        "ipv6": false,
+        "tcp6_wire_frames": 0,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500196,
+        "free_pages_before": 500196,
+        "free_pages_after": 500196,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6463272490000236,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7072871540003689,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5054904959979467,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5660479760044836,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5659784829986165,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7482540839991998,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.44519525700161466,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.38483705399994506,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.46633807200123556,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.42548732300201664,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.42497669600561494,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.28366076100064674,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6083301100006793,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.184325823996915,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.20282086000224808,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.20266146500216564,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8917470820015296,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6278113809967181,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.2607636920001823,
+            "stalled_network_gui_response_seconds": 0.04248537499370286,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.8380556789998082,
+            "stalled_network_gui_response_seconds": 0.04260281500319252,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 36752)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 60140)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45652)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 43328)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 49038)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 58702)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 41726)"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 41738)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 57634)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45438)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45450)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45444)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45454)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45478)"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "a6f52c8358a55dd353ab0fcc7904cb32ceea2b1aeda7ab7d40fb7ac83b3f7beb",
+      "boot_manifest": {
+        "kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "iso_sha256": "c67f3bd433e941ce8f475ab462c08647817d99b321a095924de3d2d04f2414c6",
+        "iso_embedded_kernel_sha256": "077cc76e4284072a9b142c4108b532b9c9b02a892217c5bab8d8e9a9074a0d91",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "operation_observations": {
+    "virtual_memory-direct/map-none": {
+      "samples": 4,
+      "min_ns": 3585984,
+      "max_ns": 14426896
+    },
+    "virtual_memory-direct/protect-rw": {
+      "samples": 4,
+      "min_ns": 527424,
+      "max_ns": 917232
+    },
+    "virtual_memory-direct/discard-none": {
+      "samples": 4,
+      "min_ns": 1743088,
+      "max_ns": 2100976
+    },
+    "virtual_memory-direct/unmap-read": {
+      "samples": 4,
+      "min_ns": 2822224,
+      "max_ns": 13010304
+    },
+    "virtual_memory-uefi/map-none": {
+      "samples": 4,
+      "min_ns": 3511296,
+      "max_ns": 3853648
+    },
+    "virtual_memory-uefi/protect-rw": {
+      "samples": 4,
+      "min_ns": 538368,
+      "max_ns": 829120
+    },
+    "virtual_memory-uefi/discard-none": {
+      "samples": 4,
+      "min_ns": 1766016,
+      "max_ns": 12762256
+    },
+    "virtual_memory-uefi/unmap-read": {
+      "samples": 4,
+      "min_ns": 2880560,
+      "max_ns": 13243920
+    }
+  },
+  "timing_limits": "shared-cloud QEMU observations;not real-time guarantees,engine benchmarks or physical-hardware results",
+  "jsc_configuration": {
+    "status": "CONFIGURED_NOT_BUILT",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "source_manifest": "docs/dependencies/webkit-jsc-bringup.json",
+    "command": [
+      "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+      "-S",
+      "/tmp/chos-webkit-jsc-source",
+      "-B",
+      "/tmp/chos-jsc-vm/cmake",
+      "-G",
+      "Ninja",
+      "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+      "-DRuby_EXECUTABLE=/workspace/chos-tools/root/usr/bin/ruby3.3",
+      "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DPORT=JSCOnly",
+      "-DENABLE_STATIC_JSC=ON",
+      "-DENABLE_JIT=OFF",
+      "-DUSE_SYSTEM_MALLOC=ON",
+      "-DENABLE_TOOLS=OFF",
+      "-DCHOS_SDK_ROOT=/tmp/chos-stage3-build/native-sdk"
+    ],
+    "returncode": 0,
+    "seconds": 11.273563550996187,
+    "log_sha256": "f35ff4f4b038ab65dbf30e6ab3b111d7f9ca617224e2dd48a8d1e3a4bf2bae7d",
+    "tool_versions": {
+      "cmake": "cmake version 3.31.6",
+      "ninja": "1.11.1.git.kitware.jobserver-1",
+      "ruby": "ruby 3.3.8 (2025-04-09 revision b200bad6cd) [x86_64-linux-gnu]",
+      "clang": "Debian clang version 19.1.7 (3+b1)",
+      "clang++": "Debian clang version 19.1.7 (3+b1)"
+    },
+    "int128_type_compile_probe": "PASS",
+    "compile_only_cmake_checks": false,
+    "native_sdk": "/tmp/chos-stage3-build/native-sdk",
+    "source_closure_files_checked": 10010,
+    "threads_missing": false,
+    "target_library_search": "CHOS sysroot only; host executables permitted",
+    "icu_missing": false,
+    "limits": [
+      "Real executable links are used; failed native POSIX thread checks remain failures.",
+      "CMake FindThreads can falsely report -lpthreads in archive mode; that is NOT accepted evidence. Native partial pthread runtime has separate guest tests.",
+      "The qualified C++20/23 container subset is not complete C++23/ABI/POSIX support. Read CMakeConfigureLog.yaml for specific compile failures; integer128 type compilation is not arithmetic-runtime qualification.",
+      "No WebCore/WPE rendering,JavaScript execution,browser or conformance result."
+    ]
+  },
+  "actual_engine_build": {
+    "status": "FAIL",
+    "engine_built": false,
+    "engine_executed": false,
+    "log_sha256": "1584ab5ff37a314675545235749ab7f1234a870f825dc2166b4c931151adb49d",
+    "first_missing_interfaces": [
+      "fcntl.h",
+      "stderr/vfprintf/fprintf streams"
+    ],
+    "closed_prior_compile_gates": [
+      "original byteswap header",
+      "sys/mman.h",
+      "unistd.h"
+    ]
+  },
+  "heap_diagnosis": {
+    "before_fix": "file/resource snapshots freed their logical blocks but retained entire backing arenas;596 empty pages retained with live payload unchanged at240bytes;separate failed profile grows36morepages",
+    "after_fix": "empty arenas return to PMM;at most one fully free minimum arena retained;PMM refusal quarantines storage",
+    "diagnostic_guest": "/tmp/chos-icu-retention-fixed",
+    "observed_heap_pages_before_after": [
+      4,
+      4
+    ],
+    "observed_live_payload_bytes_before_after": [
+      240,
+      240
+    ],
+    "quarantine_fault_path": "host/sanitizer injection only;no corrupt live PMM test claimed"
+  },
+  "retained_investigations": [
+    {
+      "path": "/workspace/chos-evidence/virtual-memory/retained-heap-growth-matrix.tar.gz",
+      "reason": "strict warm PMM check caught36-page retained heap growth in SDK ICU;fixed without weakening equality"
+    },
+    {
+      "path": "/workspace/chos-evidence/virtual-memory/retained-partial-fault-matrix.tar.gz",
+      "reason": "runner consumed USER FAULT prefix before full ESR/FAR line;complete record now required;architectural faults were correct"
+    },
+    {
+      "path": "/tmp/chos-vm-build1.log",
+      "reason": "LeakSanitizer process inspection denied by sandbox;retry with permitted inspection passes"
+    },
+    {
+      "path": "/tmp/chos-bmalloc-vm1",
+      "reason": "standalone fixture omitted required USE_SYSTEM_MALLOC profile flag;corrected to actual engine selection"
+    }
+  ],
+  "limits": [
+    "private anonymous/eager subset;no fixed/file/shared/executable maps or demand paging/swap;discard retains committed frames",
+    "range operations must fit one live region;1MiB mapping/2MiB aperture/16regions/4MiB image/8MiB frames",
+    "upstream VM helpers executed;not full bmalloc,WTF,JavaScriptCore,WebCore or browser",
+    "production browser trust/time/entropy/sandbox integration incomplete",
+    "real Pi5 SDIO host/firmware/authentication and live radio incomplete",
+    "new Fusion/Pi/laptop runs NOT RUN"
+  ],
+  "binary_publication": "source only;cc29ea8 ISO unchanged;version0.30.0 remains"
+}

@@ -11,6 +11,9 @@
 #include "chos/process_caps.h"
 
 int main(void) {
+ assert(CHOS_SYS_MEMORY_CONTROL==64&&CHOS_SYS_UNMAP_RANGE==65);
+ assert(chos_process_syscall_capability(64)==CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY));
+ assert(chos_process_syscall_capability(65)==CHOS_PROCESS_CAP(CHOS_SYS_UNMAP_MEMORY));
     assert(CHOS_SYS_SPAWN_LIMITED==54u&&CHOS_SYS_CAPABILITIES==55u&&CHOS_SYS_THREAD_SELF==60u&&CHOS_SYS_FUTEX_WAIT==61u&&CHOS_SYS_FUTEX_WAKE==CHOS_PROCESS_SYSCALL_LIMIT);
     assert(CHOS_SYS_IPC_OPEN==49u&&CHOS_SYS_IPC_CLOSE==53u&&sizeof(chos_ipc_info_t)==64u);
     assert(CHOS_SYS_CLOCK_INFO==48u&&sizeof(chos_clock_info_t)==48u);
@@ -25,7 +28,7 @@ int main(void) {
     assert(CHOS_SYS_SLEEP == 5u);
     assert(CHOS_SYS_GETSTATUS == 6u);
     assert(CHOS_SYS_WAIT == 7u);
-    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==63u);
+    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==65u);
     assert(CHOS_SYS_OPEN == 8u);
     assert(CHOS_SYS_READ == 9u);
     assert(CHOS_SYS_CLOSE == 10u);

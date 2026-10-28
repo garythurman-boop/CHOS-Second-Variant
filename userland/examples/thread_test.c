@@ -77,6 +77,9 @@ int main(int argc,char **argv){
  }
  for(unsigned i=0;i<3;i++){
   CHECK(chos_unmap_memory((void *)(uintptr_t)workers[i].stack,32768)==-CHOS_ERRNO_EBUSY);
+  CHECK(chos_unmap_range((void *)(uintptr_t)workers[i].stack,4096)==-CHOS_ERRNO_EBUSY);
+  CHECK(chos_memory_control((void *)(uintptr_t)workers[i].stack,4096,CHOS_MEMORY_PROTECT_NONE)==-CHOS_ERRNO_EBUSY);
+  CHECK(chos_memory_control((void *)(uintptr_t)workers[i].stack,4096,CHOS_MEMORY_DISCARD)==-CHOS_ERRNO_EBUSY);
   chos_thread_request_t r={.version=CHOS_THREAD_API_VERSION,.size_bytes=sizeof(r),.entry=(uint64_t)(uintptr_t)worker,
    .stack_base=workers[i].stack,.stack_bytes=32768,.tls=(uint64_t)(uintptr_t)workers[i].tls};
   CHECK(chos_thread_create(&r)==-CHOS_ERRNO_EAGAIN); /* join-record quota, no stack reuse */

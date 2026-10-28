@@ -3,13 +3,16 @@
 #include <stdint.h>
 #include "chos/syscall.h"
 /* Permission bits1..62 keep the positive signed-result ABI. SEEK63 uses
- * the existing READ9 permission class rather than consuming the sign bit. */
+ * the existing READ9 permission class rather than consuming the sign bit.
+ * MEMORY_CONTROL64 and UNMAP_RANGE65 share the existing MAP35/UNMAP36 classes. */
 #define CHOS_PROCESS_SYSCALL_LIMIT 62u
 _Static_assert(CHOS_PROCESS_SYSCALL_LIMIT<63u,"syscall permissions must fit a positive64-bit mask");
 #define CHOS_PROCESS_CAP(n) (UINT64_C(1)<<(n))
 #define CHOS_PROCESS_CAP_SEEK CHOS_PROCESS_CAP(CHOS_SYS_READ)
 static inline uint64_t chos_process_syscall_capability(uint32_t number){
  if(number==CHOS_SYS_SEEK)return CHOS_PROCESS_CAP_SEEK;
+ if(number==CHOS_SYS_MEMORY_CONTROL)return CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY);
+ if(number==CHOS_SYS_UNMAP_RANGE)return CHOS_PROCESS_CAP(CHOS_SYS_UNMAP_MEMORY);
  return number&&number<=CHOS_PROCESS_SYSCALL_LIMIT?CHOS_PROCESS_CAP(number):0;
 }
 #define CHOS_PROCESS_CAP_ALL ((UINT64_C(1)<<(CHOS_PROCESS_SYSCALL_LIMIT+1u))-2u)

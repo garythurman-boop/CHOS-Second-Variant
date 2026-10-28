@@ -75,3 +75,10 @@ no new ISO; cc29ea8 remains the selected test build and version stays0.30.0.
 Modern WebKit rendering/JavaScript, engine-sized memory and missing OS interfaces,
 production TLS policy/sandbox integration, real Pi5 SDIO host/firmware/authentication
 and independent target tests remain required for Stage3/version0.50.0.
+
+The subsequent [native virtual-memory component](NATIVE_VIRTUAL_MEMORY.md) now
+supplies owned anonymous protection/discard/partial unmap and bounded native
+unistd operations. Original WebKit VM helpers execute against the SDK with a
+checked CHOS discard adaptation. Actual JavaScriptCore compilation moves past
+the missing memory headers to fcntl.h and stderr stream APIs; no complete engine,
+modern browser or Stage3 completion is claimed.

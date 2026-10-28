@@ -1351,6 +1351,7 @@ test-userland test: $(BUILD)/userland/native_test.elf
 $(BUILD)/test-process-format $(SAN_DIR)/test-process-format $(BUILD)/test-romfs $(SAN_DIR)/test-romfs $(BUILD)/test-chfs $(SAN_DIR)/test-chfs $(BUILD)/test-installer-io $(SAN_DIR)/test-installer-io: include/chos/elf_image.h
 
 include userland/libc/Makefile.inc
+include userland/libc/mman.Makefile.inc
 include userland/libm/Makefile.inc
 include userland/libc/floatscan/Makefile.inc
 include userland/libc/wide.Makefile.inc

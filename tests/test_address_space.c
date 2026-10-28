@@ -29,6 +29,14 @@ static void test_user_descriptor_permissions(void) {
     uint64_t rw = vmm_make_user_page_descriptor(physical, 1);
     uint64_t ro = vmm_make_user_page_descriptor(physical, 0);
     uint64_t rx = vmm_make_user_code_page_descriptor(physical);
+    uint64_t none = vmm_make_user_inaccessible_page_descriptor(physical);
+    assert(none && none!=rw && none!=ro && none!=rx);
+    assert(address_space_user_descriptor_matches(none,physical,AS_PERM_USER_NONE));
+    assert(!address_space_user_descriptor_matches(rw,physical,AS_PERM_USER_NONE));
+    assert(!address_space_user_descriptor_matches(none,physical,AS_PERM_USER_RW));
+    assert(!address_space_user_descriptor_matches(none,physical,AS_PERM_USER_RX));
+    assert(!vmm_make_user_inaccessible_page_descriptor(physical+1));
+    assert(((none>>6)&3u)==0 && (none&(1ull<<11)) && (none&(1ull<<53)) && (none&(1ull<<54)));
     assert(rw != 0u && ro != 0u && rw != ro);
     assert(rx != 0u && rx != rw && rx != ro);
     assert(address_space_user_descriptor_matches(rw, physical, AS_PERM_USER_RW));

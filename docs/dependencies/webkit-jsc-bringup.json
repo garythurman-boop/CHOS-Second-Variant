@@ -18,12 +18,16 @@
     "Source/bmalloc/CMakeLists.txt": "f4a2e4daa2a6a27a38890efc094a19e8d53143713591b4157dd9984f0379c55d",
     "Source/ThirdParty/unifdef/CMakeLists.txt": "3135a578b5dc54892ad91018edf8c65f43f9a638b8c9e02d3b971e429e0de25e",
     "Source/ThirdParty/gtest/CMakeLists.txt": "fa2b4aa25345f62a68b54cb44289077d5f4a32193f134d2ff66438b112a2a620",
-    "Tools/Scripts/hmaptool": "1a63ae37f1ecd083eebf73bc052ca72d83f54b481dab8639e296a206515e60e4"
+    "Tools/Scripts/hmaptool": "1a63ae37f1ecd083eebf73bc052ca72d83f54b481dab8639e296a206515e60e4",
+    "Source/bmalloc/bmalloc/BPlatform.h": "fbe02c44510089478036a02f2fd83a758b40339dee9b9a56ac7f40e5b9de54a5",
+    "Source/bmalloc/bmalloc/VMAllocate.h": "d92807c17e34eabf574afd4f14504e8707e49f0dfe1ca8d0e709d2594a043eca"
   },
-  "patch": "ports/webkit/patches/0001-recognize-chos-cmake-identity.patch",
-  "patch_sha256": "ab6748690995ee3b67becf482a6e4eaa32e577ddfc7fc18f641e233452fdc4fa",
+  "patch": "ports/webkit/patches/0001-chos-platform-bringup.patch",
+  "patch_sha256": "4536bf8fe2ca5c3e6e4de6384e886f50e1e3495eb4238154417a01efc3c1bc74",
   "patched_files_sha256": {
-    "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c"
+    "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c",
+    "Source/bmalloc/bmalloc/BPlatform.h": "7eace90386576643b0cfca4377a9a61794763bf6e933a32b122c8f4700150216",
+    "Source/bmalloc/bmalloc/VMAllocate.h": "3d9584bd0f2508171c4adfa1095ad08891e572aa8cc8de594db506f437862b80"
   },
   "signature_verification": "Not claimed; HTTPS Git object identity and exact inspected file/patch hashes recorded. Full license/dependency/release qualification remains open.",
   "required_source_roots": [
@@ -35,5 +39,6 @@
     "Source/ThirdParty/gtest",
     "Tools/Scripts",
     "Tools/TestWebKitAPI"
-  ]
+  ],
+  "patch_scope": "Explicit CHOS CMake/bmalloc identity and real anonymous-page discard instead of unsupported MAP_FIXED;no allocator/engine/security/conformance success inferred."
 }

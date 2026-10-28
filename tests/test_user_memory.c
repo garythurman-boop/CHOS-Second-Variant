@@ -4,18 +4,30 @@
 #include "../kernel/mm/user_memory.c"
 static struct {uint64_t pa;int used,mapped;} frames[4][1024];
 static uint64_t mappings[4][512];
+static address_space_user_permissions_t permissions[4][512];
+static unsigned protect_calls,discard_calls,control_fail;
 static unsigned generations[4]={1,1,1,1},allocations,allocation_fail,map_calls,map_fail,unmap_fail,free_fail;
 static unsigned index_of(uint64_t va){assert(va>=CHOS_USER_MAP_BASE&&va<CHOS_USER_MAP_BASE+CHOS_USER_MAP_BYTES);return (unsigned)((va-CHOS_USER_MAP_BASE)/4096);}
 uint64_t chos_spin_lock_irqsave(chos_spinlock_t *p){assert(!p->held);p->held=1;return 0;}
 void chos_spin_unlock_irqrestore(chos_spinlock_t *p,uint64_t state){(void)state;assert(p->held);p->held=0;}
 int address_space_get_info(address_space_handle_t h,address_space_info_t *out){if(h.slot>=4||h.generation!=generations[h.slot]||h.id!=h.slot+1)return 0;*out=(address_space_info_t){.live=1};return 1;}
-int address_space_query(address_space_handle_t h,uint64_t va,vmm_mapping_info_t *out){uint64_t pa=mappings[h.slot][index_of(va)];if(!pa)return 0;memset(out,0,sizeof(*out));return 1;}
+int address_space_query(address_space_handle_t h,uint64_t va,vmm_mapping_info_t *out){uint64_t pa=mappings[h.slot][index_of(va)];if(!pa)return 0;memset(out,0,sizeof(*out));out->physical_address=pa;out->memory_type=VMM_MEMORY_NORMAL;out->accessible_at_el0=permissions[h.slot][index_of(va)]!=AS_PERM_USER_NONE;out->writable=permissions[h.slot][index_of(va)]==AS_PERM_USER_RW;return 1;}
 address_space_error_t address_space_alloc_user_page(address_space_handle_t h,uint64_t *pa){if(++allocations==allocation_fail)return AS_ERR_OUT_OF_MEMORY;for(unsigned i=0;i<1024;i++)if(!frames[h.slot][i].used){frames[h.slot][i].used=1;*pa=frames[h.slot][i].pa=0x50000000u+h.slot*0x400000u+i*4096;return AS_OK;}return AS_ERR_FRAME_CAPACITY;}
-address_space_error_t address_space_map_user_page(address_space_handle_t h,uint64_t va,uint64_t pa,address_space_user_permissions_t perm){assert(perm==AS_PERM_USER_RW);if(++map_calls==map_fail)return AS_ERR_OUT_OF_MEMORY;unsigned i=(unsigned)((pa-0x50000000u-h.slot*0x400000u)/4096);assert(frames[h.slot][i].used&&!frames[h.slot][i].mapped);frames[h.slot][i].mapped=1;mappings[h.slot][index_of(va)]=pa;return AS_OK;}
+address_space_error_t address_space_map_user_page(address_space_handle_t h,uint64_t va,uint64_t pa,address_space_user_permissions_t perm){assert(perm==AS_PERM_USER_RW);if(++map_calls==map_fail)return AS_ERR_OUT_OF_MEMORY;unsigned i=(unsigned)((pa-0x50000000u-h.slot*0x400000u)/4096);assert(frames[h.slot][i].used&&!frames[h.slot][i].mapped);frames[h.slot][i].mapped=1;mappings[h.slot][index_of(va)]=pa;permissions[h.slot][index_of(va)]=perm;return AS_OK;}
 address_space_error_t address_space_unmap_user_page(address_space_handle_t h,uint64_t va,uint64_t *pa){if(unmap_fail)return AS_ERR_BAD_DESCRIPTOR;uint64_t p=mappings[h.slot][index_of(va)];assert(p);if(pa)*pa=p;frames[h.slot][(p-0x50000000u-h.slot*0x400000u)/4096].mapped=0;mappings[h.slot][index_of(va)]=0;return AS_OK;}
 address_space_error_t address_space_free_user_page(address_space_handle_t h,uint64_t pa){unsigned i=(unsigned)((pa-0x50000000u-h.slot*0x400000u)/4096);assert(frames[h.slot][i].used&&!frames[h.slot][i].mapped);if(free_fail)return AS_ERR_BAD_DESCRIPTOR;frames[h.slot][i].used=0;return AS_OK;}
+address_space_error_t address_space_protect_user_range(address_space_handle_t h,uint64_t va,size_t n,address_space_user_permissions_t p){
+ protect_calls++;if(control_fail)return AS_ERR_BAD_DESCRIPTOR;
+ assert(!(n%4096)&&n&&p!=AS_PERM_USER_RX);
+ for(size_t at=0;at<n;at+=4096){assert(mappings[h.slot][index_of(va+at)]);permissions[h.slot][index_of(va+at)]=p;}
+ return AS_OK;
+}
+address_space_error_t address_space_discard_user_range(address_space_handle_t h,uint64_t va,size_t n){
+ discard_calls++;if(control_fail)return AS_ERR_BAD_DESCRIPTOR;
+ assert(n&&!(n%4096));for(size_t at=0;at<n;at+=4096)assert(mappings[h.slot][index_of(va+at)]);return AS_OK;
+}
 static unsigned used(unsigned slot){unsigned n=0;for(unsigned i=0;i<1024;i++)n+=frames[slot][i].used;return n;}
-static void reset(void){memset(owners,0,sizeof(owners));memset(frames,0,sizeof(frames));memset(mappings,0,sizeof(mappings));allocations=allocation_fail=map_calls=map_fail=unmap_fail=free_fail=0;}
+static void reset(void){memset(owners,0,sizeof(owners));memset(frames,0,sizeof(frames));memset(mappings,0,sizeof(mappings));allocations=allocation_fail=map_calls=map_fail=unmap_fail=free_fail=protect_calls=discard_calls=control_fail=0;}
 int main(void){
  address_space_handle_t a={.slot=0,.id=1,.generation=1},b={.slot=1,.id=2,.generation=1};reset();
  assert(chos_user_memory_map(a,0,0)==-CHOS_ERRNO_EINVAL);assert(chos_user_memory_map(a,(size_t)-1,0)==-CHOS_ERRNO_EINVAL);assert(chos_user_memory_map(a,4096,1)==-CHOS_ERRNO_EINVAL);
@@ -59,5 +71,39 @@ int main(void){
  reset();for(unsigned i=0;i<16;i++)assert(chos_user_memory_map(a,4096,0)>0);assert(chos_user_memory_map(a,4096,0)==-CHOS_ERRNO_ENOMEM);assert(chos_user_memory_release(a));
  reset();assert(chos_user_memory_map(a,4096,0)>0);assert(chos_user_memory_map(b,4096,0)>0);assert(used(0)==1&&used(1)==1);
  a.generation=2;assert(chos_user_memory_map(a,4096,0)==-CHOS_ERRNO_ESRCH);
+ /* Genuine range ownership and split bookkeeping, independent of the native wrapper. */
+ a.generation=1;reset();va=chos_user_memory_map(a,5*4096,0);
+ assert(!chos_user_memory_control(a,va+4096,1,CHOS_MEMORY_PROTECT_NONE));
+ assert(permissions[0][index_of(va)]==AS_PERM_USER_RW&&permissions[0][index_of(va+4096)]==AS_PERM_USER_NONE);
+ assert(!chos_user_memory_control(a,va+4096,4096,CHOS_MEMORY_PROTECT_READ));
+ assert(!chos_user_memory_control(a,va+4096,4096,CHOS_MEMORY_DISCARD)&&discard_calls==1);
+ assert(!chos_user_memory_control(a,va,5*4096,CHOS_MEMORY_VALIDATE));
+ assert(chos_user_memory_control(b,va,4096,CHOS_MEMORY_PROTECT_RW)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_control(a,va-4096,4096,CHOS_MEMORY_PROTECT_RW)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_control(a,va,4096,4)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_control(a,va+1,4096,0)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_control(a,UINT64_MAX-4095u,4096,0)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_pin(a,va,5*4096));unsigned before=protect_calls;
+ assert(chos_user_memory_control(a,va,4096,0)==-CHOS_ERRNO_EBUSY&&protect_calls==before);
+ assert(chos_user_memory_control(a,va,4096,CHOS_MEMORY_DISCARD)==-CHOS_ERRNO_EBUSY);
+ assert(chos_user_memory_unmap_range(a,va+4096,4096)==-CHOS_ERRNO_EBUSY);
+ assert(chos_user_memory_unpin(a,va,5*4096));
+ control_fail=1;assert(chos_user_memory_control(a,va,4096,0)==-CHOS_ERRNO_EIO);control_fail=0;
+ assert(!chos_user_memory_unmap_range(a,va+2*4096,4096)&&used(0)==4);
+ assert(chos_user_memory_control(a,va,5*4096,0)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_unmap_range(a,va,5*4096)==-CHOS_ERRNO_EINVAL);
+ assert(!chos_user_memory_unmap_range(a,va,1)&&used(0)==3); /* prefix trimming, rounded length */
+ assert(!chos_user_memory_unmap_range(a,va+4096,4096)&&used(0)==2);
+ assert(!chos_user_memory_unmap_range(a,va+4*4096,4096)&&used(0)==1); /* suffix trimming */
+ assert(!chos_user_memory_unmap_range(a,va+3*4096,4096)&&!used(0));
+ assert(chos_user_memory_unmap_range(a,va,4096)==-CHOS_ERRNO_EINVAL);
+ reset();va=chos_user_memory_map(a,3*4096,0);
+ for(unsigned i=1;i<16;i++)assert(chos_user_memory_map(a,4096,0)>0);
+ unsigned count=used(0);assert(chos_user_memory_unmap_range(a,va+4096,4096)==-CHOS_ERRNO_ENOMEM&&used(0)==count);
+ assert(mappings[0][index_of(va+4096)]); /* split capacity failure changes no page */
+ reset();va=chos_user_memory_map(a,3*4096,0);unmap_fail=1;
+ assert(chos_user_memory_unmap_range(a,va+4096,4096)==-CHOS_ERRNO_EIO&&used(0)==3);
+ assert(chos_user_memory_control(a,va,4096,3)==-CHOS_ERRNO_EINVAL);
+ unmap_fail=0;assert(chos_user_memory_release(a));
  puts("anonymous user mappings: bounds, owner separation, rollback, quota, non-executable pages and quarantine passed");
 }

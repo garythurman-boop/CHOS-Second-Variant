@@ -127,3 +127,10 @@ modes. C++23 byteswap is now supplied and tested. The historical2MiB/4MiB and
 missing-byteswap limits above describe earlier snapshots. The full32MiB embedded
 data package remains over budget; JavaScriptCore still requires real virtual
 memory APIs and further platform work. This is not Stage3 completion.
+
+The subsequent [native virtual-memory component](NATIVE_VIRTUAL_MEMORY.md) now
+supplies owned anonymous protection/discard/partial unmap and bounded native
+unistd operations. Original WebKit VM helpers execute against the SDK with a
+checked CHOS discard adaptation. Actual JavaScriptCore compilation moves past
+the missing memory headers to fcntl.h and stderr stream APIs; no complete engine,
+modern browser or Stage3 completion is claimed.

@@ -16,6 +16,8 @@ typedef struct {
     uint64_t free_payload_bytes;
     size_t allocated_blocks;
     size_t free_blocks;
+    size_t quarantined_arenas;
+    uint64_t quarantined_pages;
 } kheap_stats_t;
 
 /* Begin single-core, IRQ-masked UEFI bootstrap mode before the first heap call.

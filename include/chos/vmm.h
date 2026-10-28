@@ -89,6 +89,9 @@ int vmm_validate_user_page_descriptor(uint64_t descriptor, uint64_t physical_add
 /* EL0 read-only executable leaf; privileged execution remains prohibited. */
 uint64_t vmm_make_user_code_page_descriptor(uint64_t physical_address);
 int vmm_validate_user_code_page_descriptor(uint64_t descriptor, uint64_t physical_address);
+/* Owned user storage retained behind AP=00, PXN/UXN and nG (PROT_NONE). */
+uint64_t vmm_make_user_inaccessible_page_descriptor(uint64_t physical_address);
+int vmm_validate_user_inaccessible_page_descriptor(uint64_t descriptor, uint64_t physical_address);
 uint64_t vmm_make_page_descriptor(uint64_t physical_address,
                                   vmm_memory_type_t memory_type,
                                   vmm_page_permissions_t permissions);

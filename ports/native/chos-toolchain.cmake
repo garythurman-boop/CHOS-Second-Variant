@@ -24,7 +24,7 @@ set(CMAKE_AR llvm-ar)
 set(CMAKE_RANLIB llvm-ranlib)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE EXECUTABLE)
 set(CMAKE_SYSROOT "${CHOS_SDK_ROOT}")
-set(CHOS_LANGUAGE_FLAGS "-fhosted -fno-builtin -fno-stack-protector -fno-pic -fno-pie -femulated-tls -ffunction-sections -fdata-sections -mcpu=cortex-a72 -mstrict-align")
+set(CHOS_LANGUAGE_FLAGS "-D__CHOS__=1 -fhosted -fno-builtin -fno-stack-protector -fno-pic -fno-pie -femulated-tls -ffunction-sections -fdata-sections -mcpu=cortex-a72 -mstrict-align")
 # -fhosted supplies the language's ordinary main linkage/implicit return rules;
 # it is not a claim that every hosted C/C++ library API has been implemented.
 set(CMAKE_C_FLAGS_INIT "${CHOS_LANGUAGE_FLAGS} -isystem \"${CHOS_SDK_ROOT}/include\"")

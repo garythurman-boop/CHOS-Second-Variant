@@ -66,7 +66,9 @@
 #define CHOS_SYS_FUTEX_WAIT 61u /* x0=private RW word,x1=uint32 expected,x2=relative timeout ticks */
 #define CHOS_SYS_FUTEX_WAKE 62u /* x0=private RW word,x1=max waiters0..8; returns count */
 #define CHOS_SYS_SEEK 63u /* x0=owned read-only fd,x1=signed offset,x2=SET0/CUR1/END2; shares READ permission */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_SEEK
+#define CHOS_SYS_MEMORY_CONTROL 64u /* x0=owned anonymous range,x1=bytes,x2=memory_api operation */
+#define CHOS_SYS_UNMAP_RANGE 65u /* x0=owned anonymous subrange,x1=bytes; keeps exact UNMAP36 ABI */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_UNMAP_RANGE
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u
