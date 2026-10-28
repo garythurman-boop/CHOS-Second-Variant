@@ -788,7 +788,11 @@
     "include/__ranges/zip_view.h": "abc08582b4dddd70556d8cf9cad094369d1e6457e95bb58fc7508942f05b9c07",
     "include/cwchar": "859191c0067886912f9d5b5b6e6b2583ea3f15c45188e56c5d32f02dec2397de",
     "include/cwctype": "d3e0452aed4cc9dbc967784abc200e738ea0a33af63326c764f9fb391cc92cea",
-    "include/wctype.h": "49aeb2704c881d2bdb0fc19596b77ba1a3fb90d30d2629088ce10a45a491c838"
+    "include/wctype.h": "49aeb2704c881d2bdb0fc19596b77ba1a3fb90d30d2629088ce10a45a491c838",
+    "include/__tree": "ad53a5d53daa6f95ca1d18646e4a00aba4ad53db73b0cb7161ffad23ee32212e",
+    "include/cstdarg": "fd7f7fed8a1477d0643e283228b0fa0f4d6564a792086ac8de3b01ce00cb647c",
+    "include/map": "87f6e76b539a9d2f4707048060390e1b7a80f0279e359656b24a455b26a23ee1",
+    "include/set": "55375c6a0cd3ed7fce614f91afc1710ae4ad393a24afe9f870165c6cf6285226"
   },
   "scope": "Native static -O2 no-exceptions/no-RTTI allocation,containers,shared ownership,mutex/CV/once and bounded std::thread with ordered exit notification. Not full libc++,public futures,exceptions or engine runtime."
 }

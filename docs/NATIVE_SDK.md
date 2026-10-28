@@ -99,3 +99,6 @@ in the SDK through libchos-stdio.a. See [profile, evidence and limitations](NATI
 The SDK also stages ICU common with a separately named bootstrap data target.
 Use the [explicit native ICU package/profile](ICU_COMMON_NATIVE.md); real i18n and
 complete data libraries remain absent, so the full engine dependency gate stays open.
+
+Original ordered associative containers and cstdarg are now available; see the
+[native C++20/23 profile and tests](NATIVE_ORDERED_CONTAINERS.md).

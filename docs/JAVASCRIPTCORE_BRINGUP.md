@@ -157,3 +157,8 @@ nonzero status for missing **data and i18n**. No bootstrap archive is renamed to
 libicudata; no complete ICU dataset, JSC configure/build/execution or browser
 result is claimed. Interim user-test binaries are now authorized separately
 from the still-open Stage3/version0.50.0 completion gates.
+
+The subsequent [ordered-container/variadic milestone](NATIVE_ORDERED_CONTAINERS.md)
+and checked removal of ICU's unused signal include raise actual i18n object code
+generation to251/254. The remaining three units need real snprintf. No i18n
+archive/data or engine gate is claimed from that inventory.

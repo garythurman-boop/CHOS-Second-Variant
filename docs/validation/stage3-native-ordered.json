@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "scope": "original native ordered container and variadic header closure; revised i18n dependency investigation",
+  "stage3_complete": false,
+  "original_libcxx_files": 770,
+  "added_original_headers": [
+    "map",
+    "set",
+    "__tree",
+    "cstdarg"
+  ],
+  "guest_results": {
+    "native-ordered-direct20-accepted": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "b42b5a2fd883772d2efbf2ae6f1dae741abb56f6d403210eb1f64f8d36c51b2e",
+      "standard": "20",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117543,
+      "free_pages_before": 117316,
+      "free_pages_after": 117316,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 109,
+      "checks": [
+        "original libc++ map,set,multimap,multiset;3000 operation model vs independent fixed arrays per worker",
+        "extraction/collision recovery/merge,copy/move,lower_bound,duplicates and heterogeneous lookup",
+        "independent va_copy cursors preserve mixed int,double,binary128,pointer and uint64 arguments",
+        "three native threads and three lifecycles with zero heap allocations after joins",
+        "three process executions with stable warm physical frames,exit0 and no futex waiters"
+      ],
+      "cxx23_range_constructors_tested": false,
+      "limits": [
+        "bounded original container/variadic profile;not full C++23 or modern engine",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "native-ordered-sdk-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "722649e0f852c973e81a734e393ab6c77e58538cfbcf3db7403bf51127006acd",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500221,
+      "free_pages_before": 499994,
+      "free_pages_after": 499994,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 843,
+      "checks": [
+        "original libc++ map,set,multimap,multiset;3000 operation model vs independent fixed arrays per worker",
+        "extraction/collision recovery/merge,copy/move,lower_bound,duplicates,heterogeneous lookup and C++23 from_range",
+        "independent va_copy cursors preserve mixed int,double,binary128,pointer and uint64 arguments",
+        "three native threads and three lifecycles with zero heap allocations after joins",
+        "three process executions with stable warm physical frames,exit0 and no futex waiters"
+      ],
+      "limits": [
+        "bounded original container/variadic profile;not full C++23 or modern engine",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    }
+  },
+  "sdk_cxx23_compile_evidence": {
+    "path": "build/native-ordered-sdk-check/build.ninja",
+    "sha256": "749813b25ca68a6249fb3c70e41e405711c72c5d7850a5af529ce05518b91a52",
+    "description": "SDK project uses C++23,including from_range and insert_range cases"
+  },
+  "full_host_suite": {
+    "exit": 0,
+    "sha256": "e3d59f06a3b1157b18b9b9a9eb607297626e3190009a985fcb0d37316e2ad44f"
+  },
+  "sanitizer_scope": "unchanged C runtime retains the preceding native-icu-common-full-sanitize PASS; no host sanitizer result is claimed for AArch64 C++ tree execution",
+  "i18n_codegen": {
+    "original_source_commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+    "total": 254,
+    "code_generated": 251,
+    "remaining": [
+      {
+        "source": "choicfmt.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/choicfmt.cpp:178:5: error: use of undeclared identifier 'snprintf'"
+      },
+      {
+        "source": "number_decimalquantity.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/number_decimalquantity.cpp:1466:5: error: use of undeclared identifier 'snprintf'"
+      },
+      {
+        "source": "plurrule.cpp",
+        "returncode": 1,
+        "missing_header": null,
+        "first_error": "/workspace/chos-reference/icu-79.1/icu4c/source/i18n/plurrule.cpp:1841:5: error: use of undeclared identifier 'snprintf'; did you mean 'vswprintf'?"
+      }
+    ],
+    "bytes": 7001208,
+    "command_prefix": [
+      "clang++",
+      "--target=aarch64-none-elf",
+      "-mcpu=cortex-a72",
+      "-mstrict-align",
+      "-std=c++23",
+      "-fhosted",
+      "-fno-exceptions",
+      "-frtti",
+      "-femulated-tls",
+      "-fno-pic",
+      "-fno-pie",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-O2",
+      "-nostdinc++",
+      "--sysroot=/workspace/CHOS-Second-Variant/build/native-sdk",
+      "-isystem",
+      "/workspace/CHOS-Second-Variant/build/native-sdk/include/c++/v1",
+      "-isystem",
+      "/workspace/CHOS-Second-Variant/build/native-sdk/include",
+      "-I/workspace/chos-reference/icu-79.1/icu4c/source/i18n",
+      "-I/workspace/CHOS-Second-Variant/third_party/icu-common/source/common",
+      "-include",
+      "/workspace/CHOS-Second-Variant/ports/icu/native_config.h",
+      "-include",
+      "/workspace/chos-evidence/icu-native-decimal-include/decContext.h",
+      "-DU_I18N_IMPLEMENTATION=1",
+      "-DU_DEBUG=1",
+      "-c",
+      "-ferror-limit=3"
+    ],
+    "result_sha256": "7af8ac1ad5c1a35bdbe7a7cc11465d0e7e51f123eaa866d38c5c585ed29a858d",
+    "decimal_header_patch": {
+      "schema": 1,
+      "source_commit": "ddc6b66926bfac6036144ca9902992a0d6d50af9",
+      "scope": "checked removal of an unused include only; no native signal support claim",
+      "original_header_sha256": "50103f4fb1481307a89a1a90d279f393d120b1a014f559e4e1528e89f9838447",
+      "original_source_sha256": "2e8ac07bed092bb7027bc6579c9b6630beb5cc281f194a992f5ab9633817038d",
+      "patched_header_sha256": "2ffaabf5cb1c5d400cafdbf6f78fd8b22a50e3a0aa06c243fb6a00621fe1d45f",
+      "method": "force-include the checked replacement using the original DECCONTEXT guard; all other original sources are unchanged"
+    },
+    "limits": "actual object generation only; no i18n archive/link/data/runtime or signal API claim"
+  },
+  "known_failures": [
+    "first case-fold generator required a different Python UCD version; prior ICU milestone records the correction",
+    "initial generic ordered runner text included C++23 cases in C++20 metadata; accepted direct20 report now explicitly marks those cases not compiled"
+  ],
+  "limits": [
+    "real snprintf implementation is still required for the three remaining i18n units",
+    "complete ICU data/i18n and modern engine remain unfinished",
+    "production browser security and physical WiFi remain open",
+    "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+  ]
+}

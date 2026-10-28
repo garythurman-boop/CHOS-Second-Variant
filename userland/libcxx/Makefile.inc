@@ -171,3 +171,14 @@ $(BUILD)/userland/stdio_test.o: userland/examples/stdio_test.cpp $(LIBCPP_CONFIG
 $(BUILD)/userland/stdio_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/stdio_test.o $(LIBCPP_ARCHIVE) $(STDIO_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o %.a,$^)
 test: $(BUILD)/userland/stdio_test.elf
+$(BUILD)/userland/ordered_test.o: userland/examples/ordered_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -std=c++20,$(LIBCPP_FLAGS)) -std=c++23 -c $< -o $@
+$(BUILD)/userland/ordered20_test.o: userland/examples/ordered_test.cpp $(LIBCPP_CONFIG) $(LIBCPP_HEADERS) $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(LIBCPP_FLAGS) -c $< -o $@
+$(BUILD)/userland/ordered_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/ordered_test.o $(LIBCPP_ARCHIVE) $(QUAD_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
+$(BUILD)/userland/ordered20_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/ordered20_test.o $(LIBCPP_ARCHIVE) $(QUAD_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
+test: $(BUILD)/userland/ordered_test.elf $(BUILD)/userland/ordered20_test.elf

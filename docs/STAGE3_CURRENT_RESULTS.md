@@ -395,3 +395,20 @@ published with tag build-cc29ea8. All ten GitHub files were downloaded back and
 matched local SHA256SUMS; evidence is retained in
 /workspace/chos-evidence/native-stdio-github-downloads.json. This new ICU source
 work does not replace that published test build or claim Stage3/version0.50.0.
+
+## Ordered containers and narrowed i18n gaps
+
+Original map/set/tree/cstdarg headers now qualify under native C++20 direct and
+SDK C++23 isolated UEFI. Model-based tree operations, extraction/collision/merge,
+C++23 ranges, mixed variadic arguments including binary128, concurrent independent
+containers, heap0 and stable repeated-process frames pass. Full host regression
+passes. [Evidence and limits](validation/stage3-native-ordered.json) distinguish
+the C++20 cases from the extra C++23 API calls.
+
+A checked native decimal header removes only an unused signal.h include; ICU
+already disables its signal-raising code. No signal service is invented. Actual
+i18n code generation now passes **251/254** units; choicfmt.cpp,
+number_decimalquantity.cpp and plurrule.cpp still require a real snprintf. This
+is object-level dependency evidence, not a complete i18n/data library or engine.
+The [container profile](NATIVE_ORDERED_CONTAINERS.md) records the method. The
+cc29ea8 test binaries remain the current download; version0.50.0 stays reserved.
