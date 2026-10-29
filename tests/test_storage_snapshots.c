@@ -2,6 +2,7 @@
  * unavailable hardware discovery entry is modeled; filesystem code is real. */
 #include "chos/storage.h"
 #include "chos/syscall.h"
+#include "chos/file_write_api.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,6 +48,14 @@ static pthread_barrier_t gate;static chos_storage_lease_t shared;static int answ
 static void *writer(void *p){
  size_t id=(size_t)p;chos_storage_lease_t out;
  pthread_barrier_wait(&gate);answers[id]=storage_commit_snapshot("/A",&shared,id?"second":"first",id?6:5,&out);return NULL;
+}
+static void *creator(void *p){
+ size_t id=(size_t)p;unsigned char buffer[128];size_t bytes=999;chos_storage_lease_t out,old;
+ memset(&out,0xa5,sizeof out);old=out;pthread_barrier_wait(&gate);
+ answers[id]=storage_open_snapshot("/NEW",CHOS_FILE_WRITE_CREATE|CHOS_FILE_WRITE_EXCLUSIVE,buffer,sizeof buffer,&bytes,&out);
+ if(answers[id])assert(answers[id]==-CHOS_ERRNO_EEXIST&&bytes==999&&!memcmp(&out,&old,sizeof out));
+ else assert(!bytes&&out.mount&&out.object&&out.revision);
+ return NULL;
 }
 int main(void){
  reset();assert(storage_write_file("/A","old",3)&&storage_write_file("/B","other",5));
@@ -121,5 +130,30 @@ int main(void){
  storage_detach();assert(storage_attach_block_device(&noflush)&&storage_mounted()&&!storage_write_ready());
  next=snapshot("/A","data");assert(storage_commit_snapshot("/A",&next,"x",1,&a)==-CHOS_ERRNO_EROFS);
  old_writes=writes;assert(!storage_write_file("/A","x",1)&&writes==old_writes&&!storage_sync());
+ reset();size=999;memset(&next,0xa5,sizeof next);old=next;
+ assert(storage_open_snapshot("/MISSING",0,buffer,sizeof buffer,&size,&next)==-CHOS_ERRNO_ENOENT&&size==999&&!memcmp(&next,&old,sizeof next));
+ assert(storage_open_snapshot("/MISSING",CHOS_FILE_WRITE_EXCLUSIVE,buffer,sizeof buffer,&size,&next)==-CHOS_ERRNO_EINVAL);
+ assert(storage_open_snapshot("/MISSING/PATH",CHOS_FILE_WRITE_CREATE,buffer,sizeof buffer,&size,&next)==-CHOS_ERRNO_ENOENT);
+ assert(storage_open_snapshot("/",CHOS_FILE_WRITE_CREATE,buffer,sizeof buffer,&size,&next)==-CHOS_ERRNO_EISDIR);
+ assert(storage_open_snapshot("/NEW",8,buffer,sizeof buffer,&size,&next)==-CHOS_ERRNO_EINVAL);
+ assert(storage_open_snapshot("/NEW",CHOS_FILE_WRITE_CREATE,NULL,1,&size,&next)==-CHOS_ERRNO_EINVAL);
+ assert(storage_open_snapshot("/NEW",CHOS_FILE_WRITE_CREATE,buffer,0,&size,&next)==-CHOS_ERRNO_EINVAL);
+ assert(storage_open_snapshot("/NEW",CHOS_FILE_WRITE_CREATE,buffer,(size_t)CHOS_FILE_WRITE_MAX_BYTES+1,&size,&next)==-CHOS_ERRNO_EINVAL);
+ assert(!pthread_barrier_init(&gate,NULL,3));
+ for(size_t i=0;i<2;i++)assert(!pthread_create(&threads[i],NULL,creator,(void *)i));
+ pthread_barrier_wait(&gate);for(size_t i=0;i<2;i++)assert(!pthread_join(threads[i],NULL));pthread_barrier_destroy(&gate);
+ assert((!answers[0]&&answers[1]==-CHOS_ERRNO_EEXIST)||(!answers[1]&&answers[0]==-CHOS_ERRNO_EEXIST));
+ a=snapshot("/NEW","");assert(!storage_commit_snapshot("/NEW",&a,"created",7,&next));a=next;
+ size=999;memset(&next,0xa5,sizeof next);old=next;
+ assert(storage_open_snapshot("/NEW",0,buffer,1,&size,&next)==-CHOS_ERRNO_E2BIG&&size==999&&!memcmp(&next,&old,sizeof next));
+ assert(!storage_open_snapshot("/new",0,buffer,sizeof buffer,&size,&next)&&size==7&&next.revision==a.revision&&!memcmp(buffer,"created",7));
+ assert(!storage_open_snapshot("/NEW",CHOS_FILE_WRITE_TRUNCATE,buffer,1,&size,&next)&&!size&&next.object==a.object&&next.revision!=a.revision);
+ assert(storage_commit_snapshot("/NEW",&a,"stale",5,&old)==-CHOS_ERRNO_ESTALE);
+ for(unsigned point=0;point<3;point++){
+  reset();if(point==0)fail_write=writes+1;else fail_flush=flushes+point;
+  size=999;memset(&next,0xa5,sizeof next);old=next;
+  assert(storage_open_snapshot("/NEW",CHOS_FILE_WRITE_CREATE,buffer,sizeof buffer,&size,&next)==-CHOS_ERRNO_EIO&&size==999&&!memcmp(&next,&old,sizeof next)&&!storage_write_ready());
+  fail_write=fail_flush=0;assert(storage_mount()&&storage_write_ready());
+ }
  puts("actual storage/CHFS: independent leases,stale/ABA/remount/concurrent writers,backup-read guard,data/catalogue/flush failures,read-only and recovery passed");
 }

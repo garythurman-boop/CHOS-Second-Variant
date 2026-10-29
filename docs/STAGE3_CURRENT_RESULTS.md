@@ -541,3 +541,14 @@ claiming writable storage. See [the contract](NATIVE_STORAGE_SNAPSHOTS.md) and t
 associated validation manifest for fault and regression evidence. Public writable
 file descriptors, full engine filesystem integration and browser storage remain
 unimplemented by this prerequisite.
+
+### Native writable descriptor prerequisite
+
+Native CHFS working-copy descriptors now provide atomic create/exclusive/truncate,
+bounded writes, conditional flush, failure-preserving close and explicit discard.
+Both legacy read snapshots and writable buffers reserve a shared per-process
+budget before allocation/I/O. Reduced capabilities, process ownership, reserved
+network paths and ROMFS protection remain enforced. See
+[NATIVE_WRITABLE_HANDLES.md](NATIVE_WRITABLE_HANDLES.md). This is a real native
+service prerequisite; full engine filesystem integration and the modern browser
+remain open, alongside the other revised Stage3 gates.

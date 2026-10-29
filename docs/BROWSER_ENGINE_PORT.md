@@ -365,3 +365,9 @@ engine handles. Runtime identity/revision checks cover all existing mutation
 wrappers, and write/flush uncertainty fails closed. No new public descriptor API,
 POSIX inode metadata, full WTF filesystem build/link or browser persistence is
 claimed. `NATIVE_STORAGE_SNAPSHOTS.md` records the contract and remaining work.
+
+Native writable working-copy descriptors70..74 now supply real bounded
+create/exclusive/truncate/write/conditional-flush/close/abort behavior, with shared
+owned-buffer quotas and retained dirty data on conflicts. This closes a kernel
+service prerequisite, not the full WTF filesystem port: no new full-library link
+or engine execution is claimed. See `NATIVE_WRITABLE_HANDLES.md` for exact limits.

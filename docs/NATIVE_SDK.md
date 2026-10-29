@@ -186,3 +186,10 @@ length/current position and cursor-independent `pread` through owned descriptor
 operations. Both share the READ permission class. See
 [NATIVE_POSITIONAL_READS.md](NATIVE_POSITIONAL_READS.md) for bounds, snapshot
 semantics and qualification; no POSIX inode or writable-handle model is implied.
+
+The native SDK exports `chos/file_write_api.h` and the working-copy open/write/
+truncate/flush/abort helpers in `chos/user.h`. Calls70..73 require WRITE_FILE18;
+open also requires OPEN8/READ9, and abort shares CLOSE10. Old mask bits and read-only
+opens remain compatible. These are bounded native services with explicit conflict
+handling, not POSIX fcntl/stdio or a complete browser filesystem. See
+`NATIVE_WRITABLE_HANDLES.md` for ownership, quota, close and persistence semantics.

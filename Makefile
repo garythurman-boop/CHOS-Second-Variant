@@ -1649,3 +1649,5 @@ test-storage-snapshots-sanitize: $(SAN_DIR)/test-storage-snapshots
 test: test-storage-snapshots
 test-sanitize: test-storage-snapshots-sanitize
 .PHONY: test-storage-snapshots test-storage-snapshots-sanitize
+
+$(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi $(BUILD)/test-process-caps $(SAN_DIR)/test-process-caps $(BUILD)/test-storage-snapshots $(SAN_DIR)/test-storage-snapshots: include/chos/file_write_api.h include/chos/file_api.h

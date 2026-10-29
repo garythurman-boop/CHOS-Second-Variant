@@ -11,6 +11,8 @@
 #include "chos/storage.h"
 #include "chos/process.h"
 #include "chos/file_position.h"
+#include "chos/file_write_api.h"
+#include "chos/network_policy.h"
 #include "chos/gui.h"
 #include "chos/romfs.h"
 #include "chos/scheduler.h"
@@ -34,6 +36,10 @@ typedef struct {
     size_t offset;
     void *owned_data;
     int active;
+    int writable,dirty,busy;
+    size_t capacity;
+    chos_storage_lease_t lease;
+    char path[CHOS_CHFS_PATH_MAX];
 } process_file_handle_t;
 
 typedef struct {
@@ -171,6 +177,14 @@ static int reap_slot(size_t index) {
     size_t i;
     if (index >= CHOS_PROCESS_MAX) return 0;
     slot = &process_slots[index];
+    /* A reserved open or in-flight commit owns a buffer outside process_lock.
+     * Terminal cleanup must not unmap/reuse that process or free its buffer. */
+    uint64_t file_flags=chos_spin_lock_irqsave(&process_lock);
+    int file_busy=0;
+    for(i=0;i<CHOS_PROCESS_MAX_OPEN_FILES;i++)
+        if(slot->open_files[i].active==2||slot->open_files[i].busy)file_busy=1;
+    chos_spin_unlock_irqrestore(&process_lock,file_flags);
+    if(file_busy)return 0;
     if (!slot->address_space_live) {
         close_all_process_files(slot);
         slot->info.cleanup_pending = 0;
@@ -688,37 +702,54 @@ int process_main_stack_bounds(address_space_handle_t space,uint64_t *base,uint64
  chos_spin_unlock_irqrestore(&process_lock,flags);return rc;
 }
 
-int64_t process_file_open_for_address_space(address_space_handle_t space, const char *path) {
-    chos_romfs_file_t file; void *owned = NULL; int resolved; size_t index, i; uint64_t flags;
-    process_slot_t *slot; int64_t fd;
-    if (path == NULL || !romfs_path_is_valid(path)) return -(int64_t)CHOS_ERRNO_EINVAL;
-    flags = chos_spin_lock_irqsave(&process_lock);
-    index = find_process_slot_for_space_locked(space);
-    chos_spin_unlock_irqrestore(&process_lock, flags);
-    if (index == CHOS_PROCESS_MAX) return -(int64_t)CHOS_ERRNO_ESRCH;
-    resolved = resolve_program_file(path, &file, &owned);
-    if (resolved == 0) return -(int64_t)CHOS_ERRNO_ENOENT;
-    if (resolved == -2) return -(int64_t)CHOS_ERRNO_ENOMEM;
-    if (resolved < 0) return -(int64_t)CHOS_ERRNO_EIO;
-    flags = chos_spin_lock_irqsave(&process_lock);
-    slot = &process_slots[index];
-    if (!slot->address_space_live || !space_equal(slot->space, space) ||
-        slot->info.state == CHOS_PROCESS_EXITED || slot->info.state == CHOS_PROCESS_FAILED) {
-        chos_spin_unlock_irqrestore(&process_lock, flags);
-        if (owned != NULL) (void)kheap_free(owned);
-        return -(int64_t)CHOS_ERRNO_ESRCH;
-    }
-    for (i = 0u; i < CHOS_PROCESS_MAX_OPEN_FILES; ++i) if (!slot->open_files[i].active) break;
-    if (i == CHOS_PROCESS_MAX_OPEN_FILES) {
-        chos_spin_unlock_irqrestore(&process_lock, flags);
-        if (owned != NULL) (void)kheap_free(owned);
-        return -(int64_t)CHOS_ERRNO_EMFILE;
-    }
-    slot->open_files[i].data = file.data; slot->open_files[i].size = file.size;
-    slot->open_files[i].offset = 0u; slot->open_files[i].owned_data = owned; slot->open_files[i].active = 1;
-    fd = CHOS_PROCESS_FD_BASE + (int64_t)i;
-    chos_spin_unlock_irqrestore(&process_lock, flags);
-    return fd;
+static size_t file_owned_bytes_locked(const process_slot_t *slot){
+    size_t bytes=0;
+    for(size_t i=0;i<CHOS_PROCESS_MAX_OPEN_FILES;i++)bytes+=slot->open_files[i].capacity;
+    return bytes;
+}
+/* Reserve a table slot and its complete owned-buffer budget before allocation
+ * or storage I/O. A reserved slot is invisible to sibling descriptor calls and
+ * blocks terminal reaping until publication or cancellation. */
+static int reserve_file_buffer(address_space_handle_t space,size_t capacity,size_t *owner,size_t *descriptor){
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    size_t index=find_process_slot_for_space_locked(space),i;int result=0;
+    if(index==CHOS_PROCESS_MAX||process_slots[index].info.state!=CHOS_PROCESS_RUNNING||process_slots[index].info.cleanup_pending){result=-CHOS_ERRNO_ESRCH;goto done;}
+    process_slot_t *slot=&process_slots[index];
+    for(i=0;i<CHOS_PROCESS_MAX_OPEN_FILES;i++)if(!slot->open_files[i].active)break;
+    if(i==CHOS_PROCESS_MAX_OPEN_FILES){result=-CHOS_ERRNO_EMFILE;goto done;}
+    size_t used=file_owned_bytes_locked(slot);
+    if(used>CHOS_FILE_OWNED_BUDGET||capacity>CHOS_FILE_OWNED_BUDGET-used){result=-CHOS_ERRNO_ENOMEM;goto done;}
+    process_file_handle_t *file=&slot->open_files[i];
+    zero_bytes(file,sizeof(*file));file->active=2;file->capacity=capacity;
+    *owner=index;*descriptor=i;
+done:
+    chos_spin_unlock_irqrestore(&process_lock,flags);return result;
+}
+int64_t process_file_open_for_address_space(address_space_handle_t space,const char *path){
+    if(!path||!romfs_path_is_valid(path))return -CHOS_ERRNO_EINVAL;
+    chos_chfs_entry_t entry;chos_romfs_file_t embedded={0};
+    size_t capacity=0,bytes=0,index,i;void *owned=NULL;
+    int persistent=storage_lookup(path,&entry);
+    if(persistent){
+        if(chfs_entry_is_directory(&entry))return -CHOS_ERRNO_EISDIR;
+        if(entry.size_bytes>CHOS_ELF_MAX_FILE)return -CHOS_ERRNO_E2BIG;
+        capacity=entry.size_bytes?entry.size_bytes:1u;
+    }else if(!romfs_lookup(path,&embedded))return -CHOS_ERRNO_ENOENT;
+    int result=reserve_file_buffer(space,capacity,&index,&i);
+    if(result)return result;
+    if(persistent){
+        owned=kheap_alloc(capacity);
+        if(!owned)result=-CHOS_ERRNO_ENOMEM;
+        else if(!storage_read_file(path,owned,capacity,&bytes))result=-CHOS_ERRNO_EIO;
+    }else bytes=embedded.size;
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    process_slot_t *slot=&process_slots[index];process_file_handle_t *file=&slot->open_files[i];
+    if(!result&&(!space_equal(slot->space,space)||slot->info.state!=CHOS_PROCESS_RUNNING||slot->info.cleanup_pending))result=-CHOS_ERRNO_ESRCH;
+    if(!result){file->data=persistent?owned:embedded.data;file->owned_data=owned;file->size=bytes;file->active=1;}
+    else zero_bytes(file,sizeof(*file));
+    chos_spin_unlock_irqrestore(&process_lock,flags);
+    if(result&&owned)(void)kheap_free(owned);
+    return result?result:(int64_t)(CHOS_PROCESS_FD_BASE+i);
 }
 
 int64_t process_file_read_for_address_space(address_space_handle_t space, int fd,
@@ -732,11 +763,12 @@ int64_t process_file_read_for_address_space(address_space_handle_t space, int fd
     file_index = (size_t)(fd - CHOS_PROCESS_FD_BASE);
     flags = chos_spin_lock_irqsave(&process_lock);
     index = find_process_slot_for_space_locked(space);
-    if (index == CHOS_PROCESS_MAX || !process_slots[index].open_files[file_index].active) {
+    if (index == CHOS_PROCESS_MAX || process_slots[index].open_files[file_index].active!=1) {
         chos_spin_unlock_irqrestore(&process_lock, flags);
         return -(int64_t)CHOS_ERRNO_EBADF;
     }
     slot = &process_slots[index];
+    if(slot->open_files[file_index].busy){chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBUSY;}
     data = slot->open_files[file_index].data; offset = slot->open_files[file_index].offset;
     available = offset<slot->open_files[file_index].size ? slot->open_files[file_index].size-offset : 0u;
     amount = length < available ? length : available;
@@ -749,8 +781,8 @@ int64_t process_file_read_for_address_space(address_space_handle_t space, int fd
     return (int64_t)amount;
 }
 
-/* Positional reads share the same immutable snapshot and ownership lock as
- * sequential reads. No seek/save/restore window is exposed to sibling threads. */
+/* Positional reads share the same process-owned view and ownership lock as
+ * sequential reads/writes. No seek/save/restore window is exposed to siblings. */
 int64_t process_file_read_at_for_address_space(address_space_handle_t space,int fd,
         uint64_t destination,size_t length,uint64_t offset) {
     if(fd<CHOS_PROCESS_FD_BASE||fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)
@@ -759,10 +791,11 @@ int64_t process_file_read_at_for_address_space(address_space_handle_t space,int 
     if(offset>INT64_MAX)return -CHOS_ERRNO_EINVAL;
     uint64_t flags=chos_spin_lock_irqsave(&process_lock);
     size_t index=find_process_slot_for_space_locked(space),file_index=(size_t)(fd-CHOS_PROCESS_FD_BASE);
-    if(index==CHOS_PROCESS_MAX||!process_slots[index].open_files[file_index].active){
+    if(index==CHOS_PROCESS_MAX||process_slots[index].open_files[file_index].active!=1){
         chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBADF;
     }
     process_file_handle_t *file=&process_slots[index].open_files[file_index];
+    if(file->busy){chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBUSY;}
     size_t available=offset<file->size?file->size-(size_t)offset:0;
     size_t amount=length<available?length:available;
     int64_t result=(int64_t)amount;
@@ -775,12 +808,14 @@ int process_file_info_for_address_space(address_space_handle_t space,int fd,chos
         return -CHOS_ERRNO_EBADF;
     uint64_t flags=chos_spin_lock_irqsave(&process_lock);
     size_t index=find_process_slot_for_space_locked(space),file_index=(size_t)(fd-CHOS_PROCESS_FD_BASE);
-    if(index==CHOS_PROCESS_MAX||!process_slots[index].open_files[file_index].active){
+    if(index==CHOS_PROCESS_MAX||process_slots[index].open_files[file_index].active!=1){
         chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBADF;
     }
     process_file_handle_t *file=&process_slots[index].open_files[file_index];
+    if(file->busy){chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBUSY;}
     chos_file_info_t value={.version=CHOS_FILE_INFO_VERSION,.size_bytes=sizeof(value),
-        .flags=CHOS_FILE_INFO_SNAPSHOT|CHOS_FILE_INFO_READ_ONLY,
+        .flags=file->writable?(CHOS_FILE_INFO_WORKING_COPY|(file->dirty?CHOS_FILE_INFO_DIRTY:0)):
+            (CHOS_FILE_INFO_SNAPSHOT|CHOS_FILE_INFO_READ_ONLY),
         .length=file->size,.position=file->offset};
     if(file->owned_data)value.flags|=CHOS_FILE_INFO_CHFS_SOURCE;
     *out=value;chos_spin_unlock_irqrestore(&process_lock,flags);return 0;
@@ -790,28 +825,122 @@ int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,
     if(fd<CHOS_PROCESS_FD_BASE || fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)return -(int64_t)CHOS_ERRNO_EBADF;
     size_t file_index=(size_t)(fd-CHOS_PROCESS_FD_BASE);uint64_t flags=chos_spin_lock_irqsave(&process_lock);
     size_t index=find_process_slot_for_space_locked(space);
-    if(index==CHOS_PROCESS_MAX || !process_slots[index].open_files[file_index].active){chos_spin_unlock_irqrestore(&process_lock,flags);return -(int64_t)CHOS_ERRNO_EBADF;}
+    if(index==CHOS_PROCESS_MAX || process_slots[index].open_files[file_index].active!=1){chos_spin_unlock_irqrestore(&process_lock,flags);return -(int64_t)CHOS_ERRNO_EBADF;}
     process_file_handle_t *file=&process_slots[index].open_files[file_index];uint64_t position;
+    if(file->busy){chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBUSY;}
     int result=chos_file_position(file->offset,file->size,offset,origin,&position);
     if(!result)file->offset=(size_t)position;
     chos_spin_unlock_irqrestore(&process_lock,flags);return result?(int64_t)result:(int64_t)position;
 }
 
 int64_t process_file_close_for_address_space(address_space_handle_t space, int fd) {
+    return process_file_finish(space,fd,1,0);
+}
+
+int64_t process_file_open_write(address_space_handle_t space,const char *path,unsigned options,size_t capacity){
+    if(!path||!capacity||capacity>CHOS_FILE_WRITE_MAX_BYTES||
+       (options&~CHOS_FILE_WRITE_FLAGS)||
+       ((options&CHOS_FILE_WRITE_EXCLUSIVE)&&!(options&CHOS_FILE_WRITE_CREATE)))return -CHOS_ERRNO_EINVAL;
+    if(path[0]=='/'&&!path[1])return -CHOS_ERRNO_EISDIR;
+    if(!romfs_path_is_valid(path))return -CHOS_ERRNO_EINVAL;
+    if(chos_network_profile_reserved(path))return -CHOS_ERRNO_EPERM;
+    size_t length=0;while(path[length])if(++length>=CHOS_CHFS_PATH_MAX)return -CHOS_ERRNO_EINVAL;
+    chos_romfs_file_t embedded;
+    if(romfs_lookup(path,&embedded)){
+        /* Existing disk shadows may be edited, but deletion between lookup and
+         * open must not turn CREATE into permission to shadow immutable ROMFS. */
+        chos_chfs_entry_t existing;
+        if(!storage_lookup(path,&existing))return -CHOS_ERRNO_EPERM;
+        options&=~CHOS_FILE_WRITE_CREATE;
+        if(options&CHOS_FILE_WRITE_EXCLUSIVE)return -CHOS_ERRNO_EEXIST;
+    }
+    size_t index,i;int reserved=reserve_file_buffer(space,capacity,&index,&i);
+    if(reserved)return reserved;
+    process_slot_t *slot=&process_slots[index];process_file_handle_t *file=&slot->open_files[i];
+    void *buffer=kheap_alloc(capacity);size_t bytes=0;chos_storage_lease_t lease;
+    int result=buffer?storage_open_snapshot(path,options,buffer,capacity,&bytes,&lease):-CHOS_ERRNO_ENOMEM;
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    if(!result&&(!space_equal(slot->space,space)||slot->info.state!=CHOS_PROCESS_RUNNING||slot->info.cleanup_pending))result=-CHOS_ERRNO_ESRCH;
+    if(!result){
+        file->owned_data=buffer;file->data=buffer;file->size=bytes;file->lease=lease;file->writable=1;
+        for(size_t n=0;n<=length;n++)file->path[n]=path[n];
+        file->active=1;
+    }else zero_bytes(file,sizeof(*file));
+    chos_spin_unlock_irqrestore(&process_lock,flags);
+    if(result&&buffer)(void)kheap_free(buffer);
+    return result?result:(int64_t)(CHOS_PROCESS_FD_BASE+i);
+}
+
+int64_t process_file_write(address_space_handle_t space,int fd,uint64_t source,size_t length){
+    if(fd<CHOS_PROCESS_FD_BASE||fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)return -CHOS_ERRNO_EBADF;
+    if(length>CHOS_SYS_MAX_WRITE)return -CHOS_ERRNO_E2BIG;
+    uint8_t buffer[CHOS_SYS_MAX_WRITE];
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    size_t index=find_process_slot_for_space_locked(space),i=(size_t)(fd-CHOS_PROCESS_FD_BASE);
+    int64_t result=-CHOS_ERRNO_EBADF;
+    if(index==CHOS_PROCESS_MAX||process_slots[index].open_files[i].active!=1)goto done;
+    process_file_handle_t *file=&process_slots[index].open_files[i];
+    if(!file->writable)goto done;
+    if(file->busy){result=-CHOS_ERRNO_EBUSY;goto done;}
+    if(!length){result=0;goto done;}
+    if(file->offset>file->capacity||length>file->capacity-file->offset){result=-CHOS_ERRNO_ENOSPC;goto done;}
+    /* Discard a partial private copy on EFAULT, without changing file bytes,
+     * length or cursor. No user pointer survives this bounded lock interval. */
+    if(!address_space_copy_from_user(space,buffer,source,length)){result=-CHOS_ERRNO_EFAULT;goto done;}
+    if(file->offset>file->size)zero_bytes((uint8_t *)file->owned_data+file->size,file->offset-file->size);
+    copy_bytes((uint8_t *)file->owned_data+file->offset,buffer,length);
+    file->offset+=length;if(file->offset>file->size)file->size=file->offset;
+    file->dirty=1;result=(int64_t)length;
+done:
+    chos_spin_unlock_irqrestore(&process_lock,flags);return result;
+}
+
+int process_file_truncate(address_space_handle_t space,int fd,uint64_t length){
+    if(fd<CHOS_PROCESS_FD_BASE||fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)return -CHOS_ERRNO_EBADF;
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    size_t index=find_process_slot_for_space_locked(space),i=(size_t)(fd-CHOS_PROCESS_FD_BASE);
+    int result=-CHOS_ERRNO_EBADF;
+    if(index==CHOS_PROCESS_MAX||process_slots[index].open_files[i].active!=1)goto done;
+    process_file_handle_t *file=&process_slots[index].open_files[i];
+    if(!file->writable)goto done;
+    if(file->busy){result=-CHOS_ERRNO_EBUSY;goto done;}
+    if(length>INT64_MAX){result=-CHOS_ERRNO_EINVAL;goto done;}
+    if(length>file->capacity){result=-CHOS_ERRNO_ENOSPC;goto done;}
+    if(length>file->size)zero_bytes((uint8_t *)file->owned_data+file->size,(size_t)length-file->size);
+    file->size=(size_t)length;file->dirty=1;result=0;
+done:
+    chos_spin_unlock_irqrestore(&process_lock,flags);return result;
+}
+
+int64_t process_file_finish(address_space_handle_t space,int fd,int closing,int discard){
     size_t index, file_index; uint64_t flags; void *owned;
     if (fd < CHOS_PROCESS_FD_BASE || fd >= CHOS_PROCESS_FD_BASE + (int)CHOS_PROCESS_MAX_OPEN_FILES)
         return -(int64_t)CHOS_ERRNO_EBADF;
     file_index = (size_t)(fd - CHOS_PROCESS_FD_BASE);
     flags = chos_spin_lock_irqsave(&process_lock);
     index = find_process_slot_for_space_locked(space);
-    if (index == CHOS_PROCESS_MAX || !process_slots[index].open_files[file_index].active) {
+    if (index == CHOS_PROCESS_MAX || process_slots[index].open_files[file_index].active!=1) {
         chos_spin_unlock_irqrestore(&process_lock, flags);
         return -(int64_t)CHOS_ERRNO_EBADF;
     }
-    owned = process_slots[index].open_files[file_index].owned_data;
-    zero_bytes(&process_slots[index].open_files[file_index], sizeof(process_slots[index].open_files[file_index]));
+    process_slot_t *slot=&process_slots[index];process_file_handle_t *file=&slot->open_files[file_index];
+    if(file->busy){chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBUSY;}
+    owned=file->owned_data;
+    if(!discard&&file->writable&&file->dirty){
+        file->busy=1;
+        /* The reserved busy handle is a reaper fence. No close/read/seek/write
+         * can change this private working buffer while storage I/O is unlocked. */
+        chos_storage_lease_t updated;
+        chos_spin_unlock_irqrestore(&process_lock,flags);
+        int result=storage_commit_snapshot(file->path,&file->lease,owned,file->size,&updated);
+        flags=chos_spin_lock_irqsave(&process_lock);
+        file->busy=0;
+        if(result){chos_spin_unlock_irqrestore(&process_lock,flags);return result;}
+        file->lease=updated;file->dirty=0;
+    }
+    if(closing)zero_bytes(file,sizeof(*file));
     chos_spin_unlock_irqrestore(&process_lock, flags);
-    if (owned != NULL && !kheap_free(owned)) return -(int64_t)CHOS_ERRNO_EIO;
+    if (closing&&owned != NULL && !kheap_free(owned)) return -(int64_t)CHOS_ERRNO_EIO;
     return 0;
 }
 

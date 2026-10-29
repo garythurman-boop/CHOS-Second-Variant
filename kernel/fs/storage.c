@@ -4,6 +4,7 @@
 #include "chos/spinlock.h"
 #include "chos/gpt.h"
 #include "chos/syscall.h"
+#include "chos/file_write_api.h"
 
 static chos_block_device_t boot_disk; /* whole physical device */
 static chos_block_device_t gpt_fs_disk; /* bounded CHOS partition view, if present */
@@ -303,9 +304,8 @@ void storage_detach(void){
     chos_spin_unlock_irqrestore(&storage_lock,flags);
 }
 
-int storage_read_snapshot(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease){
+static int read_snapshot_locked(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease){
     if(!path||!bytes||!lease)return -CHOS_ERRNO_EINVAL;
-    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
     int result=-CHOS_ERRNO_EIO;
     if(!fs_ready)goto done;
     size_t index=catalogue_index(path);
@@ -319,7 +319,49 @@ int storage_read_snapshot(const char *path,void *buffer,size_t capacity,size_t *
     if(!chfs_read_file(&root_fs,path,buffer,capacity,&amount)||operation_failed)goto done;
     *lease=value;*bytes=amount;result=0;
 done:
+    return result;
+}
+int storage_read_snapshot(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease){
+    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
+    int result=read_snapshot_locked(path,buffer,capacity,bytes,lease);
     chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
+}
+int storage_open_snapshot(const char *path,unsigned options,void *buffer,size_t capacity,
+                          size_t *bytes,chos_storage_lease_t *lease){
+ if(!path||!buffer||!capacity||capacity>CHOS_FILE_WRITE_MAX_BYTES||!bytes||!lease||
+    (options&~CHOS_FILE_WRITE_FLAGS)||
+    ((options&CHOS_FILE_WRITE_EXCLUSIVE)&&!(options&CHOS_FILE_WRITE_CREATE)))return -CHOS_ERRNO_EINVAL;
+ if(path[0]=='/'&&!path[1])return -CHOS_ERRNO_EISDIR;
+ if(!romfs_path_is_valid(path))return -CHOS_ERRNO_EINVAL;
+ size_t length=0;while(path[length])if(++length>=CHOS_CHFS_PATH_MAX)return -CHOS_ERRNO_EINVAL;
+ uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
+ int result=-CHOS_ERRNO_EIO;
+ if(!fs_ready)goto done;
+ if(chfs_is_directory(&root_fs,path)){result=-CHOS_ERRNO_EISDIR;goto done;}
+ if(!write_ready_locked()){result=-CHOS_ERRNO_EROFS;goto done;}
+ size_t index=catalogue_index(path);
+ if(index!=SIZE_MAX){
+  if(chfs_entry_is_directory(&root_fs.entries[index])){result=-CHOS_ERRNO_EISDIR;goto done;}
+  if(options&CHOS_FILE_WRITE_EXCLUSIVE){result=-CHOS_ERRNO_EEXIST;goto done;}
+  if(!(options&CHOS_FILE_WRITE_TRUNCATE)&&root_fs.entries[index].size_bytes>capacity){result=-CHOS_ERRNO_E2BIG;goto done;}
+ }else{
+  if(!(options&CHOS_FILE_WRITE_CREATE)){result=-CHOS_ERRNO_ENOENT;goto done;}
+  char parent[CHOS_CHFS_PATH_MAX];size_t slash=0;
+  for(size_t i=0;i<length;i++)if(path[i]=='/')slash=i;
+  size_t parent_length=slash?slash:1;
+  for(size_t i=0;i<parent_length;i++)parent[i]=path[i];
+  parent[parent_length]=0;
+  if(!chfs_is_directory(&root_fs,parent)){result=-CHOS_ERRNO_ENOENT;goto done;}
+ }
+ if(index==SIZE_MAX||(options&CHOS_FILE_WRITE_TRUNCATE)){
+  mutation_begin();
+  if(!mutation_finish(chfs_write_file(&root_fs,path,NULL,0),path)){
+   result=operation_failed?-CHOS_ERRNO_EIO:-CHOS_ERRNO_ENOSPC;goto done;
+  }
+ }
+ result=read_snapshot_locked(path,buffer,capacity,bytes,lease);
+done:
+ chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
 }
 int storage_commit_snapshot(const char *path,const chos_storage_lease_t *lease,const void *data,size_t size,chos_storage_lease_t *updated){
     if(!path||!lease||!updated||(!data&&size)||size>CHOS_CHFS_FILE_MAX_BYTES)return -CHOS_ERRNO_EINVAL;

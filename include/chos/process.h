@@ -176,6 +176,10 @@ int64_t process_file_read_at_for_address_space(address_space_handle_t,int,uint64
 int process_file_info_for_address_space(address_space_handle_t,int,chos_file_info_t *);
 int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,int64_t offset,unsigned origin);
 int64_t process_file_close_for_address_space(address_space_handle_t space, int fd);
+int64_t process_file_open_write(address_space_handle_t,const char *,unsigned,size_t);
+int64_t process_file_write(address_space_handle_t,int,uint64_t,size_t);
+int process_file_truncate(address_space_handle_t,int,uint64_t);
+int64_t process_file_finish(address_space_handle_t,int,int,int);
 int process_slot_reuse_test(void);
 const char *process_state_name(chos_process_state_t state);
 const char *process_error_string(chos_process_error_t error);

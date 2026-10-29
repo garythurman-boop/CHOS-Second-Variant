@@ -17,6 +17,7 @@
 #include "chos/net_dns6_api.h"
 #include "chos/gui_protocol.h"
 #include "chos/file_api.h"
+#include "chos/file_write_api.h"
 #include "chos/net_tcp_api.h"
 #include "chos/net_dns_api.h"
 
@@ -110,6 +111,16 @@ static inline long chos_seek(int fd,int64_t offset,unsigned origin) {
 static inline long chos_close(int fd) {
     return chos_syscall1((long)CHOS_SYS_CLOSE, (long)fd);
 }
+static inline long chos_open_write(const char *path,unsigned flags,size_t capacity){
+    if(capacity>UINT32_MAX)return -CHOS_ERRNO_EINVAL;
+    chos_file_open_write_t request={.version=CHOS_FILE_WRITE_VERSION,.size_bytes=sizeof(request),
+        .flags=flags,.capacity=(uint32_t)capacity,.reserved={0,0}};
+    return chos_syscall3(CHOS_SYS_FILE_OPEN_WRITE,(long)(uintptr_t)path,(long)(uintptr_t)&request,sizeof(request));
+}
+static inline long chos_file_write(int fd,const void *data,size_t length){return chos_syscall3(CHOS_SYS_FILE_WRITE,fd,(long)(uintptr_t)data,(long)length);}
+static inline long chos_file_truncate(int fd,uint64_t length){return chos_syscall2(CHOS_SYS_FILE_TRUNCATE,fd,(long)length);}
+static inline long chos_file_flush(int fd){return chos_syscall1(CHOS_SYS_FILE_FLUSH,fd);}
+static inline long chos_file_abort(int fd){return chos_syscall1(CHOS_SYS_FILE_ABORT,fd);}
 
 /* Enumerate the merged persistent/embedded flat file namespace into caller-owned memory. */
 static inline long chos_list_files(chos_file_list_entry_t *entries, size_t capacity) {

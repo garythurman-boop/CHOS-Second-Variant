@@ -215,3 +215,10 @@ record. The real block I/O proxy quarantines uncertain writes until verified
 remount and actual flush acknowledgement; it preserves driver descriptor/DMA
 ownership. This does not yet expose writable handles or remove whole-file I/O
 latency and engine storage limits. See `NATIVE_STORAGE_SNAPSHOTS.md`.
+
+The native file service now supports bounded writable CHFS working copies with
+conditional commit and explicit abort. Legacy owned read snapshots participate in
+the same pre-allocation budget. No process lock is held over storage I/O; existing
+whole-file storage-lock latency and CHFS format/path limits remain. Public calls
+reuse existing capability classes; browser content still must be denied privileged
+storage/configuration authority. Full engine filesystem adaptation remains open.

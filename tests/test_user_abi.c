@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "chos/syscall.h"
+#include "chos/file_write_api.h"
 #include "chos/file_api.h"
 #include "chos/net.h"
 #include "chos/net_tcp_api.h"
@@ -12,6 +13,10 @@
 #include "chos/process_caps.h"
 
 int main(void) {
+ assert(CHOS_SYS_FILE_OPEN_WRITE==70&&CHOS_SYS_FILE_WRITE==71&&CHOS_SYS_FILE_TRUNCATE==72&&CHOS_SYS_FILE_FLUSH==73&&CHOS_SYS_FILE_ABORT==74);
+ assert(sizeof(chos_file_open_write_t)==32&&CHOS_FILE_WRITE_VERSION==1);
+ for(unsigned n=70;n<=73;n++)assert(chos_process_syscall_capability(n)==CHOS_PROCESS_CAP(CHOS_SYS_WRITE_FILE));
+ assert(chos_process_syscall_capability(74)==CHOS_PROCESS_CAP(CHOS_SYS_CLOSE));
  assert(CHOS_SYS_FILE_INFO==68&&CHOS_SYS_READ_AT==69&&sizeof(chos_file_info_t)==64&&sizeof(chos_file_read_at_t)==32);
  assert(CHOS_SYS_RESOURCE_INFO==67u&&sizeof(chos_resource_info_t)==96u&&CHOS_RESOURCE_VERSION==1u);
  assert(chos_process_syscall_capability(CHOS_SYS_RESOURCE_INFO)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO));
@@ -33,7 +38,7 @@ int main(void) {
     assert(CHOS_SYS_SLEEP == 5u);
     assert(CHOS_SYS_GETSTATUS == 6u);
     assert(CHOS_SYS_WAIT == 7u);
-    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==69u);
+    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==74u);
     assert(CHOS_SYS_OPEN == 8u);
     assert(CHOS_SYS_READ == 9u);
     assert(CHOS_SYS_CLOSE == 10u);

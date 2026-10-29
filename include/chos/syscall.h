@@ -72,7 +72,12 @@
 #define CHOS_SYS_RESOURCE_INFO 67u /* x0=self snapshot,x1=exact size,x2=flags0; THREAD_INFO57 capability */
 #define CHOS_SYS_FILE_INFO 68u /* x0=fd,x1=owned snapshot info,x2=exact size; READ9 capability */
 #define CHOS_SYS_READ_AT 69u /* x0=fd,x1=read-at request,x2=exact size; READ9 capability */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_READ_AT
+#define CHOS_SYS_FILE_OPEN_WRITE 70u /* x0=path,x1=32B request,x2=exact size; WRITE_FILE18 plus OPEN8/READ9 */
+#define CHOS_SYS_FILE_WRITE 71u /* x0=owned writable fd,x1=bytes,x2=count<=256; WRITE_FILE18 */
+#define CHOS_SYS_FILE_TRUNCATE 72u /* x0=owned writable fd,x1=new length; WRITE_FILE18 */
+#define CHOS_SYS_FILE_FLUSH 73u /* x0=owned writable fd; conditional durable commit; WRITE_FILE18 */
+#define CHOS_SYS_FILE_ABORT 74u /* x0=owned fd; discard uncommitted changes and close; CLOSE10 */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_FILE_ABORT
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

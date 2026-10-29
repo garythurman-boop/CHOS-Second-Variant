@@ -21,6 +21,7 @@
 #include "chos/gui.h"
 #include "chos/gui_protocol.h"
 #include "chos/file_api.h"
+#include "chos/file_write_api.h"
 #include "chos/file_position.h"
 #include "chos/storage.h"
 #include "chos/chfs.h"
@@ -631,6 +632,31 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
                 else frame->x[0] = (uint64_t)process_file_open_for_address_space(fault_space, path);
                 return frame;
             }
+            case CHOS_SYS_FILE_OPEN_WRITE: {
+                chos_file_open_write_t request;char path[CHOS_FILE_PATH_CAPACITY];
+                uint64_t required=CHOS_PROCESS_CAP(CHOS_SYS_OPEN)|CHOS_PROCESS_CAP(CHOS_SYS_READ);
+                if((permissions&required)!=required){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
+                if(frame->x[2]!=sizeof(request)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!address_space_copy_from_user(fault_space,&request,frame->x[1],sizeof(request))||
+                   !syscall_copy_user_path(fault_space,frame->x[0],path,sizeof(path))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                if(request.version!=CHOS_FILE_WRITE_VERSION||request.size_bytes!=sizeof(request)||request.reserved[0]||request.reserved[1]){
+                    frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;
+                }
+                frame->x[0]=(uint64_t)process_file_open_write(fault_space,path,request.flags,request.capacity);return frame;
+            }
+            case CHOS_SYS_FILE_WRITE:
+                if(frame->x[0]>INT32_MAX)frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);
+                else frame->x[0]=(uint64_t)process_file_write(fault_space,(int)frame->x[0],frame->x[1],(size_t)frame->x[2]);
+                return frame;
+            case CHOS_SYS_FILE_TRUNCATE:
+                if(frame->x[0]>INT32_MAX)frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);
+                else frame->x[0]=(uint64_t)(int64_t)process_file_truncate(fault_space,(int)frame->x[0],frame->x[1]);
+                return frame;
+            case CHOS_SYS_FILE_FLUSH:
+            case CHOS_SYS_FILE_ABORT:
+                if(frame->x[0]>INT32_MAX)frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);
+                else frame->x[0]=(uint64_t)process_file_finish(fault_space,(int)frame->x[0],number==CHOS_SYS_FILE_ABORT,number==CHOS_SYS_FILE_ABORT);
+                return frame;
             case CHOS_SYS_FILE_INFO: {
                 chos_file_info_t info;
                 if(frame->x[0]>INT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
@@ -650,7 +676,8 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
             }
             case CHOS_SYS_READ: {
                 uint64_t length = frame->x[2];
-                if (length > CHOS_SYS_MAX_READ) frame->x[0] = neg_errno(CHOS_ERRNO_E2BIG);
+                if(frame->x[0]>INT32_MAX)frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);
+                else if (length > CHOS_SYS_MAX_READ) frame->x[0] = neg_errno(CHOS_ERRNO_E2BIG);
                 else frame->x[0] = (uint64_t)process_file_read_for_address_space(
                     fault_space, (int)frame->x[0], frame->x[1], (size_t)length);
                 return frame;
@@ -661,7 +688,8 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
                 else frame->x[0]=(uint64_t)process_file_seek_for_address_space(fault_space,(int)frame->x[0],(int64_t)frame->x[1],(unsigned)frame->x[2]);
                 return frame;
             case CHOS_SYS_CLOSE:
-                frame->x[0] = (uint64_t)process_file_close_for_address_space(fault_space, (int)frame->x[0]);
+                if(frame->x[0]>INT32_MAX)frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);
+                else frame->x[0] = (uint64_t)process_file_close_for_address_space(fault_space, (int)frame->x[0]);
                 return frame;
             case CHOS_SYS_SPAWN: {
                 char path[CHOS_ROMFS_PATH_CAPACITY];

@@ -27,8 +27,11 @@ _Static_assert(sizeof(chos_file_list_entry_t) == 72u, "EL0 file list entry ABI c
 #define CHOS_FILE_INFO_SNAPSHOT 1u
 #define CHOS_FILE_INFO_READ_ONLY 2u
 #define CHOS_FILE_INFO_CHFS_SOURCE 4u
-/* Process-owned immutable open-file snapshot, not POSIX inode metadata.
- * Source flags describe the open-time origin, not current mount/write state. */
+#define CHOS_FILE_INFO_WORKING_COPY 8u
+#define CHOS_FILE_INFO_DIRTY 16u
+/* Process-owned file view, not POSIX inode metadata. SNAPSHOT/READ_ONLY identify
+ * the immutable legacy open; WORKING_COPY identifies a mutable private view,
+ * with DIRTY set until conditional commit. Source is the open-time origin. */
 typedef struct {
  uint32_t version,size_bytes,flags,reserved0;
  uint64_t length,position;

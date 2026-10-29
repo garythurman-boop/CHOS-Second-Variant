@@ -25,6 +25,7 @@ int storage_write_file(const char *path, const void *data, size_t size);
  * A mount/identity/content change makes the old lease stale; unrelated files do
  * not invalidate it. No inode persistence or public user-token authority implied. */
 int storage_read_snapshot(const char *,void *,size_t,size_t *,chos_storage_lease_t *);
+int storage_open_snapshot(const char *,unsigned,void *,size_t,size_t *,chos_storage_lease_t *);
 int storage_commit_snapshot(const char *,const chos_storage_lease_t *,const void *,size_t,chos_storage_lease_t *);
 int storage_write_ready(void);
 int storage_remove_file(const char *path);
