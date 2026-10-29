@@ -131,6 +131,8 @@ chos_process_error_t process_spawn_path(const char *path, uint32_t *pid_out);
 chos_process_error_t process_spawn_path_args(const char *path, const char *arguments, uint32_t *pid_out);
 /* Resolve a live process by its bound address space; returns 0 when not found. */
 uint32_t process_pid_for_address_space(address_space_handle_t space);
+/* Kernel-owned main stack bounds for a live address-space generation. */
+int process_main_stack_bounds(address_space_handle_t,uint64_t *,uint64_t *);
 /* Queue the async ROMFS demo applications and run them under timer preemption. */
 int process_async_self_test(void);
 /* Record lower-EL synchronous fault registers against the foreground or scheduled process. */

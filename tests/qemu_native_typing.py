@@ -38,20 +38,57 @@ def foreground(title):
 def app_text(pid,app,name,size=128):return probe.text(pid,app,name,size)
 def delete(pid,app,name,size=128):
  before=len(app_text(pid,app,name,size));assert before>12
- started=time.monotonic()
- state('backspace',True);time.sleep(.22);early=len(app_text(pid,app,name,size))
- assert early==before-1,('early repeat',before,early)
- # Deadline targets25Hz, but at most one repeat is dispatched per compositor
- # pump. Await actual progress under uncached software rendering rather than
- # equating wall-clock frame throughput with that maximum deadline frequency.
- wait(lambda:len(app_text(pid,app,name,size))<=before-7,3,'six native repeat deletions after the initial delay')
- debug={'field':name,'before':before,'early':early,'held':len(app_text(pid,app,name,size)),
-  'elapsed':time.monotonic()-started,'repeat_key':int.from_bytes(g.block('repeat_key',size=2),'little'),
-  'view':g.symbol('view'),'repeat_view':g.symbol('repeat_view'),'counter':g.symbol('repeat_last_counter'),
-  'delay':g.symbol('repeat_delay_counter'),'frequency':g.symbol('counter_frequency') if 'counter_frequency' in g.symbols else None}
+ def snapshot():
+  # Freeze only the debugger read, so native state/counters and app text describe
+  # the same instant. QEMU's guest virtual clock is stopped during this read.
+  g.qmp('stop')
+  try:
+   return {'key':int.from_bytes(g.block('repeat_key',size=2),'little'),
+    'counter':int.from_bytes(g.block('repeat_last_counter',size=8),'little'),
+    'delay':int.from_bytes(g.block('repeat_delay_counter',size=8),'little'),
+    'frequency':int.from_bytes(g.block('counter_frequency',size=8),'little'),
+    'length':len(app_text(pid,app,name,size))}
+  finally:g.qmp('cont')
+ started=time.monotonic();state('backspace',True);initial=None
+ def accepted():
+  nonlocal initial
+  value=snapshot()
+  if value['key']==14 and value['frequency'] and value['delay']==max(1,value['frequency']//2):
+   initial=value;return True
+  return False
+ wait(accepted,3,'hardware Backspace accepted with initial500ms deadline')
+ assert before-1<=initial['length']<=before,initial
+ first=initial if initial['length']==before-1 else None
+ def consumed():
+  nonlocal first
+  value=snapshot();assert value['key']==14,value
+  assert value['delay']==initial['delay'] and value['counter']==initial['counter'],('initial event was not consumed before repeat',initial,value)
+  assert before-1<=value['length']<=before,value
+  if value['length']<before:first=value;return True
+  return False
+ # Do not treat an event still in transit as an early-repeat failure. The host
+ # GUI tests separately check490/500ms; live guest counters retain the deadline
+ # assertion above even if software rendering delays the first visible update.
+ if first is None:wait(consumed,3,'native app consumes the initial Backspace')
+ # Six compositor pumps can exceed3s under software-emulated, uncached GOP.
+ # Keep the actual guest500ms boundary assertion independent of host throughput.
+ wait(lambda:len(app_text(pid,app,name,size))<=before-7,6,'six native repeat deletions after the initial delay')
+ repeated=snapshot()
+ assert repeated['delay']==max(1,initial['frequency']//25) and repeated['counter']-initial['counter']>=initial['delay'],('premature guest repeat',initial,repeated)
+ debug={'field':name,'before':before,'first_observed':first,'initial':initial,
+  'held':len(app_text(pid,app,name,size)),'elapsed':time.monotonic()-started,
+  'view':g.symbol('view'),'repeat_view':g.symbol('repeat_view')}
  with (out/'repeat-debug.jsonl').open('a') as f:f.write(json.dumps(debug)+'\n')
  state('backspace',False)
- wait(lambda:len(app_text(pid,app,name,size))<early-4,2,'native app consumes repeated Backspace')
+ wait(lambda:int.from_bytes(g.block('repeat_key',size=2),'little')==0,3,'hardware release cancels repeat')
+ def drained():
+  client=foreground('CHOS')
+  content=app_text(pid,app,name,size)
+  # Caret text describes what is shown: Console includes its prompt, and the
+  # focused address field displays at most its last30 characters.
+  shown=min(40,len(content)+6) if name=='input_line' else min(30,len(content)) if name=='address' else len(content.rsplit(b'\n',1)[-1])
+  return probe.queued_events(pid)==0 and client and client['pid']==pid and client['caret']['text_length']==shown
+ wait(drained,3,'native app drains legitimate pre-release events and updates its caret')
  after=len(app_text(pid,app,name,size));time.sleep(.25)
  assert len(app_text(pid,app,name,size))==after,'key release must stop repeat';return before,after
 def crop_caret(name,window,caret,scale):
@@ -89,7 +126,7 @@ try:
   wait(lambda:len(g.block('terminal_command',size=128).split(b'\0')[0])==26,3,'trusted Console typing')
   def builtin_text():return g.block('terminal_command',size=128).split(b'\0')[0]
   state('backspace',True);time.sleep(.22);assert len(builtin_text())==25
-  wait(lambda:len(builtin_text())<=19,3,'trusted Console held Backspace');state('backspace',False)
+  wait(lambda:len(builtin_text())<=19,6,'trusted Console held Backspace');state('backspace',False)
   after=len(builtin_text());time.sleep(.25);assert len(builtin_text())==after
   wait(lambda:g.symbol('text_caret_visible')==1 and g.symbol('presented_generation')==g.symbol('dirty_generation'),3,'trusted Console presented caret on')
   on=g.screen('trusted-console-on')

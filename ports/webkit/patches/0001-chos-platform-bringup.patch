@@ -120,6 +120,31 @@ index e3184e90..ce69af39 100644
  /* OS(AIX) - AIX */
  #if defined(_AIX)
  #define WTF_OS_AIX 1
+diff --git a/Source/WTF/wtf/PlatformRegisters.h b/Source/WTF/wtf/PlatformRegisters.h
+index 37efb86d..d63eb665 100644
+--- a/Source/WTF/wtf/PlatformRegisters.h
++++ b/Source/WTF/wtf/PlatformRegisters.h
+@@ -35,6 +35,8 @@
+ #include <signal.h>
+ #elif OS(WINDOWS)
+ #include <windows.h>
++#elif OS(CHOS)
++#include <chos/thread_context_api.h>
+ #elif OS(OPENBSD)
+ typedef ucontext_t mcontext_t;
+ #elif OS(QNX)
+@@ -72,6 +74,11 @@ inline PlatformRegisters& registersFromUContext(ucontext_t* ucontext)
+
+ using PlatformRegisters = CONTEXT;
+
++#elif OS(CHOS)
++
++// Native read-only register layout; no Unix ucontext or signal frame.
++using PlatformRegisters = chos_thread_context_t;
++
+ #elif HAVE(MACHINE_CONTEXT)
+
+ struct PlatformRegisters {
 diff --git a/Source/WTF/wtf/PlatformUse.h b/Source/WTF/wtf/PlatformUse.h
 index 0c16afbd..90c2f56b 100644
 --- a/Source/WTF/wtf/PlatformUse.h
@@ -132,6 +157,62 @@ index 0c16afbd..90c2f56b 100644
 +#if OS(UNIX) || OS(CHOS)
 +// CHOS supplies a tested private pthread subset, not a complete POSIX OS.
  #define USE_PTHREADS 1
+ #endif
+
+diff --git a/Source/WTF/wtf/StackBounds.cpp b/Source/WTF/wtf/StackBounds.cpp
+index d928bed8..e265b2e0 100644
+--- a/Source/WTF/wtf/StackBounds.cpp
++++ b/Source/WTF/wtf/StackBounds.cpp
+@@ -29,6 +29,9 @@
+
+ #include <windows.h>
+
++#elif OS(CHOS)
++#include <chos/user.h>
++
+ #elif OS(UNIX) || OS(HAIKU)
+
+ #include <pthread.h>
+@@ -93,6 +96,19 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+     return StackBounds { origin, bound };
+ }
+
++#elif OS(CHOS)
++
++StackBounds StackBounds::currentThreadStackBoundsInternal()
++{
++    chos_thread_context_t context;
++    RELEASE_ASSERT(!chos_thread_context(&context));
++    RELEASE_ASSERT(context.version == CHOS_THREAD_CONTEXT_VERSION && context.size_bytes == sizeof(context));
++    RELEASE_ASSERT(context.flags == (CHOS_THREAD_CONTEXT_CURRENT | CHOS_THREAD_CONTEXT_REGISTERS_VALID | CHOS_THREAD_CONTEXT_STACK_VALID));
++    RELEASE_ASSERT(context.stack_bytes && context.stack_base <= UINT64_MAX - context.stack_bytes);
++    return StackBounds { reinterpret_cast<void*>(context.stack_base + context.stack_bytes),
++        reinterpret_cast<void*>(context.stack_base) };
++}
++
+ #elif OS(UNIX) || OS(HAIKU)
+
+ #if OS(OPENBSD)
+diff --git a/Source/WTF/wtf/Threading.h b/Source/WTF/wtf/Threading.h
+index a376be92..7b8c7e67 100644
+--- a/Source/WTF/wtf/Threading.h
++++ b/Source/WTF/wtf/Threading.h
+@@ -57,7 +57,7 @@
+ #include <wtf/WordLock.h>
+ #include <wtf/text/AtomStringTable.h>
+
+-#if USE(PTHREADS) && !OS(DARWIN)
++#if USE(PTHREADS) && !OS(DARWIN) && !OS(CHOS)
+ #include <signal.h>
+ #endif
+
+@@ -326,7 +326,7 @@ protected:
+     void establishPlatformSpecificHandle(PlatformThreadHandle, ThreadIdentifier);
+ #endif
+
+-#if USE(PTHREADS) && !OS(DARWIN)
++#if USE(PTHREADS) && !OS(DARWIN) && !OS(CHOS)
+     static void signalHandlerSuspendResume(int, siginfo_t*, void* ucontext);
  #endif
 
 diff --git a/Source/WTF/wtf/ThreadingPrimitives.h b/Source/WTF/wtf/ThreadingPrimitives.h

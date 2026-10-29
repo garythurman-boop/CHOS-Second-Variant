@@ -1,0 +1,102 @@
+.text
+.p2align 2
+.global chos_capture_probe
+.type chos_capture_probe,%function
+chos_capture_probe:
+ sub sp,sp,#208
+ stp x19,x20,[sp,#0]
+ stp x21,x22,[sp,#16]
+ stp x23,x24,[sp,#32]
+ stp q8,q9,[sp,#48]
+ stp q10,q11,[sp,#80]
+ stp q12,q13,[sp,#112]
+ stp q14,q15,[sp,#144]
+ stp x29,x30,[sp,#176]
+ mrs x9,fpcr
+ mrs x10,fpsr
+ stp x9,x10,[sp,#192]
+ mov x19,x1
+ and x11,x19,#3
+ lsl x11,x11,#22
+ msr fpcr,x11
+ mov x10,#1
+ and x11,x19,#3
+ lsl x11,x10,x11
+ msr fpsr,x11
+ mov x20,#0x2020
+ mov x21,#0x2121
+ mov x22,#0x2222
+ mov x23,#0x2323
+ mov x24,#0x2424
+ movi v0.16b,#64
+ movi v1.16b,#65
+ movi v2.16b,#66
+ movi v3.16b,#67
+ movi v4.16b,#68
+ movi v5.16b,#69
+ movi v6.16b,#70
+ movi v7.16b,#71
+ movi v8.16b,#72
+ movi v9.16b,#73
+ movi v10.16b,#74
+ movi v11.16b,#75
+ movi v12.16b,#76
+ movi v13.16b,#77
+ movi v14.16b,#78
+ movi v15.16b,#79
+ movi v16.16b,#80
+ movi v17.16b,#81
+ movi v18.16b,#82
+ movi v19.16b,#83
+ movi v20.16b,#84
+ movi v21.16b,#85
+ movi v22.16b,#86
+ movi v23.16b,#87
+ movi v24.16b,#88
+ movi v25.16b,#89
+ movi v26.16b,#90
+ movi v27.16b,#91
+ movi v28.16b,#92
+ movi v29.16b,#93
+ movi v30.16b,#94
+ movi v31.16b,#95
+ dup v0.2d,x19
+ mvn x9,x19
+ ins v0.d[1],x9
+ dup v31.2d,x9
+ ins v31.d[1],x19
+ mov x1,#832
+ mov x2,#0
+ mov x8,#66
+ svc #0
+.global chos_capture_probe_after
+chos_capture_probe_after:
+ ldp x9,x10,[sp,#192]
+ msr fpcr,x9
+ msr fpsr,x10
+ ldp x19,x20,[sp,#0]
+ ldp x21,x22,[sp,#16]
+ ldp x23,x24,[sp,#32]
+ ldp q8,q9,[sp,#48]
+ ldp q10,q11,[sp,#80]
+ ldp q12,q13,[sp,#112]
+ ldp q14,q15,[sp,#144]
+ ldp x29,x30,[sp,#176]
+ add sp,sp,#208
+ ret
+.size chos_capture_probe,.-chos_capture_probe
+.global chos_context_on_alternate_stack
+.type chos_context_on_alternate_stack,%function
+chos_context_on_alternate_stack:
+ stp x19,x30,[sp,#-16]!
+ mov x19,sp
+ mov sp,x1
+ mov x1,#832
+ mov x2,#0
+ mov x8,#66
+ svc #0
+ mov sp,x19
+ ldp x19,x30,[sp],#16
+ ret
+.size chos_context_on_alternate_stack,.-chos_context_on_alternate_stack
+.section .note.GNU-stack,"",%progbits

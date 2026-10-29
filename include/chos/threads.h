@@ -9,6 +9,7 @@ int64_t chos_thread_enqueue(address_space_handle_t,const chos_thread_request_t *
 void chos_thread_cancel_pending(address_space_handle_t,uint32_t);
 int chos_thread_create_result(address_space_handle_t,uint32_t tid);
 int64_t chos_thread_self(address_space_handle_t);
+int chos_thread_current_stack(address_space_handle_t,uint32_t *,uint64_t *,uint64_t *);
 int chos_thread_info(address_space_handle_t,uint32_t,chos_thread_info_t *);
 int chos_thread_reap(address_space_handle_t,uint32_t);
 int chos_threads_main_exit(address_space_handle_t);

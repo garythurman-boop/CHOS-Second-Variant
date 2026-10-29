@@ -150,3 +150,10 @@ header import are qualified. Complete WTF/JSC compilation, Thread lifecycle/GC
 suspension, engine-sized memory and all full browser/wireless/platform gates remain
 open. The development version remains0.30.0; this source work does not replace the
 cc29ea8 user-test ISO or imply Stage3 completion.
+
+The subsequent [native current-thread context component](NATIVE_THREAD_CONTEXT.md)
+provides real own-thread stack/GPR/SIMD/FPU snapshots with read-only capability
+checks and actual AArch64 SDK assembly links. Native WTF register declarations and
+current stack discovery compile. Foreign-thread suspension/GC, complete Thread
+lifecycle, engine-sized stack/memory and the other modern browser/wireless/platform
+requirements remain open; this is not Stage3/version0.50.0 completion.

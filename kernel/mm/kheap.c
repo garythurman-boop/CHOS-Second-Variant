@@ -224,14 +224,9 @@ static int arena_is_empty(const kheap_arena_t *arena) {
 }
 static void return_empty_arena(kheap_arena_t *arena) {
     if(!arena_is_empty(arena))return;
-    /* Keep one completely free minimum arena for small allocations. Large
-     * executable/file snapshots must not become a permanent high-water cost. */
-    if(arena->pages==KHEAP_MIN_ARENA_PAGES){
-        int another=0;
-        for(kheap_arena_t *other=arena_list;other;other=other->next)
-            if(other!=arena && !other->reserved && other->pages==KHEAP_MIN_ARENA_PAGES && arena_is_empty(other)){another=1;break;}
-        if(!another)return;
-    }
+    /* Fully idle storage returns to PMM, including minimum-size arenas. An
+     * optional empty cache made the idle footprint depend on allocation order.
+     * Live blocks retain their original arena; ownership refusals quarantine. */
     kheap_arena_t **link=&arena_list;
     while(*link && *link!=arena)link=&(*link)->next;
     if(!*link)return;

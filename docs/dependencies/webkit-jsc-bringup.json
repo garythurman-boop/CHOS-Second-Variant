@@ -28,10 +28,13 @@
     "Source/WTF/wtf/PlatformOS.h": "ad5594b0edbcd6d588c255e70a9f5bbcd2a35a43f54cdd4f9bc61954398996e5",
     "Source/WTF/wtf/PlatformUse.h": "3eaf865d131699e643e079a417a37d28ef88de525c6361d213e24c3460b075be",
     "Source/WTF/wtf/ThreadingPrimitives.h": "715184ed1d2b301d70dd34a31aee757763b637cd9e742379e835dbb52e19e369",
-    "Source/WTF/wtf/CurrentTime.cpp": "f735ade17899d8192fb6a39abb0780bf19cb56a5bc7aea5471468b308827a37c"
+    "Source/WTF/wtf/CurrentTime.cpp": "f735ade17899d8192fb6a39abb0780bf19cb56a5bc7aea5471468b308827a37c",
+    "Source/WTF/wtf/PlatformRegisters.h": "22fc1bf9d399d31f62f817b78deeaef71fc7ef249394596f2b034494e5afb7d5",
+    "Source/WTF/wtf/StackBounds.cpp": "24b4e3f2bd1ecd927682a82ac0a72614565a55854f92d2c7beeb336415a378a2",
+    "Source/WTF/wtf/Threading.h": "2f3eacb1da77b0137c08c64a1f0fdec6a5d7533083498df4a3733b1f854333b5"
   },
   "patch": "ports/webkit/patches/0001-chos-platform-bringup.patch",
-  "patch_sha256": "bfd3350952af39739f26782936238773d01d52a3c226bec87d6ae3caf0f12184",
+  "patch_sha256": "4feb396c6adfd346578b8d2408079e9b36ba0dc76ecc0ea529314172fb72c612",
   "patched_files_sha256": {
     "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c",
     "Source/bmalloc/bmalloc/BPlatform.h": "7eace90386576643b0cfca4377a9a61794763bf6e933a32b122c8f4700150216",
@@ -43,7 +46,10 @@
     "Source/WTF/wtf/PlatformOS.h": "a6a9c70c8dc989e8c83dcd54e520457778bd59d65555eac7a8ccc53ce9362d14",
     "Source/WTF/wtf/PlatformUse.h": "9af8a280a7d03086479febb9de02fd982a39f586b07c6e1532cee8bf29700db2",
     "Source/WTF/wtf/ThreadingPrimitives.h": "2beb9c056a4a6982b32bcb43cbc52c6b2a0ad8c3a25928ffe4996eaec05effdc",
-    "Source/WTF/wtf/CurrentTime.cpp": "e8a432ea308521b68334025b72a15da7a98023da5fe02b7fc6b019112a4f3bc8"
+    "Source/WTF/wtf/CurrentTime.cpp": "e8a432ea308521b68334025b72a15da7a98023da5fe02b7fc6b019112a4f3bc8",
+    "Source/WTF/wtf/PlatformRegisters.h": "d4c44a66308875edc5bced9361122a10614ea1cde42cb3ecd9d3ed20008f0e08",
+    "Source/WTF/wtf/StackBounds.cpp": "f48418e4c137bd88f1ecd39fb21ae7079278a30cb6af59d7e5ad78a6e00409b3",
+    "Source/WTF/wtf/Threading.h": "0b24d45b7271b563352f425994b1ad538159bbad4c72a4c88ea6576488704a52"
   },
   "signature_verification": "Not claimed; HTTPS Git object identity and exact inspected file/patch hashes recorded. Full license/dependency/release qualification remains open.",
   "required_source_roots": [
@@ -56,7 +62,7 @@
     "Tools/Scripts",
     "Tools/TestWebKitAPI"
   ],
-  "patch_scope": "Explicit CHOS CMake/bmalloc identity;owned-page discard;OS-brokered entropy with bounded retries and fail-closed errors;bounded native Console diagnostics. No local RNG,device fallback or full engine/security/conformance success inferred. Native mutex backoff uses the real scheduled YIELD service,not an unimplemented nanosleep API. Explicit WTF CHOS identity and private pthread selection; separate real native mutex/condition backend,not Unix signals/thread suspension. Native WTF clocks use checked realtime/monotonic services;unavailable clocks fail closed;continuous-time profile does not claim suspend/resume support.",
+  "patch_scope": "Explicit CHOS CMake/bmalloc identity;owned-page discard;OS-brokered entropy with bounded retries and fail-closed errors;bounded native Console diagnostics. No local RNG,device fallback or full engine/security/conformance success inferred. Native mutex backoff uses the real scheduled YIELD service,not an unimplemented nanosleep API. Explicit WTF CHOS identity and private pthread selection; separate real native mutex/condition backend,not Unix signals/thread suspension. Native WTF clocks use checked realtime/monotonic services;unavailable clocks fail closed;continuous-time profile does not claim suspend/resume support. Native current-thread register layout and kernel-owned stack discovery;Unix signal-handler declarations excluded on CHOS. Foreign-thread suspend/GC/lifecycle remain unimplemented.",
   "native_port_files_sha256": {
     "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b"
   }

@@ -68,7 +68,8 @@
 #define CHOS_SYS_SEEK 63u /* x0=owned read-only fd,x1=signed offset,x2=SET0/CUR1/END2; shares READ permission */
 #define CHOS_SYS_MEMORY_CONTROL 64u /* x0=owned anonymous range,x1=bytes,x2=memory_api operation */
 #define CHOS_SYS_UNMAP_RANGE 65u /* x0=owned anonymous subrange,x1=bytes; keeps exact UNMAP36 ABI */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_UNMAP_RANGE
+#define CHOS_SYS_THREAD_CONTEXT 66u /* x0=current-thread snapshot,x1=exact size,x2=flags0;THREAD_INFO57 capability */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_THREAD_CONTEXT
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

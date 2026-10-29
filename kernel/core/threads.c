@@ -52,6 +52,21 @@ int64_t chos_thread_self(address_space_handle_t h){
  if(o){id=o->main_tid;for(unsigned i=0;i<THREAD_SLOTS;i++)if(threads[i].state&&equal(threads[i].space,h)&&threads[i].task_id==task){id=threads[i].tid;break;}}
  chos_spin_unlock_irqrestore(&lock,f);return id;
 }
+int chos_thread_current_stack(address_space_handle_t h,uint32_t *id,uint64_t *base,uint64_t *bytes){
+ if(!id||!base||!bytes)return -CHOS_ERRNO_EINVAL;
+ int64_t current=chos_thread_self(h);if(current<0)return (int)current;
+ uint32_t task=current_task();int main_thread=0,rc=-CHOS_ERRNO_ESRCH;
+ uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,0,0);thread_t *t=find(h,(uint32_t)current);
+ if(o&&!o->stopping){
+  if(t&&t->state==RUNNING&&t->pinned&&t->task_id==task){*base=t->request.stack_base;*bytes=t->request.stack_bytes;rc=0;}
+  else if(o->main_task==task&&o->main_tid==(uint32_t)current)main_thread=1;
+ }
+ chos_spin_unlock_irqrestore(&lock,f);
+ /* Keep thread and process locks separate; no borrowed record survives unlock. */
+ if(main_thread)rc=process_main_stack_bounds(h,base,bytes);
+ if(!rc)*id=(uint32_t)current;return rc;
+}
+
 int chos_threads_main_exit(address_space_handle_t h){
  uint32_t task=current_task();if(!scheduler_is_running()||!task)return -CHOS_ERRNO_ENOSYS;
  uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,1,task);int rc=0;

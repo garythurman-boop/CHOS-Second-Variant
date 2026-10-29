@@ -5,15 +5,15 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [native WTF service milestone](NATIVE_WTF_SERVICES.md) executes the
-upstream mutex/condition/TLS headers and actual clock units against CHOS services.
-The private pthread and clock paths fail closed on errors, and original numeric
-algorithms run. Full host/sanitizer suites and the recorded guest regressions pass.
-Actual full WTF compilation next stops at Unix register-context declarations;
-thread lifecycle/GC suspension, JavaScript execution and modern rendering remain
-open. This is source-only; the test ISO remains cc29ea8/version0.30.0. The earlier
-[bmalloc](NATIVE_BMALLOC_SERVICES.md) and [virtual-memory](NATIVE_VIRTUAL_MEMORY.md)
-components retain their separate evidence and bounded memory limits.
+The latest [native current-thread context](NATIVE_THREAD_CONTEXT.md) exposes
+kernel-owned current stack bounds and actual EL0 GPR/SIMD/FPU state through a
+read-only capability-checked syscall. Direct/UEFI probes and the recorded
+regressions qualify this component. WTF's native register declaration and current
+stack discovery now compile; further stream/filesystem/entropy/runtime services,
+foreign-thread suspension and the full engine remain open. This is source-only;
+the test ISO remains cc29ea8/version0.30.0. The preceding
+[WTF synchronization/clocks](NATIVE_WTF_SERVICES.md), [bmalloc](NATIVE_BMALLOC_SERVICES.md)
+and [virtual-memory](NATIVE_VIRTUAL_MEMORY.md) components retain separate evidence.
 
 Stage 3 is **not complete**. The revised prompt's modern browser, integrated
 production TLS policy, complete isolation/runtime and real Pi 5 wireless

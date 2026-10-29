@@ -674,6 +674,20 @@ static size_t find_process_slot_for_space_locked(address_space_handle_t space) {
     return CHOS_PROCESS_MAX;
 }
 
+int process_main_stack_bounds(address_space_handle_t space,uint64_t *base,uint64_t *bytes){
+ if(!base||!bytes)return -CHOS_ERRNO_EINVAL;
+ uint64_t flags=chos_spin_lock_irqsave(&process_lock);size_t index=find_process_slot_for_space_locked(space);
+ int rc=-CHOS_ERRNO_ESRCH;
+ if(index<CHOS_PROCESS_MAX){
+  process_slot_t *slot=&process_slots[index];uint32_t pages=slot->info.stack_pages;
+  if(slot->info.state==CHOS_PROCESS_RUNNING&&pages&&pages<=CHOS_EXEC_MAX_STACK_PAGES&&
+     slot->stack_mapped_mask==((UINT32_C(1)<<pages)-1u)){
+   *base=slot->stack_base_va;*bytes=(uint64_t)pages*PROCESS_PAGE_SIZE;rc=0;
+  }
+ }
+ chos_spin_unlock_irqrestore(&process_lock,flags);return rc;
+}
+
 int64_t process_file_open_for_address_space(address_space_handle_t space, const char *path) {
     chos_romfs_file_t file; void *owned = NULL; int resolved; size_t index, i; uint64_t flags;
     process_slot_t *slot; int64_t fd;

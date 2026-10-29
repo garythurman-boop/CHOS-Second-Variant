@@ -133,6 +133,15 @@ static void test_heap_lifecycle(void) {
 }
 
 static unsigned owned_pages(void){unsigned n=0;for(unsigned i=0;i<FAKE_PAGE_COUNT;i++)n+=fake_allocated[i];return n;}
+static void test_transient_small_arena_return(void){
+    reset_fake_pmm();kheap_begin_bootstrap();assert(kheap_init());kheap_enable_runtime_locking();
+    uint8_t *anchor=kheap_alloc(256);assert(anchor);memset(anchor,0x73,256);
+    unsigned baseline=owned_pages();uint8_t *scratch=kheap_alloc(16000);assert(scratch);
+    assert(owned_pages()==baseline+KHEAP_MIN_ARENA_PAGES);
+    assert(kheap_free(scratch));assert(owned_pages()==baseline);
+    for(unsigned i=0;i<256;i++)assert(anchor[i]==0x73);
+    assert(kheap_free(anchor)&&!owned_pages());
+}
 static void test_empty_arena_return(void){
     reset_fake_pmm();kheap_begin_bootstrap();assert(kheap_init());kheap_enable_runtime_locking();
     uint8_t *anchor=kheap_alloc(128);assert(anchor);anchor[0]=0x73;
@@ -152,8 +161,8 @@ static void test_empty_arena_return(void){
     void *a=kheap_alloc(8192),*b=kheap_alloc(8192),*c=kheap_alloc(8192);assert(a&&b&&c);
     assert(kheap_free(a)&&kheap_free(b)&&kheap_free(c));
     kheap_stats_t stats;kheap_get_stats(&stats);
-    assert(!stats.allocated_blocks&&stats.arena_count==1&&stats.total_pages==KHEAP_MIN_ARENA_PAGES);
-    assert(owned_pages()==KHEAP_MIN_ARENA_PAGES);
+    assert(!stats.allocated_blocks&&!stats.arena_count&&!stats.total_pages);
+    assert(!owned_pages());
 }
 
 #define KHEAP_STRESS_THREADS 4u
@@ -230,6 +239,7 @@ int main(void) {
     test_uninitialized_pmm();
     test_bootstrap_to_runtime_transition();
     test_heap_lifecycle();
+    test_transient_small_arena_return();
     test_empty_arena_return();
     test_concurrent_alloc_free();
     puts("Kernel heap lifecycle and concurrent alloc/free stress tests passed");

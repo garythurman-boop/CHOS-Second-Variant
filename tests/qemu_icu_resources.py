@@ -46,7 +46,7 @@ try:
   pid=re.search(r'pid=(\d+) path=/BIN/ICURES.ELF',g.text()[offset:]).group(1)
   section=g.text().rsplit('CHOS process table (foreground and scheduled EL0 processes)',1)[-1]
   assert re.search(r'\bpid='+pid+r'\b[^\r\n]*state=exited\b[^\r\n]*exit=0\b',section),section
-  if run==0:baseline=observed
+  if run==0:baseline=observed;assert baseline==cold,('first ICU launch retained pages',cold,baseline)
   else:assert observed==baseline,('base C leaked pages',baseline,observed)
  preemptions_after=g.symbol('preemption_switches');assert preemptions_after>preemptions_before
  assert g.symbol('futex_queued_waiters')==0
@@ -54,13 +54,13 @@ try:
  'native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors',
  'actual word and extended-grapheme break data;missing data and unsupported converter fail',
  '143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path',
- 'three native workers and three lifecycles,u_cleanup,heap0,stable warm frames and zero private futex waiters'],
+ 'three native workers and three lifecycles,u_cleanup,heap0,strict cold PMM equality and zero private futex waiters'],
  'limits':['selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance',
  'current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime',
  'no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN']},indent=2)+'\n')
 except Exception:
  try:
-  g.serial('procinfo');time.sleep(.4);g.serial('threads');time.sleep(.4)
+  g.serial('procinfo');time.sleep(.4);g.serial('heapinfo');time.sleep(.4)
  except Exception:pass
  (out/'failure.txt').write_text(g.text());raise
 finally:g.close()

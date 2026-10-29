@@ -1,3 +1,4 @@
+#include "chos/thread_context.h"
 #include "chos/futex.h"
 #include "chos/ipc.h"
 #include "chos/threads.h"
@@ -493,6 +494,15 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
             case CHOS_SYS_FUTEX_WAKE:
                 if(frame->x[1]>CHOS_SCHED_MAX_TASKS){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 frame->x[0]=(uint64_t)(int64_t)chos_futex_wake(fault_space,frame->x[0],(unsigned)frame->x[1]);return frame;
+            case CHOS_SYS_THREAD_CONTEXT: {
+                chos_thread_context_t context;uint32_t tid;uint64_t base,bytes;
+                if(frame->x[1]!=sizeof(context)||frame->x[2]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[0],sizeof(context))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int rc=chos_thread_current_stack(fault_space,&tid,&base,&bytes);
+                if(rc<0){frame->x[0]=(uint64_t)(int64_t)rc;return frame;}
+                if(!chos_thread_context_capture(frame,tid,base,bytes,&context)){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&context,sizeof(context))?0u:neg_errno(CHOS_ERRNO_EFAULT);return frame;
+            }
             case CHOS_SYS_THREAD_SELF:
                 frame->x[0]=(uint64_t)chos_thread_self(fault_space);return frame;
             case CHOS_SYS_THREAD_EXIT:
