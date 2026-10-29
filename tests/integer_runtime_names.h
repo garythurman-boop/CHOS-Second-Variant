@@ -1,0 +1,14 @@
+#define __udivmodti4 chos_test_udivmodti4
+#define __udivti3 chos_test_udivti3
+#define __umodti3 chos_test_umodti3
+#define __divti3 chos_test_divti3
+#define __modti3 chos_test_modti3
+#define __fixsfti chos_test_fixsfti
+#define __fixunssfti chos_test_fixunssfti
+#define __fixdfti chos_test_fixdfti
+#define __fixunsdfti chos_test_fixunsdfti
+#define __floattisf chos_test_floattisf
+#define __floatuntisf chos_test_floatuntisf
+#define __floattidf chos_test_floattidf
+#define __floatuntidf chos_test_floatuntidf
+#define __clzti2 chos_test_clzti2

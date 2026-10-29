@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the exact original LLVM emutls/binary128 dependency closures, without networking."""
+"""Verify the exact original LLVM TLS/floating/integer dependency closures, without networking."""
 from pathlib import Path
 import hashlib,json
 root=Path(__file__).resolve().parents[1]
@@ -13,6 +13,12 @@ complex_runtime=json.loads((root/'docs/dependencies/compiler-rt-complex.json').r
 for name,wanted in complex_runtime['files'].items():
     if name in manifest['files']:assert manifest['files'][name]==wanted
     manifest['files'][name]=wanted
+integer=json.loads((root/'docs/dependencies/compiler-rt-integer.json').read_text())
+for name,wanted in integer['files'].items():
+    if name in manifest['files']:assert manifest['files'][name]==wanted
+    manifest['files'][name]=wanted
+assert len(integer['sources'])==len(set(integer['sources']))
+assert set(integer['sources'])<=set(integer['files'])
 actual={str(p.relative_to(base)) for p in base.rglob('*') if p.is_file()}
 assert 'lib/builtins/aarch64/fp_mode.c' in quad['sources']
 assert 'lib/builtins/fp_mode.c' not in actual,'generic dummy FP mode backend is forbidden'
@@ -23,4 +29,4 @@ for name,wanted in manifest['files'].items():
     path=base/name
     assert path.is_relative_to(base) and '..' not in path.parts
     assert hashlib.sha256(path.read_bytes()).hexdigest()==wanted,'modified upstream file '+name
-print('LLVM compiler-rt exact original TLS/quad/complex dependency closures: '+str(len(actual))+' pinned original files verified')
+print('LLVM compiler-rt exact original TLS/quad/integer/complex dependency closures: '+str(len(actual))+' pinned original files verified')

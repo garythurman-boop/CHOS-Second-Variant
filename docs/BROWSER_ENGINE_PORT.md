@@ -371,3 +371,11 @@ create/exclusive/truncate/write/conditional-flush/close/abort behavior, with sha
 owned-buffer quotas and retained dirty data on conflicts. This closes a kernel
 service prerequisite, not the full WTF filesystem port: no new full-library link
 or engine execution is claimed. See `NATIVE_WRITABLE_HANDLES.md` for exact limits.
+
+The Int128 unit now compiles in the real WTF target. The native no-localization
+profile explicitly excludes its optional std::ostream diagnostics; original
+arithmetic/conversions and WTF PrintStream bodies remain. Missing integer division/
+conversion and ldexpl imports are supplied by original pinned LLVM/musl routines.
+The actual full WTF attempt now reports five filesystem compilation failures;
+no complete archive/link, engine execution or JavaScript result is claimed.
+`NATIVE_WTF_INT128.md` records independent oracle and native component coverage.

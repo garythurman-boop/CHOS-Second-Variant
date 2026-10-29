@@ -1,0 +1,1015 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "59c0dc37e8f1df821c49a001c80f9f8ebfbb9021",
+  "implementation": "original WTF Int128 arithmetic and original LLVM/musl runtime closure",
+  "host_checks": {
+    "full-host": {
+      "exit": 0,
+      "log_sha256": "7d3f8b84ce73df759719a3c22c0be8c87d66a3745595feec33363cecc93a4b32"
+    },
+    "full-sanitize": {
+      "exit": 0,
+      "log_sha256": "4565c6704db8daa90ee43fdb1d39256c068497939225f179ef3beab571533352"
+    },
+    "final-build": {
+      "exit": 0,
+      "log_sha256": "3295b10c1984664ed60312b81b4dcaf84b24b3fb10903cd4832b1ec5538ed879"
+    }
+  },
+  "integer_host_scope": "200000 separate-identity GCC/libgcc references;full/64bit divisors,signed boundaries,FP32/64 fractions,integer rounding;normal+ASan/UBSan",
+  "engine_compilation": {
+    "scope": "real upstream JSCOnly WTF target;not full linking/runtime",
+    "int128_object_exit": 0,
+    "int128_object_log_sha256": "dc7f4b1b9afb08106c49381a5021ae7ad6e1b084b85ee9ba491351bfae20f020",
+    "full_target_exit": 1,
+    "failed_units": [
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/FileHandle.cpp.obj",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/FileSystem.cpp.obj",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/unix/UniStdExtrasUnix.cpp.obj",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/posix/FileHandlePOSIX.cpp.obj",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/posix/FileSystemPOSIX.cpp.obj"
+    ],
+    "full_target_log_sha256": "876d1f28b3a306d57c86bd1a12fcd8f4d8585d1aa1e7567e596cb613a95d1069",
+    "patch_sha256": "889e2bd5ef02b96c63f672f7b2cff2c2b3011782c800cc422b2466c76b91a1ac",
+    "patched_files": 22
+  },
+  "final_application": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "889e2bd5ef02b96c63f672f7b2cff2c2b3011782c800cc422b2466c76b91a1ac",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+      "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+      "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a"
+    },
+    "sdk_manifest_sha256": "481c2f160cc66cf86a3ab39a67c9b51d86cda15e2ce3b7f7fb7ec19f682dac47",
+    "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/wtf_int128",
+        "-B",
+        "/workspace/chos-wtf-int128-qualified/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-wtf-int128-qualified/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 3.8343733670044458,
+    "application_sha256": "b931841d106a7a83ae0c9841ffac1bfef0834818fc344e79c5ce547a30a62040",
+    "scope": "original upstream UInt128Impl/Int128Impl arithmetic and conversions;std::ostream diagnostics explicitly unavailable",
+    "limits": [
+      "no full WTF/JSC library,JavaScript or rendering",
+      "full engine Thread lifecycle and foreign GC suspension remain open;current-thread stack/context services are separately qualified",
+      "WTF PrintStream methods compiled but not executed by this arithmetic-only fixture",
+      "native guest tests required;no new physical/Fusion qualification"
+    ]
+  },
+  "native_sdk_manifest_sha256": "481c2f160cc66cf86a3ab39a67c9b51d86cda15e2ce3b7f7fb7ec19f682dac47",
+  "accepted_guest_profiles": [
+    {
+      "profile": "int128-direct",
+      "exit": 0,
+      "seconds": 17.938273677005782,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/int128-direct",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "b931841d106a7a83ae0c9841ffac1bfef0834818fc344e79c5ce547a30a62040",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117501,
+        "free_pages_before": 117501,
+        "free_pages_after": 117501,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 353,
+        "checks": [
+          "original upstream Int128.cpp arithmetic,not reimplemented helper algorithms",
+          "37000 seeded cases per process:unsigned full-width arithmetic/division/modulo/bitwise/shifts and bounded signed references",
+          "signed minimum/maximum and divisor boundaries;upstream undefined min/-1 case excluded",
+          "float/double/binary128 long-double conversion boundaries and live three-worker interleaving",
+          "three process lifecycles,cold PMM equality,zero user heap and futex waiters"
+        ],
+        "limits": [
+          "optional std::ostream operators absent in the native no-localization profile;WTF PrintStream methods build-only here",
+          "not full WTF/JSC linking,JavaScript or browser execution;QEMU only"
+        ]
+      },
+      "result_sha256": "606db955010cedb79db0af0813f379c9184d23484dff76e7f6b105bd05690588",
+      "artifacts": {
+        "kernel_sha256": "c8d89799c2b952e9cbf7dec56fdf4bd90293edb932d34a88abc2f4ce81ced96d"
+      }
+    },
+    {
+      "profile": "int128-uefi",
+      "exit": 0,
+      "seconds": 25.241811357002007,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/int128-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "b931841d106a7a83ae0c9841ffac1bfef0834818fc344e79c5ce547a30a62040",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500147,
+        "free_pages_before": 500147,
+        "free_pages_after": 500147,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 355,
+        "checks": [
+          "original upstream Int128.cpp arithmetic,not reimplemented helper algorithms",
+          "37000 seeded cases per process:unsigned full-width arithmetic/division/modulo/bitwise/shifts and bounded signed references",
+          "signed minimum/maximum and divisor boundaries;upstream undefined min/-1 case excluded",
+          "float/double/binary128 long-double conversion boundaries and live three-worker interleaving",
+          "three process lifecycles,cold PMM equality,zero user heap and futex waiters"
+        ],
+        "limits": [
+          "optional std::ostream operators absent in the native no-localization profile;WTF PrintStream methods build-only here",
+          "not full WTF/JSC linking,JavaScript or browser execution;QEMU only"
+        ]
+      },
+      "result_sha256": "360acf57a00a514d90bc0076450d7ea8f836ea0d63a7da3376a851fd615461bd",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "quad-direct",
+      "exit": 0,
+      "seconds": 32.13608327799011,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/quad-direct",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "a0f88f79c9f2a58b31f4b18f6651072538989af165889dbebe92c004a7916ec0",
+        "cold_free_pages": 117501,
+        "free_pages_before": 117501,
+        "free_pages_after": 117501,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 687,
+        "checks": [
+          "192 exact-rational binary128 arithmetic fixtures,each add/sub/mul/div and binary32/64 narrowing",
+          "signed/unsigned32/64/128 conversions,float/double extension,NaN/infinity/signed zero",
+          "real AArch64 FPCR/FPSR addition rounding and inexact with three isolated native workers",
+          "three worker lifecycles/process and three repeated processes,stable warm physical pages/no futex waiters"
+        ],
+        "limits": [
+          "binary128 compiler-helper subset; mul/div/narrowing use upstream nearest-even rather than full dynamic-FENV semantics",
+          "exact rational fixtures are regression coverage,not exhaustive IEC60559/C/ECMAScript conformance",
+          "long-double libm transcendental functions and complete formatted I/O remain absent",
+          "not full C++ or browser integration",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "cdd2ffbd2f8e2c641ae6484527b2e4f2b62b4d7fec037ce5da1b6ad3e0def31e",
+      "artifacts": {
+        "kernel_sha256": "c8d89799c2b952e9cbf7dec56fdf4bd90293edb932d34a88abc2f4ce81ced96d"
+      }
+    },
+    {
+      "profile": "quad-uefi",
+      "exit": 0,
+      "seconds": 39.269475753986626,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/quad-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "a0f88f79c9f2a58b31f4b18f6651072538989af165889dbebe92c004a7916ec0",
+        "cold_free_pages": 500147,
+        "free_pages_before": 500147,
+        "free_pages_after": 500147,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 691,
+        "checks": [
+          "192 exact-rational binary128 arithmetic fixtures,each add/sub/mul/div and binary32/64 narrowing",
+          "signed/unsigned32/64/128 conversions,float/double extension,NaN/infinity/signed zero",
+          "real AArch64 FPCR/FPSR addition rounding and inexact with three isolated native workers",
+          "three worker lifecycles/process and three repeated processes,stable warm physical pages/no futex waiters"
+        ],
+        "limits": [
+          "binary128 compiler-helper subset; mul/div/narrowing use upstream nearest-even rather than full dynamic-FENV semantics",
+          "exact rational fixtures are regression coverage,not exhaustive IEC60559/C/ECMAScript conformance",
+          "long-double libm transcendental functions and complete formatted I/O remain absent",
+          "not full C++ or browser integration",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "6644c33fc1c76e842d567b21cb86ee57488bb72f91fc3748471e084f82430912",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "libm-uefi",
+      "exit": 0,
+      "seconds": 34.586626252988935,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/libm-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "cda04257446c529084f03e34668d58547acbdb4f8531be70ebe6970881098dd1",
+        "cold_free_pages": 500147,
+        "free_pages_before": 500147,
+        "free_pages_after": 500147,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 542,
+        "checks": [
+          "889 high-precision scalar fixtures across28 functions in binary32/binary64",
+          "NaN,infinity,signed zero,subnormal,FMA and domain/overflow flag behavior",
+          "real ARM64 fenv,invalid rounding refusal,hold/update environment",
+          "pthread inherits creating thread FPCR/FPSR and preserves distinct modes/flags across scheduling",
+          "three worker lifecycles/process and repeated cleanup",
+          "no remaining futex waiters and stable physical pages"
+        ],
+        "limits": [
+          "binary32/binary64 math profile; no binary128 long-double/nexttoward link support",
+          "scalar fixtures are regression coverage,not exhaustive C or ECMAScript conformance",
+          "legacy signgam is process-global; concurrent gamma-sign users need _r APIs",
+          "not full C++ or browser integration",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "15bacb36431a861208a814456c37c70be42c81c1474d55553529b2ec2de180ee",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "charconv-uefi",
+      "exit": 0,
+      "seconds": 18.632334785012063,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/charconv-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "b1584a1ceb7f6adeca5b55819e038e94603efdfe03d55ec1186a05c328ea3f36",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500147,
+        "free_pages_before": 500147,
+        "free_pages_after": 500147,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 476,
+        "checks": [
+          "original libc++19 integral from/to_chars and Ryu binary32/64 to_chars implementations",
+          "540 independent exact Decimal format vectors at five bounded output capacities",
+          "all integer bases2..36,signed/unsigned width/min/max,independent digit oracle and overflow/value preservation",
+          "1500 random finite bit-pattern shortest conversions per main/worker with independent musl round-trip parsing",
+          "all four rounding modes,thread-private errno and zero user heap across three worker and process cycles",
+          "1000 binary search cases per main/worker,independent search reference and actual WTF HAVE_MEMMEM path",
+          "strict cold PMM equality,preemption and no queued futexes"
+        ],
+        "limits": [
+          "floating from_chars unavailable upstream;binary128 to_chars narrows to double upstream and is not qualified;not full engine/browser",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "12f8393124b04dff5b2baf8a7441afe7d75a6c06375404e4633877f781467592",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "calendar-uefi",
+      "exit": 0,
+      "seconds": 24.932067033005296,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/calendar-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "3fa6f11766a70d980791b3719e9f4cda355f6b087751d560cf68b8fae8ddc903",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500147,
+        "free_pages_before": 500147,
+        "free_pages_after": 500147,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 130,
+        "checks": [
+          "actual DateMath/CurrentTime/WallTime/MonotonicTime/SIMDUTF/WTFProcess upstream units",
+          "702 independent unbounded Python UTC calendar vectors,normalization/negative epochs/extreme fields/nonmutating failures",
+          "actual ES5 date parser,UTC offsets,UTF8/UTF16 roundtrips,strict malformed UTF refusal and protected-page validation",
+          "C-byte case folding,reentrant guarded error strings,at-least-one-second sleep and denied/oversized waits",
+          "normal exit runs finalizer;immediate exit skips finalizer;live worker and16KiB abandoned heap are reaped",
+          "three worker cycles and process lifecycles,zero user heap,strict cold PMM equality,preemption and zero queued futexes"
+        ],
+        "limits": [
+          "UTC-only calendar,C-byte locale,bounded600-second sleep;not full WTF/JSC/browser/Intl/production time trust",
+          "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "04ad9b3fe4f641ce04b7fff0b897c8253589aa093d48ded5a8a36c17847d2866",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "native-uefi",
+      "exit": 0,
+      "seconds": 13.392981760000112,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/native-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "66ec9cbf88be09145f6c2bd3a9e09d776b93f60a5aa310cf9eb0c230607c3d31",
+        "free_pages_before": 500147,
+        "free_pages_after": 500147,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "result_sha256": "b0e724661c3d2a85871a4f5be42f5f25389fc11efccdf5c138a9a60355d538b6",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls-uefi",
+      "exit": 0,
+      "seconds": 49.261431407998316,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/tls-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "f275c842345f957fe312680664938e964d27d99889781aea98111a771326a4b0",
+        "ipv6": false,
+        "tcp6_wire_frames": 0,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500147,
+        "free_pages_before": 500147,
+        "free_pages_after": 500147,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8122746209992329,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8968738550029229,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7585186690121191,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8138109410065226,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8143244980019517,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0821178350015543,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.6922208780015353,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6117980429989984,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.675938447995577,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6978747579996707,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6972438810043968,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.491260215989314,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0805806420103181,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.400963930995204,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.22445456699642818,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.3922225729911588,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.151822321000509,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8828614469966851,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.7435375039931387,
+            "stalled_network_gui_response_seconds": 0.047138714013271965,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.282667514999048,
+            "stalled_network_gui_response_seconds": 0.046559005000744946,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 50416)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 35978)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 33640)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 35084)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 33456)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 34712)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53716)"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53724)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53726)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 37822)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 37848)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 37838)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 58418)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 58446)"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "662703e1b454a4e3a418ca2ca4bda777a9e58ab817b247614cdbbed73ba41398",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "platform-uefi",
+      "exit": 0,
+      "seconds": 49.26105750200804,
+      "directory": "/workspace/chos-evidence/wtf-int128/regressions/platform-uefi",
+      "result": {
+        "mode": "uefi",
+        "checks": [
+          "32 fast USB keypress/release pairs",
+          "PCI VirtIO CHFS write/flush/read",
+          "PCI VirtIO hardware RNG",
+          "82574L e1000e DHCP/ARP/ICMP",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "20 USB hot-unplug/reconnect cycles with ring wraps",
+          "3 mixed input/storage cycles",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 8.414,
+        "desktop_ready_seconds": 11.439,
+        "keyboard_visible_ms": 30.3,
+        "pointer_visible_ms": 45.98,
+        "maximize_visible_ms": 324.9,
+        "drag_visible_ms": 244.39,
+        "stress_seconds": 5.606,
+        "idle_cpu_percent": 21.49,
+        "status": "PASS"
+      },
+      "result_sha256": "28b93d0e044df6c581c333f784e7631b701abb332f9489bb3f1e07f542e4df01",
+      "artifacts": {
+        "kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "iso_sha256": "3327239ed29caa4fc9f3b864a51c48d97ea16d4d11fcf6b877bba73e05bda1d3",
+        "iso_embedded_kernel_sha256": "b5bf49fd2f2e72090438ed38ca4616f97c6bf9629bb56f627d1f07ada0a4c6a5",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "retained_investigations": [
+    {
+      "log": "object-build.log",
+      "diagnosis": "initial diagnostic guard also covered signed arithmetic helper;corrected before helper;candidate did not compile"
+    },
+    {
+      "log": "app-build1.log",
+      "diagnosis": "real missing integer conversion/division and ldexpl imports;original pinned runtime routines integrated"
+    },
+    {
+      "directory": "direct",
+      "diagnosis": "fractional constructor already returned correctly truncated integer;round-trip fixture incorrectly expected original fraction;oracle corrected;exact original fixture retained"
+    }
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/wtf-int128-qualified.tar.gz",
+    "archive_sha256": "7f9d7f77de25f248025373a1da56f672db899b8783dcaaf5d09a1a764d1c0230",
+    "archive_bytes": 76260536,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "source_files_sha256": {
+    "docs/dependencies/compiler-rt-integer.json": "f8a072650e8076f660935b92d406da331b52b54ac85be12597b063e76f1fee6a",
+    "docs/dependencies/musl-math.json": "f653e775ef7798d1c71b23d8287a31b5f044014facb02739d87dbd3003c5ace5",
+    "docs/dependencies/webkit-jsc-bringup.json": "03ce3fe033a14140437dce5935187f4237009762a3db83b45327c9f46f2b19d0",
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "889e2bd5ef02b96c63f672f7b2cff2c2b3011782c800cc422b2466c76b91a1ac",
+    "tools/verify_compiler_rt.py": "8fc58ab5a188dd9d6407c498cc9dd5e336dc489852e3e6cd10f175c282a948f1",
+    "userland/libm/Makefile.inc": "e3e3e91c154345d2302905eea19ba5809ee81eadf60efba9bd35e43b501171c0",
+    "tests/integer_runtime_names.h": "28ebcc468063dc38e94f746de161aa236bf7265ec095005f8a6a42e84b778102",
+    "tests/test_integer_runtime.c": "1b61971671d30476b77f0afc3691ac7a283554ac3ba36d2d551ca27656ee6b90",
+    "tests/wtf_int128/main.cpp": "0ddc264306e5f0b2abe1afeacab1112af9f9f0e89b5329fd336234592743011b",
+    "tests/wtf_int128/CMakeLists.txt": "d36c29d3a24eadab437f97ad48606d7478efaa911d2604ccd4a839a771dd0df8",
+    "tools/build_wtf_int128.py": "0088f25f1c0ef10e93501b1f3cb3722b449e2ff5d0c6f9572ffe67ca23a8a3be",
+    "tests/qemu_wtf_int128.py": "bbd418f220e8db17665d25db11957488ebfd25e8a762bfd1bdd5bd6c264a2853",
+    "docs/NATIVE_WTF_INT128.md": "55264676c511d3a32002b6b0bc9906450c63e3b42eae4c1370ef974b10a4f2c2"
+  },
+  "limits": [
+    "optional std::ostream diagnostics unavailable in native no-localization profile;WTF PrintStream bodies build-only in this arithmetic fixture",
+    "selected integer runtime/default rounding coverage;no claim for undefined conversion/division inputs or full dynamic-FENV conformance",
+    "five WTF filesystem compile blockers;complete library/link,Thread/GC/engine-sized memory/JavaScript/rendering remain open",
+    "modern browser,native Wi-Fi,production policy and revised Stage3 platform acceptance remain incomplete",
+    "new Fusion/Pi5/laptop tests NOT RUN;QEMU evidence only"
+  ]
+}

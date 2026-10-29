@@ -40,12 +40,16 @@
     "Source/WTF/wtf/simdutf/simdutf_impl.h": "2a91ae85b41ce5325f4b2f854e6c16f763a90dd3bdc501a77377216861ed5551",
     "Source/WTF/wtf/CPUTime.cpp": "37c3a55494b0430d277ae362470345d4eaec12592b4cd95a08cf5db175f51aa4",
     "Source/WTF/wtf/CPUTime.h": "2b679cccdf4d5824509e5a0abc22a0e34b09b53de8e5055e93e2e66a48f2ddb8",
-    "Source/WTF/wtf/MemoryFootprint.h": "1eff5c18292d9b44c8aaa58098477e47374042c9ed73a403d4b4ce992310b3a9"
+    "Source/WTF/wtf/MemoryFootprint.h": "1eff5c18292d9b44c8aaa58098477e47374042c9ed73a403d4b4ce992310b3a9",
+    "Source/WTF/wtf/Int128.cpp": "b2db8b9dd6aad2692223791e74b46c77522d3d0d2bd0e1c808c69c90fd5351b8",
+    "Source/WTF/wtf/Int128.h": "a0b604fe459ffb48e74d079ac380e29c3532ccdd874418e271a9a9dceef435c5"
   },
   "patch": "ports/webkit/patches/0001-chos-platform-bringup.patch",
-  "patch_sha256": "dae4914ef348a071ea75543e46030f3e2317994fba24d427e1a2f7f39b58d304",
+  "patch_sha256": "889e2bd5ef02b96c63f672f7b2cff2c2b3011782c800cc422b2466c76b91a1ac",
   "patched_files_sha256": {
     "Source/WTF/wtf/CurrentTime.cpp": "e8a432ea308521b68334025b72a15da7a98023da5fe02b7fc6b019112a4f3bc8",
+    "Source/WTF/wtf/Int128.cpp": "4a24da98f16563d73e08557557d04ff1c0565cd26ba1d1e3d2166f4dd685b0a2",
+    "Source/WTF/wtf/Int128.h": "a1e644852785281b05e5b70c57f9567601da230174246fe58a491cbd51a9cede",
     "Source/WTF/wtf/PageBlock.cpp": "1213bf14e88e90ec031cc3aaee3062204028c869a9c6f84a2ccfd00b260c11d0",
     "Source/WTF/wtf/PlatformJSCOnly.cmake": "081de28b7671db9b89870f19e92f925d03e4a5f1c762fe05b677a292190cdcc5",
     "Source/WTF/wtf/PlatformOS.h": "a6a9c70c8dc989e8c83dcd54e520457778bd59d65555eac7a8ccc53ce9362d14",
@@ -77,7 +81,7 @@
     "Tools/Scripts",
     "Tools/TestWebKitAPI"
   ],
-  "patch_scope": "Explicit CHOS CMake/bmalloc identity;owned-page discard;OS-brokered entropy with bounded retries and fail-closed errors;bounded native Console diagnostics. No local RNG,device fallback or full engine/security/conformance success inferred. Native mutex backoff uses the real scheduled YIELD service,not an unimplemented nanosleep API. Explicit WTF CHOS identity and private pthread selection; separate real native mutex/condition backend,not Unix signals/thread suspension. Native WTF clocks use checked realtime/monotonic services;unavailable clocks fail closed;continuous-time profile does not claim suspend/resume support. Native current-thread register layout and kernel-owned stack discovery;Unix signal-handler declarations excluded on CHOS. Foreign-thread suspend/GC/lifecycle remain unimplemented. Native WTF RandomDevice uses the real OS entropy broker with bounded retries/fail-closed errors;process/page helpers use real native libc services without a racy lazy page cache. Native CPUTime and memory-footprint sources select checked self-only scheduler/resource measurements; blocked time and kernel-root services excluded; no POSIX getrusage stub.",
+  "patch_scope": "Explicit CHOS CMake/bmalloc identity;owned-page discard;OS-brokered entropy with bounded retries and fail-closed errors;bounded native Console diagnostics. No local RNG,device fallback or full engine/security/conformance success inferred. Native mutex backoff uses the real scheduled YIELD service,not an unimplemented nanosleep API. Explicit WTF CHOS identity and private pthread selection; separate real native mutex/condition backend,not Unix signals/thread suspension. Native WTF clocks use checked realtime/monotonic services;unavailable clocks fail closed;continuous-time profile does not claim suspend/resume support. Native current-thread register layout and kernel-owned stack discovery;Unix signal-handler declarations excluded on CHOS. Foreign-thread suspend/GC/lifecycle remain unimplemented. Native WTF RandomDevice uses the real OS entropy broker with bounded retries/fail-closed errors;process/page helpers use real native libc services without a racy lazy page cache. Native CPUTime and memory-footprint sources select checked self-only scheduler/resource measurements; blocked time and kernel-root services excluded; no POSIX getrusage stub.; CHOS no-localization profile excludes only optional Int128 std::ostream declarations/formatting;all integer arithmetic,conversions and WTF PrintStream code retained",
   "native_port_files_sha256": {
     "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
     "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",

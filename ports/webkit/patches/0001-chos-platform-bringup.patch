@@ -76,6 +76,82 @@ index f4b97e56..5a7e0a11 100644
  #elif OS(LINUX) || OS(OPENBSD)
      struct timespec ts { };
      clock_gettime(CLOCK_BOOTTIME, &ts);
+diff --git a/Source/WTF/wtf/Int128.cpp b/Source/WTF/wtf/Int128.cpp
+index 7b11278c..c1914dec 100644
+--- a/Source/WTF/wtf/Int128.cpp
++++ b/Source/WTF/wtf/Int128.cpp
+@@ -17,9 +17,13 @@
+
+ #include <stddef.h>
+ #include <cassert>
++#if !OS(CHOS)
++// The native no-localization profile has no C++ iostream runtime. Keep the
++// optional standard-stream diagnostics out; arithmetic and WTF PrintStream stay.
+ #include <iomanip>
+ #include <ostream>  // NOLINT(readability/streams)
+ #include <sstream>
++#endif
+ #include <string>
+ #include <type_traits>
+ #include <wtf/MathExtras.h>
+@@ -127,6 +131,7 @@ UInt128Impl operator%(UInt128Impl lhs, UInt128Impl rhs) {
+   return remainder;
+ }
+
++#if !OS(CHOS)
+ namespace {
+
+ static std::string UInt128ToFormattedString(UInt128Impl v, std::ios_base::fmtflags flags) {
+@@ -197,6 +202,8 @@ std::ostream& operator<<(std::ostream& os, UInt128Impl v) {
+   return os << rep;
+ }
+
++#endif
++
+ namespace {
+
+ static UInt128Impl NODELETE UnsignedAbsoluteValue(Int128Impl v) {
+@@ -255,6 +262,7 @@ Int128Impl operator%(Int128Impl lhs, Int128Impl rhs) {
+                     UInt128Low64(remainder));
+ }
+
++#if !OS(CHOS)
+ std::ostream& operator<<(std::ostream& os, Int128Impl v) {
+   std::ios_base::fmtflags flags = os.flags();
+   std::string rep;
+@@ -300,6 +308,8 @@ std::ostream& operator<<(std::ostream& os, Int128Impl v) {
+   return os << rep;
+ }
+
++#endif
++
+ void printInternal(PrintStream& out, UInt128 value)
+ {
+     auto vector = numberToStringUnsigned<Vector<Latin1Character, 50>>(value);
+diff --git a/Source/WTF/wtf/Int128.h b/Source/WTF/wtf/Int128.h
+index 23760d9f..32d8036b 100644
+--- a/Source/WTF/wtf/Int128.h
++++ b/Source/WTF/wtf/Int128.h
+@@ -207,7 +207,9 @@ class UInt128Impl {
+ };
+
+ // allow UInt128Impl to be logged
++#if !OS(CHOS)
+ WTF_EXPORT_PRIVATE std::ostream& operator<<(std::ostream& os, UInt128Impl v);
++#endif
+
+ // TODO(strel) add operator>>(std::istream&, UInt128Impl)
+
+@@ -406,7 +408,9 @@ class Int128Impl {
+ #endif  // byte order
+ };
+
++#if !OS(CHOS)
+ WTF_EXPORT_PRIVATE std::ostream& operator<<(std::ostream& os, Int128Impl v);
++#endif
+
+ // TODO(absl-team) add operator>>(std::istream&, Int128Impl)
+
 diff --git a/Source/WTF/wtf/PageBlock.cpp b/Source/WTF/wtf/PageBlock.cpp
 index 1e131303..842b94cf 100644
 --- a/Source/WTF/wtf/PageBlock.cpp

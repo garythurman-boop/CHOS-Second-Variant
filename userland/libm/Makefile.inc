@@ -32,9 +32,9 @@ $(BUILD)/userland/libm/%.o: %.s
 	@mkdir -p $(dir $@)
 	$(CC) $(MUSL_MATH_CFLAGS) -c $< -o $@
 -include $(MUSL_MATH_OBJECTS:.o=.d)
-$(MUSL_MATH_ARCHIVE): $(MUSL_MATH_OBJECTS)
+$(MUSL_MATH_ARCHIVE): $(MUSL_MATH_OBJECTS) docs/dependencies/musl-math.json
 	rm -f $@
-	$(MUSL_MATH_AR) rcs $@ $^
+	$(MUSL_MATH_AR) rcs $@ $(filter %.o,$^)
 libm: $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC)
 .PHONY: libm
 $(BUILD)/userland/libm_test.o: userland/examples/libm_test.c tests/libm_vectors.h $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
@@ -61,9 +61,11 @@ test: test-libm
 test-sanitize: test-libm-sanitize
 .PHONY: test-libm test-libm-sanitize
 
-# Original compiler-rt binary128 arithmetic, using real AArch64 FPCR/FPSR.
+# Original compiler-rt 128-bit arithmetic, using real AArch64 FPCR/FPSR for
+# binary128. Integer helpers share this existing archive/link-group identity.
 QUAD_ROOT := third_party/compiler-rt
-QUAD_SOURCES := $(shell python3 -c 'import json;print(" ".join("third_party/compiler-rt/"+p for p in json.load(open("docs/dependencies/compiler-rt-quad.json"))["sources"]))')
+INTEGER_RT_SOURCES := $(shell python3 -c 'import json;print(" ".join("third_party/compiler-rt/"+p for p in json.load(open("docs/dependencies/compiler-rt-integer.json"))["sources"]))')
+QUAD_SOURCES := $(shell python3 -c 'import json;print(" ".join("third_party/compiler-rt/"+p for p in json.load(open("docs/dependencies/compiler-rt-quad.json"))["sources"]))') $(INTEGER_RT_SOURCES)
 QUAD_OBJECTS := $(addprefix $(BUILD)/userland/libquad/,$(addsuffix .o,$(basename $(QUAD_SOURCES))))
 QUAD_HEADERS := $(shell rg --files $(QUAD_ROOT) -g '*.h' -g '*.inc')
 QUAD_ARCHIVE := $(BUILD)/userland/libquad/libchos-quad.a
@@ -71,9 +73,9 @@ $(BUILD)/userland/libquad/%.o: %.c $(QUAD_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) $(LIBC_INCLUDES) -ffunction-sections -fdata-sections -MMD -MP -c $< -o $@
 -include $(QUAD_OBJECTS:.o=.d)
-$(QUAD_ARCHIVE): $(QUAD_OBJECTS)
+$(QUAD_ARCHIVE): $(QUAD_OBJECTS) docs/dependencies/compiler-rt-quad.json docs/dependencies/compiler-rt-integer.json
 	rm -f $@
-	llvm-ar rcs $@ $^
+	llvm-ar rcs $@ $(filter %.o,$^)
 libquad: $(QUAD_ARCHIVE)
 .PHONY: libquad
 $(BUILD)/userland/quad_test.o: userland/examples/quad_test.c tests/quad_vectors.h $(LIBC_HEADERS) $(MUSL_MATH_PUBLIC)
@@ -121,3 +123,27 @@ test-complex-runtime-sanitize: $(SAN_DIR)/test-complex-runtime
 test: test-complex-runtime
 test-sanitize: test-complex-runtime-sanitize
 .PHONY: test-complex-runtime test-complex-runtime-sanitize
+
+# Host references retain compiler/libgcc identities; only original DUT units are
+# renamed, so tests cannot accidentally compare the implementation to itself.
+INTEGER_RT_HOST_SOURCES := $(INTEGER_RT_SOURCES) third_party/compiler-rt/lib/builtins/clzti2.c
+INTEGER_RT_HOST_OBJECTS := $(addprefix $(BUILD)/integer-host/,$(addsuffix .o,$(basename $(INTEGER_RT_HOST_SOURCES))))
+INTEGER_RT_SAN_OBJECTS := $(addprefix $(SAN_DIR)/integer-host/,$(addsuffix .o,$(basename $(INTEGER_RT_HOST_SOURCES))))
+$(BUILD)/integer-host/%.o: %.c $(QUAD_HEADERS) tests/integer_runtime_names.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -include tests/integer_runtime_names.h -c $< -o $@
+$(SAN_DIR)/integer-host/%.o: %.c $(QUAD_HEADERS) tests/integer_runtime_names.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -include tests/integer_runtime_names.h -c $< -o $@
+$(BUILD)/test-integer-runtime: tests/test_integer_runtime.c $(INTEGER_RT_HOST_OBJECTS)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -fno-builtin $^ -lm -o $@
+$(SAN_DIR)/test-integer-runtime: tests/test_integer_runtime.c $(INTEGER_RT_SAN_OBJECTS)
+	$(CC_HOST) $(SAN_FLAGS) -fno-builtin $^ -lm -o $@
+test-integer-runtime: $(BUILD)/test-integer-runtime
+	python3 tools/verify_compiler_rt.py
+	./$(BUILD)/test-integer-runtime
+test-integer-runtime-sanitize: $(SAN_DIR)/test-integer-runtime
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-integer-runtime
+test: test-integer-runtime
+test-sanitize: test-integer-runtime-sanitize
+.PHONY: test-integer-runtime test-integer-runtime-sanitize

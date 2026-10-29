@@ -552,3 +552,13 @@ network paths and ROMFS protection remain enforced. See
 [NATIVE_WRITABLE_HANDLES.md](NATIVE_WRITABLE_HANDLES.md). This is a real native
 service prerequisite; full engine filesystem integration and the modern browser
 remain open, alongside the other revised Stage3 gates.
+
+### Original Int128 arithmetic and compiler-runtime closure
+
+The actual upstream WTF Int128 unit now compiles under the explicit native
+no-iostream profile, with its arithmetic and WTF logging code retained. Original
+LLVM integer-runtime routines and musl `ldexpl` close real native link gaps;
+independent host/sanitizer and native arithmetic fixtures qualify the selected
+operations. The current full WTF compile attempt is blocked by five filesystem
+units. Full library linking/engine execution and the other Stage3 gates remain
+open. See [NATIVE_WTF_INT128.md](NATIVE_WTF_INT128.md) for scope and retained failures.

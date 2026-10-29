@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "project": "LLVM compiler-rt 128-bit integer division and binary32/binary64 conversions",
+  "version": "19.1.7",
+  "commit": "cd708029e0b2869e80abe31ddb175f7c35361f90",
+  "source_root": "https://raw.githubusercontent.com/llvm/llvm-project/cd708029e0b2869e80abe31ddb175f7c35361f90/compiler-rt/lib/builtins/",
+  "license": "Apache-2.0 WITH LLVM-exception",
+  "provenance": "Original bytes fetched via HTTPS at immutable upstream commit;no release-signature verification claimed",
+  "scope": "selected original integer division/modulo and binary32/binary64 integer conversions;not a complete compiler-rt or all rounding-mode/undefined-input conformance claim",
+  "sources": [
+    "lib/builtins/udivmodti4.c",
+    "lib/builtins/udivti3.c",
+    "lib/builtins/umodti3.c",
+    "lib/builtins/divti3.c",
+    "lib/builtins/modti3.c",
+    "lib/builtins/fixsfti.c",
+    "lib/builtins/fixunssfti.c",
+    "lib/builtins/fixdfti.c",
+    "lib/builtins/fixunsdfti.c",
+    "lib/builtins/floattisf.c",
+    "lib/builtins/floatuntisf.c",
+    "lib/builtins/floattidf.c",
+    "lib/builtins/floatuntidf.c"
+  ],
+  "files": {
+    "lib/builtins/divti3.c": "b8392be2b070cda2a01bc33c7912e06ab83ce9a1ec7995fe0acbe44540cf92ae",
+    "lib/builtins/fixdfti.c": "d8f1610e93d8117dfd20d87333215b4be5a0b0a79b127183dca07ac6160cc35c",
+    "lib/builtins/fixsfti.c": "5ab5d030f95fe6c7309916f61606c19d26e755ba1605bb83044aedfdc6b1db43",
+    "lib/builtins/fixunsdfti.c": "5aab5881fc92335bd17b19409352bcd55f6dc7890f464aa3521cdc6a34625afb",
+    "lib/builtins/fixunssfti.c": "977edad73ca94331d68486155fd54ab310ae3f3f9ef95d793682fa28d9bb353b",
+    "lib/builtins/floattidf.c": "6e676a5f03ae29781b3978ab6b7510317d896b929fcda5084d2fe4b650999491",
+    "lib/builtins/floattisf.c": "47ecd2d414ddf7bac1a065f7aade5b06a1dd9eb4b99045fc6b481920f718ebc7",
+    "lib/builtins/floatuntidf.c": "a0d1db27d8b19db400a765fe6401e5027187441394cda8ddc939f130397e643b",
+    "lib/builtins/floatuntisf.c": "08e0e906c19113ed07aa5895a9ebc03342fdadbf26483a71c85962839eca5bd3",
+    "lib/builtins/int_div_impl.inc": "833906405d418f0f421d6155acc5abf79d9902ed37a44903d01c95ff55d3a010",
+    "lib/builtins/modti3.c": "23b5f5af57a8a3ccdab785eec6e486bffef932cee87ff1152b3beedaa6296414",
+    "lib/builtins/udivmodti4.c": "2cfaca7399d1392c92ec4dd6458da22933b4ad2e0cd58769f22b52be98116760",
+    "lib/builtins/udivti3.c": "c0b20f06f6e0e8a6b5423ca6674cf0c57219d07554f6f35c9ecc36bf28915355",
+    "lib/builtins/umodti3.c": "3d88088419d87b486858a4bf54ff08209944ae526c77b8dc5e0c0b6b8001c1e9"
+  },
+  "shared_headers": "Exact existing compiler-rt-quad closure;the documented original LLVM20 fp_lib.h carry fix remains selected"
+}

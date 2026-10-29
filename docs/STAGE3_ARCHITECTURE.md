@@ -222,3 +222,10 @@ the same pre-allocation budget. No process lock is held over storage I/O; existi
 whole-file storage-lock latency and CHFS format/path limits remain. Public calls
 reuse existing capability classes; browser content still must be denied privileged
 storage/configuration authority. Full engine filesystem adaptation remains open.
+
+Original WTF Int128 arithmetic now has native compile/link and component-test
+coverage after closing real LLVM/musl runtime imports. Optional C++ iostream
+logging remains explicitly outside the selected no-localization profile, while
+WTF PrintStream bodies remain original. Current full WTF compilation has five
+filesystem blockers; complete engine linking/runtime, memory/GC and all modern
+browser/wireless gates remain separate unfinished work.

@@ -193,3 +193,10 @@ open also requires OPEN8/READ9, and abort shares CLOSE10. Old mask bits and read
 opens remain compatible. These are bounded native services with explicit conflict
 handling, not POSIX fcntl/stdio or a complete browser filesystem. See
 `NATIVE_WRITABLE_HANDLES.md` for ownership, quota, close and persistence semantics.
+
+The existing `libchos-quad.a` now also supplies the selected original LLVM19
+128-bit integer division/modulo and binary32/binary64 conversion helpers. The
+musl math archive supplies original `ldexpl` over the selected binary128 scaling
+routine. Archive names/link groups remain compatible. The integer dependency
+manifest/verifier preserves original bytes; this is selected ABI coverage, not
+full compiler-rt or all floating-environment conformance. See `NATIVE_WTF_INT128.md`.
