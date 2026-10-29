@@ -180,3 +180,9 @@ Native self-only CPU/memory snapshots and WTF adapters are described in
 and idle intervals and retains completed threads; memory charges owned user
 frames. Unavailable measurements remain explicit. These component services do not
 qualify full WTF/JSC or change the bounded engine memory profile.
+
+The native read-only snapshot service additionally supplies exact open-time file
+length/current position and cursor-independent `pread` through owned descriptor
+operations. Both share the READ permission class. See
+[NATIVE_POSITIONAL_READS.md](NATIVE_POSITIONAL_READS.md) for bounds, snapshot
+semantics and qualification; no POSIX inode or writable-handle model is implied.

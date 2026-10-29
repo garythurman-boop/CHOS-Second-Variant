@@ -11,6 +11,7 @@ _Static_assert(CHOS_PROCESS_SYSCALL_LIMIT<63u,"syscall permissions must fit a po
 #define CHOS_PROCESS_CAP(n) (UINT64_C(1)<<(n))
 #define CHOS_PROCESS_CAP_SEEK CHOS_PROCESS_CAP(CHOS_SYS_READ)
 static inline uint64_t chos_process_syscall_capability(uint32_t number){
+ if(number==CHOS_SYS_FILE_INFO||number==CHOS_SYS_READ_AT)return CHOS_PROCESS_CAP(CHOS_SYS_READ);
  if(number==CHOS_SYS_RESOURCE_INFO||number==CHOS_SYS_THREAD_CONTEXT)return CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO);
  if(number==CHOS_SYS_SEEK)return CHOS_PROCESS_CAP_SEEK;
  if(number==CHOS_SYS_MEMORY_CONTROL)return CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY);

@@ -749,6 +749,43 @@ int64_t process_file_read_for_address_space(address_space_handle_t space, int fd
     return (int64_t)amount;
 }
 
+/* Positional reads share the same immutable snapshot and ownership lock as
+ * sequential reads. No seek/save/restore window is exposed to sibling threads. */
+int64_t process_file_read_at_for_address_space(address_space_handle_t space,int fd,
+        uint64_t destination,size_t length,uint64_t offset) {
+    if(fd<CHOS_PROCESS_FD_BASE||fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)
+        return -CHOS_ERRNO_EBADF;
+    if(length>CHOS_SYS_MAX_READ)return -CHOS_ERRNO_E2BIG;
+    if(offset>INT64_MAX)return -CHOS_ERRNO_EINVAL;
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    size_t index=find_process_slot_for_space_locked(space),file_index=(size_t)(fd-CHOS_PROCESS_FD_BASE);
+    if(index==CHOS_PROCESS_MAX||!process_slots[index].open_files[file_index].active){
+        chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBADF;
+    }
+    process_file_handle_t *file=&process_slots[index].open_files[file_index];
+    size_t available=offset<file->size?file->size-(size_t)offset:0;
+    size_t amount=length<available?length:available;
+    int64_t result=(int64_t)amount;
+    if(amount&&!address_space_copy_to_user(space,destination,file->data+(size_t)offset,amount))result=-CHOS_ERRNO_EFAULT;
+    chos_spin_unlock_irqrestore(&process_lock,flags);return result;
+}
+int process_file_info_for_address_space(address_space_handle_t space,int fd,chos_file_info_t *out) {
+    if(!out)return -CHOS_ERRNO_EINVAL;
+    if(fd<CHOS_PROCESS_FD_BASE||fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)
+        return -CHOS_ERRNO_EBADF;
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    size_t index=find_process_slot_for_space_locked(space),file_index=(size_t)(fd-CHOS_PROCESS_FD_BASE);
+    if(index==CHOS_PROCESS_MAX||!process_slots[index].open_files[file_index].active){
+        chos_spin_unlock_irqrestore(&process_lock,flags);return -CHOS_ERRNO_EBADF;
+    }
+    process_file_handle_t *file=&process_slots[index].open_files[file_index];
+    chos_file_info_t value={.version=CHOS_FILE_INFO_VERSION,.size_bytes=sizeof(value),
+        .flags=CHOS_FILE_INFO_SNAPSHOT|CHOS_FILE_INFO_READ_ONLY,
+        .length=file->size,.position=file->offset};
+    if(file->owned_data)value.flags|=CHOS_FILE_INFO_CHFS_SOURCE;
+    *out=value;chos_spin_unlock_irqrestore(&process_lock,flags);return 0;
+}
+
 int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,int64_t offset,unsigned origin){
     if(fd<CHOS_PROCESS_FD_BASE || fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)return -(int64_t)CHOS_ERRNO_EBADF;
     size_t file_index=(size_t)(fd-CHOS_PROCESS_FD_BASE);uint64_t flags=chos_spin_lock_irqsave(&process_lock);

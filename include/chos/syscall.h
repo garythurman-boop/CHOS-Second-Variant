@@ -70,7 +70,9 @@
 #define CHOS_SYS_UNMAP_RANGE 65u /* x0=owned anonymous subrange,x1=bytes; keeps exact UNMAP36 ABI */
 #define CHOS_SYS_THREAD_CONTEXT 66u /* x0=current-thread snapshot,x1=exact size,x2=flags0;THREAD_INFO57 capability */
 #define CHOS_SYS_RESOURCE_INFO 67u /* x0=self snapshot,x1=exact size,x2=flags0; THREAD_INFO57 capability */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_RESOURCE_INFO
+#define CHOS_SYS_FILE_INFO 68u /* x0=fd,x1=owned snapshot info,x2=exact size; READ9 capability */
+#define CHOS_SYS_READ_AT 69u /* x0=fd,x1=read-at request,x2=exact size; READ9 capability */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_READ_AT
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

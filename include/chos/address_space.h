@@ -114,6 +114,8 @@ int address_space_query(address_space_handle_t handle, uint64_t virtual_address,
 /* Copies only from currently mapped EL0-accessible normal pages owned by handle. */
 int address_space_copy_from_user(address_space_handle_t handle, void *destination,
                                  uint64_t user_source, size_t length);
+/* All destination pages are checked before any store, under the same AS lock
+ * as the copy. Refused ranges leave user bytes unchanged; no PTE race window. */
 int address_space_copy_to_user(address_space_handle_t handle, uint64_t user_destination,
                                const void *source, size_t length);
 int address_space_get_info(address_space_handle_t handle, address_space_info_t *out);

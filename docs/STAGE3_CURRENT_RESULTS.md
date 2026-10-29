@@ -5,7 +5,15 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [native CPU/memory component](NATIVE_WTF_RESOURCES.md) measures real
+The latest [native positional-read component](NATIVE_POSITIONAL_READS.md) adds
+real owned-snapshot metadata and cursor-independent reads. A live protected-buffer
+test found and fixed a shared copy-to-user prefix-write defect. Fourteen accepted
+guest profiles and the full host/sanitizer suites pass. Initial failure evidence
+is retained; typing now captures completed frame state/pixels consistently with
+unchanged deadlines. Writable handles, filesystem metadata/cache lifecycle and
+full engine/browser/wireless remain open; the six WTF blockers are unchanged.
+
+The preceding [native CPU/memory component](NATIVE_WTF_RESOURCES.md) measures real
 active process/thread dispatch intervals and owned user-frame memory. Fourteen
 accepted guest profiles and the full host/sanitizer suites qualify the service
 and regression coverage. Initial typing/TLS timeouts are retained; the typing

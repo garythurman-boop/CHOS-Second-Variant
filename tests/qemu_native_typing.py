@@ -99,16 +99,27 @@ def crop_caret(name,window,caret,scale):
  assert x1>x0 and y1>y0
  return b''.join(pixels[(row*width+x0)*3:(row*width+x1)*3] for row in range(y0,y1))
 def blink(label,logical_width):
- def presented(value):
-  return g.symbol('text_caret_visible')==value and g.symbol('presented_generation')==g.symbol('dirty_generation')
- wait(lambda:presented(1),3,label+' presented blink on')
- client=probe.foreground();assert client and client['caret']['enabled'],client
- window=g.window();scale=window['width']//logical_width;assert scale in [1,2,3,4]
- on=crop_caret(label+'-on',window,client['caret'],scale)
- wait(lambda:presented(0),3,label+' presented blink off')
- assert probe.foreground()['caret']==client['caret'],'typing fixture must await the completed app caret update'
- off=crop_caret(label+'-off',window,client['caret'],scale)
- assert on!=off,label+' caret pixels must actually blink'
+ captured={}
+ def capture(value):
+  # Visibility, completed generation, caret metadata and pixels must describe
+  # one frame. Independent running-VM reads could straddle a blink or repaint.
+  g.qmp('stop')
+  try:
+   visible=int.from_bytes(g.block('text_caret_visible',size=4),'little')
+   presented=int.from_bytes(g.block('presented_generation',size=8),'little')
+   dirty=int.from_bytes(g.block('dirty_generation',size=8),'little')
+   with (out/'blink-debug.jsonl').open('a') as f:f.write(json.dumps({'label':label,'wanted':value,'visible':visible,'presented':presented,'dirty':dirty})+'\n')
+   if visible!=value or presented!=dirty:return False
+   client=probe.foreground();assert client and client['caret']['enabled'],client
+   window=g.window();scale=window['width']//logical_width;assert scale in [1,2,3,4]
+   pixels=crop_caret(label+('-on' if value else '-off'),window,client['caret'],scale)
+   captured[value]=(client,pixels);return True
+  finally:g.qmp('cont')
+ wait(lambda:capture(1),3,label+' presented blink on')
+ wait(lambda:capture(0),3,label+' presented blink off')
+ assert captured[0][0]['caret']==captured[1][0]['caret'],'typing fixture must await the completed app caret update'
+ assert captured[1][1]!=captured[0][1],label+' caret pixels must actually blink'
+
 def spawn(path,args,title):
  before={c['pid'] for c in probe.clients()}
  g.serial('spawn '+path+(' '+args if args else ''))

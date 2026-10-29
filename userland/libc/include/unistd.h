@@ -24,6 +24,7 @@ long sysconf(int);
 int getpagesize(void);
 pid_t getpid(void);
 ssize_t read(int,void *,size_t);
+ssize_t pread(int,void *,size_t,off_t);
 ssize_t write(int,const void *,size_t);
 int close(int);
 /* At most600 seconds per call;refused waits return the unslept request. */

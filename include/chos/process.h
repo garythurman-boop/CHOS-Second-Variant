@@ -172,6 +172,8 @@ int process_query_pid(uint32_t pid, chos_process_state_t *state_out, int64_t *st
 int64_t process_file_open_for_address_space(address_space_handle_t space, const char *path);
 int64_t process_file_read_for_address_space(address_space_handle_t space, int fd,
                                             uint64_t user_destination, size_t length);
+int64_t process_file_read_at_for_address_space(address_space_handle_t,int,uint64_t,size_t,uint64_t);
+int process_file_info_for_address_space(address_space_handle_t,int,chos_file_info_t *);
 int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,int64_t offset,unsigned origin);
 int64_t process_file_close_for_address_space(address_space_handle_t space, int fd);
 int process_slot_reuse_test(void);

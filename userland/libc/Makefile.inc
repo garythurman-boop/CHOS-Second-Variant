@@ -1,6 +1,6 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iinclude -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/strings.c userland/libc/calendar.c userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
+LIBC_SOURCES := userland/libc/pread.c userland/libc/strings.c userland/libc/calendar.c userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h) include/chos/user_memory_limits.h include/chos/memory_api.h
 CALENDAR_SOURCE_FILES := $(addprefix third_party/musl/src/time/,__tm_to_secs.c __secs_to_tm.c __year_to_secs.c __month_to_secs.c)
 CALENDAR_NATIVE_OBJECTS := $(patsubst third_party/musl/src/time/%.c,$(BUILD)/userland/libc/calendar/%.o,$(CALENDAR_SOURCE_FILES))
@@ -247,3 +247,17 @@ test-calendar-vectors:
 	python3 tests/generate_calendar_vectors.py --check
 test: test-calendar-vectors
 .PHONY: test-calendar-vectors
+
+$(BUILD)/test-pread: tests/test_pread.c userland/libc/pread.c $(LIBC_HEADERS) include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 -DCHOS_PREAD_HOST_TEST -Dpread=chos_test_pread $(LIBC_INCLUDES) tests/test_pread.c userland/libc/pread.c -o $@
+$(SAN_DIR)/test-pread: tests/test_pread.c userland/libc/pread.c $(LIBC_HEADERS) include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -DCHOS_PREAD_HOST_TEST -Dpread=chos_test_pread $(LIBC_INCLUDES) tests/test_pread.c userland/libc/pread.c -o $@
+test-pread: $(BUILD)/test-pread
+	./$(BUILD)/test-pread
+test-pread-sanitize: $(SAN_DIR)/test-pread
+	./$(SAN_DIR)/test-pread
+test: test-pread
+test-sanitize: test-pread-sanitize
+.PHONY: test-pread test-pread-sanitize

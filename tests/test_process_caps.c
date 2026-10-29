@@ -2,12 +2,14 @@
 #include "chos/process_caps.h"
 #include "chos/syscall.h"
 int main(void){
+ assert(CHOS_SYS_FILE_INFO==68&&CHOS_SYS_READ_AT==69);
+ assert(chos_process_syscall_capability(68)==CHOS_PROCESS_CAP(CHOS_SYS_READ)&&chos_process_syscall_capability(69)==CHOS_PROCESS_CAP(CHOS_SYS_READ));
  assert(CHOS_SYS_THREAD_CONTEXT==66&&chos_process_syscall_capability(66)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO));
  assert(CHOS_SYS_MEMORY_CONTROL==64&&CHOS_SYS_UNMAP_RANGE==65);
  assert(chos_process_syscall_capability(64)==CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY));
  assert(chos_process_syscall_capability(65)==CHOS_PROCESS_CAP(CHOS_SYS_UNMAP_MEMORY));
  assert((int64_t)CHOS_PROCESS_CAP_ALL>0);
- assert(CHOS_SYS_SEEK==63&&CHOS_SYSCALL_LIMIT==67);
+ assert(CHOS_SYS_SEEK==63&&CHOS_SYSCALL_LIMIT==69);
  assert(chos_process_syscall_capability(CHOS_SYS_SEEK)==CHOS_PROCESS_CAP(CHOS_SYS_READ));
  assert(CHOS_PROCESS_CAP_SEEK==CHOS_PROCESS_CAP(CHOS_SYS_READ));
  assert(!chos_process_syscall_capability(0)&&!chos_process_syscall_capability(CHOS_SYSCALL_LIMIT+1u)&&!chos_process_syscall_capability(UINT32_MAX));

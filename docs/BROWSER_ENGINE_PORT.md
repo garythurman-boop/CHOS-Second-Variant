@@ -349,3 +349,13 @@ The latest full WTF build still has six blocked units: FileHandle, FileSystem,
 Int128, FileHandlePOSIX, FileSystemPOSIX and UniStdExtrasUnix. Their native
 filesystem/iostream dependencies and complete linking/runtime remain unqualified;
 this is neither a JavaScript engine nor a modern browser completion claim.
+
+The next filesystem prerequisite adds native open-snapshot length/position
+inspection and atomic positional reads. The C `pread` binding uses the actual
+process-owned snapshot without a seek/save/restore race. A live protected-buffer
+test also found and corrected a shared copy-to-user prefix-write defect; the
+complete destination is now checked while its address-space mappings remain
+locked. See [NATIVE_POSITIONAL_READS.md](NATIVE_POSITIONAL_READS.md). The engine's
+higher-level filesystem binding, writable descriptors, stable inode/metadata and
+cache/download lifecycle still require implementation. These interfaces do not
+by themselves reduce the recorded six full-WTF compilation blockers.

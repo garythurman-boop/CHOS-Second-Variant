@@ -45,6 +45,6 @@ int main(void){
  a.system_ticks=UINT64_MAX;chos_cpu_account_transition(&a,&p,2,CHOS_CPU_STOPPED);assert(!p.valid);
  chos_cpu_account_transition(NULL,&p,0,0);chos_cpu_account_transition(&a,NULL,0,0);
  assert(chos_process_syscall_capability(CHOS_SYS_RESOURCE_INFO)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO));
- assert(CHOS_PROCESS_CAP_ALL<INT64_MAX&&CHOS_SYSCALL_LIMIT==CHOS_SYS_RESOURCE_INFO);
+ assert(CHOS_PROCESS_CAP_ALL<INT64_MAX&&CHOS_SYSCALL_LIMIT>=CHOS_SYS_RESOURCE_INFO);
  puts("resource accounting: active user/kernel intervals, blocked gaps, retained owners, overflow and capability policy passed");
 }

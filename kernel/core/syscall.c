@@ -631,6 +631,23 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
                 else frame->x[0] = (uint64_t)process_file_open_for_address_space(fault_space, path);
                 return frame;
             }
+            case CHOS_SYS_FILE_INFO: {
+                chos_file_info_t info;
+                if(frame->x[0]>INT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
+                if(frame->x[2]!=sizeof(info)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[1],sizeof(info))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int result=process_file_info_for_address_space(fault_space,(int)frame->x[0],&info);
+                if(result){frame->x[0]=(uint64_t)(int64_t)result;return frame;}
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[1],&info,sizeof(info))?0u:neg_errno(CHOS_ERRNO_EFAULT);return frame;
+            }
+            case CHOS_SYS_READ_AT: {
+                chos_file_read_at_t request;
+                if(frame->x[0]>INT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EBADF);return frame;}
+                if(frame->x[2]!=sizeof(request)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!address_space_copy_from_user(fault_space,&request,frame->x[1],sizeof(request))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                if(request.flags||request.reserved){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)process_file_read_at_for_address_space(fault_space,(int)frame->x[0],request.buffer,request.length,request.offset);return frame;
+            }
             case CHOS_SYS_READ: {
                 uint64_t length = frame->x[2];
                 if (length > CHOS_SYS_MAX_READ) frame->x[0] = neg_errno(CHOS_ERRNO_E2BIG);

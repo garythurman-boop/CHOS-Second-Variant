@@ -680,26 +680,43 @@ int address_space_copy_from_user(address_space_handle_t handle, void *destinatio
 int address_space_copy_to_user(address_space_handle_t handle, uint64_t user_destination,
                                const void *source, size_t length) {
     const uint8_t *src = (const uint8_t *)source;
-    size_t copied = 0u;
+    address_space_slot_t *slot;
     if (length == 0u) return 1;
     if (src == NULL || !address_space_user_range_valid(user_destination, length)) return 0;
-    while (copied < length) {
-        uint64_t va = user_destination + (uint64_t)copied;
+    uint64_t flags = chos_spin_lock_irqsave(&address_space_lock);
+    if (!handle_slot(handle, &slot)) {
+        chos_spin_unlock_irqrestore(&address_space_lock, flags); return 0;
+    }
+    /* Validate every destination before the first store. Keep the ownership/PTE
+     * lock through both passes so unmap/protect/reap cannot invalidate the plan.
+     * query_root is the unlocked internal walker; never recursively take AS lock. */
+    size_t checked = 0u;
+    while (checked < length) {
+        uint64_t va = user_destination + checked;
         vmm_mapping_info_t mapping;
-        size_t offset = (size_t)(va & (VMM_PAGE_SIZE - 1u));
-        size_t chunk = VMM_PAGE_SIZE - offset;
-        size_t i;
-        uint8_t *dst;
+        size_t chunk = VMM_PAGE_SIZE - (size_t)(va & (VMM_PAGE_SIZE - 1u));
+        if (chunk > length - checked) chunk = length - checked;
+        if (!query_root(slot, va, &mapping) || !mapping.accessible_at_el0 ||
+            !mapping.writable || mapping.memory_type != VMM_MEMORY_NORMAL) {
+            chos_spin_unlock_irqrestore(&address_space_lock, flags); return 0;
+        }
+        checked += chunk;
+    }
+    size_t copied = 0u;
+    while (copied < length) {
+        uint64_t va = user_destination + copied;
+        vmm_mapping_info_t mapping;
+        size_t chunk = VMM_PAGE_SIZE - (size_t)(va & (VMM_PAGE_SIZE - 1u));
         if (chunk > length - copied) chunk = length - copied;
-        if (!address_space_query(handle, va, &mapping) ||
-            !mapping.accessible_at_el0 || !mapping.writable ||
-            mapping.memory_type != VMM_MEMORY_NORMAL) return 0;
-        dst = (uint8_t *)(uintptr_t)mapping.physical_address;
-        for (i = 0u; i < chunk; ++i) dst[i] = src[copied + i];
+        /* Stable under the same AS lock; the first pass proved this mapping. */
+        (void)query_root(slot, va, &mapping);
+        uint8_t *dst = (uint8_t *)(uintptr_t)mapping.physical_address;
+        for (size_t i = 0u; i < chunk; ++i) dst[i] = src[copied + i];
         vmm_clean_page_table_range(dst, chunk);
         copied += chunk;
     }
     __asm__ volatile("dsb sy" ::: "memory");
+    chos_spin_unlock_irqrestore(&address_space_lock, flags);
     return 1;
 }
 

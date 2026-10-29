@@ -12,6 +12,7 @@
 #include "chos/process_caps.h"
 
 int main(void) {
+ assert(CHOS_SYS_FILE_INFO==68&&CHOS_SYS_READ_AT==69&&sizeof(chos_file_info_t)==64&&sizeof(chos_file_read_at_t)==32);
  assert(CHOS_SYS_RESOURCE_INFO==67u&&sizeof(chos_resource_info_t)==96u&&CHOS_RESOURCE_VERSION==1u);
  assert(chos_process_syscall_capability(CHOS_SYS_RESOURCE_INFO)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO));
  assert(CHOS_SYS_THREAD_CONTEXT==66&&chos_process_syscall_capability(66)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO));
@@ -32,7 +33,7 @@ int main(void) {
     assert(CHOS_SYS_SLEEP == 5u);
     assert(CHOS_SYS_GETSTATUS == 6u);
     assert(CHOS_SYS_WAIT == 7u);
-    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==67u);
+    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==69u);
     assert(CHOS_SYS_OPEN == 8u);
     assert(CHOS_SYS_READ == 9u);
     assert(CHOS_SYS_CLOSE == 10u);

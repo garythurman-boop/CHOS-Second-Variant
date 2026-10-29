@@ -200,3 +200,11 @@ blocked/idle execution. Process totals retain exited threads without exposing
 foreign state; memory charges owned user frames. Complete WTF linking, GC/thread
 lifecycle, JavaScript execution, browser rendering/network integration and native
 Pi 5 Wi-Fi remain open. No version/completion gate changes from this prerequisite.
+
+The [native positional-read component](NATIVE_POSITIONAL_READS.md) exposes actual
+open-snapshot length/cursor and bounded cursor-independent reads. It preserves
+process ownership and READ permission aliases. A live cross-page test also
+corrected the shared copy-to-user helper to prevalidate every destination while
+holding its AS lock through the copy. Fourteen accepted guest profiles and full
+host/sanitizer checks qualify this prerequisite; writable descriptors and browser
+cache/download integration remain unimplemented. No completion/version change.

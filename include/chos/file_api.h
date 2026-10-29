@@ -23,4 +23,22 @@ typedef struct {
 
 _Static_assert(sizeof(chos_file_list_entry_t) == 72u, "EL0 file list entry ABI changed");
 
+#define CHOS_FILE_INFO_VERSION 1u
+#define CHOS_FILE_INFO_SNAPSHOT 1u
+#define CHOS_FILE_INFO_READ_ONLY 2u
+#define CHOS_FILE_INFO_CHFS_SOURCE 4u
+/* Process-owned immutable open-file snapshot, not POSIX inode metadata.
+ * Source flags describe the open-time origin, not current mount/write state. */
+typedef struct {
+ uint32_t version,size_bytes,flags,reserved0;
+ uint64_t length,position;
+ uint64_t reserved[4];
+} chos_file_info_t;
+typedef struct {
+ uint64_t offset,buffer;
+ uint32_t length,flags;
+ uint64_t reserved;
+} chos_file_read_at_t;
+_Static_assert(sizeof(chos_file_info_t)==64u,"file information ABI size");
+_Static_assert(sizeof(chos_file_read_at_t)==32u,"file positional-read ABI size");
 #endif
