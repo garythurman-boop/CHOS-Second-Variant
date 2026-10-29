@@ -4,7 +4,7 @@
   "version": "1.2.5",
   "commit": "0784374d561435f7c787a555aeab8ede699ed298",
   "source": "https://git.musl-libc.org/cgit/musl",
-  "scope": "Original snprintf/vsnprintf/vfprintf and C error-message source over a private per-call memory sink,not public writable FILE streams. Fixed C locale; internal C error messages only.",
+  "scope": "Original snprintf/vsnprintf/vfprintf and C error-message sources over private per-call string or checked writer sinks. Public unbuffered console streams use the native adapter; ordinary FILE snapshots remain read-only. Fixed C locale.",
   "sources": [
     "src/stdio/vfprintf.c",
     "src/stdio/vsnprintf.c",

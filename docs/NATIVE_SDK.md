@@ -157,3 +157,8 @@ checks and actual AArch64 SDK assembly links. Native WTF register declarations a
 current stack discovery compile. Foreign-thread suspension/GC, complete Thread
 lifecycle, engine-sized stack/memory and the other modern browser/wireless/platform
 requirements remain open; this is not Stage3/version0.50.0 completion.
+
+The [native standard-stream component](NATIVE_STANDARD_STREAMS.md) supplies
+checked unbuffered console output and actual upstream WTF FilePrintStream/PrintStream
+execution. Normal/sanitizer,SDK links and seven guest profiles qualify the component.
+Ordinary files stay read-only;complete stdio,engine/browser and hardware gates remain open.

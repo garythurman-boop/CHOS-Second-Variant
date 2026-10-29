@@ -1,4 +1,4 @@
-FORMAT_SOURCES := third_party/musl/src/stdio/vfprintf.c third_party/musl/src/stdio/vsnprintf.c third_party/musl/src/stdio/snprintf.c third_party/musl/src/errno/strerror.c
+FORMAT_SOURCES := userland/libc/format/output_writer.c third_party/musl/src/stdio/vfprintf.c third_party/musl/src/stdio/vsnprintf.c third_party/musl/src/stdio/snprintf.c third_party/musl/src/errno/strerror.c
 FORMAT_HEADERS := $(wildcard userland/libc/format/include/*.h) third_party/musl/src/errno/__strerror.h
 FORMAT_OBJECTS := $(addprefix $(BUILD)/userland/format/,$(FORMAT_SOURCES:.c=.o))
 FORMAT_ARCHIVE := $(BUILD)/userland/format/libchos-format.a
@@ -52,3 +52,8 @@ test-native-format: $(BUILD)/userland/format_test.elf
 	python3 tests/generate_format_vectors.py --check
 test: test-native-format
 .PHONY: test-native-format
+
+# Stream targets are declared before this include; add formatter prerequisites
+# after their source closure has been defined.
+$(BUILD)/test-stdio-read $(BUILD)/test-stdio-output: $(FORMAT_HOST_OBJECTS)
+$(SAN_DIR)/test-stdio-read $(SAN_DIR)/test-stdio-output: $(FORMAT_SAN_OBJECTS)

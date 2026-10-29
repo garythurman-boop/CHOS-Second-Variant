@@ -1,0 +1,311 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "base_source_commit": "1f172ef17a4d5bb2c3d6d5a5a0523f6b4f1e2d11",
+  "scope": "real unbuffered stdout/stderr,checked maintained formatter writer bridge,and actual upstream WTF output execution",
+  "changed_source_files_sha256": {
+    "tests/native_sdk/CMakeLists.txt": "917be3595b4d493e9ad92dd8ed04287dfa4ca9c692ea93b4a0dfc2468cd6ca5e",
+    "tests/stdio_host_names.h": "7081b6ee79ff17b37fc58550e495c60639ec67059651a6a31b8a4e3c8285b4f8",
+    "tests/test_stdio_read.c": "5994ae7edbfe3d9cdbf7677ee2b055eb3a80b743f029abc3759fe501c4703608",
+    "userland/examples/stdio_test.cpp": "430b35c22c96f96ff58d668a91a292f808b2e3f4bce0112b10e8cb9456d917a8",
+    "userland/libc/format/Makefile.inc": "0dac71a3cc1fa5413c41e34c749b9f3d888a377c7cc558293ca862bf3525d8e4",
+    "userland/libc/format/include/stdio_impl.h": "b1a8146b78cc7bbbe46c8760d2d0e16469b542e5cfc3548b7091877543fe6c3f",
+    "userland/libc/include/stdio.h": "167c4a55ba9389f0380c7e37ac08fc29f4ec80fa8a80e0f097826f81e3faa4d1",
+    "userland/libc/stdio.Makefile.inc": "512053cb3be60c115d64940d4a1737921893eb4babb9478f4ba01c4dd3b09e05",
+    "userland/libc/stdio_read.c": "3f2e2c51b78a69bf06545c5f9e614b38206aff0ba99e5efa41e2eec74a3d3b57",
+    "tests/qemu_wtf_stdio.py": "85f65e5aa9390ee8927b218ca024be0234c806ca7fec5f54d08eb52a4d1ab9f6",
+    "tests/test_stdio_output.c": "868b8d957a8b61c63c6bfb9ff1bee4042c2d2739edeff13ebb8a97382aeeca8b",
+    "tests/wtf_stdio/CMakeLists.txt": "551d63db276d7fee184674bbc50febc99da0d4c7a6c21893c66dd84b1c0bed6d",
+    "tests/wtf_stdio/main.cpp": "fd2132584b88c0db135ee4094d74c79698a7e14a4357bd9b3a83baa9f80b867b",
+    "tools/build_wtf_stdio.py": "225e75dff1a8646484aa56643838954b8163f891cd36a1b9ace6c5dafe05ee49",
+    "userland/libc/format/output_writer.c": "775030cce7d41b98fd08759a910f6bb11cd8a7f2695969f0fa928685123ec5e3"
+  },
+  "native_build": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "78c2166ac2c8b00fe1db734bc4a183d0695c0c73295db7b1115d3e7912015297",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b"
+    },
+    "sdk_manifest_sha256": "b281d46f989a62db016268289ca6bbe6db2905157bf29eef94a29657f84f89ae",
+    "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/wtf_stdio",
+        "-B",
+        "/workspace/chos-wtf-stdio2/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-wtf-stdio2/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 11.267924055002368,
+    "application_sha256": "04ffed02f841b82b2282a5336a3c1ee5544beac319109278992d39262dbab5ef",
+    "scope": "actual upstream FilePrintStream/PrintStream/FastMalloc units using native standard streams",
+    "limits": [
+      "no full WTF/JSC library,JavaScript or rendering",
+      "thread lifecycle/stack discovery/GC suspension remain separate services;no signal emulation",
+      "ordinary files remain read-only;stdin and buffered output remain unsupported",
+      "native guest tests required;no new physical/Fusion qualification"
+    ]
+  },
+  "guest_profiles": {
+    "output-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "04ffed02f841b82b2282a5336a3c1ee5544beac319109278992d39262dbab5ef",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117519,
+      "free_pages_before": 117519,
+      "free_pages_after": 117519,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 124,
+      "checks": [
+        "actual upstream FilePrintStream/PrintStream native console output",
+        "mixed integer/double/binary128/UTF8 printf ABI and exact output lengths",
+        "54 complete output lines across three concurrent workers and cycles per process",
+        "read snapshots stay read-only;denied writer and logical stdout close refuse writes",
+        "stderr and borrowed output remain open;zero user heap,three process lifecycles,strict cold PMM and no queued futexes"
+      ],
+      "limits": [
+        "native standard-stream component,not complete WTF/engine/browser or writable ordinary files",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "output-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "04ffed02f841b82b2282a5336a3c1ee5544beac319109278992d39262dbab5ef",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500186,
+      "free_pages_before": 500186,
+      "free_pages_after": 500186,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 129,
+      "checks": [
+        "actual upstream FilePrintStream/PrintStream native console output",
+        "mixed integer/double/binary128/UTF8 printf ABI and exact output lengths",
+        "54 complete output lines across three concurrent workers and cycles per process",
+        "read snapshots stay read-only;denied writer and logical stdout close refuse writes",
+        "stderr and borrowed output remain open;zero user heap,three process lifecycles,strict cold PMM and no queued futexes"
+      ],
+      "limits": [
+        "native standard-stream component,not complete WTF/engine/browser or writable ordinary files",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "read-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "291320e00840011da86c5c9a49139dba25841cf3ae85e7f71af8047bb61ee097",
+      "source": "disposable CHFS SDK/application",
+      "cold_free_pages": 117519,
+      "free_pages_before": 117519,
+      "free_pages_after": 117519,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 115,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "read-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "291320e00840011da86c5c9a49139dba25841cf3ae85e7f71af8047bb61ee097",
+      "source": "disposable CHFS SDK/application",
+      "cold_free_pages": 500186,
+      "free_pages_before": 500186,
+      "free_pages_after": 500186,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 124,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "format-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "d996b7d40cfdcdae08dc2c8b147107ac82dc9dd775fa64e5d3a66d26bcbec955",
+      "standard": "23",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500186,
+      "free_pages_before": 500186,
+      "free_pages_after": 500186,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 379,
+      "checks": [
+        "actual original musl string formatter over private per-invocation memory sinks",
+        "120 exact independent Decimal binary64/binary128 output fixtures at six buffer capacities",
+        "null/count-only,truncation,NUL/guard bytes,positional and wide formats,mixed variadic arguments",
+        "INT_MIN width and invalid argument slot0 errors; invalid UTF32 reports EILSEQ",
+        "three native threads keep errno and FP rounding distinct across three lifecycles",
+        "three processes,exit0,heap0,stable warm frames and no futex waiters"
+      ],
+      "limits": [
+        "bounded string formatting;no public writable FILE streams or locale translation",
+        "not complete ICU/i18n/data,modern engine or browser security",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "icu-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "ef54979b6409fe6d5ba4731bf9fcf17b5384d0a344d3476d452861b8fd2fe2d6",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500186,
+      "free_pages_before": 500186,
+      "free_pages_after": 500186,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 723,
+      "checks": [
+        "selected files extracted with individual hashes from actual upstream default4321-resource package",
+        "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+        "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+        "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+        "three native workers and three lifecycles,u_cleanup,heap0,strict cold PMM equality and zero private futex waiters"
+      ],
+      "limits": [
+        "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+        "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+        "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+      ]
+    },
+    "ethernet-uefi": {
+      "mode": "uefi",
+      "checks": [
+        "32 fast USB keypress/release pairs",
+        "PCI VirtIO CHFS write/flush/read",
+        "PCI VirtIO hardware RNG",
+        "82574L e1000e DHCP/ARP/ICMP",
+        "keyboard shortcut",
+        "relative pointer",
+        "wheel reports through hardware transport to shared input",
+        "window maximize/restore",
+        "title-bar drag",
+        "20 USB hot-unplug/reconnect cycles with ring wraps",
+        "3 mixed input/storage cycles",
+        "2-second idle observation",
+        "storage persistence after fresh guest boot"
+      ],
+      "kernel_ready_seconds": 7.723,
+      "desktop_ready_seconds": 10.715,
+      "keyboard_visible_ms": 33.65,
+      "pointer_visible_ms": 47.1,
+      "maximize_visible_ms": 202.49,
+      "drag_visible_ms": 272.5,
+      "stress_seconds": 5.68,
+      "idle_cpu_percent": 21.42,
+      "status": "PASS"
+    }
+  },
+  "host_suite": {
+    "status": "PASS",
+    "exit": 0,
+    "log_sha256": "030fb04b1089eef1724b26820105a14c8f15380372fc5031244bb3743c99df1d"
+  },
+  "sanitizers": {
+    "status": "PASS",
+    "exit": 0,
+    "log_sha256": "0c8fa2144fbf3940b36ae2fc28db6fb2e64c5ac94d1b2039cf580ee7c16ca2d8"
+  },
+  "SDK_probes": {
+    "status": "PASS",
+    "standard_output_real_link": "PASS",
+    "missing_import_and_library_refusals": "PASS",
+    "full_ICU_image_guard": "PASS_SPECIFIC_REJECTION",
+    "log_sha256": "dc7868d73edac4af9eb699e5ee150e39588ca534ff3ee74776018dd632bf4a19"
+  },
+  "upstream_WTF_units": {
+    "status": "BUILT",
+    "units": [
+      "Assertions.cpp",
+      "FilePrintStream.cpp",
+      "PrintStream.cpp",
+      "FastMalloc.cpp"
+    ],
+    "log_sha256": "761dc3ada8f88183307c8c8f8806a829867d06ba1d277636023aa3421073de8d"
+  },
+  "investigations": [
+    {
+      "reason": "initial host read-stream target had an empty early-expanded formatter prerequisite list;fixed Make include ordering",
+      "log_sha256": "6d674d658a49b766103716233f6527c7e3d252df17b5e1fe6145588e41c6d9f8"
+    },
+    {
+      "reason": "actual FilePrintStream deleting destructor requires original FastMalloc.cpp;included real unit instead of stubbing fastFree",
+      "log_sha256": "2e69a411a99d91d17ac8f5c7686e742d25e99fb2b699ea0c477d1574d92564d8"
+    },
+    {
+      "reason": "initial SDK link probe had a CMake string newline escape error;fixed source string and reran fresh configure",
+      "log_sha256": "c080c496235f2a5e5a5dcd13498eef446f08640b4b18fd57ba9c39bd687f15ed"
+    },
+    {
+      "reason": "UEFI startup correctly refused unsynchronized ISO/kernel symbols;rebuilt distribution inputs before qualification",
+      "log_sha256": "e7f443c30bd46e5e83730bcb1f2b8615ecb2d2374d02c7a50d2045cf0b94dff6"
+    },
+    {
+      "reason": "legacy read fixture assumed SEEK+1 was unassigned;now probes CHOS_SYSCALL_LIMIT+1",
+      "evidence": [
+        "regressions/read-direct/failure.txt",
+        "regressions/read-uefi/failure.txt"
+      ]
+    },
+    {
+      "reason": "recovery shell prompt/structured launch acknowledgment can interleave with process output;separate only those exact kernel messages while retaining exact application bytes/counts",
+      "evidence": [
+        "regressions/output-uefi/failure.txt",
+        "regressions-final/output-uefi/failure.txt"
+      ]
+    },
+    {
+      "reason": "external regression invocation omitted required firmware path;rerun with explicit pinned AAVMF path",
+      "log_sha256": "f2b42dd373bcb54e62da5bfdeddc6e0e4f0392307ffd765f393b8045fbaf7175"
+    }
+  ],
+  "limits": [
+    "stdout and stderr share the native console transport;no independent fd-table redirects",
+    "ordinary files remain read-only;stdin and buffered output remain unimplemented",
+    "full WTF/JSC/browser,GC/thread lifecycle and engine-sized memory remain open",
+    "production entropy/TLS/trust/time/update policy,live Pi5 wireless and platform gates remain open"
+  ],
+  "binary_publication": "SOURCE_ONLY;latest user-test ISO cc29ea8;version0.30.0",
+  "raw_evidence_archive": {
+    "archive_sha256": "8f5503b69aea073b1cd68ef164a5f135e1a8ffeff4abfcf1f0e0e8f3d4a75947",
+    "archive_bytes": 80319297,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  }
+}

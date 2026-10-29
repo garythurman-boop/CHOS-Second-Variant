@@ -1,5 +1,18 @@
 #ifndef CHOS_STDIO_HOST_NAMES_H
 #define CHOS_STDIO_HOST_NAMES_H
+#define stdout chos_test_stdout
+#define stderr chos_test_stderr
+#define printf chos_test_printf
+#define vprintf chos_test_vprintf
+#define fprintf chos_test_fprintf
+#define vfprintf chos_test_vfprintf
+#define fwrite chos_test_fwrite
+#define fputc chos_test_fputc
+#define putc chos_test_putc
+#define putchar chos_test_putchar
+#define fputs chos_test_fputs
+#define puts chos_test_puts
+#define setvbuf chos_test_setvbuf
 #define FILE chos_test_FILE
 #define fpos_t chos_test_fpos_t
 #define fopen chos_test_fopen

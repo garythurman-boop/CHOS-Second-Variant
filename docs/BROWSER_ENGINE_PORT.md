@@ -322,3 +322,8 @@ The [native WTF entropy/process/page component](NATIVE_WTF_ENTROPY.md) now
 executes actual upstream adapters in both QEMU boot modes, with explicit denied
 and missing-source failure and modeled partial/retry error tests. Full engine,
 production entropy security, browser, wireless and platform gates remain open.
+
+The [native standard-stream component](NATIVE_STANDARD_STREAMS.md) supplies
+checked unbuffered console output and actual upstream WTF FilePrintStream/PrintStream
+execution. Normal/sanitizer,SDK links and seven guest profiles qualify the component.
+Ordinary files stay read-only;complete stdio,engine/browser and hardware gates remain open.

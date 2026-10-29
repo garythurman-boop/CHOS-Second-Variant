@@ -8,11 +8,11 @@
 extern int chos_host_readers(int (*)(void *),void *);
 extern void chos_host_yield(void);
 #include "chos/file_position.h"
-extern int puts(const char *);
-extern int printf(const char *,...);
+extern int host_puts(const char *) __asm__("puts");
+extern int host_printf(const char *,...) __asm__("printf");
 static _Thread_local int local_errno;
 int *__chos_errno_location(void) { return &local_errno; }
-#define CHECK(x) do { if (!(x)) { printf("stdio check failed line %d: %s\n",__LINE__,#x); abort(); } } while (0)
+#define CHECK(x) do { if (!(x)) { host_printf("stdio check failed line %d: %s\n",__LINE__,#x); abort(); } } while (0)
 static unsigned char data[8197];
 static struct { int active; uint64_t position; } handles[FOPEN_MAX];
 static atomic_flag backend_lock=ATOMIC_FLAG_INIT;
@@ -50,6 +50,7 @@ int64_t chos_stdio_close(int fd) {
     if (fd<3 || fd>=3+(int)FOPEN_MAX || !handles[fd-3].active) { backend_release(); return -EBADF; }
     handles[fd-3].active=0; backend_release(); return -close_error;
 }
+int64_t chos_stdio_write(const void *p,size_t n) { (void)p; (void)n; return -EBADF; }
 void chos_stdio_yield(void) { chos_host_yield(); }
 static FILE *fixture(void) { FILE *f=fopen("/fixture","rb"); CHECK(f); return f; }
 static void limits(void) {
@@ -141,5 +142,5 @@ int main(void) {
     for (unsigned i=0;i<sizeof(data);i++) data[i]=(unsigned char)i;
     limits(); buffering(); errors(); lines(); random_reads(); threads();
     for (unsigned i=0;i<FOPEN_MAX;i++) CHECK(!handles[i].active);
-    puts("stdio: buffering,logical seek,pushback,short/error IO,limits,40000 model operations and three concurrent readers passed"); return 0;
+    host_puts("stdio: buffering,logical seek,pushback,short/error IO,limits,40000 model operations and three concurrent readers passed"); return 0;
 }

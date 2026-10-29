@@ -156,3 +156,10 @@ if(NOT HAVE_NATIVE_THREAD_CONTEXT)
 endif()
 enable_language(ASM)
 add_executable(sdk_thread_context ../../userland/examples/thread_context_test.cpp ../../userland/examples/thread_context_probe.S)
+
+# Diagnostic users must link the real public stream adapter and formatter, not
+# compile declarations only or inherit host stdio during the cross build.
+check_c_source_compiles("#include <stdio.h>\nint main(void){if(setvbuf(stderr,0,_IONBF,0))return 1;return fprintf(stderr,\"native %d %.2f\",fileno(stdout),1.25)<0;}" HAVE_NATIVE_STANDARD_OUTPUT)
+if(NOT HAVE_NATIVE_STANDARD_OUTPUT)
+ message(FATAL_ERROR "real native standard output and floating formatter link failed")
+endif()

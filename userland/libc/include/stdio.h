@@ -7,8 +7,8 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include "chos/file_api.h"
-/* Read-only binary streams and bounded string formatting. Writable FILE
- * streams/standard output objects remain unprovided. */
+/* Read-only binary snapshots and unbuffered console stdout/stderr. Writable
+ * ordinary files, stdin and line/full output buffering remain unprovided. */
 typedef struct __chos_FILE FILE;
 typedef struct { int64_t __position; } fpos_t;
 #define EOF (-1)
@@ -17,9 +17,25 @@ typedef struct { int64_t __position; } fpos_t;
 #define SEEK_END 2
 #define FOPEN_MAX CHOS_FILE_OPEN_MAX
 #define BUFSIZ 256
+#define _IOFBF 0
+#define _IOLBF 1
+#define _IONBF 2
 #ifdef __cplusplus
 extern "C" {
 #endif
+extern FILE *const stdout;
+extern FILE *const stderr;
+int printf(const char *,...);
+int vprintf(const char *,va_list);
+int fprintf(FILE *,const char *,...);
+int vfprintf(FILE *,const char *,va_list);
+size_t fwrite(const void *,size_t,size_t,FILE *);
+int fputc(int,FILE *);
+int putc(int,FILE *);
+int putchar(int);
+int fputs(const char *,FILE *);
+int puts(const char *);
+int setvbuf(FILE *,char *,int,size_t);
 int snprintf(char *,size_t,const char *,...);
 int vsnprintf(char *,size_t,const char *,va_list);
 FILE *fopen(const char *, const char *);

@@ -6,7 +6,7 @@
 #define EOF (-1)
 #define F_ERR 32u
 #define NL_ARGMAX 9
-/* Every context is local to one vsnprintf invocation, never a public FILE. */
+/* Every context is local to one formatter invocation, never a public FILE. */
 typedef struct __chos_format_stream FILE;
 struct __chos_format_stream {
     unsigned flags;

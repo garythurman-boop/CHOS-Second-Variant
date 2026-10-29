@@ -32,7 +32,7 @@ extern "C" int main(int argc,char **argv){
  CHECK(chos_seek((int)fd,-1,SEEK_SET)==-CHOS_ERRNO_EINVAL&&chos_seek((int)fd,0,3)==-CHOS_ERRNO_EINVAL);
  CHECK(chos_seek((int)fd,0,SEEK_SET)==0);
  CHECK(chos_read((int)fd,(void *)(uintptr_t)UINT64_MAX,1)==-CHOS_ERRNO_EFAULT&&chos_seek((int)fd,0,SEEK_CUR)==0);
- CHECK(chos_syscall0(CHOS_SYS_SEEK+1)==-CHOS_ERRNO_ENOSYS);
+ CHECK(chos_syscall0(CHOS_SYSCALL_LIMIT+1)==-CHOS_ERRNO_ENOSYS);
  long pid=chos_spawn_args("/BIN/STDIO.ELF","foreign");CHECK(pid>0&&chos_wait((uint32_t)pid)==0);
  uint64_t mask=(uint64_t)chos_capabilities()&~CHOS_PROCESS_CAP(CHOS_SYS_READ);
  CHECK((int64_t)mask>0);pid=chos_spawn_limited("/BIN/STDIO.ELF","denied",mask);CHECK(pid>0&&chos_wait((uint32_t)pid)==0);

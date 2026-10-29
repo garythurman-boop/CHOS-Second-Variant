@@ -5,11 +5,17 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
+The latest [native standard streams](NATIVE_STANDARD_STREAMS.md) execute actual
+WTF output in both boot modes, with seven qualified guest profiles and full host/
+sanitizer suites. [Native entropy/process/page services](NATIVE_WTF_ENTROPY.md)
+have separate direct/UEFI/missing-device evidence. These close concrete engine
+OS-service dependencies; they do not constitute a full engine or modern browser.
+
 The latest [native current-thread context](NATIVE_THREAD_CONTEXT.md) exposes
 kernel-owned current stack bounds and actual EL0 GPR/SIMD/FPU state through a
 read-only capability-checked syscall. Direct/UEFI probes and the recorded
 regressions qualify this component. WTF's native register declaration and current
-stack discovery now compile; further stream/filesystem/entropy/runtime services,
+stack discovery now compile; further filesystem/standard-library/runtime services,
 foreign-thread suspension and the full engine remain open. This is source-only;
 the test ISO remains cc29ea8/version0.30.0. The preceding
 [WTF synchronization/clocks](NATIVE_WTF_SERVICES.md), [bmalloc](NATIVE_BMALLOC_SERVICES.md)
