@@ -5,7 +5,14 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [numeric/search component](NATIVE_CHARCONV.md) supplies original
+The latest [UTC/date/UTF/process component](NATIVE_WTF_CALENDAR.md) runs actual
+WTF date parsing,Unicode conversion and termination paths in native guests.
+Eight accepted profiles,independent calendar oracles and full host/sanitizer
+suites qualify this component. Initial timeout traces remain recorded alongside
+identical-input individual passes. The full WTF attempt now has eight blocked
+compilation units;complete linking/runtime and every full browser gate remain open.
+
+The preceding [numeric/search component](NATIVE_CHARCONV.md) supplies original
 integral conversion,Ryu float/double formatting and WTF's real bounded binary
 search path. Independent Decimal/reference tests,seven guest profiles and full
 host/sanitizer suites pass. A full WTF build now records17 concrete blocked units;

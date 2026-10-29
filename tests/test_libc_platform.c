@@ -55,6 +55,7 @@ static void clocks(void){
  clock_info.flags=3;clock_info.realtime_nanoseconds=1000000000;assert(gettimeofday(&v,NULL)==-1&&errno==EOVERFLOW&&v.tv_sec==7&&v.tv_usec==8);
  clock_info.realtime_nanoseconds=999999999;assert(!gettimeofday(&v,NULL)&&v.tv_usec==999999);
  clock_result=-ENOSYS;v=(struct timeval){7,8};assert(gettimeofday(&v,NULL)==-1&&errno==ENOSYS&&v.tv_sec==7&&v.tv_usec==8);
- t=-1;assert(!localtime_r(&t,&out)&&errno==EOVERFLOW);
+ t=-1;assert(localtime_r(&t,&out)==&out&&out.tm_year==69&&out.tm_mon==11&&out.tm_mday==31&&out.tm_sec==59);
+ t=INT64_MAX;assert(!localtime_r(&t,&out)&&errno==EOVERFLOW);
 }
 int main(void){environments();locales();clocks();return 0;}

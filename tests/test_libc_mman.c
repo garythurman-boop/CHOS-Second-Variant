@@ -17,6 +17,8 @@ long chos_posix_getpid(void){return io_result;}
 long chos_posix_read(int fd,void *p,size_t n){(void)p;io_fd=fd;io_bytes=n;return io_result;}
 long chos_posix_write(const void *p,size_t n){(void)p;io_bytes=n;return io_result;}
 long chos_posix_close(int fd){io_fd=fd;return io_result;}
+static uint64_t sleep_ticks;static unsigned sleep_calls,fail_sleep_call;
+long chos_posix_sleep(uint64_t n){sleep_ticks=n;++sleep_calls;return sleep_calls==fail_sleep_call?-ENODEV:io_result;}
 long chos_posix_seek(int fd,int64_t off,unsigned origin){io_fd=fd;io_offset=off;io_origin=origin;return io_result;}
 int main(void){
  const int flags=MAP_PRIVATE|MAP_ANON;void *p=(void *)0x21001000;
@@ -53,5 +55,13 @@ int main(void){
  assert(write(3,NULL,7)==-1&&errno==EBADF);
  io_result=-EBADF;assert(close(8)==-1&&errno==EBADF&&io_fd==8);
  io_result=45;assert(lseek(9,-12,SEEK_END)==45&&io_fd==9&&io_offset==-12&&io_origin==2);
- assert(lseek(9,0,3)==-1&&errno==EINVAL);return 0;
+ assert(lseek(9,0,3)==-1&&errno==EINVAL);
+ unsigned before_sleep=sleep_calls;assert(!sleep(0)&&sleep_calls==before_sleep);
+ assert(sleep(UINT32_MAX)==UINT32_MAX&&errno==EINVAL&&sleep_calls==before_sleep);
+ assert(sleep(601)==601&&errno==EINVAL&&sleep_calls==before_sleep);
+ io_result=0;assert(!sleep(1)&&sleep_ticks==101&&sleep_calls==before_sleep+1);
+ unsigned calls_before_boundary=sleep_calls;assert(!sleep(600)&&sleep_ticks==1&&sleep_calls==calls_before_boundary+2);
+ io_result=-EPERM;assert(sleep(3)==3&&errno==EPERM&&sleep_ticks==301);
+ io_result=17;assert(sleep(1)==1&&errno==EIO);io_result=INT64_MIN;assert(sleep(1)==1&&errno==EIO);
+ io_result=0;fail_sleep_call=sleep_calls+2;assert(sleep(600)==1&&errno==ENODEV&&sleep_ticks==1);return 0;
 }

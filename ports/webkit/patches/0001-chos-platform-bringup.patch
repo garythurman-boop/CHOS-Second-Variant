@@ -408,6 +408,35 @@ index 5b4c0629..5c98613e 100644
  }
 
  inline void* threadSpecificGet(ThreadSpecificKey key)
+diff --git a/Source/WTF/wtf/WTFProcess.cpp b/Source/WTF/wtf/WTFProcess.cpp
+index 7d01fe9c..a2386032 100644
+--- a/Source/WTF/wtf/WTFProcess.cpp
++++ b/Source/WTF/wtf/WTFProcess.cpp
+@@ -28,7 +28,7 @@
+
+ #include <stdlib.h>
+
+-#if OS(UNIX)
++#if OS(UNIX) || OS(CHOS)
+ #include <unistd.h>
+ #endif
+
+diff --git a/Source/WTF/wtf/simdutf/simdutf_impl.h b/Source/WTF/wtf/simdutf/simdutf_impl.h
+index 10110d1a..6fe230fe 100644
+--- a/Source/WTF/wtf/simdutf/simdutf_impl.h
++++ b/Source/WTF/wtf/simdutf/simdutf_impl.h
+@@ -9946,7 +9946,11 @@ static_assert(to_base64_url_value[uint8_t('_')] == 63,
+ #include <cstddef>
+ #include <cstdint>
+ #include <cstring>
++// Scalar Base64 does not use streams. Optional logging above includes its own
++// iostream header; CHOS does not provide the C++ stream runtime yet.
++#if !defined(__CHOS__)
+ #include <iostream>
++#endif
+
+ namespace simdutf {
+ namespace scalar {
 diff --git a/Source/bmalloc/bmalloc/BPlatform.h b/Source/bmalloc/bmalloc/BPlatform.h
 index b5612278..c9d76f38 100644
 --- a/Source/bmalloc/bmalloc/BPlatform.h

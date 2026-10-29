@@ -22,6 +22,9 @@ char *strncat(char *,const char *,size_t);
 char *strchr(const char *,int);
 char *strrchr(const char *,int);
 char *strstr(const char *,const char *);
+/* Invariant C messages,POSIX int-returning reentrant copy. */
+char *strerror(int);
+int strerror_r(int,char *,size_t);
 #ifdef __cplusplus
 }
 #endif

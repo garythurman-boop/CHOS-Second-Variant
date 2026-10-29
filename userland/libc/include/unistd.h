@@ -26,6 +26,9 @@ pid_t getpid(void);
 ssize_t read(int,void *,size_t);
 ssize_t write(int,const void *,size_t);
 int close(int);
+/* At most600 seconds per call;refused waits return the unslept request. */
+unsigned sleep(unsigned);
+void _exit(int) __attribute__((noreturn));
 off_t lseek(int,off_t,int);
 #ifdef __cplusplus
 }

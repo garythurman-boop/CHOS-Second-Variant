@@ -1601,3 +1601,8 @@ test: test-thread-context
 test-sanitize: test-thread-context-sanitize
 
 include userland/libcxx/thread_context.Makefile.inc
+
+test-qemu-guest-cleanup:
+	python3 tests/test_qemu_guest_cleanup.py
+test: test-qemu-guest-cleanup
+.PHONY: test-qemu-guest-cleanup

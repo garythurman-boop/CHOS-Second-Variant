@@ -20,6 +20,10 @@ binary_strings=json.loads((root/'docs/dependencies/musl-string.json').read_text(
 for name,wanted in binary_strings['files'].items():
     if name in manifest['files']:assert manifest['files'][name]==wanted
     manifest['files'][name]=wanted
+calendar=json.loads((root/'docs/dependencies/musl-calendar.json').read_text())
+for name,wanted in calendar['files'].items():
+    if name in manifest['files']:assert manifest['files'][name]==wanted
+    manifest['files'][name]=wanted
 actual={str(p.relative_to(base)) for p in base.rglob('*') if p.is_file()}
 assert actual==set(manifest['files']),'musl math closure changed'
 for name,wanted in manifest['files'].items():

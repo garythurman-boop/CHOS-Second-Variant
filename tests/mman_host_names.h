@@ -9,3 +9,5 @@
 #define write chos_test_write
 #define close chos_test_close
 #define lseek chos_test_lseek
+
+#define sleep chos_test_sleep

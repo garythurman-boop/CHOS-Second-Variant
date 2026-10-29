@@ -2,12 +2,14 @@
 #include <errno.h>
 #include <limits.h>
 #include "chos/file_api.h"
+#include "chos/syscall.h"
 #ifdef CHOS_UNISTD_HOST_TEST
 extern long chos_posix_getpid(void);
 extern long chos_posix_read(int,void *,size_t);
 extern long chos_posix_write(const void *,size_t);
 extern long chos_posix_close(int);
 extern long chos_posix_seek(int,int64_t,unsigned);
+extern long chos_posix_sleep(uint64_t);
 #else
 #include "chos/user.h"
 #define chos_posix_getpid chos_getpid
@@ -15,6 +17,7 @@ extern long chos_posix_seek(int,int64_t,unsigned);
 #define chos_posix_write chos_write
 #define chos_posix_close chos_close
 #define chos_posix_seek chos_seek
+#define chos_posix_sleep chos_sleep_ticks
 #endif
 long sysconf(int name){
  switch(name){
@@ -37,4 +40,23 @@ int close(int fd){return (int)checked(chos_posix_close(fd));}
 off_t lseek(int fd,off_t offset,int origin){
  if(origin<SEEK_SET||origin>SEEK_END){errno=EINVAL;return -1;}
  return checked(chos_posix_seek(fd,offset,(unsigned)origin));
+}
+
+unsigned sleep(unsigned seconds){
+ if(!seconds)return 0;
+ if(seconds>CHOS_SYS_MAX_SLEEP_TICKS/100u){errno=EINVAL;return seconds;}
+ /* One extra scheduler tick prevents a request just before an IRQ from
+  * returning early. The600-second boundary needs two bounded requests. */
+ uint64_t remaining=(uint64_t)seconds*100u+1u;
+ while(remaining){
+  uint64_t chunk=remaining>CHOS_SYS_MAX_SLEEP_TICKS?CHOS_SYS_MAX_SLEEP_TICKS:remaining;
+  long result=chos_posix_sleep(chunk);
+  if(result){
+   errno=result<0&&result>=-INT_MAX?(int)-result:EIO;
+   uint64_t unslept=(remaining+99u)/100u;
+   return unslept>seconds?seconds:(unsigned)unslept;
+  }
+  remaining-=chunk;
+ }
+ return 0;
 }

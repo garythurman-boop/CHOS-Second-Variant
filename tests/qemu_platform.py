@@ -78,9 +78,19 @@ class Guest:
         (out/'command.json').write_text(json.dumps(cmd,indent=2))
         self.started=time.monotonic()
         self.process=subprocess.Popen(cmd,stdin=subprocess.PIPE,stdout=self.logfile,stderr=subprocess.STDOUT)
-        self.sock=socket.socket(socket.AF_UNIX);self.sock.settimeout(3)
-        wait(lambda:self.sockpath.exists(),5,'QMP startup')
-        self.sock.connect(str(self.sockpath));self.f=self.sock.makefile('rwb',buffering=0);self.f.readline();self.qmp('qmp_capabilities')
+        self._connect_monitor()
+    def _connect_monitor(self):
+        self.sock=None;self.f=None
+        try:
+            self.sock=socket.socket(socket.AF_UNIX);self.sock.settimeout(3)
+            wait(lambda:self.sockpath.exists(),5,'QMP startup')
+            self.sock.connect(str(self.sockpath));self.f=self.sock.makefile('rwb',buffering=0);self.f.readline();self.qmp('qmp_capabilities')
+        except BaseException:
+            # A failed constructor never reaches the caller's finally block.
+            # Reap this owned VM and close all monitor/pipe handles here too.
+            try:self.close()
+            except Exception:pass
+            raise
     def text(self): return self.log.read_text(errors='replace')
     def qmp(self,execute,**args):
         self.f.write(json.dumps({'execute':execute,'arguments':args}).encode()+b'\n')
@@ -125,10 +135,15 @@ class Guest:
         fields=pathlib.Path(f'/proc/{self.process.pid}/stat').read_text().split()
         return int(fields[13])+int(fields[14])
     def close(self):
-        self.process.terminate()
-        try:self.process.wait(timeout=3)
-        except subprocess.TimeoutExpired:self.process.kill();self.process.wait(timeout=3)
-        self.logfile.close();self.sock.close()
+        try:
+            if self.process.poll() is None:self.process.terminate()
+            try:self.process.wait(timeout=3)
+            except subprocess.TimeoutExpired:self.process.kill();self.process.wait(timeout=3)
+        finally:
+            for handle in (getattr(self,'f',None),getattr(self,'sock',None),self.process.stdin,self.logfile):
+                if handle is not None:
+                    try:handle.close()
+                    except OSError:pass
 def wait(predicate,seconds,description):
     end=time.monotonic()+seconds
     while time.monotonic()<end:

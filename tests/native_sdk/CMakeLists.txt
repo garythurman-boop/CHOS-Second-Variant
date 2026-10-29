@@ -172,3 +172,12 @@ check_c_source_compiles("#include <string.h>\nint main(void){char a[5]={1,0,2,3,
 if(NOT HAVE_NATIVE_BINARY_SEARCH)
  message(FATAL_ERROR "real native binary substring search link failed")
 endif()
+
+check_c_source_compiles("#include <time.h>\n#include <strings.h>\n#include <string.h>\n#include <unistd.h>\nint main(void){struct tm t={0};t.tm_year=70;t.tm_mday=1;char b[128];if(strerror_r(22,b,sizeof b))return 1;return mktime(&t)!=0||timegm(&t)!=0||strcasecmp(\"UTF-8\",\"utf-8\")||sleep(0);}" HAVE_NATIVE_CALENDAR_HELPERS)
+if(NOT HAVE_NATIVE_CALENDAR_HELPERS)
+ message(FATAL_ERROR "real native UTC calendar,string and process helper link failed")
+endif()
+check_c_source_compiles("#include <unistd.h>\nint main(void){_exit(17);}" HAVE_NATIVE_IMMEDIATE_EXIT)
+if(NOT HAVE_NATIVE_IMMEDIATE_EXIT)
+ message(FATAL_ERROR "real native immediate process exit link failed")
+endif()

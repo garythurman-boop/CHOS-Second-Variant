@@ -16,7 +16,8 @@ int main(void){
  struct tm c;assert(gmtime_r(&epoch,&c)==&c&&c.tm_year==100&&c.tm_mon==1&&c.tm_mday==29&&c.tm_yday==59&&c.tm_wday==2);
  epoch=4107542400;assert(gmtime_r(&epoch,&c)&&c.tm_year==200&&c.tm_mon==2&&c.tm_mday==1&&c.tm_yday==59);
  epoch=253402300799;assert(gmtime_r(&epoch,&c)&&c.tm_year==8099&&c.tm_mon==11&&c.tm_mday==31&&c.tm_sec==59);
- epoch=-1;assert(!gmtime_r(&epoch,&c)&&errno==EOVERFLOW);
+ epoch=-1;assert(gmtime_r(&epoch,&c)==&c&&c.tm_year==69&&c.tm_mon==11&&c.tm_mday==31&&c.tm_sec==59);
+ epoch=INT64_MAX;assert(!gmtime_r(&epoch,&c)&&errno==EOVERFLOW);
  assert(!gmtime_r(0,&c)&&errno==EINVAL);
  assert(clock_gettime(99,&t)==-1&&errno==EINVAL);
  mock.flags=1;t=(struct timespec){123,456};assert(clock_gettime(0,&t)==-1&&errno==EAGAIN&&t.tv_sec==123&&t.tv_nsec==456);

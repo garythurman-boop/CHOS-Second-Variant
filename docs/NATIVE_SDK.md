@@ -168,3 +168,9 @@ libc++ charconv/Ryu and musl memmem through the actual WTF span search path.
 Seven guest profiles,independent Decimal vectors and full host/sanitizer suites
 qualify the bounded subset. Full WTF compilation still records17 blocked units;
 engine/browser,production security,wireless and platform acceptance remain open.
+
+The [native UTC/WTF date and UTF component](NATIVE_WTF_CALENDAR.md) executes
+actual upstream parsing,conversion and process helpers with bounded native APIs.
+Eight accepted guest profiles and full host/sanitizer suites qualify this component;
+earlier timeout traces remain recorded. Full WTF still has eight blocked units,
+and subsequent engine/browser,security,wireless and platform gates remain open.

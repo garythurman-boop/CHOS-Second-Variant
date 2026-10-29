@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "project": "musl calendar core",
+  "version": "1.2.5",
+  "commit": "0784374d561435f7c787a555aeab8ede699ed298",
+  "source": "https://git.musl-libc.org/cgit/musl",
+  "scope": "original calendar normalization and seconds/civil-date conversion under an explicit native UTC-only wrapper;not a timezone database or DST implementation",
+  "license": "MIT;retained musl COPYRIGHT",
+  "sources": [
+    "src/time/__tm_to_secs.c",
+    "src/time/__secs_to_tm.c",
+    "src/time/__year_to_secs.c",
+    "src/time/__month_to_secs.c"
+  ],
+  "files": {
+    "src/time/__tm_to_secs.c": "dbba28fd7ccb3a774b50732b77d675a3b5b6e4a48a7c713bd31d625018be88c1",
+    "src/time/__secs_to_tm.c": "36562b874b867912bf5368d505a6402244fab067d5fdf3c905904d225f3e3d06",
+    "src/time/__year_to_secs.c": "c11dea580c3810de90a2222c07bbb0b0a127fb326b60ed92e4205bbaace999f1",
+    "src/time/__month_to_secs.c": "ec626ffe4ac4521d7376b148b74cf6eecfe17142e4a1daefd18f9f68c4b01eae"
+  }
+}

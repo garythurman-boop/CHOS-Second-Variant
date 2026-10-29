@@ -1,4 +1,4 @@
-FORMAT_SOURCES := userland/libc/format/output_writer.c third_party/musl/src/stdio/vfprintf.c third_party/musl/src/stdio/vsnprintf.c third_party/musl/src/stdio/snprintf.c third_party/musl/src/errno/strerror.c
+FORMAT_SOURCES := userland/libc/format/error_strings.c userland/libc/format/output_writer.c third_party/musl/src/stdio/vfprintf.c third_party/musl/src/stdio/vsnprintf.c third_party/musl/src/stdio/snprintf.c third_party/musl/src/errno/strerror.c
 FORMAT_HEADERS := $(wildcard userland/libc/format/include/*.h) third_party/musl/src/errno/__strerror.h
 FORMAT_OBJECTS := $(addprefix $(BUILD)/userland/format/,$(FORMAT_SOURCES:.c=.o))
 FORMAT_ARCHIVE := $(BUILD)/userland/format/libchos-format.a
@@ -57,3 +57,20 @@ test: test-native-format
 # after their source closure has been defined.
 $(BUILD)/test-stdio-read $(BUILD)/test-stdio-output: $(FORMAT_HOST_OBJECTS)
 $(SAN_DIR)/test-stdio-read $(SAN_DIR)/test-stdio-output: $(FORMAT_SAN_OBJECTS)
+
+# Keep public C error helpers out of host libc's symbol namespace during tests.
+$(BUILD)/format-host/userland/libc/format/error_strings.o $(SAN_DIR)/format-host/userland/libc/format/error_strings.o: FORMAT_HOST_FLAGS += -include tests/error_host_names.h
+$(BUILD)/format-host/userland/libc/format/error_strings.o $(SAN_DIR)/format-host/userland/libc/format/error_strings.o: tests/error_host_names.h
+
+ERROR_STRING_HOST_FLAGS := -DCHOS_HOST_TEST -include tests/error_host_names.h -include tests/basec_host_names.h $(LIBC_INCLUDES) -fno-builtin
+$(BUILD)/test-error-strings: tests/test_error_strings.c userland/libc/strings.c userland/libc/ctype.c tests/error_host_names.h tests/basec_host_names.h $(LIBC_HEADERS) $(FORMAT_HOST_OBJECTS) $(BUILD)/stdio-host-threading.o
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -pthread $(ERROR_STRING_HOST_FLAGS) tests/test_error_strings.c userland/libc/strings.c userland/libc/ctype.c $(FORMAT_HOST_OBJECTS) $(BUILD)/stdio-host-threading.o -lm -o $@
+$(SAN_DIR)/test-error-strings: tests/test_error_strings.c userland/libc/strings.c userland/libc/ctype.c tests/error_host_names.h tests/basec_host_names.h $(LIBC_HEADERS) $(FORMAT_SAN_OBJECTS) $(SAN_DIR)/stdio-host-threading.o
+	$(CC_HOST) $(SAN_FLAGS) -pthread $(ERROR_STRING_HOST_FLAGS) tests/test_error_strings.c userland/libc/strings.c userland/libc/ctype.c $(FORMAT_SAN_OBJECTS) $(SAN_DIR)/stdio-host-threading.o -lm -o $@
+test-error-strings: $(BUILD)/test-error-strings
+	./$(BUILD)/test-error-strings
+test-error-strings-sanitize: $(SAN_DIR)/test-error-strings
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-error-strings
+test: test-error-strings
+test-sanitize: test-error-strings-sanitize
+.PHONY: test-error-strings test-error-strings-sanitize

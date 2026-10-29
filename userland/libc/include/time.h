@@ -12,6 +12,9 @@ extern "C" {
 #endif
 int clock_gettime(clockid_t,struct timespec *);
 time_t time(time_t *);
+/* Runtime local time is UTC. Explicit positive DST hints are unsupported. */
+time_t mktime(struct tm *);
+time_t timegm(struct tm *);
 struct tm *gmtime_r(const time_t *,struct tm *);
 struct tm *localtime_r(const time_t *,struct tm *);
 extern char *tzname[2];

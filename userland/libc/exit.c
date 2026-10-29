@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include <pthread.h>
 #include "chos/tls_runtime.h"
 #include "chos/user.h"
@@ -33,6 +34,7 @@ void __chos_libc_process_fini(void){
  __atomic_store_n(&process_cleanup,2,__ATOMIC_RELEASE);
 }
 void _Exit(int status){chos_exit(status);}
+void _exit(int status){_Exit(status);}
 void exit(int status){__chos_libc_process_fini();_Exit(status);}
 void __cxa_pure_virtual(void){abort();}
 void __cxa_deleted_virtual(void){abort();}

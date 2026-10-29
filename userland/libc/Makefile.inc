@@ -1,8 +1,11 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iinclude -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
+LIBC_SOURCES := userland/libc/strings.c userland/libc/calendar.c userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h) include/chos/user_memory_limits.h include/chos/memory_api.h
-LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o $(BUILD)/userland/libc/musl_memmem.o
+CALENDAR_SOURCE_FILES := $(addprefix third_party/musl/src/time/,__tm_to_secs.c __secs_to_tm.c __year_to_secs.c __month_to_secs.c)
+CALENDAR_NATIVE_OBJECTS := $(patsubst third_party/musl/src/time/%.c,$(BUILD)/userland/libc/calendar/%.o,$(CALENDAR_SOURCE_FILES))
+CALENDAR_INCLUDES := -Iuserland/libc/calendar/include
+LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o $(BUILD)/userland/libc/musl_memmem.o $(CALENDAR_NATIVE_OBJECTS)
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
 	@mkdir -p $(dir $@)
 	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) -c $< -o $@
@@ -45,12 +48,12 @@ test: test-user-allocator
 test-sanitize: test-user-allocator-sanitize
 .PHONY: test-user-allocator test-user-allocator-sanitize
 
-$(BUILD)/test-libc-time: tests/test_libc_time.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+$(BUILD)/test-libc-time: tests/test_libc_time.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) userland/libc/calendar/include/time_impl.h $(LIBC_HEADERS) include/chos/clock_api.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -DCHOS_HOST_TEST -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -Iinclude $(LIBC_INCLUDES) tests/test_libc_time.c userland/libc/time.c -o $@
-$(SAN_DIR)/test-libc-time: tests/test_libc_time.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+	$(CC_HOST) -DCHOS_HOST_TEST -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -Iinclude $(LIBC_INCLUDES) $(CALENDAR_INCLUDES) tests/test_libc_time.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) -o $@
+$(SAN_DIR)/test-libc-time: tests/test_libc_time.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) userland/libc/calendar/include/time_impl.h $(LIBC_HEADERS) include/chos/clock_api.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -DCHOS_HOST_TEST $(SAN_FLAGS) -Wno-misleading-indentation $(LIBC_INCLUDES) tests/test_libc_time.c userland/libc/time.c -o $@
+	$(CC_HOST) -DCHOS_HOST_TEST $(SAN_FLAGS) -Wno-misleading-indentation $(LIBC_INCLUDES) $(CALENDAR_INCLUDES) tests/test_libc_time.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) -o $@
 test-libc-time: $(BUILD)/test-libc-time
 	./$(BUILD)/test-libc-time
 test-libc-time-sanitize: $(SAN_DIR)/test-libc-time
@@ -180,12 +183,12 @@ test-sanitize: test-exit-registry-sanitize
 .PHONY: test-exit-registry test-exit-registry-sanitize
 
 PLATFORM_HOST_FLAGS := -DCHOS_HOST_TEST -include tests/platform_host_names.h $(LIBC_INCLUDES) -Iinclude -Wno-misleading-indentation -fno-builtin
-$(BUILD)/test-libc-platform: tests/test_libc_platform.c tests/platform_host_names.h userland/libc/platform.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+$(BUILD)/test-libc-platform: tests/test_libc_platform.c tests/platform_host_names.h userland/libc/platform.c userland/libc/time.c $(CALENDAR_SOURCE_FILES) userland/libc/calendar/include/time_impl.h $(LIBC_HEADERS) include/chos/clock_api.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror $(PLATFORM_HOST_FLAGS) tests/test_libc_platform.c userland/libc/platform.c userland/libc/time.c -o $@
-$(SAN_DIR)/test-libc-platform: tests/test_libc_platform.c tests/platform_host_names.h userland/libc/platform.c userland/libc/time.c $(LIBC_HEADERS) include/chos/clock_api.h
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror $(PLATFORM_HOST_FLAGS) $(CALENDAR_INCLUDES) tests/test_libc_platform.c userland/libc/platform.c userland/libc/time.c $(CALENDAR_SOURCE_FILES) -o $@
+$(SAN_DIR)/test-libc-platform: tests/test_libc_platform.c tests/platform_host_names.h userland/libc/platform.c userland/libc/time.c $(CALENDAR_SOURCE_FILES) userland/libc/calendar/include/time_impl.h $(LIBC_HEADERS) include/chos/clock_api.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) $(SAN_FLAGS) $(PLATFORM_HOST_FLAGS) tests/test_libc_platform.c userland/libc/platform.c userland/libc/time.c -o $@
+	$(CC_HOST) $(SAN_FLAGS) $(PLATFORM_HOST_FLAGS) $(CALENDAR_INCLUDES) tests/test_libc_platform.c userland/libc/platform.c userland/libc/time.c $(CALENDAR_SOURCE_FILES) -o $@
 test-libc-platform: $(BUILD)/test-libc-platform
 	./$(BUILD)/test-libc-platform
 test-libc-platform-sanitize: $(SAN_DIR)/test-libc-platform
@@ -216,3 +219,31 @@ test-memmem-sanitize: $(SAN_DIR)/test-memmem
 test: test-memmem
 test-sanitize: test-memmem-sanitize
 .PHONY: test-memmem test-memmem-sanitize
+
+$(BUILD)/userland/libc/calendar/%.o: third_party/musl/src/time/%.c userland/libc/calendar/include/time_impl.h $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) $(CALENDAR_INCLUDES) -c $< -o $@
+
+CALENDAR_HOST_FLAGS := -DCHOS_HOST_TEST -include tests/calendar_host_names.h $(LIBC_INCLUDES) $(CALENDAR_INCLUDES) -Wno-misleading-indentation
+$(BUILD)/calendar-host-oracle.o: tests/calendar_host_oracle.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -c $< -o $@
+$(SAN_DIR)/calendar-host-oracle.o: tests/calendar_host_oracle.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -c $< -o $@
+$(BUILD)/test-calendar: tests/test_calendar.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) tests/calendar_host_names.h userland/libc/calendar/include/time_impl.h $(LIBC_HEADERS) $(BUILD)/calendar-host-oracle.o $(BUILD)/stdio-host-threading.o
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -pthread $(CALENDAR_HOST_FLAGS) tests/test_calendar.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) $(BUILD)/calendar-host-oracle.o $(BUILD)/stdio-host-threading.o -o $@
+$(SAN_DIR)/test-calendar: tests/test_calendar.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) tests/calendar_host_names.h userland/libc/calendar/include/time_impl.h $(LIBC_HEADERS) $(SAN_DIR)/calendar-host-oracle.o $(SAN_DIR)/stdio-host-threading.o
+	$(CC_HOST) $(SAN_FLAGS) -pthread $(CALENDAR_HOST_FLAGS) tests/test_calendar.c userland/libc/time.c userland/libc/calendar.c $(CALENDAR_SOURCE_FILES) $(SAN_DIR)/calendar-host-oracle.o $(SAN_DIR)/stdio-host-threading.o -o $@
+test-calendar: $(BUILD)/test-calendar
+	./$(BUILD)/test-calendar
+test-calendar-sanitize: $(SAN_DIR)/test-calendar
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-calendar
+test: test-calendar
+test-sanitize: test-calendar-sanitize
+.PHONY: test-calendar test-calendar-sanitize
+
+test-calendar-vectors:
+	python3 tests/generate_calendar_vectors.py --check
+test: test-calendar-vectors
+.PHONY: test-calendar-vectors
