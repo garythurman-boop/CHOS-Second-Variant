@@ -1,0 +1,407 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "base_source_commit": "208d61d67259fc9e0feea2fa9ab959711fed1c5d",
+  "scope": "original libc++ integral conversion,Ryu binary32/64 formatting,and native GNU binary search used by actual WTF span find",
+  "changed_source_files_sha256": {
+    "tests/native_sdk/CMakeLists.txt": "11e65ca4cae48ec5a97619dac22a983fa4c8bacffc11a8a6cbef6e82c791ac35",
+    "tests/test_libcxx_import.py": "eefd031cb06bd77e96e6db1ed833d361ccc5dce90b9cad67a8ce22e8222efcdc",
+    "tools/import_libcxx_headers.py": "c18893d1ace5ec4a325cb70a3a569d8fe98e0f8ead9429f351661fc6d0ca3c8a",
+    "tools/verify_musl_math.py": "310c81b5777e1f8f35bf5fd8453586cc8541b914209e01d3bb1cade81ccfbab1",
+    "userland/libc/Makefile.inc": "ba7e5ad1d2e5e09130165586a091f1ec2f7356bcf10f060746ffd74a3ccab505",
+    "userland/libc/include/string.h": "4c42e517d054099f51eaceb1600d05ebe7ead4234aaee144675e027ada46ebeb",
+    "userland/libcxx/Makefile.inc": "48fdbd469908313f87fdf601ec0c23821ebca256f5c892b45ef53e4e61a7b940",
+    "tests/charconv_vectors.h": "27f961fe1d99eddb20659a067d3f901643232ff2946aa65f29594d7ba55f5c26",
+    "tests/generate_charconv_vectors.py": "d0b9d9cfe777ee3b7be65c580b2409cacefaade79398af46984c9495f609fef1",
+    "tests/qemu_wtf_charconv.py": "c6b4fa6530cf7386832c73e58985f58f3d62c181a67edc8ba284afd14660a11c",
+    "tests/test_memmem.c": "c023b1a11a5c99e040867bbfc7e0b5bff86a2bba30d8bf70aa38f0b2a43c4c86",
+    "tests/wtf_charconv/CMakeLists.txt": "b517b351e5c1a56a5ff6d680a274a48de152591f169969af0e829523fa336097",
+    "tests/wtf_charconv/main.cpp": "81bda8ff72f1d24d1f7e481936ee87da9910c04de6456dc1d4083e8b0059b47e",
+    "third_party/libcxx/include/__charconv/chars_format.h": "49bfc8887035370ab4b6017ae98bb23f1b4fe82a064536bc5b5c6f6173cb0ed7",
+    "third_party/libcxx/include/__charconv/from_chars_integral.h": "9187a3d91a4872ed5dcf1ab6f4c4c647f19dc103251f936cb18fc8fb088a13dc",
+    "third_party/libcxx/include/__charconv/from_chars_result.h": "786fea7350aa3315fe2e08537a289ccedb7b2c778e08e4c8a97d2571523c2139",
+    "third_party/libcxx/include/__charconv/to_chars.h": "7ac3da6f741b23270cb6c3e51d526aab040d1d5a5d9af7b2cb76c7c23ca8e986",
+    "third_party/libcxx/include/__charconv/to_chars_floating_point.h": "19e2f18eaab40eb11bcbabcb7ecf570443688942c647eaf801e066cfe0fc0acf",
+    "third_party/libcxx/include/cfloat": "babb48638222dd5959df1126dacc67182a51d87d1e97a90e097f4bccf88db3fc",
+    "third_party/libcxx/include/charconv": "ed1205e9d27472e79317f5b128dfbf5fd22e4bdbe2e31e7f5133427b6b4f650d",
+    "third_party/libcxx/include/float.h": "7d90830ee185b3c80a5a42b680d622ebe2f06d9b63bfc0e126d6515a85781a5e",
+    "third_party/libcxx/src/charconv.cpp": "f11141aeaabfbf945505e7cf34719015753be93295e9d58e0bc52772c9c66f17",
+    "third_party/libcxx/src/include/ryu/common.h": "2da6fba68b22b90bae35b8e608be65f123b0363b0dbaa2f39c3e94033886fcbb",
+    "third_party/libcxx/src/include/ryu/d2fixed.h": "eb44884fccbbfc39e21d9744fae1edc7f2cd2f1a2c59dacf2ac81cf4d62f6a3f",
+    "third_party/libcxx/src/include/ryu/d2fixed_full_table.h": "b68007164e979c0cca68b19f52057065b412395d819c9900810e1729f1991726",
+    "third_party/libcxx/src/include/ryu/d2s.h": "46fad5fe88cd9a9986ed4a9c8bad0c302b4f3076cebd731bad14fa4a7714a566",
+    "third_party/libcxx/src/include/ryu/d2s_full_table.h": "50206d8a5d1d9f05f0041a79f450490e88251961dd8c0df93106cbf67f4fae96",
+    "third_party/libcxx/src/include/ryu/d2s_intrinsics.h": "5fdbfa56dfeb2fd5f445111bf6cb9cc5410e309220043fdc8c8f20450b27f3bb",
+    "third_party/libcxx/src/include/ryu/digit_table.h": "b9e50c0b5506de9d104fbae85272bf9e3b1987df840d3ece5d566c5921e76ec2",
+    "third_party/libcxx/src/include/ryu/f2s.h": "0685f0962c4121afa0f99603484d73dfccbadc54348fe8919d87f6242107471b",
+    "third_party/libcxx/src/include/ryu/ryu.h": "f2ee014117048b62d243898821b75d37f65a59688d3c929734632a147f2dba6f",
+    "third_party/libcxx/src/include/to_chars_floating_point.h": "16b3b4882654a6f0ef6a450bd158eb32720b8586f1cbcaafa06e84765bbda601",
+    "third_party/libcxx/src/ryu/README.txt": "97e2ebbb73b855b1adc028f8904a671a9186f124ec6c1942a9d087a6adb82255",
+    "third_party/libcxx/src/ryu/d2fixed.cpp": "2cce59c494dd4ab78c80438a7a417f277cd5ab407a034ced39535b7a9b19b494",
+    "third_party/libcxx/src/ryu/d2s.cpp": "a737615bd17c85c2679e4fcfb2aee24ed0b8521db50ad4f64e459d40179b141c",
+    "third_party/libcxx/src/ryu/f2s.cpp": "427dc841a9bc603d1336d992d1275e33ad7b82c465f8bef2d69c96c6b944bca3",
+    "third_party/musl/src/string/memmem.c": "1a17bb31fb38dac1b7e90f521ca4d2a0fe1b249f15d90ea16e89d9af9ce6bd39",
+    "tools/build_wtf_charconv.py": "8268c94f2f596a367a975d5b0d361120e367295c3fc1f92828165f05a836e349"
+  },
+  "dependencies": {
+    "libcxx_original_files": 841,
+    "musl_selected_original_files": 276,
+    "libcxx_manifest_sha256": "621ad4d97452b801b12479c9e32462f89992f264f1777120a7040599c4353357",
+    "musl_string_manifest_sha256": "c6a647eb57ed3d6af345495b559fcd19c0d3f75d3dc1bf6b809f5d7e1da7a4bc",
+    "source_closure_active_original_files": 282,
+    "real_AArch64_repeat_import": "IDENTICAL_MANIFEST_AND_ZERO_NEW_FILES",
+    "idempotence_log_sha256": "6a56982de3ebcb98a3f500f7a870ad07195644a45e900e2c14a4389852824a58"
+  },
+  "native_build": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "78c2166ac2c8b00fe1db734bc4a183d0695c0c73295db7b1115d3e7912015297",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b"
+    },
+    "sdk_manifest_sha256": "9530c664edf0d46cd473082b21d1ce22d6026a6a19bfe66d75f8dce1cffbe655",
+    "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/wtf_charconv",
+        "-B",
+        "/workspace/chos-wtf-charconv-final/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-wtf-charconv-final/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 6.458497007995902,
+    "application_sha256": "3b6f1e3cd31fedf3684f3816b22926da97314cff3ab374dbef9ab3b151291174",
+    "scope": "original libc++ integral conversion/Ryu binary32/64 to_chars and actual WTF memmem header path",
+    "limits": [
+      "no full WTF/JSC library,JavaScript or rendering",
+      "thread lifecycle/stack discovery/GC suspension remain separate services;no signal emulation",
+      "floating from_chars is absent upstream;binary128 to_chars narrows to double upstream and is not qualified",
+      "native guest tests required;no new physical/Fusion qualification"
+    ]
+  },
+  "stdio_relinked_native_build": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "78c2166ac2c8b00fe1db734bc4a183d0695c0c73295db7b1115d3e7912015297",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b"
+    },
+    "sdk_manifest_sha256": "9530c664edf0d46cd473082b21d1ce22d6026a6a19bfe66d75f8dce1cffbe655",
+    "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/wtf_stdio",
+        "-B",
+        "/workspace/chos-wtf-stdio-charconv/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-wtf-stdio-charconv/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 9.587371793000784,
+    "application_sha256": "b0475200c6079f998f26de1b5cf4927a505477aa4038ff7d43485f7ad2612d74",
+    "scope": "actual upstream FilePrintStream/PrintStream/FastMalloc units using native standard streams",
+    "limits": [
+      "no full WTF/JSC library,JavaScript or rendering",
+      "thread lifecycle/stack discovery/GC suspension remain separate services;no signal emulation",
+      "ordinary files remain read-only;stdin and buffered output remain unsupported",
+      "native guest tests required;no new physical/Fusion qualification"
+    ]
+  },
+  "guest_profiles": {
+    "numeric-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "3b6f1e3cd31fedf3684f3816b22926da97314cff3ab374dbef9ab3b151291174",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117519,
+      "free_pages_before": 117519,
+      "free_pages_after": 117519,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 523,
+      "checks": [
+        "original libc++19 integral from/to_chars and Ryu binary32/64 to_chars implementations",
+        "540 independent exact Decimal format vectors at five bounded output capacities",
+        "all integer bases2..36,signed/unsigned width/min/max,independent digit oracle and overflow/value preservation",
+        "1500 random finite bit-pattern shortest conversions per main/worker with independent musl round-trip parsing",
+        "all four rounding modes,thread-private errno and zero user heap across three worker and process cycles",
+        "1000 binary search cases per main/worker,independent search reference and actual WTF HAVE_MEMMEM path",
+        "strict cold PMM equality,preemption and no queued futexes"
+      ],
+      "limits": [
+        "floating from_chars unavailable upstream;binary128 to_chars narrows to double upstream and is not qualified;not full engine/browser",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "numeric-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "3b6f1e3cd31fedf3684f3816b22926da97314cff3ab374dbef9ab3b151291174",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500185,
+      "free_pages_before": 500185,
+      "free_pages_after": 500185,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 595,
+      "checks": [
+        "original libc++19 integral from/to_chars and Ryu binary32/64 to_chars implementations",
+        "540 independent exact Decimal format vectors at five bounded output capacities",
+        "all integer bases2..36,signed/unsigned width/min/max,independent digit oracle and overflow/value preservation",
+        "1500 random finite bit-pattern shortest conversions per main/worker with independent musl round-trip parsing",
+        "all four rounding modes,thread-private errno and zero user heap across three worker and process cycles",
+        "1000 binary search cases per main/worker,independent search reference and actual WTF HAVE_MEMMEM path",
+        "strict cold PMM equality,preemption and no queued futexes"
+      ],
+      "limits": [
+        "floating from_chars unavailable upstream;binary128 to_chars narrows to double upstream and is not qualified;not full engine/browser",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "read-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "9faa468e7627f10932a73f70355b73c4402a0f8ea6b00f875d5c386f71c9b5c6",
+      "source": "disposable CHFS SDK/application",
+      "cold_free_pages": 500185,
+      "free_pages_before": 500185,
+      "free_pages_after": 500185,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 126,
+      "checks": [
+        "read-only buffered streams over actual CHFS snapshots",
+        "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+        "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+        "three std::thread workers consume each byte once across three lifecycles",
+        "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+      ],
+      "limits": [
+        "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+        "ICU full data and browser engine not qualified",
+        "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "format-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "375716f932f5730b8fc268c19b93f1b854cd280d3ce0cbc8a13734e97b076e2d",
+      "standard": "23",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500185,
+      "free_pages_before": 500185,
+      "free_pages_after": 500185,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 363,
+      "checks": [
+        "actual original musl string formatter over private per-invocation memory sinks",
+        "120 exact independent Decimal binary64/binary128 output fixtures at six buffer capacities",
+        "null/count-only,truncation,NUL/guard bytes,positional and wide formats,mixed variadic arguments",
+        "INT_MIN width and invalid argument slot0 errors; invalid UTF32 reports EILSEQ",
+        "three native threads keep errno and FP rounding distinct across three lifecycles",
+        "three processes,exit0,heap0,stable warm frames and no futex waiters"
+      ],
+      "limits": [
+        "bounded string formatting;no public writable FILE streams or locale translation",
+        "not complete ICU/i18n/data,modern engine or browser security",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "icu-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "ef54979b6409fe6d5ba4731bf9fcf17b5384d0a344d3476d452861b8fd2fe2d6",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500185,
+      "free_pages_before": 500185,
+      "free_pages_after": 500185,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 717,
+      "checks": [
+        "selected files extracted with individual hashes from actual upstream default4321-resource package",
+        "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+        "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+        "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+        "three native workers and three lifecycles,u_cleanup,heap0,strict cold PMM equality and zero private futex waiters"
+      ],
+      "limits": [
+        "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+        "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+        "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+      ]
+    },
+    "ethernet-uefi": {
+      "mode": "uefi",
+      "checks": [
+        "32 fast USB keypress/release pairs",
+        "PCI VirtIO CHFS write/flush/read",
+        "PCI VirtIO hardware RNG",
+        "82574L e1000e DHCP/ARP/ICMP",
+        "keyboard shortcut",
+        "relative pointer",
+        "wheel reports through hardware transport to shared input",
+        "window maximize/restore",
+        "title-bar drag",
+        "20 USB hot-unplug/reconnect cycles with ring wraps",
+        "3 mixed input/storage cycles",
+        "2-second idle observation",
+        "storage persistence after fresh guest boot"
+      ],
+      "kernel_ready_seconds": 7.99,
+      "desktop_ready_seconds": 11.003,
+      "keyboard_visible_ms": 72.04,
+      "pointer_visible_ms": 47.95,
+      "maximize_visible_ms": 216.78,
+      "drag_visible_ms": 252.69,
+      "stress_seconds": 6.021,
+      "idle_cpu_percent": 14.0,
+      "status": "PASS"
+    },
+    "stdio-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "b0475200c6079f998f26de1b5cf4927a505477aa4038ff7d43485f7ad2612d74",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500185,
+      "free_pages_before": 500185,
+      "free_pages_after": 500185,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 132,
+      "checks": [
+        "actual upstream FilePrintStream/PrintStream native console output",
+        "mixed integer/double/binary128/UTF8 printf ABI and exact output lengths",
+        "54 complete output lines across three concurrent workers and cycles per process",
+        "read snapshots stay read-only;denied writer and logical stdout close refuse writes",
+        "stderr and borrowed output remain open;zero user heap,three process lifecycles,strict cold PMM and no queued futexes"
+      ],
+      "limits": [
+        "native standard-stream component,not complete WTF/engine/browser or writable ordinary files",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    }
+  },
+  "independent_oracle": {
+    "vectors": 540,
+    "arithmetic": "Python Decimal exact binary32/64,precision2000,round-half-even",
+    "capacities_per_vector": 5,
+    "header_sha256": "27f961fe1d99eddb20659a067d3f901643232ff2946aa65f29594d7ba55f5c26",
+    "host_binary_search_cases": 30000,
+    "comparison": "independent reference and glibc;guarded pages;1MiB periodic adversarial case",
+    "host_binary_search_normal_and_ASan_UBSan": "PASS",
+    "log_sha256": "fb948a2ee41ae4ec2f3995e3ef7bbf5bea0b6b7514831516b3312400b84f9e49"
+  },
+  "host_suite": {
+    "status": "PASS",
+    "exit": 0,
+    "log_sha256": "bdd116193084197a5118075fca2bfceb73a4a33581a6172edf97b061c7475006"
+  },
+  "sanitizers": {
+    "status": "PASS",
+    "exit": 0,
+    "log_sha256": "896fc0ef776d61752ed5e8b6f8a2dd27eb4e9b110d099619b1653a24c1b8a2ed"
+  },
+  "SDK_probes": {
+    "status": "PASS",
+    "files": 1171,
+    "real_numeric_search_stream_links": "PASS",
+    "negative_import_library_and_full_ICU_budget_guards": "PASS_SPECIFIC_REFUSALS",
+    "log_sha256": "a823d2d7780c93eb1796d9b61fdee5ef2123cfac81dc617f09c4afcd1ed97e1f"
+  },
+  "upstream_WTF": {
+    "status": "BUILD_FAILED_RETAINED",
+    "engine_executed": false,
+    "blocked_units": [
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/DateMath.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/FileHandle.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/FileSystem.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/Int128.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/Lock.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/SafeStrerror.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/SIMDUTF.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/WTFProcess.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/text/Base64.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringCommon.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringImpl.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/UTF8Conversion.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/posix/CPUTimePOSIX.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/posix/FileHandlePOSIX.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/unix/UniStdExtrasUnix.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/generic/MemoryFootprintGeneric.cpp.obj ",
+      "Source/WTF/wtf/CMakeFiles/WTF.dir/posix/FileSystemPOSIX.cpp.obj "
+    ],
+    "log_sha256": "bf1271c323d85b260fbc1a204ada1e4e58281695a13442d28b90871dbe99b3c4",
+    "diagnosis": "remaining native filesystem,calendar,sleep/exit/error/string,CPU/memory and ostream dependencies;POSIX sources still require proper native replacements"
+  },
+  "investigations": [
+    {
+      "reason": "missing original float.h wrapper discovered by real cfloat preprocessor scan;imported both wrappers",
+      "log_sha256": "b80c6da27cecfce7ff717900fe6af45b0a4a42be394d9848b68b25ba532ec6d0"
+    },
+    {
+      "reason": "conservative source scan followed inactive locale branch;real native-source-closure scans compile selected units and their quoted dependencies",
+      "log_sha256": "6a6877b4196ad140a9d523677677a265b551edf45d526a9db66695575466c6b1"
+    },
+    {
+      "reason": "original memmem sign comparison warning;source unchanged,warning disabled only for this original unit",
+      "log_sha256": "4fd29b6c4ee7f08b8bd613702a512649c770b1707a794ce31bd57b914849797b"
+    },
+    {
+      "reason": "test indentation warning corrected without changing original search source or checks",
+      "log_sha256": "138113aa5189ae4b02cebc96fe1298ff0febee8315450e73543b50d669ff0f37"
+    },
+    {
+      "reason": "SDK object ownership guard correctly refused product outside native runtime directory;product moved inside whitelist,old SDK intact until successful replacement",
+      "log_sha256": "7dbd68df071f35404bde963ca8b4f612ea63ae5ba9396630d1477124f8913a07"
+    },
+    {
+      "reason": "fixture attempted old intact SDK after refused installer;correctly failed missing charconv header;rebuilt SDK and reran",
+      "log_sha256": "eb9abcb65ef2012bd96cdbe9a377d5ea030992b19e352ff5e01851645767c547"
+    }
+  ],
+  "limits": [
+    "floating from_chars absent from selected upstream release",
+    "upstream long-double to_chars casts to double;binary128 range/precision NOT QUALIFIED",
+    "not full WTF/JSC,JavaScript execution or modern browser",
+    "engine-sized memory/stacks,thread lifecycle/foreign GC,production security,Pi5 wireless and platform gates open"
+  ],
+  "binary_publication": "SOURCE_ONLY;latest user-test ISO cc29ea8;version0.30.0",
+  "raw_evidence_archive": {
+    "archive_sha256": "42896b603f7e24db692a16ef1f03ee9810c2bee8b4e251f3f90d97c77c4eb3c7",
+    "archive_bytes": 58203076,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  }
+}

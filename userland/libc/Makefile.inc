@@ -2,7 +2,7 @@
 LIBC_INCLUDES := -Iinclude -Iuserland/libc/include
 LIBC_SOURCES := userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h) include/chos/user_memory_limits.h include/chos/memory_api.h
-LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o
+LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o $(BUILD)/userland/libc/musl_memmem.o
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
 	@mkdir -p $(dir $@)
 	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) -c $< -o $@
@@ -193,3 +193,26 @@ test-libc-platform-sanitize: $(SAN_DIR)/test-libc-platform
 test: test-libc-platform
 test-sanitize: test-libc-platform-sanitize
 .PHONY: test-libc-platform test-libc-platform-sanitize
+
+# Original maintained GNU binary search primitive; no host libc is linked.
+$(BUILD)/userland/libc/musl_memmem.o: third_party/musl/src/string/memmem.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) $(LIBC_INCLUDES) -Wno-sign-compare -c $< -o $@
+
+$(BUILD)/memmem-host.o: third_party/musl/src/string/memmem.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Wno-sign-compare -fno-builtin -Dmemmem=chos_test_memmem -c $< -o $@
+$(SAN_DIR)/memmem-host.o: third_party/musl/src/string/memmem.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Wno-sign-compare -fno-builtin -Dmemmem=chos_test_memmem -c $< -o $@
+$(BUILD)/test-memmem: tests/test_memmem.c $(BUILD)/memmem-host.o
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -fno-builtin $^ -o $@
+$(SAN_DIR)/test-memmem: tests/test_memmem.c $(SAN_DIR)/memmem-host.o
+	$(CC_HOST) $(SAN_FLAGS) -fno-builtin $^ -o $@
+test-memmem: $(BUILD)/test-memmem
+	./$(BUILD)/test-memmem
+test-memmem-sanitize: $(SAN_DIR)/test-memmem
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-memmem
+test: test-memmem
+test-sanitize: test-memmem-sanitize
+.PHONY: test-memmem test-memmem-sanitize

@@ -5,7 +5,13 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [native standard streams](NATIVE_STANDARD_STREAMS.md) execute actual
+The latest [numeric/search component](NATIVE_CHARCONV.md) supplies original
+integral conversion,Ryu float/double formatting and WTF's real bounded binary
+search path. Independent Decimal/reference tests,seven guest profiles and full
+host/sanitizer suites pass. A full WTF build now records17 concrete blocked units;
+no complete WTF/JSC,JavaScript or modern browser execution is claimed.
+
+The preceding [native standard streams](NATIVE_STANDARD_STREAMS.md) execute actual
 WTF output in both boot modes, with seven qualified guest profiles and full host/
 sanitizer suites. [Native entropy/process/page services](NATIVE_WTF_ENTROPY.md)
 have separate direct/UEFI/missing-device evidence. These close concrete engine

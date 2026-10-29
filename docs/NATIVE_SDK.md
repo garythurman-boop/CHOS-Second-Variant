@@ -162,3 +162,9 @@ The [native standard-stream component](NATIVE_STANDARD_STREAMS.md) supplies
 checked unbuffered console output and actual upstream WTF FilePrintStream/PrintStream
 execution. Normal/sanitizer,SDK links and seven guest profiles qualify the component.
 Ordinary files stay read-only;complete stdio,engine/browser and hardware gates remain open.
+
+The [native numeric/search component](NATIVE_CHARCONV.md) now executes original
+libc++ charconv/Ryu and musl memmem through the actual WTF span search path.
+Seven guest profiles,independent Decimal vectors and full host/sanitizer suites
+qualify the bounded subset. Full WTF compilation still records17 blocked units;
+engine/browser,production security,wireless and platform acceptance remain open.

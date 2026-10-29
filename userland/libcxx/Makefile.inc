@@ -6,7 +6,7 @@ LIBCPP_HEADERS := $(shell rg --files $(LIBCPP_ROOT) userland/libcxx/include)
 # C++ wrappers must precede C headers, including for their include_next contracts.
 LIBCPP_INCLUDES := -nostdinc++ -isystem $(LIBCPP_GENERATED) -isystem userland/libcxx/include -isystem $(LIBCPP_ROOT)/include -isystem userland/libc/include -isystem $(MUSL_MATH_GENERATED)
 LIBCPP_FLAGS := $(filter-out -std=c11 -mgeneral-regs-only,$(USER_CFLAGS)) -std=c++20 -fno-exceptions -fno-rtti -femulated-tls -ffunction-sections -fdata-sections $(LIBCPP_INCLUDES)
-LIBCPP_SOURCES := $(LIBCPP_ROOT)/src/new.cpp $(LIBCPP_ROOT)/src/new_handler.cpp $(LIBCPP_ROOT)/src/new_helpers.cpp $(LIBCPP_ROOT)/src/algorithm.cpp $(LIBCPP_ROOT)/src/hash.cpp userland/libcxx/string_instantiations.cpp userland/libcxx/verbose_abort.cpp userland/libcxx/threading.cpp userland/libcxx/clocks.cpp $(LIBCPP_ROOT)/src/mutex.cpp $(LIBCPP_ROOT)/src/mutex_destructor.cpp $(LIBCPP_ROOT)/src/condition_variable.cpp $(LIBCPP_ROOT)/src/condition_variable_destructor.cpp $(LIBCPP_ROOT)/src/memory.cpp $(LIBCPP_ROOT)/src/thread.cpp $(LIBCPP_ROOT)/src/future.cpp userland/libcxx/termination.cpp
+LIBCPP_SOURCES := $(LIBCPP_ROOT)/src/charconv.cpp $(LIBCPP_ROOT)/src/ryu/d2fixed.cpp $(LIBCPP_ROOT)/src/ryu/d2s.cpp $(LIBCPP_ROOT)/src/ryu/f2s.cpp $(LIBCPP_ROOT)/src/new.cpp $(LIBCPP_ROOT)/src/new_handler.cpp $(LIBCPP_ROOT)/src/new_helpers.cpp $(LIBCPP_ROOT)/src/algorithm.cpp $(LIBCPP_ROOT)/src/hash.cpp userland/libcxx/string_instantiations.cpp userland/libcxx/verbose_abort.cpp userland/libcxx/threading.cpp userland/libcxx/clocks.cpp $(LIBCPP_ROOT)/src/mutex.cpp $(LIBCPP_ROOT)/src/mutex_destructor.cpp $(LIBCPP_ROOT)/src/condition_variable.cpp $(LIBCPP_ROOT)/src/condition_variable_destructor.cpp $(LIBCPP_ROOT)/src/memory.cpp $(LIBCPP_ROOT)/src/thread.cpp $(LIBCPP_ROOT)/src/future.cpp userland/libcxx/termination.cpp
 LIBCPP_OBJECTS := $(addprefix $(BUILD)/userland/libcxx/,$(addsuffix .o,$(basename $(LIBCPP_SOURCES))))
 LIBCPP_ARCHIVE := $(BUILD)/userland/libcxx/libchos-c++.a
 $(LIBCPP_GENERATED)/__config_site: tools/configure_libcxx.py $(LIBCPP_ROOT)/include/__config_site.in $(LIBCPP_ROOT)/vendor/llvm/default_assertion_handler.in
@@ -188,3 +188,15 @@ $(BUILD)/userland/format_test.o: userland/examples/format_test.cpp tests/format_
 $(BUILD)/userland/format_test.elf: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(BUILD)/userland/format_test.o $(LIBCPP_ARCHIVE) $(FORMAT_ARCHIVE) $(QUAD_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(WIDE_ARCHIVE) $(LIBC_OBJECTS) userland/app.ld
 	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^) --start-group $(filter %.a,$^) --end-group
 test: $(BUILD)/userland/format_test.elf
+
+# Real private implementation include tree, with the same C++23 preprocessing
+# profile used to establish the pinned source dependency closure.
+CHARCONV_ORIGINAL_HEADERS := $(wildcard $(LIBCPP_ROOT)/src/include/ryu/*.h) $(LIBCPP_ROOT)/src/include/to_chars_floating_point.h
+CHARCONV_OBJECTS := $(addprefix $(BUILD)/userland/libcxx/$(LIBCPP_ROOT)/src/,charconv.o ryu/d2fixed.o ryu/d2s.o ryu/f2s.o)
+$(CHARCONV_OBJECTS): LIBCPP_FLAGS := $(filter-out -std=c++20,$(LIBCPP_FLAGS)) -std=c++23 -I$(LIBCPP_ROOT)/src
+$(CHARCONV_OBJECTS): $(CHARCONV_ORIGINAL_HEADERS)
+
+test-charconv-vectors:
+	python3 tests/generate_charconv_vectors.py --check
+test: test-charconv-vectors
+.PHONY: test-charconv-vectors

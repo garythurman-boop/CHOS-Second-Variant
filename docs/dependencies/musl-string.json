@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "project": "musl bounded binary substring search",
+  "version": "1.2.5",
+  "commit": "0784374d561435f7c787a555aeab8ede699ed298",
+  "source": "https://git.musl-libc.org/cgit/musl",
+  "scope": "original length-bounded memmem with short-needle and two-way search;not a full GNU/POSIX libc",
+  "license": "MIT;retained musl COPYRIGHT",
+  "sources": [
+    "src/string/memmem.c"
+  ],
+  "files": {
+    "src/string/memmem.c": "1a17bb31fb38dac1b7e90f521ca4d2a0fe1b249f15d90ea16e89d9af9ce6bd39"
+  }
+}

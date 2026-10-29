@@ -9,6 +9,8 @@ void *memmove(void *,const void *,size_t);
 void *memset(void *,int,size_t);
 int memcmp(const void *,const void *,size_t);
 void *memchr(const void *,int,size_t);
+/* Length-bounded binary substring search (GNU extension). */
+void *memmem(const void *,size_t,const void *,size_t);
 size_t strlen(const char *);
 size_t strnlen(const char *,size_t);
 int strcmp(const char *,const char *);

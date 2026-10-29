@@ -25,7 +25,10 @@ class ImportTransactions(unittest.TestCase):
         originals = {'include/plain': b'// original public header\n',
                      'include/broken': b'#include <__private.h>\n',
                      'include/__private.h': b'#include <__absent.h>\n',
-                     'src/hash.cpp': b'// original source\n'}
+                     'src/hash.cpp': b'// original source\n',
+                     'src/real.cpp': b'#include "include/detail.h"\n',
+                     'src/include/detail.h': b'// selected private source header\n',
+                     'src/include/unused.h': b'// must remain unimported\n'}
         with tarfile.open(self.archive, 'w:xz') as archive:
             for name, data in originals.items():
                 entry = tarfile.TarInfo('libcxx-1.0.0.src/'+name)
@@ -70,6 +73,53 @@ class ImportTransactions(unittest.TestCase):
         result = self.run_import(*arguments)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(self.manifest.read_text())['sources'], ['src/hash.cpp'])
+
+    def test_native_scan_failure_reports_cause_without_import(self):
+        for name in ('__config_site', '__assertion_handler'):
+            p = self.root/'build/userland/libcxx/include'/name
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text('// configuration fixture\n')
+        p = self.root/'build/userland/libm/include/math.h'
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text('// math fixture\n')
+        compiler = self.root/'compiler'
+        compiler.write_text('#!/usr/bin/env python3\nimport sys\nsys.stderr.write("missing native dependency fixture\\n")\nraise SystemExit(9)\n')
+        compiler.chmod(0o755)
+        before = self.snapshot()
+        result = self.run_import('--native-header-closure', '--header', 'plain',
+                                 '--compiler', str(compiler))
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('missing native dependency fixture', result.stderr)
+        self.assertEqual(before, self.snapshot())
+
+    def test_native_source_scan_imports_only_reported_quoted_dependency(self):
+        for name in ('__config_site', '__assertion_handler'):
+            p = self.root/'build/userland/libcxx/include'/name
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text('// configuration fixture\n')
+        p = self.root/'build/userland/libm/include/math.h'
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text('// math fixture\n')
+        compiler = self.root/'compiler'
+        compiler.write_text('#!/usr/bin/env python3\nimport sys,pathlib\np=pathlib.Path(sys.argv[-1])\nprint("chos_import: "+str(p)+" "+str(p.parent/"include/detail.h"))\n')
+        compiler.chmod(0o755)
+        arguments = ('--native-source-closure', '--source-file', 'real.cpp',
+                     '--compiler', str(compiler))
+        before = self.snapshot()
+        result = self.run_import(*arguments, '--check-only')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(before, self.snapshot())
+        result = self.run_import(*arguments)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        manifest = json.loads(self.manifest.read_text())
+        self.assertEqual(set(manifest['files']), {'src/real.cpp', 'src/include/detail.h'})
+        self.assertEqual(manifest['sources'], ['src/real.cpp'])
+        self.assertEqual((self.base/'src/include/detail.h').read_bytes(),
+                         b'// selected private source header\n')
+        before = self.snapshot()
+        result = self.run_import(*arguments)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(before, self.snapshot())
 
     def test_archive_identity_failure_preserves_tree(self):
         before = self.snapshot()

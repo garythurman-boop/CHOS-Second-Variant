@@ -163,3 +163,12 @@ check_c_source_compiles("#include <stdio.h>\nint main(void){if(setvbuf(stderr,0,
 if(NOT HAVE_NATIVE_STANDARD_OUTPUT)
  message(FATAL_ERROR "real native standard output and floating formatter link failed")
 endif()
+
+check_cxx_source_compiles("#include <charconv>\n#include <cfloat>\nint main(){char b[128];auto r=std::to_chars(b,b+128,1.25,std::chars_format::scientific,6);int value=0;auto n=std::from_chars(b,r.ptr,value);return r.ec==std::errc{}&&n.ec==std::errc{}&&DBL_MANT_DIG==53?0:1;}" HAVE_NATIVE_CHARCONV)
+if(NOT HAVE_NATIVE_CHARCONV)
+ message(FATAL_ERROR "real native original charconv/Ryu link failed")
+endif()
+check_c_source_compiles("#include <string.h>\nint main(void){char a[5]={1,0,2,3,4};char b[2]={0,2};return memmem(a,5,b,2)==a+1?0:1;}" HAVE_NATIVE_BINARY_SEARCH)
+if(NOT HAVE_NATIVE_BINARY_SEARCH)
+ message(FATAL_ERROR "real native binary substring search link failed")
+endif()
