@@ -317,3 +317,8 @@ checks and actual AArch64 SDK assembly links. Native WTF register declarations a
 current stack discovery compile. Foreign-thread suspension/GC, complete Thread
 lifecycle, engine-sized stack/memory and the other modern browser/wireless/platform
 requirements remain open; this is not Stage3/version0.50.0 completion.
+
+The [native WTF entropy/process/page component](NATIVE_WTF_ENTROPY.md) now
+executes actual upstream adapters in both QEMU boot modes, with explicit denied
+and missing-source failure and modeled partial/retry error tests. Full engine,
+production entropy security, browser, wireless and platform gates remain open.

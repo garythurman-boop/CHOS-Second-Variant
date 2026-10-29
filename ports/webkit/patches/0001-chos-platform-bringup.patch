@@ -76,6 +76,54 @@ index f4b97e56..5a7e0a11 100644
  #elif OS(LINUX) || OS(OPENBSD)
      struct timespec ts { };
      clock_gettime(CLOCK_BOOTTIME, &ts);
+diff --git a/Source/WTF/wtf/PageBlock.cpp b/Source/WTF/wtf/PageBlock.cpp
+index 1e131303..842b94cf 100644
+--- a/Source/WTF/wtf/PageBlock.cpp
++++ b/Source/WTF/wtf/PageBlock.cpp
+@@ -26,7 +26,7 @@
+ #include "config.h"
+ #include <wtf/PageBlock.h>
+
+-#if OS(UNIX)
++#if OS(UNIX) || OS(CHOS)
+ #include <unistd.h>
+ #endif
+
+@@ -37,7 +37,9 @@
+
+ namespace WTF {
+
++#if !OS(CHOS)
+ static size_t s_pageSize;
++#endif
+
+ #if OS(UNIX)
+
+@@ -59,6 +61,16 @@ inline size_t systemPageSize()
+
+ size_t pageSize()
+ {
++#if OS(CHOS)
++    // The native profile has a real sysconf implementation. Do not use the
++    // generic unsynchronized lazy cache from concurrent engine workers.
++    long value = sysconf(_SC_PAGESIZE);
++    RELEASE_ASSERT(value > 0);
++    size_t size = static_cast<size_t>(value);
++    RELEASE_ASSERT(isPowerOfTwo(size) && size <= CeilingOnPageSize);
++    RELEASE_ASSERT(roundUpToMultipleOf(size, CeilingOnPageSize) == CeilingOnPageSize);
++    return size;
++#else
+     if (!s_pageSize) {
+         s_pageSize = systemPageSize();
+         RELEASE_ASSERT(isPowerOfTwo(s_pageSize));
+@@ -66,6 +78,7 @@ size_t pageSize()
+         RELEASE_ASSERT(roundUpToMultipleOf(s_pageSize, CeilingOnPageSize) == CeilingOnPageSize);
+     }
+     return s_pageSize;
++#endif
+ }
+
+ } // namespace WTF
 diff --git a/Source/WTF/wtf/PlatformJSCOnly.cmake b/Source/WTF/wtf/PlatformJSCOnly.cmake
 index a2328be2..22158d72 100644
 --- a/Source/WTF/wtf/PlatformJSCOnly.cmake
@@ -159,6 +207,134 @@ index 0c16afbd..90c2f56b 100644
  #define USE_PTHREADS 1
  #endif
 
+diff --git a/Source/WTF/wtf/ProcessID.h b/Source/WTF/wtf/ProcessID.h
+index d3ea6f89..45a8f8f2 100644
+--- a/Source/WTF/wtf/ProcessID.h
++++ b/Source/WTF/wtf/ProcessID.h
+@@ -27,10 +27,14 @@
+
+ #include <wtf/Platform.h>
+
+-#if OS(UNIX)
++#if OS(UNIX) || OS(CHOS)
+ #include <unistd.h>
+ #endif
+
++#if OS(CHOS)
++#include <wtf/Assertions.h>
++#endif
++
+ #if OS(WINDOWS)
+ #include <windows.h>
+ #endif
+@@ -47,9 +51,15 @@ inline ProcessID getCurrentProcessID()
+ {
+ #if OS(WINDOWS)
+     return GetCurrentProcessId();
++#else
++#if OS(CHOS)
++    auto pid = getpid();
++    RELEASE_ASSERT(pid > 0);
++    return pid;
+ #else
+     return getpid();
+ #endif
++#endif
+ }
+
+ } // namespace WTF
+diff --git a/Source/WTF/wtf/RandomDevice.cpp b/Source/WTF/wtf/RandomDevice.cpp
+index 95921fd3..1bbcbf77 100644
+--- a/Source/WTF/wtf/RandomDevice.cpp
++++ b/Source/WTF/wtf/RandomDevice.cpp
+@@ -28,8 +28,11 @@
+ #include <wtf/RandomDevice.h>
+
+ #include <stdlib.h>
++#if OS(CHOS)
++#include <chos/user.h>
++#endif
+
+-#if !OS(DARWIN) && !OS(FUCHSIA) && OS(UNIX)
++#if !OS(DARWIN) && !OS(FUCHSIA) && OS(UNIX) && !OS(CHOS)
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -51,7 +54,7 @@
+
+ namespace WTF {
+
+-#if !OS(DARWIN) && !OS(FUCHSIA) && OS(UNIX)
++#if !OS(DARWIN) && !OS(FUCHSIA) && OS(UNIX) && !OS(CHOS)
+ NEVER_INLINE NO_RETURN_DUE_TO_CRASH static void crashUnableToOpenURandom()
+ {
+     CRASH();
+@@ -63,7 +66,7 @@ NEVER_INLINE NO_RETURN_DUE_TO_CRASH static void crashUnableToReadFromURandom()
+ }
+ #endif
+
+-#if !OS(DARWIN) && !OS(FUCHSIA) && !OS(WINDOWS)
++#if !OS(DARWIN) && !OS(FUCHSIA) && !OS(WINDOWS) && !OS(CHOS)
+ RandomDevice::RandomDevice()
+ {
+     int ret = 0;
+@@ -76,7 +79,7 @@ RandomDevice::RandomDevice()
+ }
+ #endif
+
+-#if !OS(DARWIN) && !OS(FUCHSIA) && !OS(WINDOWS)
++#if !OS(DARWIN) && !OS(FUCHSIA) && !OS(WINDOWS) && !OS(CHOS)
+ RandomDevice::~RandomDevice()
+ {
+     close(m_fd);
+@@ -91,6 +94,25 @@ void RandomDevice::cryptographicallyRandomValues(std::span<uint8_t> buffer)
+     RELEASE_ASSERT(!CCRandomGenerateBytes(buffer.data(), buffer.size()));
+ #elif OS(FUCHSIA)
+     zx_cprng_draw(buffer.data(), buffer.size());
++#elif OS(CHOS)
++    // The OS owns the source/reseed policy. Never synthesize entropy here.
++    size_t offset = 0;
++    unsigned retries = 0;
++    while (offset < buffer.size()) {
++        size_t remaining = buffer.size() - offset;
++        size_t request = remaining < CHOS_SYS_MAX_RANDOM_BYTES ? remaining : CHOS_SYS_MAX_RANDOM_BYTES;
++        auto portion = buffer.subspan(offset, request);
++        long count = chos_random_bytes(portion.data(), portion.size());
++        if (count > 0 && static_cast<size_t>(count) <= request) {
++            offset += static_cast<size_t>(count);
++            continue;
++        }
++        if ((count == -CHOS_ERRNO_EAGAIN || count == -CHOS_ERRNO_EINTR) && retries++ < 32) {
++            RELEASE_ASSERT(!chos_sleep_ticks(1));
++            continue;
++        }
++        CRASH();
++    }
+ #elif OS(UNIX)
+     ssize_t amountRead = 0;
+     while (static_cast<size_t>(amountRead) < buffer.size()) {
+diff --git a/Source/WTF/wtf/RandomDevice.h b/Source/WTF/wtf/RandomDevice.h
+index ce4af347..57abe6bb 100644
+--- a/Source/WTF/wtf/RandomDevice.h
++++ b/Source/WTF/wtf/RandomDevice.h
+@@ -36,7 +36,7 @@ class RandomDevice {
+     WTF_MAKE_NONCOPYABLE(RandomDevice);
+     WTF_DEPRECATED_MAKE_FAST_ALLOCATED(RandomDevice);
+ public:
+-#if OS(DARWIN) || OS(FUCHSIA) || OS(WINDOWS)
++#if OS(DARWIN) || OS(FUCHSIA) || OS(WINDOWS) || OS(CHOS)
+     RandomDevice() = default;
+ #else
+     RandomDevice();
+@@ -49,7 +49,7 @@ public:
+     void cryptographicallyRandomValues(std::span<uint8_t> buffer);
+
+ private:
+-#if OS(DARWIN) || OS(FUCHSIA) || OS(WINDOWS)
++#if OS(DARWIN) || OS(FUCHSIA) || OS(WINDOWS) || OS(CHOS)
+ #elif OS(UNIX)
+     int m_fd { -1 };
+ #else
 diff --git a/Source/WTF/wtf/StackBounds.cpp b/Source/WTF/wtf/StackBounds.cpp
 index d928bed8..e265b2e0 100644
 --- a/Source/WTF/wtf/StackBounds.cpp

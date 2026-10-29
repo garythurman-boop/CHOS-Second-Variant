@@ -1,0 +1,339 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "base_source_commit": "3d46ae59ae4a6da7f5f35c8ef555a005ecd8f52e",
+  "scope": "actual upstream WTF native OS entropy,PID and page services",
+  "source_files_sha256": {
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "78c2166ac2c8b00fe1db734bc4a183d0695c0c73295db7b1115d3e7912015297",
+    "docs/dependencies/webkit-jsc-bringup.json": "03703f7ff6a896017e44e3b7107caeda902b892e98861c6d0661b5f6a84f6bf8",
+    "tools/build_wtf_entropy.py": "2c7aed85cc91e642d00ecf5c2bee09c856f2d0e76a5f84bac87eba0dd985106e",
+    "tools/test_wtf_entropy_host.py": "d90831681d39004f6e344c178be2cbcee850231e95a6af7a42d276fdf7b219e6",
+    "tests/qemu_wtf_entropy.py": "95aaed0afedd6974ec08c930b8d912ad8ac8ed1c2ad040dd392258f20de64bb1",
+    "tests/wtf_entropy/main.cpp": "d02b1f249d57f228ab228f646666c1554dde8a3602efb3cde1ef9b35306147b6",
+    "tests/wtf_entropy/CMakeLists.txt": "468aaacd91b3384cab81f836608fc81086a406010e7bcabd66e6e4362c9e1b2c",
+    "tests/wtf_entropy_host/main.cpp": "8630281bb3ec2b22ef6c1f731317197f1d1bd67243a4b22279cdc376c90c0fd2",
+    "tests/wtf_entropy_host/chos/user.h": "f75122eceac02a7da80a808793e2134daccdc0b9b52de35c92ca6cd9d9f96002"
+  },
+  "native_build": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "engine_built": false,
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "78c2166ac2c8b00fe1db734bc4a183d0695c0c73295db7b1115d3e7912015297",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b"
+    },
+    "sdk_manifest_sha256": "1dd36eecdf531f5e000a2016fabec944ba6ee281690d0c972fd053a3d2151e0a",
+    "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/wtf_entropy",
+        "-B",
+        "/workspace/chos-wtf-entropy-final/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-wtf-entropy-final/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 8.197879323000961,
+    "application_sha256": "87c06dcb1ec34718b5a64bfba7e51dddf2498fadf90d5d3f84f80095a3c52e8f",
+    "scope": "actual upstream RandomDevice/PageBlock units and ProcessID header with native OS services",
+    "limits": [
+      "no full WTF/JSC library,JavaScript or rendering",
+      "thread lifecycle/stack discovery/GC suspension remain separate services;no signal emulation",
+      "OS transport sanity is not entropy quality/reseed certification;production policy remains open",
+      "native guest tests required;no new physical/Fusion qualification"
+    ]
+  },
+  "host_fault_model": {
+    "status": "PASS",
+    "stage3_complete": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "78c2166ac2c8b00fe1db734bc4a183d0695c0c73295db7b1115d3e7912015297",
+    "records": [
+      {
+        "kind": "normal",
+        "command": [
+          "g++",
+          "-std=c++23",
+          "-O1",
+          "-g",
+          "-DNDEBUG=1",
+          "-D__CHOS__=1",
+          "-DBUILDING_JSCONLY__",
+          "-DUSE_SYSTEM_MALLOC=1",
+          "-Dgetpid=chos_test_getpid",
+          "-Dsysconf=chos_test_sysconf",
+          "-I/workspace/CHOS-Second-Variant/tests/wtf_entropy_host",
+          "-I/workspace/CHOS-Second-Variant/include",
+          "-I/workspace/chos-reference/webkit-2.54.2/Source/WTF",
+          "-I/workspace/chos-reference/webkit-2.54.2/Source/bmalloc",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-Wno-expansion-to-defined",
+          "-Wno-misleading-indentation",
+          "/workspace/CHOS-Second-Variant/tests/wtf_entropy_host/main.cpp",
+          "/workspace/chos-reference/webkit-2.54.2/Source/WTF/wtf/RandomDevice.cpp",
+          "/workspace/chos-reference/webkit-2.54.2/Source/WTF/wtf/PageBlock.cpp",
+          "-o",
+          "/workspace/chos-wtf-entropy-host2/normal"
+        ],
+        "exit": 0,
+        "runs": [
+          {
+            "case": "normal",
+            "exit": 0,
+            "expected": 0
+          },
+          {
+            "case": "1",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "2",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "3",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "4",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "5",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "6",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "7",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "8",
+            "exit": 42,
+            "expected": 42
+          }
+        ],
+        "seconds": 8.235425900998962,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "kind": "sanitize",
+        "command": [
+          "g++",
+          "-std=c++23",
+          "-O1",
+          "-g",
+          "-DNDEBUG=1",
+          "-D__CHOS__=1",
+          "-DBUILDING_JSCONLY__",
+          "-DUSE_SYSTEM_MALLOC=1",
+          "-Dgetpid=chos_test_getpid",
+          "-Dsysconf=chos_test_sysconf",
+          "-I/workspace/CHOS-Second-Variant/tests/wtf_entropy_host",
+          "-I/workspace/CHOS-Second-Variant/include",
+          "-I/workspace/chos-reference/webkit-2.54.2/Source/WTF",
+          "-I/workspace/chos-reference/webkit-2.54.2/Source/bmalloc",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-Wno-expansion-to-defined",
+          "-Wno-misleading-indentation",
+          "/workspace/CHOS-Second-Variant/tests/wtf_entropy_host/main.cpp",
+          "/workspace/chos-reference/webkit-2.54.2/Source/WTF/wtf/RandomDevice.cpp",
+          "/workspace/chos-reference/webkit-2.54.2/Source/WTF/wtf/PageBlock.cpp",
+          "-o",
+          "/workspace/chos-wtf-entropy-host2/sanitize",
+          "-fsanitize=address,undefined",
+          "-fno-omit-frame-pointer"
+        ],
+        "exit": 0,
+        "runs": [
+          {
+            "case": "normal",
+            "exit": 0,
+            "expected": 0
+          },
+          {
+            "case": "1",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "2",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "3",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "4",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "5",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "6",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "7",
+            "exit": 42,
+            "expected": 42
+          },
+          {
+            "case": "8",
+            "exit": 42,
+            "expected": 42
+          }
+        ],
+        "seconds": 24.979448928002967,
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "scope": "actual adapter source,partial chunks/canaries,32transient retry boundary,zero/oversized/error results,sleep failure,PID/page refusal",
+    "limits": [
+      "host-modeled broker/PID/page services;fatal handler only checks model counters",
+      "not kernel/hardware entropy quality or a cryptographic evaluation",
+      "native guest tests required;no full WTF/JSC/browser success"
+    ]
+  },
+  "guest_profiles": {
+    "direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "87c06dcb1ec34718b5a64bfba7e51dddf2498fadf90d5d3f84f80095a3c52e8f",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117523,
+      "free_pages_before": 117523,
+      "free_pages_after": 117523,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 159,
+      "entropy_available": true,
+      "checks": [
+        "actual original WTF RandomDevice/PageBlock and ProcessID native adapters",
+        "bounded256-byte requests,600-byte canaries and empty requests",
+        "three workers sharing stateless source;three worker and process lifecycles",
+        "denied RNG/PID and read-only output abort134 without user fault",
+        "zero user heap,strict cold PMM equality,preemption and zero queued futexes"
+      ],
+      "limits": [
+        "native OS-service component,not entropy quality certification,full WTF,engine or browser",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "missing": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "87c06dcb1ec34718b5a64bfba7e51dddf2498fadf90d5d3f84f80095a3c52e8f",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 117523,
+      "free_pages_before": 117523,
+      "free_pages_after": 117523,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 102,
+      "entropy_available": false,
+      "checks": [
+        "actual original WTF RandomDevice/PageBlock and ProcessID native adapters",
+        "bounded256-byte requests,600-byte canaries and empty requests",
+        "three workers sharing stateless source;three worker and process lifecycles",
+        "missing entropy abort134 within bounded retry budget;empty request and new process still run",
+        "zero user heap,strict cold PMM equality,preemption and zero queued futexes"
+      ],
+      "limits": [
+        "native OS-service component,not entropy quality certification,full WTF,engine or browser",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    },
+    "uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "87c06dcb1ec34718b5a64bfba7e51dddf2498fadf90d5d3f84f80095a3c52e8f",
+      "source": "disposable CHFS native application",
+      "cold_free_pages": 500194,
+      "free_pages_before": 500194,
+      "free_pages_after": 500194,
+      "timer_preemptions_before": 0,
+      "timer_preemptions_after": 167,
+      "entropy_available": true,
+      "checks": [
+        "actual original WTF RandomDevice/PageBlock and ProcessID native adapters",
+        "bounded256-byte requests,600-byte canaries and empty requests",
+        "three workers sharing stateless source;three worker and process lifecycles",
+        "denied RNG/PID and read-only output abort134 without user fault",
+        "zero user heap,strict cold PMM equality,preemption and zero queued futexes"
+      ],
+      "limits": [
+        "native OS-service component,not entropy quality certification,full WTF,engine or browser",
+        "QEMU evidence,new Fusion/Pi/laptop qualification NOT RUN"
+      ]
+    }
+  },
+  "upstream_WTF_units": {
+    "status": "BUILT",
+    "units": [
+      "RandomDevice.cpp",
+      "PageBlock.cpp"
+    ],
+    "log_sha256": "0b6986ba9991704e42759e5e3a6037bb3faa925b47dd8f74fd5a09b13acfa6e5"
+  },
+  "investigations": [
+    {
+      "result": "HOST_FIXTURE_COMPILE_FAILED",
+      "reason": "deprecated chained volatile assignment under Werror;split into separate assignments",
+      "log_sha256": "25b2898cc0256c4d63ba99d8f63120dd10adc70aeebd104efd5a14aabd434955"
+    }
+  ],
+  "regression_scope": "native component and modeled fault normal/sanitizer tests;no kernel or input/driver contract changes;full host matrix retained in prior milestone",
+  "open": [
+    "full WTF/JSC compilation and execution",
+    "thread lifecycle/foreign GC suspension",
+    "engine-sized memory/stacks",
+    "modern browser/conformance",
+    "production entropy/TLS/time/trust/update policy",
+    "live Pi5 SDIO/WiFi",
+    "remaining IPv6/multiple-interface and platform gates"
+  ],
+  "binary_publication": "HELD;latest user-test ISO cc29ea8;version remains0.30.0",
+  "guest_evidence_archive": {
+    "archive_sha256": "8c6d172a0ad7282fc5869385e78c6ea3c15eecd39ef9a0d0e90bb21baec21740",
+    "archive_bytes": 10674970,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  }
+}
