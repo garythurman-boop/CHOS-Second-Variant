@@ -174,3 +174,9 @@ actual upstream parsing,conversion and process helpers with bounded native APIs.
 Eight accepted guest profiles and full host/sanitizer suites qualify this component;
 earlier timeout traces remain recorded. Full WTF still has eight blocked units,
 and subsequent engine/browser,security,wireless and platform gates remain open.
+
+Native self-only CPU/memory snapshots and WTF adapters are described in
+[NATIVE_WTF_RESOURCES.md](NATIVE_WTF_RESOURCES.md). CPU accounting excludes blocked
+and idle intervals and retains completed threads; memory charges owned user
+frames. Unavailable measurements remain explicit. These component services do not
+qualify full WTF/JSC or change the bounded engine memory profile.

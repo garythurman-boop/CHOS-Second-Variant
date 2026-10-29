@@ -339,3 +339,13 @@ actual upstream parsing,conversion and process helpers with bounded native APIs.
 Eight accepted guest profiles and full host/sanitizer suites qualify this component;
 earlier timeout traces remain recorded. Full WTF still has eight blocked units,
 and subsequent engine/browser,security,wireless and platform gates remain open.
+
+The checked JSCOnly profile now selects native CPUTime and memory-footprint
+adapters backed by the real scheduler/resource service. Original upstream CPUTime
+and clock units execute in direct/UEFI fixtures, with sleep excluded from CPU
+usage, exited-worker aggregation, independent process generations and real page
+ownership checks. See [NATIVE_WTF_RESOURCES.md](NATIVE_WTF_RESOURCES.md).
+The latest full WTF build still has six blocked units: FileHandle, FileSystem,
+Int128, FileHandlePOSIX, FileSystemPOSIX and UniStdExtrasUnix. Their native
+filesystem/iostream dependencies and complete linking/runtime remain unqualified;
+this is neither a JavaScript engine nor a modern browser completion claim.

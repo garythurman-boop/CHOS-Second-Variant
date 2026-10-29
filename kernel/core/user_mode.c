@@ -85,8 +85,10 @@ int user_mode_execute_with_tls(address_space_handle_t space, uint64_t entry,
 
     *faulted_out = 0;
     /* SP/DAIF/result storage is on this task's EL1 stack, never shared globally. */
+    scheduler_account_user_entry();
     trampoline_status = chos_enter_el0(entry, user_stack_top, argc, argv, faulted_out,tls);
 
+    scheduler_account_kernel_entry();
     if (activated_here) {
         chos_atomic_store_u32(&user_mode_session_active, 0u);
         if (address_space_deactivate() != AS_OK) {

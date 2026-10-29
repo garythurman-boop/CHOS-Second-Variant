@@ -15,7 +15,7 @@ ASFLAGS := --target=aarch64-none-elf -mcpu=cortex-a72 -g
 LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 
 SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/examples/browser_core.c kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
-             kernel/core/exception.c kernel/core/thread_context.c kernel/core/threads.c kernel/core/futex.c kernel/core/ipc.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/elf_image.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
+             kernel/core/exception.c kernel/core/resource_accounting.c kernel/core/thread_context.c kernel/core/threads.c kernel/core/futex.c kernel/core/ipc.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/elf_image.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
              kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/uefi_vmm.c kernel/mm/uefi_vmm_boot.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/mm/user_memory.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
              kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
              kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/net/net_profile.c kernel/net/net_manager.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
@@ -1499,7 +1499,7 @@ test: test-process-caps $(BUILD)/userland/caps_test.elf
 test-sanitize: test-process-caps-sanitize
 .PHONY: test-process-caps test-process-caps-sanitize
 
-$(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi: include/chos/process_caps.h include/chos/syscall.h include/chos/ipc.h
+$(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi: include/chos/process_caps.h include/chos/syscall.h include/chos/ipc.h include/chos/resource_api.h
 $(BUILD)/userland/libc-cpp-api.o: userland/libchos/include/chos/user.h include/chos/process_caps.h
 
 # FP-enabled native profile: use the real AArch64 floating-point ABI.
@@ -1606,3 +1606,17 @@ test-qemu-guest-cleanup:
 	python3 tests/test_qemu_guest_cleanup.py
 test: test-qemu-guest-cleanup
 .PHONY: test-qemu-guest-cleanup
+
+$(BUILD)/test-resource-accounting: tests/test_resource_accounting.c kernel/core/resource_accounting.c include/chos/resource_accounting.h include/chos/process_caps.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 -Iinclude tests/test_resource_accounting.c kernel/core/resource_accounting.c -o $@
+$(SAN_DIR)/test-resource-accounting: tests/test_resource_accounting.c kernel/core/resource_accounting.c include/chos/resource_accounting.h include/chos/process_caps.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -Iinclude tests/test_resource_accounting.c kernel/core/resource_accounting.c -o $@
+test-resource-accounting: $(BUILD)/test-resource-accounting
+	./$(BUILD)/test-resource-accounting
+test-resource-accounting-sanitize: $(SAN_DIR)/test-resource-accounting
+	./$(SAN_DIR)/test-resource-accounting
+test: test-resource-accounting
+test-sanitize: test-resource-accounting-sanitize
+.PHONY: test-resource-accounting test-resource-accounting-sanitize

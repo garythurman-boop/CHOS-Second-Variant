@@ -5,11 +5,19 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [UTC/date/UTF/process component](NATIVE_WTF_CALENDAR.md) runs actual
+The latest [native CPU/memory component](NATIVE_WTF_RESOURCES.md) measures real
+active process/thread dispatch intervals and owned user-frame memory. Fourteen
+accepted guest profiles and the full host/sanitizer suites qualify the service
+and regression coverage. Initial typing/TLS timeouts are retained; the typing
+fixture now waits for physical release across focus cancellation, and separate
+reruns pass with original deadlines. The latest full WTF attempt has six blocked
+filesystem/iostream units; complete linking/runtime/browser/wireless remain open.
+
+The preceding [UTC/date/UTF/process component](NATIVE_WTF_CALENDAR.md) runs actual
 WTF date parsing,Unicode conversion and termination paths in native guests.
 Eight accepted profiles,independent calendar oracles and full host/sanitizer
 suites qualify this component. Initial timeout traces remain recorded alongside
-identical-input individual passes. The full WTF attempt now has eight blocked
+identical-input individual passes. At that checkpoint, the full WTF attempt had eight blocked
 compilation units;complete linking/runtime and every full browser gate remain open.
 
 The preceding [numeric/search component](NATIVE_CHARCONV.md) supplies original
@@ -504,3 +512,12 @@ fails on missing libc++ bit-operation headers and sys/mman.h. This is a genuine
 configuration milestone, not a built/running engine or modern browser. Full
 runtime/memory integration, browser security/rendering/features, live WiFi and
 independent target qualification remain open. No new ISO or0.50.0 release.
+
+Native WTF resource milestone: checked self-only process/thread CPU intervals and
+owned user-frame memory snapshots now execute through the selected CHOS adapters.
+Direct and UEFI resource fixtures pass three strict cold-cleanup lifecycles;
+full host and ASan/UBSan suites pass. CPU tests distinguish active work from real
+sleep and retain reaped workers; memory tests follow allocation/protection/release.
+See [NATIVE_WTF_RESOURCES.md](NATIVE_WTF_RESOURCES.md). Full WTF still has six
+filesystem/iostream compilation blockers, with engine runtime/browser and Wi-Fi
+requirements still open. Stage 3 and version 0.50.0 are not complete.

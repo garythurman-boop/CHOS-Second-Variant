@@ -125,10 +125,10 @@ index 1e131303..842b94cf 100644
 
  } // namespace WTF
 diff --git a/Source/WTF/wtf/PlatformJSCOnly.cmake b/Source/WTF/wtf/PlatformJSCOnly.cmake
-index a2328be2..22158d72 100644
+index a2328be2..92d80907 100644
 --- a/Source/WTF/wtf/PlatformJSCOnly.cmake
 +++ b/Source/WTF/wtf/PlatformJSCOnly.cmake
-@@ -36,13 +36,22 @@ else ()
+@@ -36,14 +36,25 @@ else ()
          generic/MainThreadGeneric.cpp
 
          posix/OSAllocatorPOSIX.cpp
@@ -139,6 +139,7 @@ index a2328be2..22158d72 100644
          unix/LanguageUnix.cpp
          unix/LoggingUnix.cpp
      )
+-    if (WTF_OS_FUCHSIA)
 +    if (WTF_OS_CHOS)
 +        if (NOT EXISTS "${CHOS_WTF_PLATFORM_DIR}/ThreadingPrimitivesCHOS.cpp")
 +            message(FATAL_ERROR "Set CHOS_WTF_PLATFORM_DIR to the checked native WTF port")
@@ -149,9 +150,24 @@ index a2328be2..22158d72 100644
 +    else ()
 +        list(APPEND WTF_SOURCES posix/ThreadingPOSIX.cpp)
 +    endif ()
-     if (WTF_OS_FUCHSIA)
++    if (WTF_OS_CHOS)
++        list(APPEND WTF_SOURCES "${CHOS_WTF_PLATFORM_DIR}/CPUTimeCHOS.cpp")
++    elseif (WTF_OS_FUCHSIA)
          list(APPEND WTF_SOURCES
              fuchsia/CPUTimeFuchsia.cpp
+         )
+@@ -76,6 +87,11 @@ if (WIN32)
+         win/MemoryFootprintWin.cpp
+         win/MemoryPressureHandlerWin.cpp
+     )
++elseif (WTF_OS_CHOS)
++    list(APPEND WTF_SOURCES
++        "${CHOS_WTF_PLATFORM_DIR}/MemoryFootprintCHOS.cpp"
++        generic/MemoryPressureHandlerGeneric.cpp
++    )
+ elseif (APPLE)
+     file(COPY mac/MachExceptions.defs DESTINATION ${WTF_DERIVED_SOURCES_DIR})
+     add_custom_command(
 diff --git a/Source/WTF/wtf/PlatformOS.h b/Source/WTF/wtf/PlatformOS.h
 index e3184e90..ce69af39 100644
 --- a/Source/WTF/wtf/PlatformOS.h

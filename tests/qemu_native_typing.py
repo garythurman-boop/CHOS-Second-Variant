@@ -156,10 +156,17 @@ try:
  browser_lengths=delete(browser_pid,browser,'address',512);blink('native-browser',760)
  key('esc');wait(lambda:foreground('CHOS Console'),6,'Console focus restored after browser close')
  checks+=['actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)']
- state('backspace',True);time.sleep(.05)
+ state('backspace',True)
+ wait(lambda:int.from_bytes(g.block('repeat_key',size=2),'little')==14,3,'old window accepts held Backspace before focus changes')
  editor_pid=spawn('/BIN/TEXTVIEW.CHX','/DOCUMENTS/REPEAT.TXT','CHOS Text Editor')
  time.sleep(.65);assert app_text(editor_pid,editor,'document',8192)==document.read_bytes(),'focus change must cancel held deletion'
+ # Focus changes already clear repeat_key. That is not a physical key-up
+ # acknowledgement: immediately repressing may coalesce the USB reports and
+ # leave the new window with no press edge. Wait for the normalized release.
+ released_before=int.from_bytes(g.block('chos_input_diagnostics',size=8),'little')
  state('backspace',False)
+ wait(lambda:int.from_bytes(g.block('chos_input_diagnostics',size=8),'little')>released_before,
+  3,'physical Backspace release delivered after focus cancellation')
  document_lengths=delete(editor_pid,editor,'document',8192);blink('native-editor',640)
  old_caret_y=probe.foreground()['caret']['y']
  key('ret');key('a')

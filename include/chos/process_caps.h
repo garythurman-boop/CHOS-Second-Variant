@@ -5,13 +5,13 @@
 /* Permission bits1..62 keep the positive signed-result ABI. SEEK63 uses
  * the existing READ9 permission class rather than consuming the sign bit.
  * MEMORY_CONTROL64/UNMAP_RANGE65 share MAP35/UNMAP36; current-thread context66
- * shares the read-only THREAD_INFO57 class. */
+ * and self-resource snapshot67 share the read-only THREAD_INFO57 class. */
 #define CHOS_PROCESS_SYSCALL_LIMIT 62u
 _Static_assert(CHOS_PROCESS_SYSCALL_LIMIT<63u,"syscall permissions must fit a positive64-bit mask");
 #define CHOS_PROCESS_CAP(n) (UINT64_C(1)<<(n))
 #define CHOS_PROCESS_CAP_SEEK CHOS_PROCESS_CAP(CHOS_SYS_READ)
 static inline uint64_t chos_process_syscall_capability(uint32_t number){
- if(number==CHOS_SYS_THREAD_CONTEXT)return CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO);
+ if(number==CHOS_SYS_RESOURCE_INFO||number==CHOS_SYS_THREAD_CONTEXT)return CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO);
  if(number==CHOS_SYS_SEEK)return CHOS_PROCESS_CAP_SEEK;
  if(number==CHOS_SYS_MEMORY_CONTROL)return CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY);
  if(number==CHOS_SYS_UNMAP_RANGE)return CHOS_PROCESS_CAP(CHOS_SYS_UNMAP_MEMORY);

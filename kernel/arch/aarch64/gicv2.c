@@ -134,7 +134,7 @@ int interrupt_controller_ready(void) {
     return controller_ready;
 }
 
-chos_irq_context_t *interrupt_irq_dispatch(chos_irq_context_t *context) {
+static chos_irq_context_t *irq_dispatch_inner(chos_irq_context_t *context) {
     uint32_t acknowledge;
     uint32_t interrupt_id;
 
@@ -215,4 +215,11 @@ uint64_t interrupt_context_last_elr(void) {
 
 uint64_t interrupt_context_last_spsr(void) {
     return last_irq_spsr;
+}
+
+chos_irq_context_t *interrupt_irq_dispatch(chos_irq_context_t *context) {
+    scheduler_account_kernel_entry();
+    chos_irq_context_t *result = irq_dispatch_inner(context);
+    scheduler_account_exception_return(result);
+    return result;
 }

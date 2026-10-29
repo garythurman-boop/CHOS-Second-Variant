@@ -192,3 +192,11 @@ actual upstream parsing,conversion and process helpers with bounded native APIs.
 Eight accepted guest profiles and full host/sanitizer suites qualify this component;
 earlier timeout traces remain recorded. Full WTF still has eight blocked units,
 and subsequent engine/browser,security,wireless and platform gates remain open.
+
+The native engine platform now has real self-only CPU and memory accounting:
+[resource service and WTF qualification](NATIVE_WTF_RESOURCES.md). Architectural
+counter intervals are split at native user/kernel boundaries and paused during
+blocked/idle execution. Process totals retain exited threads without exposing
+foreign state; memory charges owned user frames. Complete WTF linking, GC/thread
+lifecycle, JavaScript execution, browser rendering/network integration and native
+Pi 5 Wi-Fi remain open. No version/completion gate changes from this prerequisite.

@@ -6,6 +6,7 @@
 #include "chos/task_stack_layout.h"
 #include "chos/irq_context.h"
 #include "chos/address_space.h"
+#include "chos/resource_api.h"
 
 #define CHOS_TASK_NAME_CAPACITY 16u
 #define CHOS_SCHED_NO_INDEX ((size_t)-1)
@@ -59,6 +60,12 @@ typedef struct {
 /* Cooperative scheduling is the default. Timer preemption is opt-in and intended
  * for development/testing only until SMP, syscall and device-driver locking exist. */
 void scheduler_init(void);
+/* Observation only: mode boundaries do not change dispatch policy. */
+void scheduler_account_kernel_entry(void);
+void scheduler_account_exception_return(const chos_irq_context_t *);
+void scheduler_account_user_entry(void);
+/* CPU fields only, owned current process/thread snapshot; no foreign handles. */
+int scheduler_current_resource_info(chos_resource_info_t *);
 /* `argument` is a borrowed pointer; the caller owns its lifetime and cleanup. */
 int scheduler_create_task(const char *name, scheduler_task_entry_t entry,
                           void *argument, uint32_t *task_id_out);

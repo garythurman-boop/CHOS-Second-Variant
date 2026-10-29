@@ -451,7 +451,7 @@ static uint64_t syscall_spawn_via_kernel_service(const char *path, const char *a
     }
 }
 
-chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
+static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) {
     uint64_t ec, far;
     address_space_handle_t fault_space;
     if (frame == NULL) {
@@ -494,6 +494,19 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
             case CHOS_SYS_FUTEX_WAKE:
                 if(frame->x[1]>CHOS_SCHED_MAX_TASKS){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 frame->x[0]=(uint64_t)(int64_t)chos_futex_wake(fault_space,frame->x[0],(unsigned)frame->x[1]);return frame;
+            case CHOS_SYS_RESOURCE_INFO: {
+                chos_resource_info_t info = {.version=CHOS_RESOURCE_VERSION,.size_bytes=sizeof(info)};
+                if (frame->x[1]!=sizeof(info)||frame->x[2]) {frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if (!syscall_user_range_writable(fault_space,frame->x[0],sizeof(info))) {frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                address_space_info_t memory;
+                if (!address_space_get_info(fault_space,&memory)) {frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                info.flags=CHOS_RESOURCE_MEMORY_VALID;
+                info.mapped_bytes=(uint64_t)memory.mapped_user_pages*VMM_PAGE_SIZE;
+                info.resident_bytes=(uint64_t)memory.owned_user_frames*VMM_PAGE_SIZE;
+                (void)scheduler_current_resource_info(&info);
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&info,sizeof(info))?0u:neg_errno(CHOS_ERRNO_EFAULT);
+                return frame;
+            }
             case CHOS_SYS_THREAD_CONTEXT: {
                 chos_thread_context_t context;uint32_t tid;uint64_t base,bytes;
                 if(frame->x[1]!=sizeof(context)||frame->x[2]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
@@ -1253,4 +1266,13 @@ chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
     uart_puts("\n");
     user_mode_force_return(frame, (int64_t)(-128 - (int64_t)ec));
     return frame;
+}
+
+/* Account actual EL0/EL1 boundaries around every return path. IRQ entry/return
+ * separately handles interruptions and dispatches while a syscall blocks. */
+chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
+    scheduler_account_kernel_entry();
+    chos_irq_context_t *result = chos_threads_cancel_return(lower_sync_dispatch_inner(frame));
+    scheduler_account_exception_return(result);
+    return result;
 }

@@ -3,6 +3,7 @@
 #include "chos/scheduler.h"
 #include "chos/timer.h"
 #include "chos/uart.h"
+#include "chos/resource_accounting.h"
 
 #define SCHED_CONTEXT_GPR_COUNT 12u
 #define SCHED_CONTROL_STACK_SIZE (8u * 1024u)
@@ -23,6 +24,7 @@ _Static_assert((CHOS_TASK_STACK_SLOT_SIZE % CHOS_TASK_STACK_GUARD_SIZE) == 0u,
 
 typedef struct {
     scheduler_cpu_context_t context;
+    chos_cpu_account_t cpu;
     scheduler_task_entry_t entry;
     void *argument;
     chos_irq_context_t *irq_frame;
@@ -33,6 +35,14 @@ typedef struct {
 } scheduler_task_t;
 
 static scheduler_task_t tasks[CHOS_SCHED_MAX_TASKS];
+/* Full generation identity prevents a reused AS slot inheriting an old process.
+ * A scheduler pin prevents reuse while any old thread may still execute. */
+static struct {
+    address_space_handle_t space;
+    chos_cpu_account_t cpu;
+} process_cpu[CHOS_AS_MAX_SPACES];
+static size_t accounting_slot = CHOS_SCHED_NO_INDEX;
+
 static scheduler_task_state_t task_states[CHOS_SCHED_MAX_TASKS];
 static uint64_t task_wake_ticks[CHOS_SCHED_MAX_TASKS];
 static uint8_t task_reap_pending[CHOS_SCHED_MAX_TASKS];
@@ -75,6 +85,32 @@ static void scheduler_preemptive_bootstrap_trampoline(void) __attribute__((noret
 static void scheduler_preemptive_idle_trampoline(void) __attribute__((noreturn));
 
 
+/* All helpers below execute with local IRQs masked. These fixed BSS records
+ * never acquire AS/process/heap locks, including on IRQ entry and return. */
+static int accounting_owner(size_t slot) {
+    if (slot >= CHOS_SCHED_MAX_TASKS || !tasks[slot].has_address_space) return 0;
+    address_space_handle_t a = tasks[slot].address_space;
+    if (a.slot >= CHOS_AS_MAX_SPACES) return 0;
+    address_space_handle_t b = process_cpu[a.slot].space;
+    return a.id == b.id && a.generation == b.generation && a.slot == b.slot;
+}
+static void accounting_transition(size_t slot, uint64_t now, unsigned mode) {
+    if (!accounting_owner(slot)) return;
+    chos_cpu_account_transition(&tasks[slot].cpu,
+        &process_cpu[tasks[slot].address_space.slot].cpu, now, mode);
+}
+static void accounting_stop(void) {
+    if (accounting_slot < CHOS_SCHED_MAX_TASKS)
+        accounting_transition(accounting_slot, timer_counter(), CHOS_CPU_STOPPED);
+    accounting_slot = CHOS_SCHED_NO_INDEX;
+}
+static void accounting_dispatch(size_t slot) {
+    uint64_t now = timer_counter();
+    accounting_transition(accounting_slot, now, CHOS_CPU_STOPPED);
+    accounting_slot = accounting_owner(slot) ? slot : CHOS_SCHED_NO_INDEX;
+    accounting_transition(accounting_slot, now, CHOS_CPU_KERNEL);
+}
+
 /* Run with local IRQs masked (or from the IRQ dispatcher). Each process root
  * contains the same privileged kernel mappings, so scheduler code/stacks remain
  * accessible before and after TTBR0 changes. */
@@ -94,6 +130,7 @@ static int scheduler_activate_task_root(size_t slot) {
     }
     after = vmm_current_root_table_address();
     if (before != after) ++address_space_switches;
+    accounting_dispatch(slot);
     return 1;
 }
 
@@ -106,6 +143,7 @@ static int scheduler_activate_kernel_root(void) {
         return 0;
     }
     if (before != vmm_current_root_table_address()) ++address_space_switches;
+    accounting_stop();
     return 1;
 }
 
@@ -119,6 +157,42 @@ static uint64_t scheduler_critical_enter(void) {
 
 static void scheduler_critical_leave(uint64_t daif) {
     __asm__ volatile("msr daif, %0\n\tisb" :: "r"(daif) : "memory");
+}
+
+static void accounting_mode(unsigned mode) {
+    uint64_t daif = scheduler_critical_enter();
+    if (scheduler_running && current_slot < CHOS_SCHED_MAX_TASKS &&
+        task_states[current_slot] == SCHED_TASK_RUNNING && accounting_owner(current_slot)) {
+        accounting_slot = current_slot;
+        accounting_transition(current_slot, timer_counter(), mode);
+    }
+    scheduler_critical_leave(daif);
+}
+void scheduler_account_kernel_entry(void) { accounting_mode(CHOS_CPU_KERNEL); }
+void scheduler_account_user_entry(void) { accounting_mode(CHOS_CPU_USER); }
+void scheduler_account_exception_return(const chos_irq_context_t *frame) {
+    if (frame) accounting_mode((frame->spsr & 15u) ? CHOS_CPU_KERNEL : CHOS_CPU_USER);
+}
+int scheduler_current_resource_info(chos_resource_info_t *out) {
+    if (!out) return 0;
+    uint64_t daif = scheduler_critical_enter();
+    size_t slot = current_slot;
+    if (!scheduler_running || slot >= CHOS_SCHED_MAX_TASKS ||
+        task_states[slot] != SCHED_TASK_RUNNING || !accounting_owner(slot)) {
+        scheduler_critical_leave(daif); return 0;
+    }
+    if (accounting_slot == slot)
+        accounting_transition(slot, timer_counter(), tasks[slot].cpu.mode);
+    chos_cpu_account_t t = tasks[slot].cpu;
+    chos_cpu_account_t p = process_cpu[tasks[slot].address_space.slot].cpu;
+    uint64_t frequency = timer_frequency_hz();
+    if (t.valid && p.valid && frequency) {
+        out->flags |= CHOS_RESOURCE_CPU_VALID;
+        out->counter_frequency = frequency;
+        out->process_user_ticks = p.user_ticks; out->process_system_ticks = p.system_ticks;
+        out->thread_user_ticks = t.user_ticks; out->thread_system_ticks = t.system_ticks;
+    }
+    scheduler_critical_leave(daif); return 1;
 }
 
 static void copy_name(char *destination, const char *source) {
@@ -244,11 +318,17 @@ void scheduler_init(void) {
         tasks[i].address_space = (address_space_handle_t){0u, 0u, 0u};
         tasks[i].has_address_space = 0;
         tasks[i].id = 0u;
+        chos_cpu_account_init(&tasks[i].cpu);
         tasks[i].name[0] = '\0';
     }
     for (i = 0u; i < SCHED_CONTEXT_GPR_COUNT; ++i) scheduler_context.x19_x30[i] = 0u;
     scheduler_context.sp = 0u;
     current_slot = CHOS_SCHED_NO_INDEX;
+    accounting_slot = CHOS_SCHED_NO_INDEX;
+    for (i = 0; i < CHOS_AS_MAX_SPACES; ++i) {
+        process_cpu[i].space = (address_space_handle_t){0};
+        chos_cpu_account_init(&process_cpu[i].cpu);
+    }
     next_task_id = 1u;
     created_tasks = 0u;
     completed_tasks = 0u;
@@ -315,6 +395,11 @@ static int scheduler_create_task_internal(const char *name,
     tasks[slot].has_address_space = address_space != NULL;
     tasks[slot].address_space = address_space != NULL
         ? *address_space : (address_space_handle_t){0u, 0u, 0u};
+    chos_cpu_account_init(&tasks[slot].cpu);
+    if (address_space && !accounting_owner(slot)) {
+        process_cpu[address_space->slot].space = *address_space;
+        chos_cpu_account_init(&process_cpu[address_space->slot].cpu);
+    }
     initialize_task_irq_frame(slot);
     tasks[slot].id = next_task_id++;
     /* Exhaustion never recycles a task identity while old records may exist. */
@@ -422,6 +507,7 @@ void scheduler_yield(void) {
     wake_due_tasks_locked();
     task_states[current] = SCHED_TASK_READY;
     if (preemption_requested) {
+        accounting_stop();
         volatile scheduler_task_state_t *observed_state = &task_states[current];
         /* Wait until an IRQ actually selects this saved frame again before returning. */
         scheduler_critical_leave(daif);
@@ -477,6 +563,7 @@ void scheduler_sleep_ticks(uint64_t ticks) {
     wake_due_tasks_locked();
 
     if (preemption_requested) {
+        accounting_stop();
         volatile scheduler_task_state_t *observed_state = &task_states[current];
         scheduler_critical_leave(daif);
         /* The timer IRQ suspends this stack; the call returns only after wakeup. */
@@ -521,6 +608,7 @@ int scheduler_prepare_sleep_ticks(uint64_t ticks){
  }
  task_states[current_slot]=SCHED_TASK_SLEEPING;
  task_wake_ticks[current_slot]=sleep_deadline(timer_ticks(),ticks);++sleep_calls;
+ accounting_stop();
  scheduler_critical_leave(flags);return 1;
 }
 void scheduler_await_dispatch(void){
@@ -559,6 +647,7 @@ void scheduler_exit_current(void) {
         for (;;) __asm__ volatile("wfe");
     }
     current = current_slot;
+    accounting_stop();
     task_states[current] = SCHED_TASK_DEAD;
     task_wake_ticks[current] = 0u;
     task_reap_pending[current] = 1u;
