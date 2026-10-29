@@ -529,3 +529,15 @@ sleep and retain reaped workers; memory tests follow allocation/protection/relea
 See [NATIVE_WTF_RESOURCES.md](NATIVE_WTF_RESOURCES.md). Full WTF still has six
 filesystem/iostream compilation blockers, with engine runtime/browser and Wi-Fi
 requirements still open. Stage 3 and version 0.50.0 are not complete.
+
+### Conditional CHFS snapshot prerequisite
+
+Kernel-private snapshot leases now distinguish mount, record identity and file
+revision, with conditional commits that refuse stale concurrent writers and
+same-metadata delete/recreate. Existing mutation wrappers participate. A lower
+I/O failure quarantines writes until a verified remount plus real recovery flush;
+missing backend flush support leaves discovery/read access available without
+claiming writable storage. See [the contract](NATIVE_STORAGE_SNAPSHOTS.md) and the
+associated validation manifest for fault and regression evidence. Public writable
+file descriptors, full engine filesystem integration and browser storage remain
+unimplemented by this prerequisite.

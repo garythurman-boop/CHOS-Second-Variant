@@ -3,6 +3,7 @@
 #include "chos/romfs.h"
 #include "chos/spinlock.h"
 #include "chos/gpt.h"
+#include "chos/syscall.h"
 
 static chos_block_device_t boot_disk; /* whole physical device */
 static chos_block_device_t gpt_fs_disk; /* bounded CHOS partition view, if present */
@@ -10,11 +11,89 @@ static chos_block_slice_context_t gpt_fs_context;
 static chos_gpt_partition_t gpt_partitions[CHOS_GPT_MAX_PARTITIONS];
 static chos_block_device_t *filesystem_disk;
 static chos_chfs_t root_fs;
+static chos_block_device_t checked_fs_disk;
+static chos_storage_versions_t file_versions;
+/* Fixed scratch is serialized by storage_lock; never put a32KiB catalogue on
+ * a16KiB kernel stack or allocate while the I/O/IRQ ownership lock is held. */
+static chos_chfs_entry_t previous_entries[CHOS_CHFS_MAX_FILES];
+static int operation_failed,operation_wrote,write_uncertain,recovering_mount;
+
 static int disk_ready;
 static int fs_ready;
 static int format_allowed;
 static chos_gpt_error_t last_gpt_result = CHOS_GPT_ERR_ARGUMENT;
 static chos_spinlock_t storage_lock = CHOS_SPINLOCK_INITIALIZER;
+
+static int checked_read(chos_block_device_t *device,uint64_t lba,uint32_t count,void *buffer){
+    chos_block_device_t *parent=(chos_block_device_t *)device->context;
+    int result=block_read(parent,lba,count,buffer);
+    if(!result)operation_failed=1;
+    return result;
+}
+static int checked_write(chos_block_device_t *device,uint64_t lba,uint32_t count,const void *buffer){
+    /* An allocator backup-read failure must not be followed by a data write
+     * that could overwrite extents whose ownership was not established. */
+    if(operation_failed||(write_uncertain&&!recovering_mount))return 0;
+    operation_wrote=1;
+    int result=block_write((chos_block_device_t *)device->context,lba,count,buffer);
+    if(!result){operation_failed=1;write_uncertain=1;}
+    return result;
+}
+static int checked_flush(chos_block_device_t *device){
+    if(operation_failed||(write_uncertain&&!recovering_mount))return 0;
+    int result=block_flush((chos_block_device_t *)device->context);
+    if(!result){operation_failed=1;write_uncertain=1;}
+    return result;
+}
+static void operation_begin(void){operation_failed=operation_wrote=0;}
+static void configure_checked_disk(void){
+    checked_fs_disk=*filesystem_disk;
+    checked_fs_disk.context=filesystem_disk;
+    checked_fs_disk.read=checked_read;
+    /* Missing flush cannot establish durable writes; keep read-only discovery
+     * functional rather than manufacture a flush acknowledgement. */
+    checked_fs_disk.write=filesystem_disk->write&&filesystem_disk->flush?checked_write:NULL;
+    checked_fs_disk.flush=filesystem_disk->flush?checked_flush:NULL;
+}
+static int mount_checked(void){
+    int needs_flush=write_uncertain;
+    chos_storage_versions_invalidate(&file_versions);
+    if(!filesystem_disk)return 0;
+    configure_checked_disk();operation_begin();recovering_mount=1;
+    int result=chfs_mount(&root_fs,&checked_fs_disk);
+    /* Reading a complete catalogue does not acknowledge pending device-cache
+     * writes after a failed flush. Require a real recovery flush before making
+     * that selected catalogue writable again. */
+    if(result&&needs_flush&&filesystem_disk->write&&filesystem_disk->flush&&!operation_failed)
+        (void)checked_flush(&checked_fs_disk);
+    recovering_mount=0;
+    if(result){
+        if(!operation_failed)write_uncertain=0;
+        else write_uncertain=1;
+        if(!chos_storage_versions_mount(&file_versions,root_fs.entries))write_uncertain=1;
+    }
+    return result;
+}
+static int write_ready_locked(void){
+    return fs_ready&&filesystem_disk&&filesystem_disk->write&&filesystem_disk->flush&&
+        !write_uncertain&&chos_storage_versions_can_mutate(&file_versions);
+}
+static void mutation_begin(void){
+    operation_begin();
+    for(size_t i=0;i<CHOS_CHFS_MAX_FILES;i++)previous_entries[i]=root_fs.entries[i];
+}
+static size_t catalogue_index(const char *path){
+    for(size_t i=0;i<CHOS_CHFS_MAX_FILES;i++)if(root_fs.entries[i].path[0]&&romfs_path_equal(path,root_fs.entries[i].path))return i;
+    return SIZE_MAX;
+}
+static int mutation_finish(int result,const char *changed_path){
+    if(operation_failed&&operation_wrote)write_uncertain=1;
+    size_t force=result&&changed_path?catalogue_index(changed_path):SIZE_MAX;
+    if(!chos_storage_versions_update(&file_versions,previous_entries,root_fs.entries,force)){
+        write_uncertain=1;return 0;
+    }
+    return result&&!operation_failed;
+}
 
 static int path_has_child(const char *directory, const char *path) {
     size_t n = 0u, i;
@@ -40,9 +119,10 @@ int storage_attach_block_device(chos_block_device_t *device) {
     boot_disk = *device;
     disk_ready = 1;
     fs_ready = 0;
+    chos_storage_versions_invalidate(&file_versions);
     filesystem_disk = &boot_disk;
     format_allowed = 1; /* raw unpartitioned CHFS images remain supported for QEMU */
-    if (chfs_mount(&root_fs, &boot_disk)) {
+    if (mount_checked()) {
         fs_ready = 1;
         chos_spin_unlock_irqrestore(&storage_lock, flags);
         return 1;
@@ -64,7 +144,7 @@ int storage_attach_block_device(chos_block_device_t *device) {
                                        part->first_lba, part_sectors, "chos-gpt-data")) continue;
             filesystem_disk = &gpt_fs_disk;
             format_allowed = 1; /* explicit shell mkfs may format this CHOS partition only */
-            if (chfs_mount(&root_fs, filesystem_disk)) { fs_ready = 1; mounted = 1; break; }
+            if (mount_checked()) { fs_ready = 1; mounted = 1; break; }
         }
         (void)mounted;
     } else {
@@ -83,23 +163,36 @@ int storage_init(void) {
     if (!virtio_blk_init(&device)) return 0;
     return storage_attach_block_device(&device);
 }
-const char *storage_error(void) { return virtio_blk_last_error(); }
+const char *storage_error(void) {
+    if(write_uncertain)return "filesystem I/O uncertain; writes require a verified remount";
+    if(fs_ready&&!chos_storage_versions_can_mutate(&file_versions))return "filesystem identity budget exhausted; writes unavailable";
+    return virtio_blk_last_error();
+}
 int storage_block_ready(void) { return disk_ready; }
 int storage_mounted(void) { return fs_ready; }
 int storage_format(void) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = disk_ready && format_allowed && filesystem_disk != NULL &&
-                 filesystem_disk->write != NULL && chfs_format(filesystem_disk);
-    fs_ready = result ? chfs_mount(&root_fs, filesystem_disk) : 0;
+    chos_storage_versions_invalidate(&file_versions);
+    int result=0;
+    if(disk_ready&&format_allowed&&filesystem_disk&&filesystem_disk->write&&filesystem_disk->flush){
+        configure_checked_disk();operation_begin();recovering_mount=1;
+        result=chfs_format(&checked_fs_disk);recovering_mount=0;
+    }
+    fs_ready=result?mount_checked():0;
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return fs_ready;
 }
 int storage_mount(void) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    fs_ready = disk_ready && filesystem_disk != NULL && chfs_mount(&root_fs, filesystem_disk);
+    fs_ready = disk_ready && filesystem_disk != NULL && mount_checked();
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return fs_ready;
 }
+int storage_write_ready(void){
+    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
+    int result=write_ready_locked();chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
+}
+
 chos_block_device_t *storage_device(void) { return disk_ready ? &boot_disk : 0; }
 chos_chfs_t *storage_filesystem(void) { return fs_ready ? &root_fs : 0; }
 int storage_lookup(const char *path, chos_chfs_entry_t *out) {
@@ -110,43 +203,62 @@ int storage_lookup(const char *path, chos_chfs_entry_t *out) {
 }
 int storage_read_file(const char *path, void *buffer, size_t capacity, size_t *bytes_read) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
+    operation_begin();
     int result = fs_ready && chfs_read_file(&root_fs, path, buffer, capacity, bytes_read);
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
 int storage_write_file(const char *path, const void *data, size_t size) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = fs_ready && chfs_write_file(&root_fs, path, data, size);
+    int result=0;
+    if(write_ready_locked()){
+        mutation_begin();result=mutation_finish(chfs_write_file(&root_fs, path, data, size),path);
+    }
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
 int storage_remove_file(const char *path) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = fs_ready && chfs_remove_file(&root_fs, path);
+    int result=0;
+    if(write_ready_locked()){
+        mutation_begin();result=mutation_finish(chfs_remove_file(&root_fs, path),NULL);
+    }
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
 int storage_rename_file(const char *old_path, const char *new_path) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = fs_ready && chfs_rename_file(&root_fs, old_path, new_path);
+    int result=0;
+    if(write_ready_locked()){
+        mutation_begin();result=mutation_finish(chfs_rename_file(&root_fs, old_path, new_path),new_path);
+    }
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
 int storage_rename_directory(const char *old_path, const char *new_path) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = fs_ready && chfs_rename_directory(&root_fs, old_path, new_path);
+    int result=0;
+    if(write_ready_locked()){
+        mutation_begin();result=mutation_finish(chfs_rename_directory(&root_fs, old_path, new_path),new_path);
+    }
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
 int storage_make_directory(const char *path) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = fs_ready && chfs_make_directory(&root_fs, path);
+    int result=0;
+    if(write_ready_locked()){
+        mutation_begin();result=mutation_finish(chfs_make_directory(&root_fs, path),path);
+    }
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
 int storage_remove_directory(const char *path) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = fs_ready && chfs_remove_directory(&root_fs, path);
+    int result=0;
+    if(write_ready_locked()){
+        mutation_begin();result=mutation_finish(chfs_remove_directory(&root_fs, path),NULL);
+    }
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
@@ -165,7 +277,8 @@ int storage_is_directory(const char *path) {
 }
 int storage_sync(void) {
     uint64_t flags = chos_spin_lock_irqsave(&storage_lock);
-    int result = fs_ready && chfs_sync(&root_fs);
+    operation_begin();
+    int result = fs_ready && filesystem_disk && filesystem_disk->flush && chfs_sync(&root_fs);
     chos_spin_unlock_irqrestore(&storage_lock, flags);
     return result;
 }
@@ -183,4 +296,48 @@ void storage_get_stats(chos_chfs_stats_t *out) {
     chos_spin_unlock_irqrestore(&storage_lock, flags);
 }
 
-void storage_detach(void){disk_ready=0;fs_ready=0;filesystem_disk=0;format_allowed=0;}
+void storage_detach(void){
+    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
+    disk_ready=0;fs_ready=0;filesystem_disk=0;format_allowed=0;
+    chos_storage_versions_invalidate(&file_versions);
+    chos_spin_unlock_irqrestore(&storage_lock,flags);
+}
+
+int storage_read_snapshot(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease){
+    if(!path||!bytes||!lease)return -CHOS_ERRNO_EINVAL;
+    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
+    int result=-CHOS_ERRNO_EIO;
+    if(!fs_ready)goto done;
+    size_t index=catalogue_index(path);
+    if(index==SIZE_MAX){result=-CHOS_ERRNO_ENOENT;goto done;}
+    if(chfs_entry_is_directory(&root_fs.entries[index])){result=-CHOS_ERRNO_EISDIR;goto done;}
+    if(root_fs.entries[index].size_bytes>capacity){result=-CHOS_ERRNO_E2BIG;goto done;}
+    if(root_fs.entries[index].size_bytes&&!buffer){result=-CHOS_ERRNO_EINVAL;goto done;}
+    chos_storage_lease_t value;
+    if(!chos_storage_versions_get(&file_versions,index,&value))goto done;
+    size_t amount=0;operation_begin();
+    if(!chfs_read_file(&root_fs,path,buffer,capacity,&amount)||operation_failed)goto done;
+    *lease=value;*bytes=amount;result=0;
+done:
+    chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
+}
+int storage_commit_snapshot(const char *path,const chos_storage_lease_t *lease,const void *data,size_t size,chos_storage_lease_t *updated){
+    if(!path||!lease||!updated||(!data&&size)||size>CHOS_CHFS_FILE_MAX_BYTES)return -CHOS_ERRNO_EINVAL;
+    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
+    int result=-CHOS_ERRNO_EIO;
+    if(!fs_ready)goto done;
+    if(!chos_storage_versions_match(&file_versions,lease)||
+       !romfs_path_equal(path,root_fs.entries[lease->index].path)){
+        result=-CHOS_ERRNO_ESTALE;goto done;
+    }
+    if(chfs_entry_is_directory(&root_fs.entries[lease->index])){result=-CHOS_ERRNO_EISDIR;goto done;}
+    if(!write_ready_locked()){result=-CHOS_ERRNO_EROFS;goto done;}
+    mutation_begin();
+    int success=mutation_finish(chfs_write_file(&root_fs,path,data,size),path);
+    if(!success){result=operation_failed?-CHOS_ERRNO_EIO:-CHOS_ERRNO_ENOSPC;goto done;}
+    chos_storage_lease_t value;
+    if(!chos_storage_versions_get(&file_versions,lease->index,&value)){write_uncertain=1;goto done;}
+    *updated=value;result=0;
+done:
+    chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
+}

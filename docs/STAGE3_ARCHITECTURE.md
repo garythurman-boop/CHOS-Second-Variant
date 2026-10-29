@@ -208,3 +208,10 @@ corrected the shared copy-to-user helper to prevalidate every destination while
 holding its AS lock through the copy. Fourteen accepted guest profiles and full
 host/sanitizer checks qualify this prerequisite; writable descriptors and browser
 cache/download integration remain unimplemented. No completion/version change.
+
+The CHFS writable-descriptor prerequisite now has kernel-private runtime leases
+and conditional commit, preventing a stale working copy from overwriting a newer
+record. The real block I/O proxy quarantines uncertain writes until verified
+remount and actual flush acknowledgement; it preserves driver descriptor/DMA
+ownership. This does not yet expose writable handles or remove whole-file I/O
+latency and engine storage limits. See `NATIVE_STORAGE_SNAPSHOTS.md`.

@@ -56,7 +56,7 @@ int chos_native_storage_enable_writes(void){
     if(installation_in_progress())return 0;
     uint64_t id,n;
     if(!native_storage_disk.ready || !chos_nvme_snapshot(&id,&n) || id!=native_storage_selected_identity || n!=native_storage_disk.sector_count)return 0;
-    native_storage_writable=storage_attach_block_device(&native_storage_disk) && storage_mounted();
+    native_storage_writable=storage_attach_block_device(&native_storage_disk) && storage_write_ready();
     return native_storage_writable;
 }
 const char *chos_native_storage_status(void){return installation_in_progress()?"Installer owns the target until completion or cancellation.":chos_nvme_last_error();}
@@ -83,13 +83,13 @@ void chos_install_tick(void){
     uint64_t before=timer_counter();
     chos_install_step(&installation);
     uint64_t elapsed=timer_counter()-before;if(elapsed>installer_max_step_counter_ticks)installer_max_step_counter_ticks=elapsed;
-    if(previous!=INSTALL_DONE && installation.state==INSTALL_DONE){native_storage_selected_identity=installation.plan.disk_identity;native_storage_writable=storage_attach_block_device(&native_storage_disk) && storage_mounted();}
+    if(previous!=INSTALL_DONE && installation.state==INSTALL_DONE){native_storage_selected_identity=installation.plan.disk_identity;native_storage_writable=storage_attach_block_device(&native_storage_disk) && storage_write_ready();}
 }
 int chos_persist_display_request(uint32_t width,uint32_t height){
-    if(!native_storage_writable||installation_in_progress())return 0;
+    if(!native_storage_writable||!storage_write_ready()||installation_in_progress())return 0;
     return chos_install_save_display(&native_storage_disk,chos_nvme_snapshot,native_storage_selected_identity,width,height);
 }
-int chos_native_storage_is_writable(void){return native_storage_writable;}
+int chos_native_storage_is_writable(void){return native_storage_writable&&storage_write_ready();}
 int chos_native_storage_is_present(void){return native_storage_disk.ready;}
 int chos_install_available(void){return native_storage_boot && !(native_storage_boot->flags&CHOS_BOOT_FLAG_BOOT_NVME) && native_storage_boot->installer_payload_size!=0u;}
 static fdt_info_t boot_device_tree;

@@ -359,3 +359,9 @@ locked. See [NATIVE_POSITIONAL_READS.md](NATIVE_POSITIONAL_READS.md). The engine
 higher-level filesystem binding, writable descriptors, stable inode/metadata and
 cache/download lifecycle still require implementation. These interfaces do not
 by themselves reduce the recorded six full-WTF compilation blockers.
+
+CHFS conditional snapshot commit is now a kernel-private foundation for writable
+engine handles. Runtime identity/revision checks cover all existing mutation
+wrappers, and write/flush uncertainty fails closed. No new public descriptor API,
+POSIX inode metadata, full WTF filesystem build/link or browser persistence is
+claimed. `NATIVE_STORAGE_SNAPSHOTS.md` records the contract and remaining work.
