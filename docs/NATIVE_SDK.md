@@ -142,3 +142,11 @@ run; the original numbers header's widened-double precision limitation is explic
 Actual engine compilation now reaches WTF threading/numeric dependencies beyond
 the earlier fcntl/stderr blocker. This is component evidence, not JavaScript,
 rendering, production entropy, new hardware qualification or Stage3 completion.
+
+The subsequent [native WTF synchronization and clock component](NATIVE_WTF_SERVICES.md)
+executes original primitive/time headers and clock units using real private pthread
+and checked clock services. Original numeric algorithms and transactional native
+header import are qualified. Complete WTF/JSC compilation, Thread lifecycle/GC
+suspension, engine-sized memory and all full browser/wireless/platform gates remain
+open. The development version remains0.30.0; this source work does not replace the
+cc29ea8 user-test ISO or imply Stage3 completion.

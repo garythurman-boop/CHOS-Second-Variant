@@ -5,14 +5,15 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [native bmalloc service milestone](NATIVE_BMALLOC_SERVICES.md) builds
-and executes the actual upstream system-malloc library, including native entropy,
-bounded diagnostics and contended mutexes. Original C++23 expected/hash support
-also runs. Full host/sanitizer suites and the recorded guest matrix pass. The next
-actual engine blockers are WTF threading primitives and the missing numeric header;
-no JavaScript or modern rendering executes yet. This is source-only; the test ISO
-remains cc29ea8/version0.30.0. The earlier [virtual-memory milestone](NATIVE_VIRTUAL_MEMORY.md)
-retains its separate 20-profile evidence and bounded memory limits.
+The latest [native WTF service milestone](NATIVE_WTF_SERVICES.md) executes the
+upstream mutex/condition/TLS headers and actual clock units against CHOS services.
+The private pthread and clock paths fail closed on errors, and original numeric
+algorithms run. Full host/sanitizer suites and the recorded guest regressions pass.
+Actual full WTF compilation next stops at Unix register-context declarations;
+thread lifecycle/GC suspension, JavaScript execution and modern rendering remain
+open. This is source-only; the test ISO remains cc29ea8/version0.30.0. The earlier
+[bmalloc](NATIVE_BMALLOC_SERVICES.md) and [virtual-memory](NATIVE_VIRTUAL_MEMORY.md)
+components retain their separate evidence and bounded memory limits.
 
 Stage 3 is **not complete**. The revised prompt's modern browser, integrated
 production TLS policy, complete isolation/runtime and real Pi 5 wireless

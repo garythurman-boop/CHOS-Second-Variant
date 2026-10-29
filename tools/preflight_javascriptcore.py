@@ -31,6 +31,8 @@ if not changed:
 elif changed!=set(m['patched_files_sha256']):p.error('unexpected reference source changes')
 for name,wanted in m['patched_files_sha256'].items():
  if sha((source/name).read_bytes())!=wanted:p.error('source differs from the recorded patch: '+name)
+for name,wanted in m.get('native_port_files_sha256',{}).items():
+ if sha((root/name).read_bytes())!=wanted:p.error('native port differs from the recorded source: '+name)
 for name,wanted in m['source_files_sha256'].items():
  if name not in m['patched_files_sha256'] and sha((source/name).read_bytes())!=wanted:p.error('modified checked source: '+name)
 programs={}
@@ -45,7 +47,8 @@ command=[programs['cmake'],'-S',str(source),'-B',str(out/'cmake'),'-G','Ninja',
  '-DCMAKE_MAKE_PROGRAM='+programs['ninja'],'-DRuby_EXECUTABLE='+programs['ruby'],
  '-DCMAKE_TOOLCHAIN_FILE='+str(root/('ports/native/chos-toolchain.cmake' if o.native_sdk else 'ports/webkit/chos-compile-preflight.cmake')),
  '-DCMAKE_BUILD_TYPE=Release','-DPORT=JSCOnly','-DENABLE_STATIC_JSC=ON',
- '-DENABLE_JIT=OFF','-DUSE_SYSTEM_MALLOC=ON','-DENABLE_TOOLS=OFF']
+ '-DENABLE_JIT=OFF','-DUSE_SYSTEM_MALLOC=ON','-DENABLE_TOOLS=OFF',
+ '-DCHOS_WTF_PLATFORM_DIR='+str(root/'ports/webkit/chos')]
 if o.native_sdk:
  subprocess.run([sys.executable,str(root/'tools/verify_native_sdk.py'),str(o.native_sdk.resolve())],check=True)
  command.append('-DCHOS_SDK_ROOT='+str(o.native_sdk.resolve()))

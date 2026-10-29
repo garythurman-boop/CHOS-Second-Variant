@@ -1,3 +1,156 @@
+diff --git a/Source/WTF/wtf/CurrentTime.cpp b/Source/WTF/wtf/CurrentTime.cpp
+index f4b97e56..5a7e0a11 100644
+--- a/Source/WTF/wtf/CurrentTime.cpp
++++ b/Source/WTF/wtf/CurrentTime.cpp
+@@ -66,6 +66,17 @@
+
+ namespace WTF {
+
++#if OS(CHOS)
++// The native API reports unavailable/denied clocks. This infallible engine API
++// must fail closed rather than return a fabricated epoch or mutable fallback.
++static timespec checkedNativeClock(clockid_t clock)
++{
++    timespec result;
++    RELEASE_ASSERT(!clock_gettime(clock, &result));
++    return result;
++}
++#endif
++
+ #if OS(WINDOWS)
+
+ // Number of 100 nanosecond between January 1, 1601 and January 1, 1970.
+@@ -213,15 +224,23 @@ double currentTime()
+
+ Int128 currentTimeInNanoseconds()
+ {
++#if OS(CHOS)
++    auto ts = checkedNativeClock(CLOCK_REALTIME);
++#else
+     struct timespec ts { };
+     clock_gettime(CLOCK_REALTIME, &ts);
++#endif
+     return (static_cast<Int128>(ts.tv_sec) * 1'000'000'000) + ts.tv_nsec;
+ }
+
+ static inline double currentTime()
+ {
++#if OS(CHOS)
++    auto ts = checkedNativeClock(CLOCK_REALTIME);
++#else
+     struct timespec ts { };
+     clock_gettime(CLOCK_REALTIME, &ts);
++#endif
+     return static_cast<double>(ts.tv_sec) + ts.tv_nsec / 1'000'000'000.0;
+ }
+
+@@ -303,6 +322,9 @@ MonotonicTime MonotonicTime::now()
+     return fromMachAbsoluteTime(mach_absolute_time());
+ #elif OS(FUCHSIA)
+     return fromRawSeconds(zx_clock_get_monotonic() / static_cast<double>(ZX_SEC(1)));
++#elif OS(CHOS)
++    auto ts = checkedNativeClock(CLOCK_MONOTONIC);
++    return fromRawSeconds(static_cast<double>(ts.tv_sec) + ts.tv_nsec / 1e9);
+ #elif OS(LINUX) || OS(FREEBSD) || OS(OPENBSD) || OS(NETBSD)
+     struct timespec ts { };
+     clock_gettime(CLOCK_MONOTONIC, &ts);
+@@ -344,6 +366,10 @@ ContinuousTime ContinuousTime::now()
+ {
+ #if OS(DARWIN)
+     return fromMachContinuousTime(mach_continuous_time());
++#elif OS(CHOS)
++    // No native suspend/resume service exists in this bounded profile.
++    // Use the real monotonic clock, not the generic mutable wall-clock cache.
++    return fromRawSeconds(MonotonicTime::now().secondsSinceEpoch().value());
+ #elif OS(LINUX) || OS(OPENBSD)
+     struct timespec ts { };
+     clock_gettime(CLOCK_BOOTTIME, &ts);
+@@ -362,6 +388,10 @@ ContinuousApproximateTime ContinuousApproximateTime::now()
+ {
+ #if OS(DARWIN)
+     return fromMachContinuousApproximateTime(mach_continuous_approximate_time());
++#elif OS(CHOS)
++    // No native suspend/resume service exists in this bounded profile.
++    // Use the real monotonic clock, not the generic mutable wall-clock cache.
++    return fromRawSeconds(MonotonicTime::now().secondsSinceEpoch().value());
+ #elif OS(LINUX) || OS(OPENBSD)
+     struct timespec ts { };
+     clock_gettime(CLOCK_BOOTTIME, &ts);
+diff --git a/Source/WTF/wtf/PlatformJSCOnly.cmake b/Source/WTF/wtf/PlatformJSCOnly.cmake
+index a2328be2..22158d72 100644
+--- a/Source/WTF/wtf/PlatformJSCOnly.cmake
++++ b/Source/WTF/wtf/PlatformJSCOnly.cmake
+@@ -36,13 +36,22 @@ else ()
+         generic/MainThreadGeneric.cpp
+
+         posix/OSAllocatorPOSIX.cpp
+-        posix/ThreadingPOSIX.cpp
+
+         text/unix/TextBreakIteratorInternalICUUnix.cpp
+
+         unix/LanguageUnix.cpp
+         unix/LoggingUnix.cpp
+     )
++    if (WTF_OS_CHOS)
++        if (NOT EXISTS "${CHOS_WTF_PLATFORM_DIR}/ThreadingPrimitivesCHOS.cpp")
++            message(FATAL_ERROR "Set CHOS_WTF_PLATFORM_DIR to the checked native WTF port")
++        endif ()
++        list(APPEND WTF_SOURCES
++            "${CHOS_WTF_PLATFORM_DIR}/ThreadingPrimitivesCHOS.cpp"
++        )
++    else ()
++        list(APPEND WTF_SOURCES posix/ThreadingPOSIX.cpp)
++    endif ()
+     if (WTF_OS_FUCHSIA)
+         list(APPEND WTF_SOURCES
+             fuchsia/CPUTimeFuchsia.cpp
+diff --git a/Source/WTF/wtf/PlatformOS.h b/Source/WTF/wtf/PlatformOS.h
+index e3184e90..ce69af39 100644
+--- a/Source/WTF/wtf/PlatformOS.h
++++ b/Source/WTF/wtf/PlatformOS.h
+@@ -47,6 +47,11 @@
+ /* ==== OS() - underlying operating system; only to be used for mandated low-level services like
+    virtual memory, not to choose a GUI toolkit ==== */
+
++/* CHOS has its own native ABI; do not infer UNIX/Linux services. */
++#if defined(__CHOS__)
++#define WTF_OS_CHOS 1
++#endif
++
+ /* OS(AIX) - AIX */
+ #if defined(_AIX)
+ #define WTF_OS_AIX 1
+diff --git a/Source/WTF/wtf/PlatformUse.h b/Source/WTF/wtf/PlatformUse.h
+index 0c16afbd..90c2f56b 100644
+--- a/Source/WTF/wtf/PlatformUse.h
++++ b/Source/WTF/wtf/PlatformUse.h
+@@ -119,7 +119,8 @@
+ #define USE_WEB_THREAD 1
+ #endif
+
+-#if OS(UNIX)
++#if OS(UNIX) || OS(CHOS)
++// CHOS supplies a tested private pthread subset, not a complete POSIX OS.
+ #define USE_PTHREADS 1
+ #endif
+
+diff --git a/Source/WTF/wtf/ThreadingPrimitives.h b/Source/WTF/wtf/ThreadingPrimitives.h
+index 5b4c0629..5c98613e 100644
+--- a/Source/WTF/wtf/ThreadingPrimitives.h
++++ b/Source/WTF/wtf/ThreadingPrimitives.h
+@@ -134,7 +134,12 @@ inline void threadSpecificKeyDelete(ThreadSpecificKey key)
+
+ inline void threadSpecificSet(ThreadSpecificKey key, void* value)
+ {
++#if OS(CHOS)
++    // A lost thread-specific binding cannot be treated as successful setup.
++    RELEASE_ASSERT(!pthread_setspecific(key, value));
++#else
+     pthread_setspecific(key, value);
++#endif
+ }
+
+ inline void* threadSpecificGet(ThreadSpecificKey key)
 diff --git a/Source/bmalloc/bmalloc/BPlatform.h b/Source/bmalloc/bmalloc/BPlatform.h
 index b5612278..c9d76f38 100644
 --- a/Source/bmalloc/bmalloc/BPlatform.h

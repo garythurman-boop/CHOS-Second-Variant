@@ -827,7 +827,48 @@
     "include/__expected/unexpect.h": "f78b461d4dd156d54b4a3631e4efa58382662fbb5cc7b078c00683b2773e067a",
     "include/__expected/expected.h": "6303ca3a3135167cc2660d2228941fb4d1fe34d5866730cb75c25c58d9285688",
     "include/__expected/bad_expected_access.h": "03d1ab297e7f403ef00e1c37bd93cef6935b1837e63e86e581d1131d6a066c9f",
-    "include/numbers": "66379e936294194b9437cd9a797d9b999932946269e67adfa4b07ab9ff2f5813"
+    "include/numbers": "66379e936294194b9437cd9a797d9b999932946269e67adfa4b07ab9ff2f5813",
+    "include/numeric": "2252433d19414fe1714d69040db3e75f6fd954291dd351cef1628f02c071fdb4",
+    "include/__numeric/transform_inclusive_scan.h": "10395bfe812a8d60ba61a8c30a78bd57d316cdf2595d03d64cdaf4604d330845",
+    "include/__numeric/transform_exclusive_scan.h": "243bc3a525c0e2bb2cbb51fbad27caef17444b9a041db05437218d45c94f0a6d",
+    "include/__numeric/saturation_arithmetic.h": "7a7408f9b891f6bf1c81c14ac6b9e6fbe9ade0705a67f2428fef9172a88a2d85",
+    "include/__numeric/pstl.h": "d95c96655f101ba060e5ab78b4513f948323b3a69d0c6f3b8ae114427f4f9d5a",
+    "include/__numeric/partial_sum.h": "c86cd3a78b52247a50107f80bd03d3934dfa21dfd9441fa8fa7ae0f89d25d994",
+    "include/__numeric/midpoint.h": "1dada7e796b553d6c77ccff782ce1196cb8890e11012bdab330f7a3b21a01ab9",
+    "include/__numeric/iota.h": "bf7a064ffa56c649c3fcbc6719a084a714873f5a382ca6ebb152b5b010c34236",
+    "include/__numeric/inner_product.h": "6fa7a71437a5c606306dbce2541524350bceff59ff3b65309a9113ccca020660",
+    "include/__numeric/inclusive_scan.h": "724cce224801a986b05f198208097cc5b89811e4722d01f6a66cbaa618515fba",
+    "include/__numeric/gcd_lcm.h": "9abd90a704d67e2635689cd2c59e3b701b33af009b704de139fe26f15f95cb1c",
+    "include/__numeric/exclusive_scan.h": "7c014b25db4e22757d008aff80983dc43829330a674363a2f3f12b3ae38ec464",
+    "include/__numeric/adjacent_difference.h": "9f29e25c380513f6fc10182410b285fde33b752f9db95006a5d50beb032fd885",
+    "include/__numeric/accumulate.h": "7628c656ed2c45537ce3cf1afefcf85b5bbe7ea4ec36397f0bff51699128ca28"
   },
-  "scope": "Native static -O2 no-exceptions/no-RTTI allocation,containers,shared ownership,mutex/CV/once and bounded std::thread with ordered exit notification. Not full libc++,public futures,exceptions or engine runtime."
+  "scope": "Native static -O2 no-exceptions/no-RTTI allocation,containers,shared ownership,mutex/CV/once and bounded std::thread with ordered exit notification. Not full libc++,public futures,exceptions or engine runtime.",
+  "native_header_imports": [
+    {
+      "target": "aarch64-none-elf",
+      "language": "c++23",
+      "configuration_sha256": "4fa402fb7d90947d6f0add9dc0f74a2b0f1615727061243e5aee77971a9abd72",
+      "selected_headers": [
+        "numeric"
+      ],
+      "active_original_files": [
+        "include/__numeric/accumulate.h",
+        "include/__numeric/adjacent_difference.h",
+        "include/__numeric/exclusive_scan.h",
+        "include/__numeric/gcd_lcm.h",
+        "include/__numeric/inclusive_scan.h",
+        "include/__numeric/inner_product.h",
+        "include/__numeric/iota.h",
+        "include/__numeric/midpoint.h",
+        "include/__numeric/partial_sum.h",
+        "include/__numeric/pstl.h",
+        "include/__numeric/saturation_arithmetic.h",
+        "include/__numeric/transform_exclusive_scan.h",
+        "include/__numeric/transform_inclusive_scan.h",
+        "include/numeric"
+      ],
+      "policy": "real native preprocessing; original private and explicitly selected public headers only"
+    }
+  ]
 }

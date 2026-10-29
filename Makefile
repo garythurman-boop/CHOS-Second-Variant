@@ -1579,3 +1579,8 @@ test-file-position-sanitize: $(SAN_DIR)/test-file-position
 test: test-file-position
 test-sanitize: test-file-position-sanitize
 .PHONY: test-file-position test-file-position-sanitize
+
+test-libcxx-import:
+	python3 tests/test_libcxx_import.py
+.PHONY: test-libcxx-import
+test: test-libcxx-import
