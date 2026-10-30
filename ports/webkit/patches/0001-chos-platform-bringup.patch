@@ -77,7 +77,7 @@ index f4b97e56..5a7e0a11 100644
      struct timespec ts { };
      clock_gettime(CLOCK_BOOTTIME, &ts);
 diff --git a/Source/WTF/wtf/FileHandle.cpp b/Source/WTF/wtf/FileHandle.cpp
-index e2f48ce8..d7376e83 100644
+index e2f48ce8..f3b07eb2 100644
 --- a/Source/WTF/wtf/FileHandle.cpp
 +++ b/Source/WTF/wtf/FileHandle.cpp
 @@ -28,6 +28,10 @@
@@ -108,8 +108,28 @@ index e2f48ce8..d7376e83 100644
      if (lockMode)
          lock(lockMode);
  #else
+@@ -46,6 +58,9 @@ FileHandle::FileHandle(PlatformFileHandle handle, OptionSet<FileLockMode> lockMo
+
+ FileHandle::FileHandle(FileHandle&& other)
+     : m_handle(std::exchange(other.m_handle, std::nullopt))
++#if OS(CHOS)
++    , m_writeOnly(std::exchange(other.m_writeOnly, false))
++#endif
+ { }
+
+ FileHandle::~FileHandle()
+@@ -58,6 +73,9 @@ FileHandle& FileHandle::operator=(FileHandle&& other)
+     close();
+
+     m_handle = std::exchange(other.m_handle, std::nullopt);
++#if OS(CHOS)
++    m_writeOnly = std::exchange(other.m_writeOnly, false);
++#endif
+     return *this;
+ }
+
 diff --git a/Source/WTF/wtf/FileHandle.h b/Source/WTF/wtf/FileHandle.h
-index b3675206..f82a89ab 100644
+index b3675206..df309c84 100644
 --- a/Source/WTF/wtf/FileHandle.h
 +++ b/Source/WTF/wtf/FileHandle.h
 @@ -33,6 +33,8 @@
@@ -133,6 +153,116 @@ index b3675206..f82a89ab 100644
  using PlatformHandleTraits = IntegralMarkableTraits<int, invalidPlatformFileHandle>;
  #endif
 
+@@ -78,6 +84,15 @@ public:
+         return FileHandle { handle, lockMode };
+     }
+
++#if OS(CHOS)
++    static FileHandle adoptWriteOnly(PlatformFileHandle handle)
++    {
++        FileHandle result { handle, { } };
++        result.m_writeOnly = true;
++        return result;
++    }
++#endif
++
+     WTF_EXPORT_PRIVATE FileHandle(FileHandle&&);
+     WTF_EXPORT_PRIVATE FileHandle& operator=(FileHandle&&);
+
+@@ -114,6 +129,9 @@ private:
+     void close();
+
+     Markable<PlatformFileHandle, PlatformHandleTraits> m_handle;
++#if OS(CHOS)
++    bool m_writeOnly { false };
++#endif
+ };
+
+ } // namespace FileSystemImpl
+diff --git a/Source/WTF/wtf/FileSystem.cpp b/Source/WTF/wtf/FileSystem.cpp
+index 7771695d..80bd28b2 100644
+--- a/Source/WTF/wtf/FileSystem.cpp
++++ b/Source/WTF/wtf/FileSystem.cpp
+@@ -40,7 +40,9 @@
+ #include <wtf/text/ParsingUtilities.h>
+ #include <wtf/text/StringBuilder.h>
+
+-#if !OS(WINDOWS)
++#if OS(CHOS)
++#include <cerrno>
++#elif !OS(WINDOWS)
+ #include <fcntl.h>
+ #include <sys/mman.h>
+ #include <sys/param.h>
+@@ -328,6 +330,15 @@ std::optional<MappedFileData> mapFile(const String& filePath, MappedFileMode mod
+
+ MappedFileData createMappedFileData(const String& path, size_t bytesSize, FileHandle* outputHandle)
+ {
++#if OS(CHOS)
++    // Native anonymous mappings do not provide shared file writeback. Reject
++    // before creating a destination, rather than leave a successful empty file.
++    UNUSED_PARAM(path);
++    UNUSED_PARAM(bytesSize);
++    UNUSED_PARAM(outputHandle);
++    errno = ENOTSUP;
++    return { };
++#else
+     constexpr bool failIfFileExists = true;
+     auto handle = FileSystem::openFile(path, FileSystem::FileOpenMode::ReadWrite, FileSystem::FileAccessPermission::User, { }, failIfFileExists);
+
+@@ -368,10 +379,18 @@ MappedFileData createMappedFileData(const String& path, size_t bytesSize, FileHa
+
+     succeeded = true;
+     return WTF::move(*mappedFile);
++#endif
+ }
+
+ void finalizeMappedFileData(MappedFileData& mappedFileData, size_t bytesSize)
+ {
++#if OS(CHOS)
++    // createMappedFileData cannot produce a native shared mapping. Do not claim
++    // a void-returning finalize successfully flushed unsupported shared data.
++    UNUSED_PARAM(mappedFileData);
++    UNUSED_PARAM(bytesSize);
++    RELEASE_ASSERT_NOT_REACHED();
++#else
+     auto* map = mappedFileData.mutableSpan().data();
+ #if OS(WINDOWS)
+     DWORD oldProtection;
+@@ -384,6 +403,7 @@ void finalizeMappedFileData(MappedFileData& mappedFileData, size_t bytesSize)
+     // Flush (asynchronously) to file, turning this into clean memory.
+     msync(map, bytesSize, MS_ASYNC);
+ #endif
++#endif
+ }
+
+ MappedFileData mapToFile(const String& path, size_t bytesSize, NOESCAPE const Function<void(const Function<bool(std::span<const uint8_t>)>&)>& apply, FileHandle* outputHandle)
+@@ -432,7 +452,10 @@ std::optional<Salt> readOrMakeSalt(const String& path)
+     bool success = handle.write(salt) == salt.size();
+     if (!success)
+         return { };
+-
++#if OS(CHOS)
++    if (!handle.flush())
++        return { };
++#endif
+     return salt;
+ }
+
+@@ -448,7 +471,12 @@ std::optional<uint64_t> overwriteEntireFile(const String& path, std::span<const
+     if (!fileHandle)
+         return { };
+
+-    return fileHandle.write(span);
++    auto written = fileHandle.write(span);
++#if OS(CHOS)
++    if (!written || !fileHandle.flush())
++        return { };
++#endif
++    return written;
+ }
+
+ void deleteAllFilesModifiedSince(const String& directory, WallTime time)
 diff --git a/Source/WTF/wtf/FileSystem.h b/Source/WTF/wtf/FileSystem.h
 index 6195096c..0bb36bf2 100644
 --- a/Source/WTF/wtf/FileSystem.h
@@ -280,11 +410,24 @@ index 1e131303..842b94cf 100644
  }
 
  } // namespace WTF
+diff --git a/Source/WTF/wtf/PlatformHave.h b/Source/WTF/wtf/PlatformHave.h
+index 2776e4f9..c1f83acd 100644
+--- a/Source/WTF/wtf/PlatformHave.h
++++ b/Source/WTF/wtf/PlatformHave.h
+@@ -434,7 +434,7 @@
+ #define HAVE_URL_FORMATTING 1
+ #endif
+
+-#if !OS(WINDOWS) && !OS(QNX)
++#if !OS(WINDOWS) && !OS(QNX) && !OS(CHOS)
+ #define HAVE_STACK_BOUNDS_FOR_NEW_THREAD 1
+ #endif
+
 diff --git a/Source/WTF/wtf/PlatformJSCOnly.cmake b/Source/WTF/wtf/PlatformJSCOnly.cmake
-index a2328be2..75a41310 100644
+index a2328be2..d49468ed 100644
 --- a/Source/WTF/wtf/PlatformJSCOnly.cmake
 +++ b/Source/WTF/wtf/PlatformJSCOnly.cmake
-@@ -36,14 +36,25 @@ else ()
+@@ -36,14 +36,26 @@ else ()
          generic/MainThreadGeneric.cpp
 
          posix/OSAllocatorPOSIX.cpp
@@ -302,6 +445,7 @@ index a2328be2..75a41310 100644
 +        endif ()
 +        list(APPEND WTF_SOURCES
 +            "${CHOS_WTF_PLATFORM_DIR}/ThreadingPrimitivesCHOS.cpp"
++            "${CHOS_WTF_PLATFORM_DIR}/CurrentThreadCHOS.cpp"
 +        )
 +    else ()
 +        list(APPEND WTF_SOURCES posix/ThreadingPOSIX.cpp)
@@ -312,21 +456,35 @@ index a2328be2..75a41310 100644
          list(APPEND WTF_SOURCES
              fuchsia/CPUTimeFuchsia.cpp
          )
-@@ -62,8 +73,12 @@ else ()
+@@ -62,13 +74,20 @@ else ()
          )
      endif ()
 
-+    if (WTF_OS_CHOS)
-+        list(APPEND WTF_SOURCES "${CHOS_WTF_PLATFORM_DIR}/FileHandleCHOS.cpp")
-+    else ()
-+        list(APPEND WTF_SOURCES posix/FileHandlePOSIX.cpp)
-+    endif ()
-     list(APPEND WTF_SOURCES
+-    list(APPEND WTF_SOURCES
 -        posix/FileHandlePOSIX.cpp
-         posix/FileSystemPOSIX.cpp
-         posix/MappedFileDataPOSIX.cpp
+-        posix/FileSystemPOSIX.cpp
+-        posix/MappedFileDataPOSIX.cpp
+-
+-        unix/UniStdExtrasUnix.cpp
+-    )
++    if (WTF_OS_CHOS)
++        list(APPEND WTF_SOURCES
++            "${CHOS_WTF_PLATFORM_DIR}/FileHandleCHOS.cpp"
++            "${CHOS_WTF_PLATFORM_DIR}/FileSystemCHOS.cpp"
++            "${CHOS_WTF_PLATFORM_DIR}/UniStdExtrasCHOS.cpp"
++        )
++    else ()
++        list(APPEND WTF_SOURCES
++            posix/FileHandlePOSIX.cpp
++            posix/FileSystemPOSIX.cpp
++            unix/UniStdExtrasUnix.cpp
++        )
++    endif ()
++    list(APPEND WTF_SOURCES posix/MappedFileDataPOSIX.cpp)
+ endif ()
 
-@@ -76,6 +91,11 @@ if (WIN32)
+ if (WIN32)
+@@ -76,6 +95,11 @@ if (WIN32)
          win/MemoryFootprintWin.cpp
          win/MemoryPressureHandlerWin.cpp
      )
@@ -555,6 +713,22 @@ index d928bed8..e265b2e0 100644
  #elif OS(UNIX) || OS(HAIKU)
 
  #if OS(OPENBSD)
+diff --git a/Source/WTF/wtf/Threading.cpp b/Source/WTF/wtf/Threading.cpp
+index 830f8b7f..d3618a7e 100644
+--- a/Source/WTF/wtf/Threading.cpp
++++ b/Source/WTF/wtf/Threading.cpp
+@@ -484,7 +484,11 @@ void initialize()
+         Thread::initializeTLSKey();
+ #endif
+         initializeDates();
++#if !OS(CHOS)
+         Thread::initializePlatformThreading();
++#endif
++        // CHOS current-thread adoption uses native private pthread TLS. Unix
++        // suspension signals are not installed or claimed by this profile.
+ #if PLATFORM(COCOA)
+         initializeLibraryPathDiagnostics();
+ #endif
 diff --git a/Source/WTF/wtf/Threading.h b/Source/WTF/wtf/Threading.h
 index a376be92..7b8c7e67 100644
 --- a/Source/WTF/wtf/Threading.h
@@ -594,6 +768,50 @@ index 5b4c0629..5c98613e 100644
  }
 
  inline void* threadSpecificGet(ThreadSpecificKey key)
+diff --git a/Source/WTF/wtf/WTFConfig.cpp b/Source/WTF/wtf/WTFConfig.cpp
+index 253b6827..3fe31f7a 100644
+--- a/Source/WTF/wtf/WTFConfig.cpp
++++ b/Source/WTF/wtf/WTFConfig.cpp
+@@ -50,7 +50,7 @@
+ #if PLATFORM(COCOA)
+ #include <wtf/spi/cocoa/MachVMSPI.h>
+ #include <mach/mach.h>
+-#elif OS(LINUX)
++#elif OS(LINUX) || OS(CHOS)
+ #include <sys/mman.h>
+ #endif
+
+@@ -178,7 +178,11 @@ void Config::initialize()
+         g_wtfConfig.lowestAccessibleAddress = roundDownToMultipleOf(onePage, std::max<uintptr_t>(onePage, address));
+     }();
+     g_wtfConfig.highestAccessibleAddress = static_cast<uintptr_t>((1ULL << OS_CONSTANT(EFFECTIVE_ADDRESS_WIDTH)) - 1);
++#if !OS(CHOS)
+     SignalHandlers::initialize();
++#endif
++    // Native user faults are owned by the CHOS exception boundary. This does
++    // not implement the Unix signal/trap services required by the full engine.
+
+     [[maybe_unused]] uint8_t* reservedConfigBytes = reinterpret_cast_ptr<uint8_t*>(WebConfig::g_config);
+
+@@ -191,7 +195,9 @@ void Config::finalize()
+ {
+     static std::once_flag once;
+     std::call_once(once, [] {
++#if !OS(CHOS)
+         SignalHandlers::finalize();
++#endif
+         if (!g_wtfConfig.disabledFreezingForTesting)
+             Config::permanentlyFreeze();
+     });
+@@ -224,7 +230,7 @@ void permanentlyFreezePages(void* base, size_t size, FreezePagePermission permis
+
+     // There's no going back now!
+     result = vm_protect(mach_task_self(), reinterpret_cast<vm_address_t>(base), size, UpdateMaximumPermission, permission == FreezePagePermission::ReadOnly ? VM_PROT_READ : VM_PROT_NONE);
+-#elif OS(LINUX)
++#elif OS(LINUX) || OS(CHOS)
+     result = mprotect(base, size, permission == FreezePagePermission::ReadOnly ? PROT_READ : PROT_NONE);
+ #else
+     // FIXME: Implement equivalent for Windows, maybe with VirtualProtect.
 diff --git a/Source/WTF/wtf/WTFProcess.cpp b/Source/WTF/wtf/WTFProcess.cpp
 index 7d01fe9c..a2386032 100644
 --- a/Source/WTF/wtf/WTFProcess.cpp

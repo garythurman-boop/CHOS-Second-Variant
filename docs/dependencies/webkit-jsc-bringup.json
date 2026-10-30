@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "role": "reproducible upstream-source dependency triage,not production engine vendoring/build",
+  "role": "reproducible native WTF component build/link and dependency bringup;not a production JSC/browser qualification",
   "project": "WPE WebKit / JavaScriptCore",
   "tag": "wpewebkit-2.54.2",
   "tag_object": "6c294e37d744618c3f9983b44c7759b8265ecf63",
@@ -45,19 +45,26 @@
     "Source/WTF/wtf/Int128.h": "a0b604fe459ffb48e74d079ac380e29c3532ccdd874418e271a9a9dceef435c5",
     "Source/WTF/wtf/FileHandle.cpp": "acfa1a40ca40ba261bfe555fc6c6fd553ef91aa05994f296616edd08a08e872d",
     "Source/WTF/wtf/FileHandle.h": "3f0263740d22fc807dd70a18ad85c5c8d4fcf5ae93f6e49ff69cf2211470dc61",
-    "Source/WTF/wtf/FileSystem.h": "1ae8f96ef8c9872489553cda20616b10363f3cc5eec9cf1181e375c367b055d3"
+    "Source/WTF/wtf/FileSystem.h": "1ae8f96ef8c9872489553cda20616b10363f3cc5eec9cf1181e375c367b055d3",
+    "Source/WTF/wtf/FileSystem.cpp": "3ccf6fc3f4562fea69261258f2d0c9aa27413c1c0e00725b2b8cdd2b331e8c07",
+    "Source/WTF/wtf/Threading.cpp": "30e8991182bb2eb47c25d6157a73f8ab02f2eaddd2048e02502eaaed535a8ad3",
+    "Source/WTF/wtf/WTFConfig.cpp": "40e139089d4f05283bedd242a6ca6ac3e74d52436242de57c55a7441a9321c61",
+    "Source/WTF/wtf/posix/ThreadingPOSIX.cpp": "e6ffd87856c75fcc657485e25352a189de9881609e891a2fa71b4dbb5b67fb24",
+    "Source/WTF/wtf/PlatformHave.h": "408ca38ec7160b785fb9020189d4e909aa539c550a0f53fbd3eaf7ab221909fb"
   },
   "patch": "ports/webkit/patches/0001-chos-platform-bringup.patch",
-  "patch_sha256": "ed5e148f53ba3e993461a70b84c187e166371dd04b3d949f4d94678d62c93424",
+  "patch_sha256": "468433c6e2aafaba5c88e658475c1abe559a5cf80c596418cf86863538b59c8f",
   "patched_files_sha256": {
     "Source/WTF/wtf/CurrentTime.cpp": "e8a432ea308521b68334025b72a15da7a98023da5fe02b7fc6b019112a4f3bc8",
-    "Source/WTF/wtf/FileHandle.cpp": "064571d68416ec5b74f9c4eb7eb43a6288af7fa08a54a381823061720044707a",
-    "Source/WTF/wtf/FileHandle.h": "69f38e5600ce7dffcc492ec36c06ef9a512e775c69507504720b6e829d401b6c",
+    "Source/WTF/wtf/FileHandle.cpp": "9118c18fc6faccc2dca594b3cf5597e8fe7915969e456bbdca0054766ffd7703",
+    "Source/WTF/wtf/FileHandle.h": "f33a66c90c4ee7fb8da2e8f455ad65b6028ea8770ebe8f2bd63a6711cbd3aa15",
+    "Source/WTF/wtf/FileSystem.cpp": "a2c0690170006ee140923a7f610ce05dae6d3a5b816880a21abfe64f72bedd41",
     "Source/WTF/wtf/FileSystem.h": "0e64b3613f4f1cae88d2f9427ba8b023ef6dda8c96c45681412e02ae63147b11",
     "Source/WTF/wtf/Int128.cpp": "4a24da98f16563d73e08557557d04ff1c0565cd26ba1d1e3d2166f4dd685b0a2",
     "Source/WTF/wtf/Int128.h": "a1e644852785281b05e5b70c57f9567601da230174246fe58a491cbd51a9cede",
     "Source/WTF/wtf/PageBlock.cpp": "1213bf14e88e90ec031cc3aaee3062204028c869a9c6f84a2ccfd00b260c11d0",
-    "Source/WTF/wtf/PlatformJSCOnly.cmake": "185e32c065468180da956730b369797ef8fdf7597380ee72f22413254855c7fe",
+    "Source/WTF/wtf/PlatformHave.h": "fb1c9dfa5af77b04e14dd0ba129436b89454e007dab8a7ea94e6c6026f3d57af",
+    "Source/WTF/wtf/PlatformJSCOnly.cmake": "2bb9875e61154ec577bc83bbd959aee37d48fc1763ed92f545e250c802018245",
     "Source/WTF/wtf/PlatformOS.h": "a6a9c70c8dc989e8c83dcd54e520457778bd59d65555eac7a8ccc53ce9362d14",
     "Source/WTF/wtf/PlatformRegisters.h": "d4c44a66308875edc5bced9361122a10614ea1cde42cb3ecd9d3ed20008f0e08",
     "Source/WTF/wtf/PlatformUse.h": "9af8a280a7d03086479febb9de02fd982a39f586b07c6e1532cee8bf29700db2",
@@ -65,8 +72,10 @@
     "Source/WTF/wtf/RandomDevice.cpp": "91015392a487e8490299cbce2af0f765fcd3c7554fbd258b9080951413bd7213",
     "Source/WTF/wtf/RandomDevice.h": "2346b34760eee9628005f0c1cb0dfe389e38622c0e8fad1700da063b607380b9",
     "Source/WTF/wtf/StackBounds.cpp": "f48418e4c137bd88f1ecd39fb21ae7079278a30cb6af59d7e5ad78a6e00409b3",
+    "Source/WTF/wtf/Threading.cpp": "7087a35437dee3fe987bacc0ce218a1186a5a5ca0cdf440b2f7a68078a61a305",
     "Source/WTF/wtf/Threading.h": "0b24d45b7271b563352f425994b1ad538159bbad4c72a4c88ea6576488704a52",
     "Source/WTF/wtf/ThreadingPrimitives.h": "2beb9c056a4a6982b32bcb43cbc52c6b2a0ad8c3a25928ffe4996eaec05effdc",
+    "Source/WTF/wtf/WTFConfig.cpp": "c790f99ded88aa3d78e6992599393868a64535e6b211bc1d111454a2415143e5",
     "Source/WTF/wtf/WTFProcess.cpp": "5425303984f170a9f81561d2ed8de4dea0739917dbae3152ceb64b5eae1323f3",
     "Source/WTF/wtf/simdutf/simdutf_impl.h": "3e055e240d5cc054adc8a8e59ae6ea9bcf4e6d7789d1458bd1360d98665032ae",
     "Source/bmalloc/bmalloc/BPlatform.h": "7eace90386576643b0cfca4377a9a61794763bf6e933a32b122c8f4700150216",
@@ -87,11 +96,14 @@
     "Tools/Scripts",
     "Tools/TestWebKitAPI"
   ],
-  "patch_scope": "Explicit CHOS CMake/bmalloc identity;owned-page discard;OS-brokered entropy with bounded retries and fail-closed errors;bounded native Console diagnostics. No local RNG,device fallback or full engine/security/conformance success inferred. Native mutex backoff uses the real scheduled YIELD service,not an unimplemented nanosleep API. Explicit WTF CHOS identity and private pthread selection; separate real native mutex/condition backend,not Unix signals/thread suspension. Native WTF clocks use checked realtime/monotonic services;unavailable clocks fail closed;continuous-time profile does not claim suspend/resume support. Native current-thread register layout and kernel-owned stack discovery;Unix signal-handler declarations excluded on CHOS. Foreign-thread suspend/GC/lifecycle remain unimplemented. Native WTF RandomDevice uses the real OS entropy broker with bounded retries/fail-closed errors;process/page helpers use real native libc services without a racy lazy page cache. Native CPUTime and memory-footprint sources select checked self-only scheduler/resource measurements; blocked time and kernel-root services excluded; no POSIX getrusage stub.; CHOS no-localization profile excludes only optional Int128 std::ostream declarations/formatting;all integer arithmetic,conversions and WTF PrintStream code retained; Native FileHandle uses real owned reads/writes/seek/metadata/conditional durable commit. Unsupported adoption locks rejected;private mapped copies use native anonymous protection,not shared file-backed mmap. Close failure reported before explicit abort.",
+  "patch_scope": "Explicit CHOS CMake/bmalloc identity;owned-page discard;OS-brokered entropy with bounded retries and fail-closed errors;bounded native Console diagnostics. No local RNG,device fallback or full engine/security/conformance success inferred. Native mutex backoff uses the real scheduled YIELD service,not an unimplemented nanosleep API. Explicit WTF CHOS identity and private pthread selection; separate real native mutex/condition backend,not Unix signals/thread suspension. Native WTF clocks use checked realtime/monotonic services;unavailable clocks fail closed;continuous-time profile does not claim suspend/resume support. Native current-thread register layout and kernel-owned stack discovery;Unix signal-handler declarations excluded on CHOS. Foreign-thread suspend/GC/lifecycle remain unimplemented. Native WTF RandomDevice uses the real OS entropy broker with bounded retries/fail-closed errors;process/page helpers use real native libc services without a racy lazy page cache. Native CPUTime and memory-footprint sources select checked self-only scheduler/resource measurements; blocked time and kernel-root services excluded; no POSIX getrusage stub.; CHOS no-localization profile excludes only optional Int128 std::ostream declarations/formatting;all integer arithmetic,conversions and WTF PrintStream code retained; Native FileHandle uses real owned reads/writes/seek/metadata/conditional durable commit. Unsupported adoption locks rejected;private mapped copies use native anonymous protection,not shared file-backed mmap. Close failure reported before explicit abort.; Native filesystem binds actual owned CHOS I/O and full restartable directory pages. Truncate handles restrict reads across moves;unsupported locks/shared maps reject before mutation. Common native persistence helpers require explicit flush. Current-thread adoption uses native pthread TLS and the upstream two-pass ownership/destruction algorithm;no native Thread creation or foreign GC suspension. Unix signal setup explicitly excluded;config freezing attempts actual native protection and cannot silently succeed through the generic no-op. Shared maps,locks,timestamps,capacity API,descriptor duplication/inheritance and full engine hardening remain open.",
   "native_port_files_sha256": {
     "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
     "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
     "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
-    "ports/webkit/chos/FileHandleCHOS.cpp": "bed9e97c0fe4b45a8ebe872884f7bcfd4051e3c640f7273b7262ab0b2f4468ff"
+    "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+    "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+    "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+    "ports/webkit/chos/CurrentThreadCHOS.cpp": "5381ec8203c4a33f1a04eed65a83a356024d455eba74232452e465f89c88271a"
   }
 }

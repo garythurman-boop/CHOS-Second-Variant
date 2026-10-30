@@ -217,3 +217,10 @@ The [complete native directory-page service](NATIVE_DIRECTORY_PAGES.md) adds
 read-only restartable enumeration beyond the old global64-entry catalogue.
 Mount/revision/authority tokens reject changed observations; no inode or persistent
 cursor is fabricated. Higher-level engine filesystem adaptation remains open.
+
+The [linked native WTF filesystem/current-thread component](NATIVE_WTF_FILESYSTEM.md)
+now builds the real WTF archive and executes selected original String/Vector and
+filesystem paths with native current-thread adoption. The stack-discovery flag
+now accurately reflects current-only kernel bounds. Explicit filesystem/config
+limits, full Thread/GC, engine-sized memory, JavaScript/rendering and every full
+browser/wireless/security/platform gate remain open.

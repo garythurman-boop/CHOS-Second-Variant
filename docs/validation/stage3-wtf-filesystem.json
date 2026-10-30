@@ -1,0 +1,2590 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "e427955557edfe4a384479d98ad21a7832eaaae0",
+  "implementation": "complete native WTF archive build and linked original String/Vector/filesystem/current-thread component execution",
+  "browser_engine_built": false,
+  "javascript_executed": false,
+  "full_WTF_runtime_qualified": false,
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "patch_sha256": "468433c6e2aafaba5c88e658475c1abe559a5cf80c596418cf86863538b59c8f",
+  "patched_files": 29,
+  "native_port_files_sha256": {
+    "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+    "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+    "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+    "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+    "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+    "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+    "ports/webkit/chos/CurrentThreadCHOS.cpp": "5381ec8203c4a33f1a04eed65a83a356024d455eba74232452e465f89c88271a"
+  },
+  "archive_libraries": {
+    "libWTF.a": {
+      "sha256": "564898ec1544f84c94573e93aef67d518582563dcd601c7a032234453175633e",
+      "members": [
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ASCIICType.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ApproximateTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Assertions.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/AutomaticThread.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/AvailableMemory.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/BitVector.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/BloomFilter.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CPUTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ClockType.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CodePtr.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CompactPtr.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CompilationThread.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ConcurrentBuffer.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ConcurrentPtrHashSet.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ContinuousApproximateTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ContinuousTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CountingLock.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CrossThreadCopier.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CrossThreadTaskHandler.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CryptographicUtilities.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CryptographicallyRandomNumber.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CurrentThread.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/CurrentTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/DataLog.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/DateMath.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/DebugHeap.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/EmbeddedFixedVector.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/FastBitVector.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/FastFloat.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/FastMalloc.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/FileHandle.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/FilePrintStream.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/FileSystem.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/FunctionDispatcher.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/GlobalVersion.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/GregorianDateTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/HashTable.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/HexNumber.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Int128.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/JSONValues.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Language.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/LikelyDenseUnsignedIntegerSet.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Lock.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/LockedPrintStream.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/LogChannels.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/LogInitialization.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Logger.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Logging.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/MainThread.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/MainThreadDispatcher.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/MallocCommon.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/MediaTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/MemoryPressureHandler.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/MetaAllocator.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/MonotonicTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/NativePromise.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/NumberOfCores.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/OSRandomSource.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ObjectIdentifier.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/PageBlock.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ParallelHelperPool.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ParallelJobsGeneric.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ParkingLot.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/PreciseSum.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/PrintStream.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ProcessPrivilege.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/RAMSize.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/RandomDevice.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ReadWriteLock.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/RefCountDebugger.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/RefTrackerMixin.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/RunLoop.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/RuntimeApplicationChecks.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SHA1.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SIMDUTF.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SafeStrerror.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Seconds.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SegmentedVector.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredAllocator.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredAutomaticThread.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredImmortalHeap.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredMalloc.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SixCharacterHash.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SmallSet.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/StackBounds.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/StackCheck.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/StackPointer.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/StackStats.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/StackTrace.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/StringPrintStream.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/SuspendableWorkQueue.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ThreadGroup.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/ThreadMessage.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Threading.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/TimeWithDynamicClockType.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/TimeZone.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/TimingScope.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/URL.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/URLHelpers.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/URLParser.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/UUID.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/UnbarrieredMonotonicTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/UniqueArray.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/Vector.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WTFAssertions.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WTFConfig.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WTFProcess.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WallTime.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WeakPtr.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WeakRandomNumber.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WordLock.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WorkQueue.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/WorkerPool.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dragonbox/dragonbox_to_chars.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/bignum-dtoa.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/bignum.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/cached-powers.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/diy-fp.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/double-conversion.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/fast-dtoa.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/fixed-dtoa.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/strtod.cc.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/persistence/PersistentCoders.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/persistence/PersistentDecoder.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/persistence/PersistentEncoder.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/ASCIILiteral.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/AtomString.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/AtomStringImpl.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/AtomStringTable.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/Base64.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/CString.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/CStringView.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/ExternalStringImpl.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/LineEnding.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringBuffer.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringBuilder.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringBuilderJSON.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringCommon.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringImpl.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringView.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/SymbolImpl.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/SymbolRegistry.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/TextBreakIterator.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/TextStream.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/UniquedStringImpl.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/WTFString.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UnicodeExtras.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UTextProvider.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UTextProviderLatin1.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UTextProviderUTF16.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/threads/BinarySemaphore.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/threads/Signals.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/CollatorDefault.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/UTF8Conversion.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/icu/CollatorICU.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/icu/ICUHelpers.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/generic/WorkQueueGeneric.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/generic/MainThreadGeneric.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/posix/OSAllocatorPOSIX.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/text/unix/TextBreakIteratorInternalICUUnix.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/unix/LanguageUnix.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/unix/LoggingUnix.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/ThreadingPrimitivesCHOS.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/CurrentThreadCHOS.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/CPUTimeCHOS.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/FileHandleCHOS.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/FileSystemCHOS.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/UniStdExtrasCHOS.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/posix/MappedFileDataPOSIX.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/MemoryFootprintCHOS.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/generic/MemoryPressureHandlerGeneric.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/WTF/wtf/CMakeFiles/WTF.dir/generic/RunLoopGeneric.cpp.obj"
+      ]
+    },
+    "libbmalloc.a": {
+      "sha256": "4d23708bd1fdad4a124d39f77c095e2cbcf438c05acc48414512f2effef6d499",
+      "members": [
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/CryptoRandom.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/SystemHeap.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Environment.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Gigacage.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/HeapKind.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Logging.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Mutex.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/TZoneHeap.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/TZoneHeapManager.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/VMAllocate.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/bmalloc.cpp.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_flex.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_iso.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_utils.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/jit_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_page_config_kind.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_config_kind.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_page_config_kind.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/tagged_bmalloc_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/tagged_bmalloc_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/tagged_bmalloc_heap_utils.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_type.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/hotbit_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/hotbit_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_test_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_test_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/jit_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/minalign32_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/minalign32_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pagesize64k_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pagesize64k_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_alignment.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_all_heaps.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_allocation_callbacks.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_allocation_result.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_baseline_allocator.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_baseline_allocator_table.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_basic_heap_config_enumerator_data.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_allocator.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_directory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_page.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_size_class.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_view.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bootstrap_free_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bootstrap_heap_page_provider.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_coalign.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_commit_span.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_committed_pages_vector.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_bootstrap_free_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_expendable_memory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_heap_reservation.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_large_utility_free_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compute_summary_object_callbacks.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_create_basic_heap_page_caches_with_reserved_memory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_deallocate.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_debug_spectrum.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_deferred_decommit_log.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_designated_intrinsic_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_dyld_state.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_dynamic_primitive_heap_map.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_ensure_heap_forced_into_reserved_memory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_ensure_heap_with_page_caches.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerable_page_malloc.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerable_range_list.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_bitfit_heaps.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_initially_unaccounted_pages.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_large_heaps.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_segregated_heaps.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_unaccounted_pages_as_meta.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerator.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerator_region.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_epoch.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_exclusive_view_template_memo_table.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_expendable_memory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_extended_gcd.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fast_large_free_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fast_megapage_cache.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fast_megapage_table.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fd_stream.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_free_granules.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_config_utils.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_for_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_lock.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_ref.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_runtime_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_summary.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_table.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_immortal_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_expendable_memory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_free_heap_deferred_commit_log.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_free_heap_helpers.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_heap_physical_page_sharing_cache.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_map.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_sharing_pool.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_utility_free_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_lenient_compact_unsigned_ptr.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_local_allocator.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_local_allocator_scavenger_data.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_local_view_cache.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_lock.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_lock_free_read_ptr_ptr_hashtable.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_log.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_malloc_stack_logging.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mar_registry.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mar_report_crash.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_medium_megapage_cache.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_megapage_cache.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_monotonic_time.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mte.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mte_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_base.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_base_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_header_table.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_malloc.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_sharing_participant.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_sharing_pool.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_payload_reservation_page_list.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_physical_memory_transaction.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_primitive_heap_ref.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_probabilistic_guard_malloc_allocator.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_process.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_ptr_worklist.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_race_test_hooks.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_random.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_red_black_tree.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_redundant_local_allocator_node.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_report_crash.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_reserved_memory_provider.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_root.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_runtime_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_scavenger.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_directory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_exclusive_view.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_page.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_page_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_size_directory.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_view.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_simple_free_heap_helpers.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_simple_large_free_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_simple_type.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_small_medium_bootstrap_free_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_small_medium_bootstrap_heap_page_provider.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_stats.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_status_reporter.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_stream.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_string_stream.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache_layout.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache_layout_node.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache_node.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_suspend_lock.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_utility_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_utility_heap_config.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_utils.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_versioned_field.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_virtual_range.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/thingy_heap.c.obj",
+        "/workspace/chos-evidence/wtf-filesystem/qualified-inputs/../Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/thingy_heap_config.c.obj"
+      ]
+    }
+  },
+  "engine_build_log_sha256": "8c35b1682f73592d30612d7b0fabdb384fcfff35cb5a076cb48b85b1368aa794",
+  "sdk_files": 1179,
+  "sdk_manifest_sha256": "888c31957914c99e700b9a185acfe9bc3f307d30ec8061eacb8199cd1781ad96",
+  "final_application": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "engine_built": false,
+    "wtf_archive_built": true,
+    "full_wtf_runtime_qualified": false,
+    "wtf_archive_sha256": "564898ec1544f84c94573e93aef67d518582563dcd601c7a032234453175633e",
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "468433c6e2aafaba5c88e658475c1abe559a5cf80c596418cf86863538b59c8f",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+      "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+      "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+      "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+      "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+      "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+      "ports/webkit/chos/CurrentThreadCHOS.cpp": "5381ec8203c4a33f1a04eed65a83a356024d455eba74232452e465f89c88271a"
+    },
+    "sdk_manifest_sha256": "888c31957914c99e700b9a185acfe9bc3f307d30ec8061eacb8199cd1781ad96",
+    "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-context-engine/cmake",
+        "--target",
+        "WTF",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/wtf_filesystem",
+        "-B",
+        "/workspace/chos-wtf-filesystem-qualified/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-wtf-filesystem-qualified/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 4.737231786013581,
+    "application_sha256": "6d2c9752590d64fd8b844ee4b371bb3911ba1642c3643858c5bd25448922d9bb",
+    "deployment": "/workspace/chos-wtf-filesystem-qualified/cmake/wtf_filesystem.elf",
+    "debug_application_sha256": "80e68742127670e7c61ed21037de43941cb50ec540baa6d6a9ff9947fd993457",
+    "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+    "scope": "real native WTF archive;String/Vector/path/file/directory component execution;not JavaScript/browser",
+    "limits": [
+      "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+      "full engine Thread lifecycle and foreign GC suspension remain open;current-thread stack/context services are separately qualified",
+      "native filesystem has explicit format/service limits,including no coherent shared maps/locks/timestamps/capacity service",
+      "native guest tests required;no new physical/Fusion qualification"
+    ]
+  },
+  "host_checks": {
+    "full-host": {
+      "exit": 0,
+      "log_sha256": "534e3364caca5a5a33e0c469c899fe73d113869b0dd270e1d218e08f394e0b5a"
+    },
+    "full-sanitize": {
+      "exit": 0,
+      "log_sha256": "6b8f4bf1aecd41686ab2babef9d2d87e81cbc3a8d27816ff1c22cc4c9b3b6151"
+    },
+    "final-build": {
+      "exit": 0,
+      "log_sha256": "c9af2432baadf7ec2f10d1e60906e5ca02bd3736f230a5c980e74f2e19654347"
+    }
+  },
+  "accepted_guest_profiles": [
+    {
+      "profile": "filesystem-direct",
+      "exit": 0,
+      "seconds": 14.331132877996424,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "6d2c9752590d64fd8b844ee4b371bb3911ba1642c3643858c5bd25448922d9bb",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117497,
+        "free_pages_before": 117497,
+        "free_pages_after": 117497,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 556,
+        "heap_before_crt_exit": [
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ]
+        ],
+        "checks": [
+          "actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations",
+          "real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations",
+          "write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files",
+          "native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics",
+          "root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters",
+          "static ELF config protection explicitly unavailable;no generic no-op freeze success claimed"
+        ],
+        "limits": [
+          "selected library component,not full WTF/JSC/JavaScript/browser runtime",
+          "no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets",
+          "native Thread creation/foreign GC suspension and static-config protection remain open",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "ee044af21932e6de915814546ec896b1fdd4b5b407ab1c9a15b24fbe01957fe9",
+      "artifacts": {
+        "kernel_sha256": "7b768730e7d6b66b75e8bce0ff1e773b119ae44c72abeaf59542fbe91f6e5008"
+      }
+    },
+    {
+      "profile": "filesystem-uefi",
+      "exit": 0,
+      "seconds": 20.689056442002766,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "6d2c9752590d64fd8b844ee4b371bb3911ba1642c3643858c5bd25448922d9bb",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 544,
+        "heap_before_crt_exit": [
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ]
+        ],
+        "checks": [
+          "actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations",
+          "real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations",
+          "write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files",
+          "native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics",
+          "root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters",
+          "static ELF config protection explicitly unavailable;no generic no-op freeze success claimed"
+        ],
+        "limits": [
+          "selected library component,not full WTF/JSC/JavaScript/browser runtime",
+          "no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets",
+          "native Thread creation/foreign GC suspension and static-config protection remain open",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "e7729f01aed68893ce9a0b436a7bb5545cdcb8cbe5367cf881b075ede9a98107",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "handles-uefi",
+      "exit": 0,
+      "seconds": 14.789484524008003,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "ac5061f372dc8401fc5b6fe7ff0b512d27065f2ee7b7fb76144a1d92f2424fdb",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 242,
+        "checks": [
+          "actual upstream FileHandle lifecycle with native reads/writes larger than transfer limit",
+          "held metadata and snapshot bytes survive rewrite;durable flush and stale-close refusal with explicit discard",
+          "real private read/write mapped copy does not alter descriptor bytes or cursor;read protection and empty-file mapping;shared/unsupported lock refusal",
+          "three concurrent file writers and three process lifecycles,cold PMM equality and zero user heap/futex waiters"
+        ],
+        "limits": [
+          "FileHandle component only;readAll/append String+Vector paths/full WTF link/runtime not executed",
+          "private copied mappings only;no coherent shared file maps or advisory locks",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "45fbe7bec9bc49e5f8ac8c2f10fcb31090ba4986784f29caea4d45994561a799",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "directory-uefi",
+      "exit": 0,
+      "seconds": 74.19174982199911,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "aa4abf06db166461df7e12f0837fb6e5cd309dc43cdb6a19faeb2200223cc28f",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 2880,
+        "maximum_observed_page_us": 359626,
+        "checks": [
+          "full175-file directory after175 unrelated files plus10 explicit subdirectories,real ROMFS merge and empty directories",
+          "immutable pages within one token,write/rename/state-change refusal with unchanged output and explicit restart",
+          "capability refusal,invalid size/version/flags/reserved/path,index overflow and protected crosspage output",
+          "three concurrent enumeration threads;three process lifecycles,cold PMM equality and zero user heap/futex waiters"
+        ],
+        "limits": [
+          "read-only restartable native directory pages,not full engine filesystem/browser",
+          "global mutations conservatively invalidate token;bounded whole catalogue CPU work and native CHFS path limits",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "83bdf6e3390032d14c125187506b403f0e022dd524dc3e9e9310dac660679683",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "icu-uefi",
+      "exit": 0,
+      "seconds": 27.711262332988554,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "794a9aaf19e634c2d53b5a49080163ba5a180056423864d224c3f08f0b9bc6e4",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 558,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,strict cold PMM equality and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "1f19632edf1e94c42b2f2f7c20afd6584ce727181ae3670d2dfb9d7e79e04ea6",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "int128-uefi",
+      "exit": 0,
+      "seconds": 24.862284011993324,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "b931841d106a7a83ae0c9841ffac1bfef0834818fc344e79c5ce547a30a62040",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 351,
+        "checks": [
+          "original upstream Int128.cpp arithmetic,not reimplemented helper algorithms",
+          "37000 seeded cases per process:unsigned full-width arithmetic/division/modulo/bitwise/shifts and bounded signed references",
+          "signed minimum/maximum and divisor boundaries;upstream undefined min/-1 case excluded",
+          "float/double/binary128 long-double conversion boundaries and live three-worker interleaving",
+          "three process lifecycles,cold PMM equality,zero user heap and futex waiters"
+        ],
+        "limits": [
+          "optional std::ostream operators absent in the native no-localization profile;WTF PrintStream methods build-only here",
+          "not full WTF/JSC linking,JavaScript or browser execution;QEMU only"
+        ]
+      },
+      "result_sha256": "131f96d769ca693749d2ef2b8fa55dbb3b2dc384d1e9d3e2fc56f2869de8c07c",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls6-uefi",
+      "exit": 0,
+      "seconds": 56.02955025200208,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "b1403f90f6c4a5ff4a76b777ee5ff94eb7f370f97acc30875410e8677474a926",
+        "ipv6": true,
+        "tcp6_wire_frames": 367,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6914146220078692,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7292729129985673,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5891644950024784,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.649885931998142,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6282980389951263,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8113132950093132,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.5066823509987444,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.4888319610035978,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5488794349948876,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5679796199983684,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6093168310035253,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.4055038490041625,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.694670662007411,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.350395560002653,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.28419456600386184,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.34612005899543874,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9559566709940555,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6961862790049054,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.375555757986149,
+            "stalled_network_gui_response_seconds": 0.048761576996184886,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.9880946639896138,
+            "stalled_network_gui_response_seconds": 0.02303220800240524,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 35962, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 33604, 0, 0)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 32990, 0, 0)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 55052, 0, 0)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 58078, 0, 0)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: SSLV3_ALERT_BAD_CERTIFICATE] ssl/tls alert bad certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: SSLV3_ALERT_UNSUPPORTED_CERTIFICATE] ssl/tls alert unsupported certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_EXPIRED] ssl/tls alert certificate expired (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_UNKNOWN] ssl/tls alert certificate unknown (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 49322, 0, 0)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 51262, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 42322, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 51266, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 54676, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 54678, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 36200, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 54684, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 54688, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "ff47e6b750005d0e8b13a61364fee5ea065b056858f464863176a3b98637443a",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "typing-uefi",
+      "exit": 0,
+      "seconds": 41.61857463599881,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "02672d455c87eb2402745132f02105f7c60a69feed575d79dd8bd32014692910",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "result_sha256": "6d4e710e3dcb04d83b0cf65734ddc346cba51fd3d4eb8f1b67d962772c8e8066",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "platform-uefi",
+      "exit": 0,
+      "seconds": 50.060108902995125,
+      "result": {
+        "mode": "uefi",
+        "checks": [
+          "32 fast USB keypress/release pairs",
+          "PCI VirtIO CHFS write/flush/read",
+          "PCI VirtIO hardware RNG",
+          "82574L e1000e DHCP/ARP/ICMP",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "20 USB hot-unplug/reconnect cycles with ring wraps",
+          "3 mixed input/storage cycles",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 7.1,
+        "desktop_ready_seconds": 10.135,
+        "keyboard_visible_ms": 29.76,
+        "pointer_visible_ms": 48.94,
+        "maximize_visible_ms": 202.61,
+        "drag_visible_ms": 272.83,
+        "stress_seconds": 5.732,
+        "idle_cpu_percent": 83.81,
+        "status": "PASS"
+      },
+      "result_sha256": "8a707eea955bda6354a87f945a12070a395d1fc92d9c27b8ed42d496d8b34ca1",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls-uefi-rerun",
+      "exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "b1403f90f6c4a5ff4a76b777ee5ff94eb7f370f97acc30875410e8677474a926",
+        "ipv6": false,
+        "tcp6_wire_frames": 0,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8535866349993739,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8967612569977064,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7117435469990596,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7946386340045137,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9140549419971649,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.1800225030019647,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 1.2609639889997197,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8336009240010753,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6525683839863632,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5706711910024751,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6824627690075431,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7538229589990806,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7963641609967453,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.300484203995438,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5467840179917403,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.3483770199964056,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0210686109930975,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7988655060034944,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.923970522999298,
+            "stalled_network_gui_response_seconds": 0.04507135599851608,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.990151138001238,
+            "stalled_network_gui_response_seconds": 0.04631024700938724,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 40368)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 55062)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 59186)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 33456)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 39310)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 38646)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 40414)"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 40430)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 40442)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 44716)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 44736)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 44720)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 44744)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 44758)"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "5a6fdbd4a9874d9ac80203e149ec88c368bc6dcc3918e75f800a3da83a71a1b9",
+      "artifacts": {
+        "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+        "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "additional_TLS_confirmation": {
+    "profile": "tls-uefi-confirm",
+    "exit": 0,
+    "result": {
+      "status": "PASS",
+      "mode": "uefi",
+      "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+      "application_sha256": "b1403f90f6c4a5ff4a76b777ee5ff94eb7f370f97acc30875410e8677474a926",
+      "ipv6": false,
+      "tcp6_wire_frames": 0,
+      "missing_clock": false,
+      "missing_entropy": false,
+      "cold_free_pages": 500142,
+      "free_pages_before": 500142,
+      "free_pages_after": 500142,
+      "cases": [
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.8347521840041736,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "chain",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.834470350004267,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "bad-chain",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6485415030037984,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.8151779420004459,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "rsa256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.7098308529966744,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "aes256",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 1.1374498340010177,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 4,
+          "hostname": "wrong.chos.test",
+          "seconds": 0.6299626040126896,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 8,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.5710643409984186,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "wrong-purpose",
+          "expected": 4096,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6942860650015064,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "expired",
+          "expected": 1,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.6357668989949161,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "future",
+          "expected": 512,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.44797192700207233,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "malformed",
+          "expected": 998,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.41078765100974124,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "truncated",
+          "expected": 997,
+          "hostname": "fixture.chos.test",
+          "seconds": 1.3829244439984905,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "stall",
+          "expected": 996,
+          "hostname": "fixture.chos.test",
+          "seconds": 15.42041189900192,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 993,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.2033584820019314,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 995,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.3049543789966265,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 994,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.9581665599980624,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "valid",
+          "expected": 0,
+          "hostname": "fixture.chos.test",
+          "seconds": 0.7544154820061522,
+          "stalled_network_gui_response_seconds": null,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 989,
+          "hostname": "fixture.chos.test",
+          "seconds": 2.2590739380102605,
+          "stalled_network_gui_response_seconds": 0.04410442299558781,
+          "result": "PASS"
+        },
+        {
+          "kind": "threaded",
+          "expected": 988,
+          "hostname": "fixture.chos.test",
+          "seconds": 1.9292982739862055,
+          "stalled_network_gui_response_seconds": 0.04496342899801675,
+          "result": "PASS"
+        }
+      ],
+      "server_events": [
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 34400)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "chain",
+          "accepted": true
+        },
+        {
+          "kind": "chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "chain",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 46036)"
+        },
+        {
+          "kind": "chain",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "bad-chain",
+          "accepted": true
+        },
+        {
+          "kind": "bad-chain",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "bad-chain",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "rsa",
+          "accepted": true
+        },
+        {
+          "kind": "rsa",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 40028)"
+        },
+        {
+          "kind": "rsa",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "rsa256",
+          "accepted": true
+        },
+        {
+          "kind": "rsa256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "rsa256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 38500)"
+        },
+        {
+          "kind": "rsa256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "aes256",
+          "accepted": true
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "aes256",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 52768)"
+        },
+        {
+          "kind": "aes256",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "wrong-purpose",
+          "accepted": true
+        },
+        {
+          "kind": "wrong-purpose",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "wrong-purpose",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "expired",
+          "accepted": true
+        },
+        {
+          "kind": "expired",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "expired",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "future",
+          "accepted": true
+        },
+        {
+          "kind": "future",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "future",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "malformed",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "accepted": true
+        },
+        {
+          "kind": "truncated",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "truncated",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 47070)"
+        },
+        {
+          "kind": "truncated",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "stall",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 45814)"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 45830)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "valid",
+          "accepted": true
+        },
+        {
+          "kind": "valid",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "valid",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 45836)"
+        },
+        {
+          "kind": "valid",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 52514)"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 52538)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 52522)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "accepted": true
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "sni": "fixture.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 52540)"
+        },
+        {
+          "kind": "threaded",
+          "sni": "wrong.chos.test"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        },
+        {
+          "kind": "threaded",
+          "version": "TLSv1.3",
+          "cipher": "TLS_AES_256_GCM_SHA384",
+          "alpn": "http/1.1",
+          "peer": "('127.0.0.1', 52558)"
+        },
+        {
+          "kind": "threaded",
+          "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+        },
+        {
+          "kind": "threaded",
+          "request": "GET /fixture"
+        }
+      ],
+      "limits": [
+        "ephemeral test root only; production trust store/update policy still open",
+        "firmware/RTC clock availability is not authenticated time",
+        "browser integration, full modern engine and live Wi-Fi remain open",
+        "QEMU evidence; Fusion/physical TLS NOT RUN"
+      ]
+    },
+    "result_sha256": "c7ba12232dea735e11e82be48d25cecfe95dc0e910cbea71a66cc9f6756ffe9d",
+    "artifacts": {
+      "kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+      "iso_sha256": "8ef51e58fd9292ae26afbbab182a128813f3578f8acf0d1bbe1c7615d5c53169",
+      "iso_embedded_kernel_sha256": "def59e8265a4532a4e22ae4a337ec514463f1adbc9122ba874ee025ffd67e83e",
+      "kernel_symbols_match_iso": true
+    }
+  },
+  "retained_failed_profiles": [
+    {
+      "profile": "tls-uefi",
+      "exit": 1,
+      "seconds": 42.24267107699416,
+      "log_sha256": "f13fc9b382772bc4b0ef4d2abcc674557322605faa88f839fc70b78641f75b61",
+      "serial_sha256": "24205a5c25d84d9f927cb6096167d8111fcdd4a5fe68ed7b934ee0214e63965a",
+      "diagnosis": "process diagnostic timeout after malformed-peer rejection;command echoed,then no response;exact original stall cause unresolved"
+    }
+  ],
+  "retained_investigations": [
+    {
+      "log": "app-build1.log",
+      "diagnosis": "real missing current-thread TLS/yield and native config/signal boundary imports;proper native services/profile guards integrated"
+    },
+    {
+      "directory": "direct1",
+      "diagnosis": "guest never started:5.61MiB debug ELF exceeds4MiB CHFS;deploy strip-debug retains full symbols ELF and verifies identical loaded segments/entry/ABI notes"
+    },
+    {
+      "directory": "direct4",
+      "diagnosis": "strengthened registry check exposed incorrect generic HAVE_STACK_BOUNDS_FOR_NEW_THREAD=1;native current-only capability nowaccurate;adopted workers register own actual bounds;assertion retained"
+    }
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/wtf-filesystem-qualified.tar.gz",
+    "archive_sha256": "4938d22250763398912b6a2066f4454f77e2f7b24609482012d91ab469aa5677",
+    "archive_bytes": 96611058,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "source_files_sha256": {
+    "docs/BROWSER_ENGINE_PORT.md": "820ba4f7aa18c7afed0305fd3fc077161021c60c1c2c1bf699a8222d57a36b16",
+    "docs/NATIVE_SDK.md": "b81184c64592b273647963583cca7a1436966772bfb23a3e997433d518fcd9c8",
+    "docs/STAGE3_ARCHITECTURE.md": "98a7f8ef9be8c08862000b1558eeb22711862e5bb868f96d8c1d11a51915d99f",
+    "docs/STAGE3_CURRENT_RESULTS.md": "735daabda22a0c70d0296d6299f1d73ef2eb40cceb0fd55c57cc9d46f5b3c177",
+    "docs/dependencies/webkit-jsc-bringup.json": "5d0aa970a5bb426a5ef978c1b4236807201e6fecd42e15c8622c2af7fc2c5204",
+    "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "468433c6e2aafaba5c88e658475c1abe559a5cf80c596418cf86863538b59c8f",
+    "docs/NATIVE_WTF_FILESYSTEM.md": "6118e9f0c5a0ea6547545468fe9ec463faec89704a1feb6c7320bc0d8c96909e",
+    "ports/webkit/chos/CurrentThreadCHOS.cpp": "5381ec8203c4a33f1a04eed65a83a356024d455eba74232452e465f89c88271a",
+    "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+    "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+    "tests/qemu_wtf_filesystem.py": "9eb0cbb6b072164b4ac72152a838d1c2ced6606a13019d5c87fdc377f46896c2",
+    "tests/wtf_filesystem/CMakeLists.txt": "2b67146ac0bd480c1484624882f20cbe4c49365ce1d4362913c31e4cc1a020e7",
+    "tests/wtf_filesystem/main.cpp": "9951479ae8bfe9ed0d18940e93075fd12c8ab548f4b882b16e4c405e3170d098",
+    "tools/build_wtf_filesystem.py": "c286eeab09482b9c1efb4d270704b03aa3023d142e33f99c31de64b1791233a2"
+  },
+  "limits": [
+    "selected real library component,not full WTF runtime/JavaScriptCore/rendering/browser acceptance",
+    "CHFS47ASCII paths/4MiB files/fourfds/8MiB filebuffer quota;nativewriteopenreserves4MiB;no atomic destination replacement",
+    "sharedfilewriteback/advisorylocks/timestamps/capacityAPI/descriptorinheritance+duplication unavailable;explicit failures,not fabricated metadata",
+    "native Thread creation/join/detach/foreign GC suspension and static ELF config-page protection remain open;anonymous-only protection refusal is not hardening success",
+    "ICUcommon+stubdata supportsselected String/pathcomponent,not full defaultdata/Intl execution",
+    "existing native image/stack/anon/thread/process budgets are not engine-sized",
+    "precise initial TLS diagnostic stall cause unresolved despite two separate passing identical-artifact profiles",
+    "nativePi5WiFi/full browser/security/platformgates remain open;new Fusion/Pi/laptop NOT RUN"
+  ]
+}

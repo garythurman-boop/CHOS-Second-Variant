@@ -26,7 +26,7 @@ static bool metadata(int fd, chos_file_metadata_t& out)
 
 std::optional<uint64_t> FileHandle::read(std::span<uint8_t> bytes)
 {
-    if (!m_handle) { errno = EBADF; return { }; }
+    if (!m_handle || m_writeOnly) { errno = EBADF; return { }; }
     size_t done = 0;
     // Generic appendFileContents treats a short read as EOF. Hide the native
     // transfer limit, not actual EOF/errors, from these engine callers.
@@ -120,6 +120,7 @@ void FileHandle::close()
 std::optional<MappedFileData> FileHandle::map(MappedFileMode mode, FileOpenMode access)
 {
     if (!m_handle) { errno = EBADF; return { }; }
+    if (m_writeOnly) { errno = EBADF; return { }; }
     // Native mappings are private anonymous pages. A copied private file view
     // has real private semantics; never advertise shared writeback/coherence.
     if (mode != MappedFileMode::Private || (access != FileOpenMode::Read && access != FileOpenMode::ReadWrite)) {
