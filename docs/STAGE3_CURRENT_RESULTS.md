@@ -5,7 +5,7 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The complete directory source checkpoint is `e427955`. Native writable working-copy
+The complete linked WTF filesystem source checkpoint is `e438245`. Native writable working-copy
 handles, shared buffer quotas and conditional commits are qualified in
 [NATIVE_WRITABLE_HANDLES.md](NATIVE_WRITABLE_HANDLES.md). Original WTF Int128 and
 the LLVM/musl runtime closure are qualified in
@@ -23,16 +23,22 @@ actual upstream lifecycle operations with native durable I/O and private mapped
 copies. Shared writeback mappings and advisory locks remain explicitly unavailable.
 The [complete directory-page service](NATIVE_DIRECTORY_PAGES.md) additionally
 avoids the old global64-entry catalogue and rejects changed observations between
-pages. This is native namespace access, not yet the higher-level WTF filesystem.
+pages. This supplies complete namespace observations to the WTF filesystem backend.
 The [native WTF filesystem/current-thread component](NATIVE_WTF_FILESYSTEM.md)
 now builds the actual WTF archive and links/runs its selected String/Vector and
 filesystem paths in CHOS. The corrected stack-discovery capability makes adopted
 thread registration use actual current bounds. This is selected component
 execution, not full-library runtime or an engine. Engine-sized memory/Thread/GC,
-JavaScript and modern rendering, remaining filesystem/persistence and config
+JavaScript and modern rendering, remaining filesystem/persistence and engine
 hardening, native Wi-Fi, production security policy and platform acceptance remain
 open. Stage 3 is incomplete; version remains 0.30.0. These are software and
 qualification gaps, not solely unavailable-hardware tests.
+
+[One-way native image data protection](NATIVE_IMAGE_PROTECTION.md) additionally
+enables actual WTF configuration freezing. It refuses write restoration, validates
+complete owned data ranges before changes and confines deliberate access faults
+to the application. This closes a config-protection prerequisite, not the full
+engine/security acceptance gate.
 
 The following entries retain earlier checkpoint evidence and the limitations
 recorded at those points; use the current status above for remaining work.

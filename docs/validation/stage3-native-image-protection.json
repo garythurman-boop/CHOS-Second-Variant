@@ -1,0 +1,3666 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "e43824539624fbe0ae34d7dc4844540eb3643513",
+  "implementation": "one-way own-image data permission reductions and actual linked WTF Config::finalize freezing",
+  "syscall": 78,
+  "capability_class": "existing MAP35;positive permission-bit mask unchanged",
+  "operations": [
+    "read-only/XN",
+    "inaccessible/XN;later read restoration refused"
+  ],
+  "range_limit_bytes": 1048576,
+  "max_pages_per_call": 256,
+  "browser_engine_built": false,
+  "javascript_executed": false,
+  "full_WTF_runtime_qualified": false,
+  "sdk_files": 1181,
+  "sdk_manifest_sha256": "1332a36607c24ecdc4cf3ab35043552f4d1c1b39c1af8957f1fa7760565b6cb0",
+  "final_applications": {
+    "image": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "sdk_manifest_sha256": "1332a36607c24ecdc4cf3ab35043552f4d1c1b39c1af8957f1fa7760565b6cb0",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/native_image_protection",
+          "-B",
+          "/workspace/chos-native-image-protection-qualified/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-native-image-protection-qualified/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "application_sha256": "e257c59d4aee09a0043ab546e57cc8d5c635cb15d700376b741395c01536a019",
+      "limits": [
+        "one-way owned image data permissions;not full engine/sandbox completion",
+        "native guest qualification required;no hardware target claim"
+      ]
+    },
+    "WTF": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "564898ec1544f84c94573e93aef67d518582563dcd601c7a032234453175633e",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "468433c6e2aafaba5c88e658475c1abe559a5cf80c596418cf86863538b59c8f",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "5381ec8203c4a33f1a04eed65a83a356024d455eba74232452e465f89c88271a"
+      },
+      "sdk_manifest_sha256": "1332a36607c24ecdc4cf3ab35043552f4d1c1b39c1af8957f1fa7760565b6cb0",
+      "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j4"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/wtf_filesystem",
+          "-B",
+          "/workspace/chos-wtf-image-protection-qualified/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-wtf-image-protection-qualified/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 5.909826009999961,
+      "application_sha256": "5d661b75337c2158913afc4ccfc9332dd4809203d6f7d1535316c771d8645c3c",
+      "deployment": "/workspace/chos-wtf-image-protection-qualified/cmake/wtf_filesystem.elf",
+      "debug_application_sha256": "cee722d7573d16cadbe856a440420968d363f51ea412fd7806b9544253a89f52",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "real native WTF archive;String/Vector/path/file/directory component execution;not JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "full engine Thread lifecycle and foreign GC suspension remain open;current-thread stack/context services are separately qualified",
+        "native filesystem has explicit format/service limits,including no coherent shared maps/locks/timestamps/capacity service",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    }
+  },
+  "libraries": {
+    "libWTF.a": {
+      "sha256": "564898ec1544f84c94573e93aef67d518582563dcd601c7a032234453175633e",
+      "members": [
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ASCIICType.cpp.obj",
+          "bytes": 1192,
+          "sha256": "c8e836be6eb0ea4b1ac826316bda0146675370aee3f9152f5a050be298300027"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ApproximateTime.cpp.obj",
+          "bytes": 1880,
+          "sha256": "cbeaff5ee00c681c4da1cc4a56527c7f4a9f2849ee54b7b87b4c421620f9521f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Assertions.cpp.obj",
+          "bytes": 47736,
+          "sha256": "fe91f9257ca86b1149048fb36f1e77a89cca4f5354518de2837ad59685b5e883"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/AutomaticThread.cpp.obj",
+          "bytes": 28424,
+          "sha256": "0702f3683994d118e2615345d678c579767b8c51ad0f402c4356daee3c3937c6"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/AvailableMemory.cpp.obj",
+          "bytes": 2352,
+          "sha256": "27db41ed99332f5be606ef871eb2b4c8d01f3aa9346b3f35112724e0af66540f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/BitVector.cpp.obj",
+          "bytes": 12920,
+          "sha256": "667171d9d9481c02ff3ffd914a9a1f8ead2f04aaf34589b6bdbbf404e2ac9157"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/BloomFilter.cpp.obj",
+          "bytes": 792,
+          "sha256": "d0eadbb762d19ae19a4736b9e05220aa2732fb87bbdc0f385ce4095de08f3e81"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CPUTime.cpp.obj",
+          "bytes": 1256,
+          "sha256": "9a48eaa1a6936f9c6334b40696a0a0da20a86f95b8db36ef5c7ffd54504215e5"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ClockType.cpp.obj",
+          "bytes": 3080,
+          "sha256": "02ca8ed3d1c44c3d4b5da6cad2c6d1446924292957e99e39981bb0570d3b2b94"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CodePtr.cpp.obj",
+          "bytes": 2792,
+          "sha256": "9a5f67a08265e4183948bd6eeb4bbc09d5cff2262fc321f3aab6a519b2f86ae3"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CompactPtr.cpp.obj",
+          "bytes": 784,
+          "sha256": "495ea640a6e9986f1331a1fbc6235b8566610d1ee76218711aa0157fd34774d7"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CompilationThread.cpp.obj",
+          "bytes": 1752,
+          "sha256": "f3a44b6108aa755c19b13377c1d26df8228a5bf49e6f64694ce1da7c268209e0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ConcurrentBuffer.cpp.obj",
+          "bytes": 792,
+          "sha256": "690bbf735a761a0e3e5aa9a4ebc45e5f89078edccdf0f7d9711f90f2c2aca04a"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ConcurrentPtrHashSet.cpp.obj",
+          "bytes": 14560,
+          "sha256": "c0e5aa54279ffc896d3be402a8d35b30f1800afa11111f5d00ece15ddc8cab36"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ContinuousApproximateTime.cpp.obj",
+          "bytes": 2472,
+          "sha256": "189050240f2e26d1df33380604bff6bc5056318e6b3631db38d3d1343939ea46"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ContinuousTime.cpp.obj",
+          "bytes": 1880,
+          "sha256": "d4911adb21d57437d0290ce24906ccbc484b72d0f6de02b941229c01b3ca70d3"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CountingLock.cpp.obj",
+          "bytes": 8960,
+          "sha256": "07969d6686795b65eb8e9ea39c23c66788d61a30a1f199a862ab28d3b459f7de"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CrossThreadCopier.cpp.obj",
+          "bytes": 792,
+          "sha256": "b735a610218a5a5938cf89769a9cb4bc48f07ebb4fe0274f085bb842c7dd532a"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CrossThreadTaskHandler.cpp.obj",
+          "bytes": 20304,
+          "sha256": "7750ec315cb5b59abde803446dff697464903dfbb6197accac6cceed47ad88d4"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CryptographicUtilities.cpp.obj",
+          "bytes": 3392,
+          "sha256": "2482ddbb85d2955a834642ba0d2a8bdc46dcbc8ff7f8137ea12756a7eabafdc3"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CryptographicallyRandomNumber.cpp.obj",
+          "bytes": 22800,
+          "sha256": "385a358fe66b4526a6433b4c140ab026565d66cdfe5af4cb60eab0eceef07662"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CurrentThread.cpp.obj",
+          "bytes": 2112,
+          "sha256": "92b9a4496e9638ca1adee42fc71be841eeef742c1e1d846b6277974b563a94a5"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/CurrentTime.cpp.obj",
+          "bytes": 5552,
+          "sha256": "c27c52595cbea117dab2dd3de8208e6aa93dde5fc10a9e596312776af47eb55c"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/DataLog.cpp.obj",
+          "bytes": 8696,
+          "sha256": "be75e6207622fbe4778455150c2af6f5b832f50e76383a532a65f65671f90fac"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/DateMath.cpp.obj",
+          "bytes": 53888,
+          "sha256": "b073d4622a0c9512d3d15b5ee6b649f259163f946fb5fdd7d0824e6fed75a168"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/DebugHeap.cpp.obj",
+          "bytes": 784,
+          "sha256": "fcabb478b0e00b09bfa052cc821e949b9f21a317674ddf197188cd6f6994ef86"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/EmbeddedFixedVector.cpp.obj",
+          "bytes": 800,
+          "sha256": "c3a9631158d6e3f1d63fc5f053a8fbebbff829df5848424fcad73824696cccab"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/FastBitVector.cpp.obj",
+          "bytes": 4664,
+          "sha256": "5440e4c0d536d065b097b43b3a0e029a1cc886847df36f0a15bac6afb62177bd"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/FastFloat.cpp.obj",
+          "bytes": 44440,
+          "sha256": "a50b46c4d05412d105e4a718ead52fca4edb22667f62fd6f29d4086e6e96238b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/FastMalloc.cpp.obj",
+          "bytes": 21360,
+          "sha256": "00d95f4bae2486d5d9c212406df3a784cc2e82ce5d68a287fb316e30f11ebd74"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/FileHandle.cpp.obj",
+          "bytes": 5648,
+          "sha256": "e545430eacc8f6df29b533afef53dae275b05ba27d91b3e575abf028eb77be32"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/FilePrintStream.cpp.obj",
+          "bytes": 4928,
+          "sha256": "f79315d2b11ca7b4015818426ee1ae64eb1f8633ef78697d3f2928081b4adbc6"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/FileSystem.cpp.obj",
+          "bytes": 33840,
+          "sha256": "066e770af8809f9456f37b9d42e76180ad90561837f933be95d7a50119e4bc01"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/FunctionDispatcher.cpp.obj",
+          "bytes": 2248,
+          "sha256": "27d53e4990616e90b0fa969b3483387eacc6e25cedf084ef2779bcc21addd91c"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/GlobalVersion.cpp.obj",
+          "bytes": 1528,
+          "sha256": "d77b8625100b794c5d9bff3f637f6c663d99c15aceb18932de2cd049a668e797"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/GregorianDateTime.cpp.obj",
+          "bytes": 3888,
+          "sha256": "a36f1bf424125b8e32f79bcc329245de4e771fae10efe7c9550956cb8aacccbc"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/HashTable.cpp.obj",
+          "bytes": 784,
+          "sha256": "0bd58f1c88260b4cd2ab6b059403319d97f5d341a2d477a867bae33782b9e47e"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/HexNumber.cpp.obj",
+          "bytes": 4440,
+          "sha256": "c6b657a40bebfd328691158f248e62426f53ae6074b64dfea49ae7ced5d0c388"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Int128.cpp.obj",
+          "bytes": 22536,
+          "sha256": "26a92860100a5f414d0139c4f06e14972552a65ca8ae1829eb4ff2845308c28e"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/JSONValues.cpp.obj",
+          "bytes": 75312,
+          "sha256": "d3f08856dfe785a27d6898c4f7c3b4d123c7a94a443a2a96b6861ef3f79c791a"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Language.cpp.obj",
+          "bytes": 38112,
+          "sha256": "bdbf5a8e9b77f8de2ef079dfa12a7ed0d89c162c16570874a185212528498ab7"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/LikelyDenseUnsignedIntegerSet.cpp.obj",
+          "bytes": 808,
+          "sha256": "3b923327965e652969f8f7ece17e5b8abee9e8737ebda662d0fa25a8aebcec9b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Lock.cpp.obj",
+          "bytes": 10784,
+          "sha256": "b5abaa648a02ae412d5349193949cd652c92b0b48dbe127f4852535e128df9f7"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/LockedPrintStream.cpp.obj",
+          "bytes": 5872,
+          "sha256": "00f2b87238c7936bdd7695d4a828571c9bdd5ff0193a4338760270684018adae"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/LogChannels.cpp.obj",
+          "bytes": 792,
+          "sha256": "236855c918f2d38ce29a803bc980f0e9910a35e2f1d01c464f14593ac5db0937"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/LogInitialization.cpp.obj",
+          "bytes": 792,
+          "sha256": "7da12ec0a594d36a1d441f77241c0497cf13981e988a95f8b33a73bfe171a6bf"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Logger.cpp.obj",
+          "bytes": 16712,
+          "sha256": "92d752bda769578fbc9a26d3ba1fc6d07ecd2bbdb12e56e6e0c688989446be19"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Logging.cpp.obj",
+          "bytes": 784,
+          "sha256": "9c2953b0abf1ead1598c7d7ddec730883c61cae55d316ebb3661947175c4197f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/MainThread.cpp.obj",
+          "bytes": 13336,
+          "sha256": "7f78bccade51db0692c67f71bfb1d24e182144d1d85793c66e81a1aabbbe3de1"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/MainThreadDispatcher.cpp.obj",
+          "bytes": 5960,
+          "sha256": "9ef02fb8b179f3c11890237c9a926cd56c47fef4401d533dd808726be075ece6"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/MallocCommon.cpp.obj",
+          "bytes": 792,
+          "sha256": "1ed42797c5325b76d629cc748e7aa014dd8a65e416a5e1534add27b479574bed"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/MediaTime.cpp.obj",
+          "bytes": 46256,
+          "sha256": "7f963ee3a6db45bab1860b1540c9d3827fa1e03d0a54fa6f10a6d36c1db8ae2f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/MemoryPressureHandler.cpp.obj",
+          "bytes": 31840,
+          "sha256": "d2e06d4c6d2ce23de2e77cfa4f292a8ba653b7b5f8c9c1e02ecf2e287a1aae71"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/MetaAllocator.cpp.obj",
+          "bytes": 44264,
+          "sha256": "39ed29778f4ede7a938b2acbd27ae230b19af6c662830bf58368f0eec9b4e1e0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/MonotonicTime.cpp.obj",
+          "bytes": 1872,
+          "sha256": "31b711a637aeb5ab8355de23186b86139b68c55872d5a43cea7698d39024b818"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/NativePromise.cpp.obj",
+          "bytes": 792,
+          "sha256": "c487e8325ffe53ba61dd3be4700d6420f0be56d334f1a07fe9781d600e7c3fb4"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/NumberOfCores.cpp.obj",
+          "bytes": 3808,
+          "sha256": "3ad99b17c93d5e3c777f618e3093bb7641f628666c62f8a309e943a7217dfb3b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/OSRandomSource.cpp.obj",
+          "bytes": 2384,
+          "sha256": "68e587cfc64103ae8e24794143a7c855b0dc1f65b11f9f07891edda40255c98f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ObjectIdentifier.cpp.obj",
+          "bytes": 4288,
+          "sha256": "d315917a6cdc07033fe718bda36117c4fb6c2d39bf09c8daa7adb8ff3c95a4b7"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/PageBlock.cpp.obj",
+          "bytes": 2536,
+          "sha256": "709b3152f1331bc6659c2a27371ea8ddd625a2179359637ad6e2a9b08c8111d6"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ParallelHelperPool.cpp.obj",
+          "bytes": 31464,
+          "sha256": "e089cca5e8edf4e65c1d2970858b5be1881386df9c7198368a89bf18de27d8b0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ParallelJobsGeneric.cpp.obj",
+          "bytes": 15928,
+          "sha256": "59f04e2b0d7fd5ce3083744bde7c9fe0c756582ac0ef94aeabba0367428fb136"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ParkingLot.cpp.obj",
+          "bytes": 39616,
+          "sha256": "068ec951a78d45ae8786c74d78eefa291ead86896ca2d8f6c115557e603291bf"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/PreciseSum.cpp.obj",
+          "bytes": 20104,
+          "sha256": "8e8b569151a61549ca4c4404c467b104ad5b87e9dc6185f951cf6f699c7cf4eb"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/PrintStream.cpp.obj",
+          "bytes": 38160,
+          "sha256": "628bef62f0de48f1f5b63143b7ea2ae2d44ae7c2191da7204bd5c1c431217c5e"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ProcessPrivilege.cpp.obj",
+          "bytes": 3008,
+          "sha256": "f5e0bfe9bafe1c16af3652cb9b382fd22eecf58d04d1ad7ec632d78cf9253dfa"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/RAMSize.cpp.obj",
+          "bytes": 2064,
+          "sha256": "271d5757f210c6f4369e432cbf83f4b849d74ea1b8e010167920a930cce1642b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/RandomDevice.cpp.obj",
+          "bytes": 2392,
+          "sha256": "6689a4e1da477846b3aabaa885f84241c868166233be3695000eefabd9ff88f7"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ReadWriteLock.cpp.obj",
+          "bytes": 5912,
+          "sha256": "56a197f50548edb9a5a717c6c069e77fb2caf037d9f23b72438c532ee066ea6d"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/RefCountDebugger.cpp.obj",
+          "bytes": 6224,
+          "sha256": "53b06bbec2366c1abde5c2e7530146443410ba9bd1aba6023996c751e61886ef"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/RefTrackerMixin.cpp.obj",
+          "bytes": 792,
+          "sha256": "ebba34662d5370f3563b9c474ad1f6a8f6b7af0932ca20151fd5c04470bb5f95"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/RunLoop.cpp.obj",
+          "bytes": 35624,
+          "sha256": "59f3ec287296a878651c47a4704882b25bc53cee8c2ff3a00fb3b1cdc1dc7cc6"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/RuntimeApplicationChecks.cpp.obj",
+          "bytes": 6736,
+          "sha256": "58a3fcf65c515910dc7e818bfb584062a5ef287c3890b30176737f1d168a8659"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SHA1.cpp.obj",
+          "bytes": 10472,
+          "sha256": "3d4c4943a05202898c19ecfd903694c12eb959f1fe8e89c43372ba82ee450e8f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SIMDUTF.cpp.obj",
+          "bytes": 612976,
+          "sha256": "731da69c80a1b4afd5128a966f6b8c25792ed5b365889a676fd393578c945998"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SafeStrerror.cpp.obj",
+          "bytes": 1856,
+          "sha256": "acd181da962eaa3e88b7f6a99dee2ae4c611c08326458857c0b460a518244ff0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Seconds.cpp.obj",
+          "bytes": 7976,
+          "sha256": "f94e38996c10a1bcc13914df42cef342ee1d89ff13cbb9f18f02e2a74f58d8cf"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SegmentedVector.cpp.obj",
+          "bytes": 792,
+          "sha256": "67d1deff86ae4339638bc3dab7fb3a83454f1071f8a0fee46110434bc3bb0327"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredAllocator.cpp.obj",
+          "bytes": 800,
+          "sha256": "7aa05ea6e8975ea844a1ab1a045e31535f3d18442e1a8923789e10a7b5c97b8e"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredAutomaticThread.cpp.obj",
+          "bytes": 800,
+          "sha256": "912b0c0c175bc99629ac726b9f1ead31fcabc03f9ea3f835c95c24670e40206d"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredImmortalHeap.cpp.obj",
+          "bytes": 800,
+          "sha256": "43f4b20fff491d2b03225c0d8bcbd058d47aa88e5c4d3702b374d908982792c5"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SequesteredMalloc.cpp.obj",
+          "bytes": 792,
+          "sha256": "034fd1044fbc41852a4c0d7f8fe3a1f04bf5b7f85a6f85ced1bd78dcd9c7c66b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SixCharacterHash.cpp.obj",
+          "bytes": 3336,
+          "sha256": "a0526e8a69ecbec2329e9adfd9576a819d51db3df13cd4827536b6acc5cb074d"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SmallSet.cpp.obj",
+          "bytes": 784,
+          "sha256": "ae950d56a7fdfbf1e16c91aac4da1c8cb564fa369e28fb89b4d387b1815e3b60"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/StackBounds.cpp.obj",
+          "bytes": 2752,
+          "sha256": "2a233b9b46c8f55a2d05dd4bc0f805459d654c50911bed97e881c40474b3f46a"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/StackCheck.cpp.obj",
+          "bytes": 784,
+          "sha256": "e7aa2d5678a0c11ec85ead855e61efe96aca40744131051ef4b940d87fb4772e"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/StackPointer.cpp.obj",
+          "bytes": 792,
+          "sha256": "294a376268789aa3ae33b263112e67b56a5aac8a10ae2554e1d3a9913057c9f0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/StackStats.cpp.obj",
+          "bytes": 784,
+          "sha256": "4b3ecb256e5682796d5648de6c7dfcc8374589d327916cb6c29b5220ea24c84f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/StackTrace.cpp.obj",
+          "bytes": 3672,
+          "sha256": "1bd011d3db9d3827a38a0728120b568f24109f9bd3a3d4196d613fc329e23ae1"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/StringPrintStream.cpp.obj",
+          "bytes": 8528,
+          "sha256": "a26ee4bef567bd0b6d10af8758a4577cbe4dcd2f7adcdf0dcf27f434e4ac1a47"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/SuspendableWorkQueue.cpp.obj",
+          "bytes": 33824,
+          "sha256": "164ca5875f0103367d334a45f8ada3706577ff5e4de0948ece6e176dbf53744a"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ThreadGroup.cpp.obj",
+          "bytes": 5592,
+          "sha256": "504b63d958d17a308d6b0fe0d5520bf00575983aaffe770fc429d5691d960adf"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/ThreadMessage.cpp.obj",
+          "bytes": 1872,
+          "sha256": "91d07fc3127ef0fd3dd6ea59bd4abaf2cc451f05a8f844ecb74c61f526d35e84"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Threading.cpp.obj",
+          "bytes": 63600,
+          "sha256": "d67ce57daaf25e742fc993bebbc912facb09f4f68f72dfe699cd38bc11fb6a83"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/TimeWithDynamicClockType.cpp.obj",
+          "bytes": 14736,
+          "sha256": "23b32aa28bd1f298ff9879f7fc936c2dee40d4b3984479978a9ceb10a6f5c381"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/TimeZone.cpp.obj",
+          "bytes": 2760,
+          "sha256": "264c506f4f70e27b6bd2d63b0540f116f26b0c8fdeac2dcfd698afba80399d89"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/TimingScope.cpp.obj",
+          "bytes": 6752,
+          "sha256": "3db54d50ab2a8efabbaacab1503fc8beeeed5202c85227f5998af45290b652c2"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/URL.cpp.obj",
+          "bytes": 350752,
+          "sha256": "1fdb109f69780fd3c270920fd53c2969cb6129c80e74a55dfbfa3ffff6861f0a"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/URLHelpers.cpp.obj",
+          "bytes": 48984,
+          "sha256": "ce2a8ee4992029069f7fe7094f59f8cdd3fa31303e19214a89a53308ad38b497"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/URLParser.cpp.obj",
+          "bytes": 219592,
+          "sha256": "65ba54fdae7077e878d6e9c756850a8f590c194736ef3879d6324f61ce6c35bb"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/UUID.cpp.obj",
+          "bytes": 17080,
+          "sha256": "cb86775bbb816e6ebed160c4157337fd3e82129be4526fcca82268c5dc9dbc05"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/UnbarrieredMonotonicTime.cpp.obj",
+          "bytes": 1904,
+          "sha256": "000defcd188822f8c2314e8201708009849f8241beb0ccb9747bcbca3b46f604"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/UniqueArray.cpp.obj",
+          "bytes": 792,
+          "sha256": "2cc3860d7296beaa022a43f4328a72eb52aa26149e8c41e461dd554c9f552c46"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/Vector.cpp.obj",
+          "bytes": 784,
+          "sha256": "8fb59a381d2621f70b44072359144d404141cdbb90b46b8a1a6dfbab9d9724a9"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WTFAssertions.cpp.obj",
+          "bytes": 792,
+          "sha256": "41a1d1093383e997e513c019ab26a18e7d261d04557dbf1776e47296720e97d0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WTFConfig.cpp.obj",
+          "bytes": 26568,
+          "sha256": "4ba00486f4b31bd2dffffc7f0707a11e2253d0731c4d8ed6ce31fd9a3b57b2b7"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WTFProcess.cpp.obj",
+          "bytes": 1688,
+          "sha256": "12235508652b7c69eb1f8d062107d9cbba95db34acf3f421ea305920eeb0ee7f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WallTime.cpp.obj",
+          "bytes": 2352,
+          "sha256": "74a556a665761dcbc39e29965d18dbd0ea34c25257a730a2e23243dd3361f49b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WeakPtr.cpp.obj",
+          "bytes": 784,
+          "sha256": "509728c970518559e813a1c28a0b13e7c7aa00ea4c0abbc01bedbb1aba9ff77e"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WeakRandomNumber.cpp.obj",
+          "bytes": 2336,
+          "sha256": "3a787e9f1ff2140850ded8ef9649e6ff322f3a1a06ec1edbf130bf78d24470b4"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WordLock.cpp.obj",
+          "bytes": 3424,
+          "sha256": "a02a6fa936fb3648410b59fdde7627bf4e042ad17a5e908b7e23547ca85c1000"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WorkQueue.cpp.obj",
+          "bytes": 37136,
+          "sha256": "63ac5a7aae1eb22ef557f69e2851b107ee22d29899dbd7847f1762f8a87736f0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/WorkerPool.cpp.obj",
+          "bytes": 19120,
+          "sha256": "2129354865441ae817cf1f1e639fa0d447cdc6284618c6cecdca6b1d43a99017"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa.cpp.obj",
+          "bytes": 24944,
+          "sha256": "de33d0305e5eadd8d5b422f6b849d97c100c4d376a4e8f7948d202902b625865"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dragonbox/dragonbox_to_chars.cpp.obj",
+          "bytes": 52648,
+          "sha256": "d2bc924fbaaa1d1a3fea97db778d747b06ca2a5db4ec771bafb39ff59cd52b25"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/bignum-dtoa.cc.obj",
+          "bytes": 6936,
+          "sha256": "28e529f3e57ce6f92334551aa424efee5582a0f4877431b10735ef8484b6efaa"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/bignum.cc.obj",
+          "bytes": 19776,
+          "sha256": "4ab46076bfc4f832237a31c888dcf75c9ec3dbc8043b2e7b36903b84845af98a"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/cached-powers.cc.obj",
+          "bytes": 4232,
+          "sha256": "6cfbed6484f638593573addb4960002a298497955b1da3b9597d1dc8deab3308"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/diy-fp.cc.obj",
+          "bytes": 1304,
+          "sha256": "ba29f8e3c350c31455994a6220dfea75147cd96cf5873ecff3dfa90e6c9e623c"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/double-conversion.cc.obj",
+          "bytes": 22008,
+          "sha256": "64f8b97599bb858174cab0f7e992a415de7d6360a04acdff0bdba1fd1b12a137"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/fast-dtoa.cc.obj",
+          "bytes": 4720,
+          "sha256": "77126b2972a96c6cb6ff71b014f27e622bc807fd715ddb4ba5f7c425d7d9b176"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/fixed-dtoa.cc.obj",
+          "bytes": 6904,
+          "sha256": "9bf208a65b1f78853e4bb29a891007cbea1537799fecc04d4a927ca42bbb76c3"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/dtoa/strtod.cc.obj",
+          "bytes": 24400,
+          "sha256": "67a81a9ecf819a2face4f20f820d687dd4c81f9d9bea4c893affbd8a10c82db1"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/persistence/PersistentCoders.cpp.obj",
+          "bytes": 10328,
+          "sha256": "7258aed1fe25bd8ac522cfef61503114eb02ab62db5293a30533b3e83ec6c612"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/persistence/PersistentDecoder.cpp.obj",
+          "bytes": 11472,
+          "sha256": "85f26705cae9f69b6148b8083bb6542e115213ca4d8a253f51163c58c7efb673"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/persistence/PersistentEncoder.cpp.obj",
+          "bytes": 18856,
+          "sha256": "320c002078a3a812aa7bce1724b6139b78ffede6d99521c9552b42f60776fdc2"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/ASCIILiteral.cpp.obj",
+          "bytes": 1512,
+          "sha256": "f7eee5d616320477fbb357e03276ca5a60b528b39f1407dce38dfdaabbc94401"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/AtomString.cpp.obj",
+          "bytes": 19672,
+          "sha256": "a003308912c3040370eb9520c5d51ddf866e9808ba0cf0db3983b8129573ab26"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/AtomStringImpl.cpp.obj",
+          "bytes": 59928,
+          "sha256": "fc4b2ebb9825268bb0f15f9a6990e5796aa2a9d2277833f1c31e8cb7b8262ca7"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/AtomStringTable.cpp.obj",
+          "bytes": 2024,
+          "sha256": "2579ff95116c1c901170cb2a905de9c4e8ffcc2af24ed684b96e55c04be0c7e2"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/Base64.cpp.obj",
+          "bytes": 41416,
+          "sha256": "887a9c28a4e367a9b0b34866c1f20d6994fd6c6cff8604f54830207d4856171b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/CString.cpp.obj",
+          "bytes": 17872,
+          "sha256": "75674d8a34bfbc74f376be82597cf6e9fb92f259ddc77981a22730facba82a55"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/CStringView.cpp.obj",
+          "bytes": 1528,
+          "sha256": "ecb016bafb6df20e441258c605a39a3b396a504db10fdb968afc49e713266d92"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/ExternalStringImpl.cpp.obj",
+          "bytes": 4648,
+          "sha256": "f276b332f9e30f5aa3701525dee1e325199ac9f20f8f8e3ff818a2a8268ff562"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/LineEnding.cpp.obj",
+          "bytes": 4040,
+          "sha256": "9d96d4bed828c90232eeffcc3de21acddb12eabb26335eb389fd992d8c8e3a19"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringBuffer.cpp.obj",
+          "bytes": 792,
+          "sha256": "6ecd732fc9d57160f717461306d38b0a7587d006e85048d26d3db092b20acc86"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringBuilder.cpp.obj",
+          "bytes": 27568,
+          "sha256": "d3cbff3d69ada157621ea3243f9691688ef9655bb7daac4126440721445f1ddc"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringBuilderJSON.cpp.obj",
+          "bytes": 4544,
+          "sha256": "0d8bd2f08ad14e5cef03129bbdca71f650f0e0933d1368cd6f864f9c69472503"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringCommon.cpp.obj",
+          "bytes": 4680,
+          "sha256": "1efd6b1b02b88abc921d8f71957d7f62b33c4482a2ae5c6acc30dc831ab47f82"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringImpl.cpp.obj",
+          "bytes": 232304,
+          "sha256": "4065205b00dbc35d8976ea4655f63db01121b916f91427e87068986ee84c2448"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/StringView.cpp.obj",
+          "bytes": 133400,
+          "sha256": "e98c36583b36ae91ca90d790ed107dd708a7f3c57f103e3457c9d4f393c4006c"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/SymbolImpl.cpp.obj",
+          "bytes": 14464,
+          "sha256": "f58be1ab6ba0262d1aa7382ca32c4f8aa1346b95e38cf29ccb8fa7a110b5e8c4"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/SymbolRegistry.cpp.obj",
+          "bytes": 9248,
+          "sha256": "f5a70fa4baeddc74eae834b91e6cdc33356b5b590dfa08070618910d9e05bcad"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/TextBreakIterator.cpp.obj",
+          "bytes": 21128,
+          "sha256": "2bb96997e9bb55f25f6128f7f01528e457040eb4c4fa3a1b116b5afc82c3142c"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/TextStream.cpp.obj",
+          "bytes": 49344,
+          "sha256": "69a166ebda565b9197ca9d43e46fb496beca1732e713e0653d3842fd2a8d50e1"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/UniquedStringImpl.cpp.obj",
+          "bytes": 2200,
+          "sha256": "4b636b67c10df029d5be7fbee77a6076012f52b00fe705fce566021d6654d619"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/WTFString.cpp.obj",
+          "bytes": 81584,
+          "sha256": "6a31b26bf640fcd2415b0760352278dae2f29d70cf7918753676c7957527dbf3"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UnicodeExtras.cpp.obj",
+          "bytes": 1440,
+          "sha256": "6ba2eb3d60cd10940a86f993465627a6a366156faa77fa95895d604d4501b8c2"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UTextProvider.cpp.obj",
+          "bytes": 2024,
+          "sha256": "c58938b28eef0e014d5398c0c2f822ed257e6528d07a9f118b61881997cd3f2b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UTextProviderLatin1.cpp.obj",
+          "bytes": 18840,
+          "sha256": "b17e2c179583834d02641de06c43135c71b3838847b2a14f7389109b32827e24"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/icu/UTextProviderUTF16.cpp.obj",
+          "bytes": 4128,
+          "sha256": "c094ffb05308c03ae0dc94d847849b8f317bc5e1470bf80c2924508ff19042b5"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/threads/BinarySemaphore.cpp.obj",
+          "bytes": 5152,
+          "sha256": "b642ca12d15ac5336168130b0c2e597fb7dda789520adc5f8200098402d605cd"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/threads/Signals.cpp.obj",
+          "bytes": 784,
+          "sha256": "ed51904a55680caaf010a815688c056386ffcd8c6dd4e2c2405a5a30b6fd3014"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/CollatorDefault.cpp.obj",
+          "bytes": 792,
+          "sha256": "27a172f3cf8ffd6ebbb6e0d3b97ee51590c0ca9d9bc7d97c6152f891a605aa7c"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/UTF8Conversion.cpp.obj",
+          "bytes": 9512,
+          "sha256": "e81addef9063296bb19f798c12a32803d84e0b4c969efb8443629becd4da5428"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/icu/CollatorICU.cpp.obj",
+          "bytes": 9864,
+          "sha256": "6537c00cc69fb1ddfa12f58932db6bdd23740349adb98aa391ce3ce1e6495254"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/unicode/icu/ICUHelpers.cpp.obj",
+          "bytes": 2984,
+          "sha256": "5a0612ebdd9d9b60f4d1c4aeda5dd7ba230059c30f0979026cca4dbd1d28611d"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/generic/WorkQueueGeneric.cpp.obj",
+          "bytes": 14072,
+          "sha256": "bacce2fa16323f24fd5e4efcec910bce867dda45941dc8449eac9303db987b83"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/generic/MainThreadGeneric.cpp.obj",
+          "bytes": 2080,
+          "sha256": "162af08335fa54a7cb8f4395dd1cda6e279905896e11db3c932f5cf8a2400c02"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/posix/OSAllocatorPOSIX.cpp.obj",
+          "bytes": 10080,
+          "sha256": "0247a84c64a5e06e06e486e5bcc28b00d25470700f29f95c041f547a038e42f1"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/text/unix/TextBreakIteratorInternalICUUnix.cpp.obj",
+          "bytes": 2024,
+          "sha256": "a9fccada3f5f5819e6f9d9110a3a38794f517f462e4da2b0b8720ed8e7227c42"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/unix/LanguageUnix.cpp.obj",
+          "bytes": 6136,
+          "sha256": "0d180623983e38fe10c61c398c45ef55ed0803ea5212a88ca134e18605107a97"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/unix/LoggingUnix.cpp.obj",
+          "bytes": 792,
+          "sha256": "24d000515706ae447863b9c6e870dc9e783e9b201ccb15e8f1d0623a9a14e92f"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/ThreadingPrimitivesCHOS.cpp.obj",
+          "bytes": 7344,
+          "sha256": "677dd909adb6ed40ae1a1f44c1910855a216e2a1d8acf46e58a5e4e422aa87a8"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/CurrentThreadCHOS.cpp.obj",
+          "bytes": 9360,
+          "sha256": "18768c105d0f5d6382bb4aa3162913f4a05e41a444e378a62012ea7219057aa3"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/CPUTimeCHOS.cpp.obj",
+          "bytes": 2896,
+          "sha256": "c30e08b784ecf755f977a47c8defafcd4ef1ace8802c8f06dcdf5594175dfee2"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/FileHandleCHOS.cpp.obj",
+          "bytes": 8952,
+          "sha256": "db4e0718801d86eea7f44e6049f1fe7182e675a9b19598b520c0967144540b0b"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/FileSystemCHOS.cpp.obj",
+          "bytes": 85744,
+          "sha256": "8f86d28afe475f5182126dcf14d3be815aad8340d67fa993004871640a79d9f0"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/UniStdExtrasCHOS.cpp.obj",
+          "bytes": 2896,
+          "sha256": "2b77b437a3f21f3b9160e7e31fdfcdd98bbd57288061f5285634f5d4d6e6595e"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/posix/MappedFileDataPOSIX.cpp.obj",
+          "bytes": 1832,
+          "sha256": "3ccf1c00a358fdd8077e838dd35f79b3ce9e73991fcf90fe3f6d7449278934d1"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/MemoryFootprintCHOS.cpp.obj",
+          "bytes": 2232,
+          "sha256": "e3e20ef2856b3b0520077fe576c9dc8cb12dd45933b261c51b022e0c1772ec28"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/generic/MemoryPressureHandlerGeneric.cpp.obj",
+          "bytes": 2560,
+          "sha256": "3bc342daf42b461d2d09c5538baef60b1d1d0d373a75cde775e9cdd27c686ef1"
+        },
+        {
+          "path": "Source/WTF/wtf/CMakeFiles/WTF.dir/generic/RunLoopGeneric.cpp.obj",
+          "bytes": 36136,
+          "sha256": "ff4113cff4448df912d94529215e5aacb928c9283cd906970b24587b3223c70d"
+        }
+      ]
+    },
+    "libbmalloc.a": {
+      "sha256": "4d23708bd1fdad4a124d39f77c095e2cbcf438c05acc48414512f2effef6d499",
+      "members": [
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/CryptoRandom.cpp.obj",
+          "bytes": 1328,
+          "sha256": "0002d735e237204d5e61b5ea16d2a64e4674a219bb0fab3119f7b177e6582025"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/SystemHeap.cpp.obj",
+          "bytes": 15920,
+          "sha256": "d03f7b9ce21faf42dc7865801bdeb1a4676aa77ee7a12f5c429f69962880da03"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Environment.cpp.obj",
+          "bytes": 2448,
+          "sha256": "d78cb168a99e3cdfda49c4c591bc4b1c5eda610333428acaaef482f80751b373"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Gigacage.cpp.obj",
+          "bytes": 784,
+          "sha256": "2b0fb90358d8304563c0335ccae2a9f488ae33136917409701bdc1b7745d2ede"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/HeapKind.cpp.obj",
+          "bytes": 1464,
+          "sha256": "7d9ed3c4e1c78db5d8cb2a90b16f6cd112b0b283a15f4770c6075e6b203697d4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Logging.cpp.obj",
+          "bytes": 3112,
+          "sha256": "a1beebcd892825e0928f9dcdd1f1394c2813a143ba9fcae190858755f871c6aa"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/Mutex.cpp.obj",
+          "bytes": 1376,
+          "sha256": "dbeeaa76259dde5bd38d6dd1ce7df8663f4b166b939c637c448680209c1d3386"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/TZoneHeap.cpp.obj",
+          "bytes": 784,
+          "sha256": "94848616f5be8815166b44496e4046f7d815ad739e6a2004155f073bcc72fb49"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/TZoneHeapManager.cpp.obj",
+          "bytes": 792,
+          "sha256": "b5153bf3e6779d3ce56d962a3041b9c40b1c97d2cce3ec52930a3f280e1c9622"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/VMAllocate.cpp.obj",
+          "bytes": 784,
+          "sha256": "469893c2da70f64995eff025c11120f474041717ee6fb07d29a0eccd4aad84cf"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/bmalloc/bmalloc.cpp.obj",
+          "bytes": 8712,
+          "sha256": "b43c95b4606e1a46c7d813a69da2da2b7a1a09f4182d99a7a3a9665a6b8155b2"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap.c.obj",
+          "bytes": 784,
+          "sha256": "dd401cfebdd4fbd864b255fad32fb64295ec4ae8aa485be6a8658e7c2c104a31"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_config.c.obj",
+          "bytes": 792,
+          "sha256": "7eb70c3bf492dc618e1e6e658c5d5a1c1a620178024c6959a810b7f77893274b"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_flex.c.obj",
+          "bytes": 792,
+          "sha256": "a6397a5e8456d36ea54475fb5cf00e3ad870cc68bfc72acc2b764ad8b054c41e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_iso.c.obj",
+          "bytes": 792,
+          "sha256": "9842c32629232d7389ff6f732e4d6cc392d18107ebc487dbb9299c5242602858"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_heap_utils.c.obj",
+          "bytes": 792,
+          "sha256": "db8b2f6d744e2abac4790e48b3b7ae0832a8e46a1b8fc7d95c4ff3a675d127cb"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/jit_heap.c.obj",
+          "bytes": 784,
+          "sha256": "e11c3f1f9470b0d0a0d61345c3f1b37864ec1898e7768b5b441ac0bb0238a318"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_page_config_kind.c.obj",
+          "bytes": 800,
+          "sha256": "f67b903d62cede7266e9d53e59e37f892f52f925186a1036f5e4b270c1e61ee2"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_config_kind.c.obj",
+          "bytes": 792,
+          "sha256": "18f7e2d5dd95090cf911d60be13847751f1dc35d67497e49fed72e5e3f1ebc7e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_page_config_kind.c.obj",
+          "bytes": 808,
+          "sha256": "ccaed344afaddfd06edfe26f6afdab513fc41534131fd1ffe6fa256ad47bc69e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/tagged_bmalloc_heap.c.obj",
+          "bytes": 792,
+          "sha256": "4143ca415583ca978f176d39ddd1e08d19e8317cfa8cfce05ae16c3ce28efd25"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/tagged_bmalloc_heap_config.c.obj",
+          "bytes": 800,
+          "sha256": "3e258b4563aebfdd5d8037ff238f3032b1bd9ef1737e183e5ce5360840789448"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/tagged_bmalloc_heap_utils.c.obj",
+          "bytes": 800,
+          "sha256": "d08b5093f6f445683b7a7f9199b25b4ca89f9ae76ed29649a060855d882f7892"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/bmalloc_type.c.obj",
+          "bytes": 704,
+          "sha256": "4c85374aab2c2739ad5719b6ca5b525388d574920d984d3e2c728d33f5f6de45"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/hotbit_heap.c.obj",
+          "bytes": 704,
+          "sha256": "1df3e6fc349e9d71c50affd033920dfc93cb1c1197a4af9c8774898418437c4a"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/hotbit_heap_config.c.obj",
+          "bytes": 712,
+          "sha256": "4946de563c9829a22a29079e1c05df0f60944e15b23d0dd9d6db8c7d4deff302"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_heap.c.obj",
+          "bytes": 704,
+          "sha256": "cc1da022cb90fe9f4b69ae3b6dff375f08c8fd6b913f3082295996e82964eb50"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_heap_config.c.obj",
+          "bytes": 712,
+          "sha256": "62d8a8b96565b2a761e5edbdb072520a64d58923f02c7a79117e0ab3d9af43d1"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_test_heap.c.obj",
+          "bytes": 712,
+          "sha256": "f0144a62a4670b83dc132252a31b55deea3e2a8d503ae0b3d1ef4e4910afe8b2"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/iso_test_heap_config.c.obj",
+          "bytes": 712,
+          "sha256": "33e47768e3e7f0e9b481e8cc5328a80421ed6dc26feb54798f95ef631fecd4cb"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/jit_heap_config.c.obj",
+          "bytes": 712,
+          "sha256": "8836fc6de57370514721127281b4eabe6744e6d66fccee99c2c08b3cba24df2f"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/minalign32_heap.c.obj",
+          "bytes": 712,
+          "sha256": "017163e2a7bccf5f46a1acff292554d928da871e0eff6080ef557701e9c9538a"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/minalign32_heap_config.c.obj",
+          "bytes": 720,
+          "sha256": "bf8426776e32d9e668d64302d4fa1c160e683de473fa403df63632b72e328674"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pagesize64k_heap.c.obj",
+          "bytes": 712,
+          "sha256": "ae1804f10131cf999891baef728a929d83a83eaae1a6d119609eebd2bd7673cd"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pagesize64k_heap_config.c.obj",
+          "bytes": 720,
+          "sha256": "9118ceb2fc2f7e5a067177082ce60ff980f279817e09250e4bd0f22a977e6856"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_alignment.c.obj",
+          "bytes": 712,
+          "sha256": "68ec65fe7e55134216799222c536caaf78325d749198d261a151e793eec354f8"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_all_heaps.c.obj",
+          "bytes": 712,
+          "sha256": "7bab64471b1a01c399bf01c297948253ea7f0135c0a9238e473aaba46ba90d5f"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_allocation_callbacks.c.obj",
+          "bytes": 720,
+          "sha256": "38850dd9a040b463e25b7f3e9673cab25f75c48a45e83fe300a412c6e688e339"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_allocation_result.c.obj",
+          "bytes": 720,
+          "sha256": "58cdcd42b1167982788ca2543724641e583a66c5db4f8c005129f913e22a3830"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_baseline_allocator.c.obj",
+          "bytes": 720,
+          "sha256": "1ee9197bbc1c889957c0cf2e17b94c0ee72c95699121f38725eab4618b06c1d0"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_baseline_allocator_table.c.obj",
+          "bytes": 720,
+          "sha256": "9a5c885e3552d4d124850181fd4e810248a0a1889a8220f8249b9939f82f6fe6"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_basic_heap_config_enumerator_data.c.obj",
+          "bytes": 736,
+          "sha256": "6e2f58831ae244c59bb4b9a6f315d1be4d633cbaf1a241953e6bc4e33d374f99"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_allocator.c.obj",
+          "bytes": 712,
+          "sha256": "56133a7ad8f0411d2a55c903068ee915a01d039fc6fde91bcb4301d33bd9696e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_directory.c.obj",
+          "bytes": 712,
+          "sha256": "c6a9951124206f6912cdcaffe0b324d9701406c8fc05bf99bc9d2e9c6a139bcd"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_heap.c.obj",
+          "bytes": 712,
+          "sha256": "88755fcd0bcc6e5b583475577cc85eb88af56a1f1026c19d8f180219116e5815"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_page.c.obj",
+          "bytes": 712,
+          "sha256": "b3fe8b5980657ea4eddc47699f65621af3732beb33c3616b5d0338af907f5618"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_size_class.c.obj",
+          "bytes": 720,
+          "sha256": "ef8610df20a6024056f93316d25f46152aa6f56801f79f42fc7b58c66b9e058f"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bitfit_view.c.obj",
+          "bytes": 712,
+          "sha256": "8d655070e712017cd51c0a82326a7adb9479b60be7f18e1d6ced767a3a8d6723"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bootstrap_free_heap.c.obj",
+          "bytes": 720,
+          "sha256": "24bb9bf188f2837d31e428301f68f6efeaaedf10243b5d4a4f5430e766c146d4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_bootstrap_heap_page_provider.c.obj",
+          "bytes": 728,
+          "sha256": "95354b11b003a303494c68cffce30f560fbf20b730ef67000d34d93e981f67f3"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_coalign.c.obj",
+          "bytes": 704,
+          "sha256": "76352683d097a3ef621665b236a0c0c9a4d989a4af89e0914de87615d3150bdd"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_commit_span.c.obj",
+          "bytes": 712,
+          "sha256": "898c211fc9e2355dd6ab5cdff0ae8d366f25fd0e9a4a1be268a8744d79662b06"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_committed_pages_vector.c.obj",
+          "bytes": 720,
+          "sha256": "7a58155ad9af19d4941e26d9ff936d01d306023c359a42cc6bbedc6f943d5f7b"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_bootstrap_free_heap.c.obj",
+          "bytes": 728,
+          "sha256": "9a00705a7566a661d6d7f23a406c25e54c20f273ae027a70802c5e42f27ccce5"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_expendable_memory.c.obj",
+          "bytes": 728,
+          "sha256": "9b49ae151d8195e6ad4f08ad69babb44e8c60240d72902426e5bd94a6ebf1df0"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_heap_reservation.c.obj",
+          "bytes": 720,
+          "sha256": "8e64e5a8d1a258cae641ccd20da36d209321baca106f24aa3ed8c1bb9215c232"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compact_large_utility_free_heap.c.obj",
+          "bytes": 728,
+          "sha256": "5d6907dd29f41bf16c7089678cdf7f4dc88f19407d0a7dde271fc12961376de0"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_compute_summary_object_callbacks.c.obj",
+          "bytes": 728,
+          "sha256": "fd5cd7429ce86355f0d9046c6e7dff75a46d5b9ff12f6ba3aa73a0e16d8fd0ec"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_create_basic_heap_page_caches_with_reserved_memory.c.obj",
+          "bytes": 752,
+          "sha256": "dcba9b0e6fc0d46116a42b6d327f0e190933438bbfa95eb27dd2c5169bbd4dc6"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_deallocate.c.obj",
+          "bytes": 712,
+          "sha256": "2975668595ae4ec2de73e11cca0bea1ace2a8d11bcb6c527b3c416d2b2f97a9c"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_debug_spectrum.c.obj",
+          "bytes": 712,
+          "sha256": "ec20c348c6b454e6d2879b89b0c527beb071d3ad67248e0b6350b68b3ced89e1"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_deferred_decommit_log.c.obj",
+          "bytes": 720,
+          "sha256": "22be6a00b38d91997aca1e1f1ed970806f51c6f83fb8e6041b9da5a690e89901"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_designated_intrinsic_heap.c.obj",
+          "bytes": 728,
+          "sha256": "5ae5c4a9f8d5f9523d81ee4d4b39f6c7b18d3ddec6ffc5c32aba46e02457432c"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_dyld_state.c.obj",
+          "bytes": 712,
+          "sha256": "bfb9fb8c2da450df0fd3876bba43975bcb0397fd16e7716c202d4af4e6089388"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_dynamic_primitive_heap_map.c.obj",
+          "bytes": 728,
+          "sha256": "4b38efd958da0a818765cbf0ac78b413355f9b4a30e8ec69719957fa84ce2d52"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_ensure_heap_forced_into_reserved_memory.c.obj",
+          "bytes": 736,
+          "sha256": "a7293e444ade2304f668d652e1bf58d73e30b3ebbfcf603fabb801bfa826887d"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_ensure_heap_with_page_caches.c.obj",
+          "bytes": 728,
+          "sha256": "975891c09a1778f6a40cfbafe715507eed2557490f77f4b69e8fddd4825ff16c"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerable_page_malloc.c.obj",
+          "bytes": 720,
+          "sha256": "ff3ee4dec8f0542472abd50975f2aec3be72873f9ad62a65be843e32bbf067e4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerable_range_list.c.obj",
+          "bytes": 720,
+          "sha256": "7d4b5bb71c4ae3c318d6d6d057dfa6b50267deba8f19f2bce09fb2ce29d4fd10"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_bitfit_heaps.c.obj",
+          "bytes": 720,
+          "sha256": "9cebee1b09334c16fad417f733bed8be0e28425ab994149fdc0cafbb686adc3f"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_initially_unaccounted_pages.c.obj",
+          "bytes": 736,
+          "sha256": "b0bb4ae553aac7082263a8a9ac8ffac4591989b9da7461156004edf5c34ebfce"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_large_heaps.c.obj",
+          "bytes": 720,
+          "sha256": "eceeba0411a7f2f4d622295f7263b5da449be7aedbea02e6d5b75a9e474ac168"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_segregated_heaps.c.obj",
+          "bytes": 728,
+          "sha256": "8320d17ccbd593526b2576aac52d5279765ebea5d8b65e979283e90f4e314cb4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerate_unaccounted_pages_as_meta.c.obj",
+          "bytes": 736,
+          "sha256": "19f3c02e36015c615fd4b24f8819c61da186b59753c911b799f7dfc3dc515855"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerator.c.obj",
+          "bytes": 712,
+          "sha256": "abf0ea878deec9b496ef50e4906376be1db64c27f11714f4ca33e527e92908e2"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_enumerator_region.c.obj",
+          "bytes": 720,
+          "sha256": "415d059b12377debdfe0d1da4714156939e4cab2171e02df99dcdd6f08929a47"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_epoch.c.obj",
+          "bytes": 704,
+          "sha256": "601cdf5d60bc1244deaa47bef1f8a7430123efd7360cce2927895803008a29d8"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_exclusive_view_template_memo_table.c.obj",
+          "bytes": 736,
+          "sha256": "e6259d69aa174732d10025bccdca1f520a71f8b97c7d9bd72f51f2056135cbe1"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_expendable_memory.c.obj",
+          "bytes": 720,
+          "sha256": "4dffdbf1df54ef3a907099dc0c9490010e8e44c75365bd7cdebf47094cc7a34c"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_extended_gcd.c.obj",
+          "bytes": 712,
+          "sha256": "d0943dde36eae6fdb5176dcab3d11257d7a22d292d8fc211803a0d60d083447b"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fast_large_free_heap.c.obj",
+          "bytes": 720,
+          "sha256": "124655ba1ec9adba3b904033e6905d4e02dc2ee19c9b1ad7b6f076c160aab303"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fast_megapage_cache.c.obj",
+          "bytes": 720,
+          "sha256": "57c1136f5d980d99a3709768fe232be439d83e408a7785b24cd73743c02eccf3"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fast_megapage_table.c.obj",
+          "bytes": 720,
+          "sha256": "fe0f34e96ab7828f92309dcd8f26f92df630bcfa294e9d266c36e505d5d273fd"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_fd_stream.c.obj",
+          "bytes": 712,
+          "sha256": "d2d324e623ab93cc064131d6fd42fed6a3755cfe52002dfc752aafbec08a40c8"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_free_granules.c.obj",
+          "bytes": 712,
+          "sha256": "9c23723976c693f768815828f569dc8b8ef002002cbe5adc6b5adb3939193460"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap.c.obj",
+          "bytes": 704,
+          "sha256": "9661365160aff0d875529943ded8ce89e238c9762857be28214cabaccf43a7eb"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_config.c.obj",
+          "bytes": 712,
+          "sha256": "98030ffe8c2b6bbf3d4c929e3238221c5bd81411bf1c979126619730a0b585d8"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_config_utils.c.obj",
+          "bytes": 720,
+          "sha256": "b409ef3ee159abbc6f50325a39aaf3c725b50f60092b92bac0e7b0cc604c6e38"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_for_config.c.obj",
+          "bytes": 712,
+          "sha256": "f838d22ba2bf2852e56a0298f8a5837ad384819679dc47042813e39fa19d606b"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_lock.c.obj",
+          "bytes": 712,
+          "sha256": "3fab3aab1d06665606325f1accec6aeefa6e8bf5c528c59960570292d87f87ef"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_ref.c.obj",
+          "bytes": 704,
+          "sha256": "d1e652f42bc4c182cd159ba373b0ae668099d9a3914651e8a56f14edc3daf3f7"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_runtime_config.c.obj",
+          "bytes": 720,
+          "sha256": "2067beacee023e847a218787cd495756aa855ea87d639b9cde3e9645cb34aca4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_summary.c.obj",
+          "bytes": 712,
+          "sha256": "cf5b5987d83420ee53845b8918970413d36da4c035d3b77c748cb3d65f774d65"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_heap_table.c.obj",
+          "bytes": 712,
+          "sha256": "399a67aa3a5446b33130fd8d8e6a5abe90b95330b8d9f1e624586ec443444a24"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_immortal_heap.c.obj",
+          "bytes": 712,
+          "sha256": "d1b3e16893a8705afaa5a6abfec74b8a006dbaf50dd3dc68ed9199fcef0fe5ac"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_expendable_memory.c.obj",
+          "bytes": 720,
+          "sha256": "8fbf5f65a3cda129251a5a6e3b6fdfd9b616c3b33f2f2dc0404fd2736001d0a6"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_free_heap_deferred_commit_log.c.obj",
+          "bytes": 736,
+          "sha256": "7be2496a32f26831197302518378e7d77d867fbfe14509e5bf7a7345755fac11"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_free_heap_helpers.c.obj",
+          "bytes": 720,
+          "sha256": "8aa23a01d71b25f4481c23a251ecf280a25078185c2502f2ac66e59dd3becf20"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_heap.c.obj",
+          "bytes": 712,
+          "sha256": "a7aa5ab8832d48935a0e7e72567c3a79e714867e7a919dfeea59d065029b13c2"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_heap_physical_page_sharing_cache.c.obj",
+          "bytes": 736,
+          "sha256": "9cbf4a5ca4f750e1b93156b76d41a66529243de021fe2dfae82e8c29c5cc9d45"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_map.c.obj",
+          "bytes": 712,
+          "sha256": "3f3891546eca988cd4078327d63e17d350c50813cb8be0140bbf3ff4d1cbfc2a"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_sharing_pool.c.obj",
+          "bytes": 720,
+          "sha256": "8a8a265fd80fb61d84b7e456d6b524b52b994df331b84908ff7d5a85a5fb8f70"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_large_utility_free_heap.c.obj",
+          "bytes": 720,
+          "sha256": "985f0f712c7dfe0d6d6b4db0487f71714be3d1af59f88e8b3c2d4f7ef6179e15"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_lenient_compact_unsigned_ptr.c.obj",
+          "bytes": 728,
+          "sha256": "2d38df43c052f95b61b8afd9c19179f061edf9ca5b9569577ed4d6a33c40d659"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_local_allocator.c.obj",
+          "bytes": 712,
+          "sha256": "54991764ed40b7359c67ee3225057d0fc73cddaff4f0ff9aedddc8136f129457"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_local_allocator_scavenger_data.c.obj",
+          "bytes": 728,
+          "sha256": "649920757b4b08595aa030ba0d587645b4072deb91cf9474519c89fa990b0e3e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_local_view_cache.c.obj",
+          "bytes": 712,
+          "sha256": "5471492a119f361960a261b1a621e3b1781596d8729cee626ccecf51ee41f0a4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_lock.c.obj",
+          "bytes": 704,
+          "sha256": "6dc9d57157609423330397d653c55c39953b17ee9893c3b47fd7662bfcdaf33e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_lock_free_read_ptr_ptr_hashtable.c.obj",
+          "bytes": 728,
+          "sha256": "65357d681a481dbadc8b8f19abbdfdd053a85001d76c5e6af8f30de7c8aac631"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_log.c.obj",
+          "bytes": 704,
+          "sha256": "0079c076895cb863b7b2fc36272373765041fb72a76185a9df77e4e9706fdbdd"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_malloc_stack_logging.c.obj",
+          "bytes": 720,
+          "sha256": "1e0d61eaf67a9e2e95029e6506ba60565d08c7fa7c7e2ee8081fafdf4907af37"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mar_registry.c.obj",
+          "bytes": 712,
+          "sha256": "ae1b94519bde11e6ad6b5ac995f8fe17209047144c6c3b655595732393e092e0"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mar_report_crash.c.obj",
+          "bytes": 712,
+          "sha256": "3905c9c7345ef7515c75d9c6ef86a32e8c5be66fcd01cf12c7729c50884c1c51"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_medium_megapage_cache.c.obj",
+          "bytes": 720,
+          "sha256": "0c2c7c9fb9af4fcdf51340826d965e1229eee09160028d8f5b1804cc4c47b7bd"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_megapage_cache.c.obj",
+          "bytes": 712,
+          "sha256": "e68d3d5f280d666088546a766dc5496a75034aa1bad056454b5ec1692cd556c7"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_monotonic_time.c.obj",
+          "bytes": 712,
+          "sha256": "524624e6eb342043d1b7afda972e33fd589902e4635d734b064d216f72c56fa2"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mte.c.obj",
+          "bytes": 704,
+          "sha256": "cd27e46974b493655e49bf863e47b2df7b85c5d4793fa1bb08b5ea2f3172e6a5"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_mte_config.c.obj",
+          "bytes": 712,
+          "sha256": "d0a4faf5e2fa4c0dd5a2dfcb50497f1b9f729c9b03a41589203aaaedd8742432"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_base.c.obj",
+          "bytes": 712,
+          "sha256": "740d23af20eb7d41377a044834c10f040e504ea4df3db0976d7a3f3d8e24c47e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_base_config.c.obj",
+          "bytes": 712,
+          "sha256": "f3513bafd83bc7058f0b4e5f4bd220751d042b8e4c761f8d513cecd12324c4c0"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_header_table.c.obj",
+          "bytes": 720,
+          "sha256": "76c05f7ff19f3fd5f8e1891becebc19c1b3de1b83d7669f194a4a0b4e3d2694d"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_malloc.c.obj",
+          "bytes": 712,
+          "sha256": "2cf51d497efe11efb93868098923ff673e58ba5d024d6e77094851fd9faf7d10"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_sharing_participant.c.obj",
+          "bytes": 720,
+          "sha256": "0456a3f92bfd25246d1813af8191c28d04daef76bc3dec3fee497fd8009beb98"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_page_sharing_pool.c.obj",
+          "bytes": 720,
+          "sha256": "d5c6be8c00d184d45d6cfbd37cb9f4849674650030576c633e0d1b074d6893fc"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_payload_reservation_page_list.c.obj",
+          "bytes": 728,
+          "sha256": "9239496a43b8c93ee2aff0b68e5368f7d8d60de0fb80e051b55632bb4cafc5a6"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_physical_memory_transaction.c.obj",
+          "bytes": 728,
+          "sha256": "fe0abea5b0d75b00c9b17e33ab364f503957650b8d2b8c7b9c466cf06ce677d4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_primitive_heap_ref.c.obj",
+          "bytes": 720,
+          "sha256": "ae8a1078ec151768873be368e4dee63a9e50e04fc3d84e02779c3f284ed9a7d0"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_probabilistic_guard_malloc_allocator.c.obj",
+          "bytes": 736,
+          "sha256": "8d3ac0b0343065c184fd0f09d5c212c2a0d52d2b0e88226eab56155e4cbf403e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_process.c.obj",
+          "bytes": 864,
+          "sha256": "46d4d2cc7c2f19efd845498798fdcf23a0f182f1d388ee9c0cee86eab178c6e3"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_ptr_worklist.c.obj",
+          "bytes": 712,
+          "sha256": "502f1886d81822df6bb76fe0c87fd0224cd566c3918773f26733ec62bf482b1d"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_race_test_hooks.c.obj",
+          "bytes": 712,
+          "sha256": "a774d5c03fccb62e5c94c579c459b265700b4252a55f34d13ce02599f6333f10"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_random.c.obj",
+          "bytes": 704,
+          "sha256": "add05b34939f8ef8e025fce08acad1993550186b3ed8c6da25c0646e59c38b1e"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_red_black_tree.c.obj",
+          "bytes": 712,
+          "sha256": "b4ba75371de800038676be0b21309bc61e7c716a5cd1567a64324d0087c823bf"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_redundant_local_allocator_node.c.obj",
+          "bytes": 728,
+          "sha256": "a5b8f05b3b785d08c419195e49ce987426a194b033c5703853279d0723574eb4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_report_crash.c.obj",
+          "bytes": 712,
+          "sha256": "8da0697d94af322f56c85b431a6258a61cedc7c6cf8690606fb5426edbbed0ad"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_reserved_memory_provider.c.obj",
+          "bytes": 720,
+          "sha256": "2f11ab9a57777c722a239d10c22341a1f12ea9a6bcde2d6035a5f81f890c35c1"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_root.c.obj",
+          "bytes": 704,
+          "sha256": "f09b958dfccf1fefa3f005ba05a54bf883b91a84048c66bd4a7c38dca949b4d7"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_runtime_config.c.obj",
+          "bytes": 712,
+          "sha256": "92a4d9314fd1fba4b6da387afc95360c52fe3983c6b7c6b0832810ddf3c9090a"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_scavenger.c.obj",
+          "bytes": 712,
+          "sha256": "b76594017f3eef9ee85dcdeebbb6e257e8a61c16673fcb43685876d6750e97bc"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_directory.c.obj",
+          "bytes": 720,
+          "sha256": "f321ed1c5e46ebbe7e823eddcfa6a9f24864f3ca6efe7e1468f3db4d41fbb6d7"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_exclusive_view.c.obj",
+          "bytes": 728,
+          "sha256": "2fcfaf33d72f64bfbc3bfe03c3a6b1168f6b60a29c1dac88360df88761084b51"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_heap.c.obj",
+          "bytes": 712,
+          "sha256": "5e272824736a35da338a2557d55566ae5177a0f37a7e61a1c32117f1b4d1affc"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_page.c.obj",
+          "bytes": 712,
+          "sha256": "cc695cc1fd76a9113f8152e7f9d56f0e963ad39d19a2bc7ac2d9882d37440ffa"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_page_config.c.obj",
+          "bytes": 720,
+          "sha256": "55880d1b72818ca612d481f6fc58ef3e6469ef514e66b27cb762fcb225601b94"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_size_directory.c.obj",
+          "bytes": 728,
+          "sha256": "157e521b8c3ed70fd29530cb9d7dbbb6bdd8bb85ee193e796f76788443c32b96"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_segregated_view.c.obj",
+          "bytes": 712,
+          "sha256": "00a0a435e2511097bf854630a78f26fe1eefdbccb06dc38daf98d1dced6a67c1"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_simple_free_heap_helpers.c.obj",
+          "bytes": 720,
+          "sha256": "b27b4efe0b52ab5160e0fec59d0aad0cd070aaa8166251705cce82afd17d88a4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_simple_large_free_heap.c.obj",
+          "bytes": 720,
+          "sha256": "8bab429964b84af664da1ce66d0e96f1b64a018b6ffc138a571a8733e53d4da4"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_simple_type.c.obj",
+          "bytes": 712,
+          "sha256": "9524cb1ef4de8eda033f2578332fbf6d6e0f16461c5380933385c47e33990fc3"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_small_medium_bootstrap_free_heap.c.obj",
+          "bytes": 728,
+          "sha256": "d2b1a9cb54f547ec54e90ed2421132b84ef756e3024f0b843512f43ab561396f"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_small_medium_bootstrap_heap_page_provider.c.obj",
+          "bytes": 744,
+          "sha256": "e1db99cdb6c1f6b4ece0b87a9e021c7b8c3eaa2c9e247286f7ab781c0e97de49"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_stats.c.obj",
+          "bytes": 704,
+          "sha256": "83c0a3e8d87d728648194daca836762ba9f2819a14a6908dcf75f38cce2d42cc"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_status_reporter.c.obj",
+          "bytes": 712,
+          "sha256": "ebcb25ea6a657c0db07a06e71828f61f66dfef05f8ac7c01da015ae228dafab8"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_stream.c.obj",
+          "bytes": 704,
+          "sha256": "d858b14734a00e9ac82519ae8f33b97f4389fd12be81d1ec430685b557ba24d6"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_string_stream.c.obj",
+          "bytes": 712,
+          "sha256": "67b73dd668753d257bd2c88c377af4ddf092a67c2ae8101afe5dee03cad680ea"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread.c.obj",
+          "bytes": 704,
+          "sha256": "6d934717b4e3ed1b3c65cf96b5efa43bc51b6f9a637e45404dbdf2472511de90"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache.c.obj",
+          "bytes": 720,
+          "sha256": "d9442f9a9027a6898cdf5b0480789de72d20b2a1eb0c8a107d8cd6167e8610bb"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache_layout.c.obj",
+          "bytes": 728,
+          "sha256": "1a7fd3a412edb0fb8c9379e81286a74ecd3bf381160a9db4828cfe287ba00481"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache_layout_node.c.obj",
+          "bytes": 728,
+          "sha256": "b61b4e1b300a3bff092aa68199449c9dde3e5904c52d18d64d1d435c7b7835af"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_local_cache_node.c.obj",
+          "bytes": 720,
+          "sha256": "9193b863bc82f4de71aa5c9baaa502d56aa26873da1913729fbc5b6589a3635c"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_thread_suspend_lock.c.obj",
+          "bytes": 720,
+          "sha256": "7dfcd6837b6cc31a06b077c8f19d6aa5e142b3bd48e7d6b16317ffae5dd22f48"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_utility_heap.c.obj",
+          "bytes": 712,
+          "sha256": "c33e4dda3a53eb1627e8664d82127d2029e80017cd6964298dd1ab9f63da13a1"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_utility_heap_config.c.obj",
+          "bytes": 720,
+          "sha256": "158258fdb8a44828d2630a9c8c83a1024688ec7b03b50ac6a521fa54454d6204"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_utils.c.obj",
+          "bytes": 704,
+          "sha256": "b48bacc5bdf8245740e61a43f30180b454f1b5c2a0cbc2f0ae42a7a3cb409b28"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_versioned_field.c.obj",
+          "bytes": 712,
+          "sha256": "007ac2595ac2c3edd97c592bed090702302d8b7117e55badd4e24784fe6f68ad"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/pas_virtual_range.c.obj",
+          "bytes": 712,
+          "sha256": "a83483b7d7e0b9fadcfaeb5aec2a1eb14d3492f1a66f6ceb1e5ee286577655aa"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/thingy_heap.c.obj",
+          "bytes": 704,
+          "sha256": "155d9cb3c468f9aabd765277df8e8cb85bef5863a55d49a05d91c1bbe8739728"
+        },
+        {
+          "path": "Source/bmalloc/CMakeFiles/bmalloc.dir/libpas/src/libpas/thingy_heap_config.c.obj",
+          "bytes": 712,
+          "sha256": "65bb50c7cd8f7ae6f8b7f55463938d1a2ee9abb450426863502f511e239ce3dc"
+        }
+      ]
+    }
+  },
+  "host_checks": {
+    "host-full": {
+      "exit": 0,
+      "log_sha256": "af43b8725f93ec2053b4fe7b8766ed8f003687c8482c31de7d0fe028c20c42ff"
+    },
+    "sanitize-full": {
+      "exit": 0,
+      "log_sha256": "87be99ebddfa6b972b39225b2d9e8e6b43d49aec52ee3b8d07d6f31882e0f265"
+    },
+    "final-build": {
+      "exit": 0,
+      "log_sha256": "69b39f1047ec74480c59b0d76c04e8b74bfd0c5e1414c6a386a7f321d0120e24"
+    }
+  },
+  "accepted_guest_profiles": [
+    {
+      "profile": "image-direct",
+      "exit": 0,
+      "seconds": 6.889136881000013,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "e257c59d4aee09a0043ab546e57cc8d5c635cb15d700376b741395c01536a019",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117497,
+        "free_pages_before": 117497,
+        "free_pages_after": 117497,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 44,
+        "checks": [
+          "actual own-image RO/NONE permission reductions with native mprotect routing;write/read restoration and executable/data promotion refused",
+          "unaligned/zero/wrapping/full-width mode/stack/anonymous/kernel/RX and invalid suffix refusal without changing writable prefix",
+          "actual kernel copyout into readonly image refused without cursor change;copyin from inaccessible image refused",
+          "three concurrent sealing workers,two deliberately faulted children and reduced capability child per lifecycle",
+          "three process lifecycles,cold PMM equality,zero heap/futex waiters"
+        ],
+        "limits": [
+          "bounded one-way image data protection,not shared file mapping or full browser sandbox",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "d41bbf1d1a488bb88a020003f8ee5124e5ced191218f82910a6cbc9acd0fb41a",
+      "artifacts": {
+        "kernel_sha256": "639d2d058d72d4a7008cd6cd8479c42172ec48eaf26ac43891109ce89aa52236"
+      }
+    },
+    {
+      "profile": "image-uefi",
+      "exit": 0,
+      "seconds": 14.247054065999691,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "e257c59d4aee09a0043ab546e57cc8d5c635cb15d700376b741395c01536a019",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500140,
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 46,
+        "checks": [
+          "actual own-image RO/NONE permission reductions with native mprotect routing;write/read restoration and executable/data promotion refused",
+          "unaligned/zero/wrapping/full-width mode/stack/anonymous/kernel/RX and invalid suffix refusal without changing writable prefix",
+          "actual kernel copyout into readonly image refused without cursor change;copyin from inaccessible image refused",
+          "three concurrent sealing workers,two deliberately faulted children and reduced capability child per lifecycle",
+          "three process lifecycles,cold PMM equality,zero heap/futex waiters"
+        ],
+        "limits": [
+          "bounded one-way image data protection,not shared file mapping or full browser sandbox",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "fe9b05ccdc50720472056c73e7b9c48cdbf6d928b42ef88d2ca612edcec2e498",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "wtf-direct",
+      "exit": 0,
+      "seconds": 12.889100351007073,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "5d661b75337c2158913afc4ccfc9332dd4809203d6f7d1535316c771d8645c3c",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117497,
+        "free_pages_before": 117497,
+        "free_pages_after": 117497,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 559,
+        "heap_before_crt_exit": [
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ]
+        ],
+        "checks": [
+          "actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations",
+          "real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations",
+          "write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files",
+          "native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics",
+          "root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters",
+          "real Config::finalize freezes owned static image pages;write restoration refused and child write faults;strict cold cleanup"
+        ],
+        "limits": [
+          "selected library component,not full WTF/JSC/JavaScript/browser runtime",
+          "no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets",
+          "native Thread creation/foreign GC suspension remain open",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "8894c33f910b263dd0585db338addd1b758574d458fe97f49c2754adbd696ea0",
+      "artifacts": {
+        "kernel_sha256": "639d2d058d72d4a7008cd6cd8479c42172ec48eaf26ac43891109ce89aa52236"
+      }
+    },
+    {
+      "profile": "wtf-uefi",
+      "exit": 0,
+      "seconds": 21.0449426240084,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "5d661b75337c2158913afc4ccfc9332dd4809203d6f7d1535316c771d8645c3c",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500140,
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 601,
+        "heap_before_crt_exit": [
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ]
+        ],
+        "checks": [
+          "actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations",
+          "real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations",
+          "write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files",
+          "native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics",
+          "root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters",
+          "real Config::finalize freezes owned static image pages;write restoration refused and child write faults;strict cold cleanup"
+        ],
+        "limits": [
+          "selected library component,not full WTF/JSC/JavaScript/browser runtime",
+          "no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets",
+          "native Thread creation/foreign GC suspension remain open",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "1632966999117bfe8eafaa17d107a22d611537bbd5c992044953cc41e1dd9b57",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "vm-direct",
+      "exit": 0,
+      "seconds": 6.88219589900109,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "0901647bf96b6b1c6adc0f41670ed4ae48929fb1f8b1e47e0601f823bfae2557",
+        "cold_free_pages": 117497,
+        "free_pages_before": 117497,
+        "free_pages_after": 117497,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 76,
+        "contained_faults": [
+          {
+            "mode": "read-none",
+            "esr": 2449473551,
+            "far": 553652224
+          },
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 553652224
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 553652224
+          },
+          {
+            "mode": "unmapped-middle",
+            "esr": 2449473543,
+            "far": 553656320
+          }
+        ],
+        "operation_timings_ns": [
+          {
+            "operation": "map-none",
+            "nanoseconds": 4673600
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 592016
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1847200
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 13046304
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 6484608
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 1525824
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 2612448
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3909872
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 19245296
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 563232
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1916336
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3462656
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 16247104
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 635552
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 2194832
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 4038064
+          }
+        ],
+        "checks": [
+          "real owned anonymous mmap at NONE/R/RW;zero-on-discard with protection retained;RW restoration",
+          "partial middle unmap/prefix/suffix trim;split-quota failure changes no live data",
+          "three concurrent native worker lifecycles;all cleanup returns heap and warm physical pages",
+          "actual foreign address-space and reduced syscall-permission attempts denied;code permissions cannot be promoted",
+          "architectural read-NONE/write-RO/execute-XN/unmapped-hole faults at exact announced addresses;subsequent execution works",
+          "real sysconf/getpagesize/getpid and bounded process-owned read/lseek/close;write invalid fd fails"
+        ],
+        "limits": [
+          "bounded private anonymous subset;no fixed/file/shared/executable mappings;no sparse demand paging or swap",
+          "munmap/mprotect/madvise must fit one live owned region;unsupported holes/multiple regions fail",
+          "1MiB mapping,2MiB aperture,16 regions,4MiB image,8MiB owned frames;not engine-sized",
+          "not full POSIX,JavaScriptCore/browser or Stage3 completion;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "fc07475956a589c09369e278546d1938b45050126af45413c4d28d567a554cea",
+      "artifacts": {
+        "kernel_sha256": "639d2d058d72d4a7008cd6cd8479c42172ec48eaf26ac43891109ce89aa52236"
+      }
+    },
+    {
+      "profile": "vm-uefi",
+      "exit": 0,
+      "seconds": 16.509541088002152,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "0901647bf96b6b1c6adc0f41670ed4ae48929fb1f8b1e47e0601f823bfae2557",
+        "cold_free_pages": 500140,
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 75,
+        "contained_faults": [
+          {
+            "mode": "read-none",
+            "esr": 2449473551,
+            "far": 553652224
+          },
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 553652224
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 553652224
+          },
+          {
+            "mode": "unmapped-middle",
+            "esr": 2449473543,
+            "far": 553656320
+          }
+        ],
+        "operation_timings_ns": [
+          {
+            "operation": "map-none",
+            "nanoseconds": 4611680
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 599504
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 2288560
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3075584
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 16758256
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 1132272
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1718512
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3232496
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 15886944
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 641360
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 2219920
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3511488
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 15139920
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 584880
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1831536
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3045296
+          }
+        ],
+        "checks": [
+          "real owned anonymous mmap at NONE/R/RW;zero-on-discard with protection retained;RW restoration",
+          "partial middle unmap/prefix/suffix trim;split-quota failure changes no live data",
+          "three concurrent native worker lifecycles;all cleanup returns heap and warm physical pages",
+          "actual foreign address-space and reduced syscall-permission attempts denied;code permissions cannot be promoted",
+          "architectural read-NONE/write-RO/execute-XN/unmapped-hole faults at exact announced addresses;subsequent execution works",
+          "real sysconf/getpagesize/getpid and bounded process-owned read/lseek/close;write invalid fd fails"
+        ],
+        "limits": [
+          "bounded private anonymous subset;no fixed/file/shared/executable mappings;no sparse demand paging or swap",
+          "munmap/mprotect/madvise must fit one live owned region;unsupported holes/multiple regions fail",
+          "1MiB mapping,2MiB aperture,16 regions,4MiB image,8MiB owned frames;not engine-sized",
+          "not full POSIX,JavaScriptCore/browser or Stage3 completion;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "d6993323c27af4daf04f19f867d2da916d101ce39cc6ec60f927c9282eb43cb1",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "native-uefi",
+      "exit": 0,
+      "seconds": 12.957702181010973,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "4d8ac3f54687e9b7835a89e3f80c298dd21e3fbf78bb9d6d8e3a951304b86ba0",
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "result_sha256": "70c536fd977e2c9caca18b6c07b3f778ed237911aa31bcad52d6b9add56e68df",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "directory-uefi",
+      "exit": 0,
+      "seconds": 75.7864180750039,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "aa4abf06db166461df7e12f0837fb6e5cd309dc43cdb6a19faeb2200223cc28f",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500140,
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 2937,
+        "maximum_observed_page_us": 39261,
+        "checks": [
+          "full175-file directory after175 unrelated files plus10 explicit subdirectories,real ROMFS merge and empty directories",
+          "immutable pages within one token,write/rename/state-change refusal with unchanged output and explicit restart",
+          "capability refusal,invalid size/version/flags/reserved/path,index overflow and protected crosspage output",
+          "three concurrent enumeration threads;three process lifecycles,cold PMM equality and zero user heap/futex waiters"
+        ],
+        "limits": [
+          "read-only restartable native directory pages,not full engine filesystem/browser",
+          "global mutations conservatively invalidate token;bounded whole catalogue CPU work and native CHFS path limits",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "6c6d279626708f401172e8d44386ef85084c1c5d094a811552600045fa357680",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "icu-uefi",
+      "exit": 0,
+      "seconds": 30.311329012998613,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "794a9aaf19e634c2d53b5a49080163ba5a180056423864d224c3f08f0b9bc6e4",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500140,
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 604,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,strict cold PMM equality and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "da8c044b9504cc94c79e7994b383b5006169c68153d43a178b23e5b068a8a672",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls-uefi",
+      "exit": 0,
+      "seconds": 58.151823093998246,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "f81b3049cf5ad07a72170be6a9deaf66d0e0466c899b63450a03b223bd594874",
+        "ipv6": false,
+        "tcp6_wire_frames": 0,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500140,
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8551496360014426,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8933179510058835,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6899611770058982,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.812246850997326,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8348727470001904,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.1067641010013176,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.6922774150007172,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5921108900074614,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.715235694005969,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7141503349994309,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7025916619895725,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5770138170046266,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9178802530077519,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.421809707011562,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9739653220021864,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.004011048004031,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 3.95124776699231,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.049476511994726,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 3.4828779779927572,
+            "stalled_network_gui_response_seconds": 0.04995581699768081,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 3.036673636001069,
+            "stalled_network_gui_response_seconds": 0.04749457200523466,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 43456)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53358)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 42380)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 35398)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 32972)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 38148)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53758)"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53762)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53764)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45746)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45754)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45760)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45772)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45778)"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "4e772f56fa39b7f108158fe719eb0e206ec47223080b2717486a357686a3ac30",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls6-uefi",
+      "exit": 0,
+      "seconds": 50.496761318994686,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "f81b3049cf5ad07a72170be6a9deaf66d0e0466c899b63450a03b223bd594874",
+        "ipv6": true,
+        "tcp6_wire_frames": 366,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500140,
+        "free_pages_before": 500140,
+        "free_pages_after": 500140,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.945473341998877,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9131893489975482,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6713566329999594,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7179539360076888,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7136267390014837,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.895599054012564,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.6095302510075271,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.575445935013704,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6705901269888273,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6516438360122265,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6500487169978442,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.470534113002941,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7760471549991053,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.933487698988756,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.2866101210092893,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.24714193399995565,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9914770979958121,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6319112339988351,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.780018798002857,
+            "stalled_network_gui_response_seconds": 0.046344196001882665,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.09564238099847,
+            "stalled_network_gui_response_seconds": 0.04523447599785868,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 41188, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 49568, 0, 0)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 36024, 0, 0)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 59628, 0, 0)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 54436, 0, 0)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: SSLV3_ALERT_BAD_CERTIFICATE] ssl/tls alert bad certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: SSLV3_ALERT_UNSUPPORTED_CERTIFICATE] ssl/tls alert unsupported certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_EXPIRED] ssl/tls alert certificate expired (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_UNKNOWN] ssl/tls alert certificate unknown (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 48262, 0, 0)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 33988, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 37398, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 34002, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 42060, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 42074, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 56284, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 42080, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 42096, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "79d68f52ee7dcf853550b5fdd4459b8a29cf4531e8c9d1959407012e0bd34273",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "typing-uefi",
+      "exit": 0,
+      "seconds": 44.541804576001596,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "b6ca6b537bb19d1ea6e224d5fd10b529dac61024bf1697d3edde0a1c11dc267f",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "result_sha256": "5d9278ebb4616d6a229d8e24216f1e00553f5fb629c4abbfb6b478dc77468dc0",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "platform-uefi",
+      "exit": 0,
+      "seconds": 50.45888093698886,
+      "result": {
+        "mode": "uefi",
+        "checks": [
+          "32 fast USB keypress/release pairs",
+          "PCI VirtIO CHFS write/flush/read",
+          "PCI VirtIO hardware RNG",
+          "82574L e1000e DHCP/ARP/ICMP",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "20 USB hot-unplug/reconnect cycles with ring wraps",
+          "3 mixed input/storage cycles",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 7.92,
+        "desktop_ready_seconds": 10.959,
+        "keyboard_visible_ms": 32.53,
+        "pointer_visible_ms": 53.55,
+        "maximize_visible_ms": 195.43,
+        "drag_visible_ms": 272.63,
+        "stress_seconds": 5.645,
+        "idle_cpu_percent": 11.5,
+        "status": "PASS"
+      },
+      "result_sha256": "beceacac3bcaed1e4ec747a713b500fa20acd7e66456873cc7b87a0d666d8dba",
+      "artifacts": {
+        "kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "iso_sha256": "7dc7302c748ede5b4e93af60acdfa20ea56bd4710e262d1982c99474a9a4e1da",
+        "iso_embedded_kernel_sha256": "0b2cebd46b7c7aa6f78d99c8ea1a0392b0f4b80ddae2ef632eca4906f56f29da",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "retained_investigations": [
+    {
+      "log": "build1.log",
+      "diagnosis": "host oracle assertion triggered -Wlogical-not-parentheses under -Werror;explicit boolean comparison corrected before tests executed"
+    },
+    {
+      "profile": "direct1",
+      "log_sha256": "8ce4f4dcbb59f43205e4bb14eb0185571fc59787b46cd703e391e537827f2f5d",
+      "serial_sha256": "d0fc503990ee4819000935113df92bfc2e0b2ca7bdfa3bbdb757216ffc5f4340",
+      "diagnosis": "test incorrectly expected wait=-1 for deliberate fault;actual kernel contract returns -128-exceptionClass=-164;exact exit plus FAILED state now asserted;product permission fault worked as designed",
+      "exact_original_application_sha256": "089c7c6ac1db151bea1218ff6756c2954acd77cad6ce9041018a6f65681031cf"
+    }
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/image-protection-qualified.tar.gz",
+    "archive_sha256": "72130e2ac9227a6b6aa16da3df200417de93e4fe26c2440b4f6ebe1ce8f980ed",
+    "archive_bytes": 139616680,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "source_files_sha256": {
+    "Makefile": "4f70c046a6db9f97aa10c81890b80b1b3c9164d13fa5e6270b519daba9dc465d",
+    "docs/BROWSER_ENGINE_PORT.md": "f80735769e333d2c04d2e8d87e077f2a896088362ce107b756a26a5f18103b8a",
+    "docs/NATIVE_IMAGE_PROTECTION.md": "cf552957ddabe835770b4d51ff0a7ed0be53e8dcb48772a1fc5a85f8f26919c5",
+    "docs/NATIVE_SDK.md": "80548bf0c3afe62c4f85bfc015314df463937b3f811ff3ce81c3019f76b40cb4",
+    "docs/NATIVE_WTF_FILESYSTEM.md": "a88065f9a6a5bf6a958a6286d98c485f3c7aab48bb0e6aa5d080be36ffb683cb",
+    "docs/STAGE3_ARCHITECTURE.md": "44d2849aaa345ea5d50eb9c4996964cbda7d7b41985dfebb43040690809232bc",
+    "docs/STAGE3_CURRENT_RESULTS.md": "a7e0148a3b5fd47c6503be8d07df3fe80596bc7dda2724b6fc7d11ffd6e1dbbc",
+    "include/chos/image_memory_api.h": "a6c9a52f05b45162425e5b562d9e1de4e6e4ddb7ee0c02728e902e55f0f3d3d0",
+    "include/chos/image_memory_policy.h": "d24e204ba5bb4b37e37f8621d30130c3291a9a816ed601ca8b0ecc264b5f0ae5",
+    "include/chos/process.h": "cb1b2e0ba1e66549d2d7700449d00bedcecb8c63a42b85bfd2b6f8b1c2b8aace",
+    "include/chos/process_caps.h": "6b7369bd693c9238fc003f379c9c41e7981daa95100554beec44e345224383ac",
+    "include/chos/syscall.h": "738bf64f021ed5c8bc6a0e40358c50d21f7887540f3ab909ea64561fdad1f9a1",
+    "kernel/core/process.c": "00c36a43437544154be4de392d52f80ed68daf53168e3a633c5e86244072a549",
+    "kernel/core/syscall.c": "075e38d7f2270aefc0ab3e3040cd8b332d16e75e9dde04cf0fa3c86d64e58b43",
+    "kernel/mm/image_memory_policy.c": "6b27c68b03f43189c3995bd5db5a4eaef247968b1c3108ce144b9785e604ef3c",
+    "tests/native_image_protection/CMakeLists.txt": "5e76abfb7336a8583ad06c326627a6889715a8d42788ad4ce1e8e44cf40c430d",
+    "tests/native_image_protection/main.cpp": "2fa1a7e22d9588414257506f75000ce4e8e171b20f2a29f48564ea7cea69435c",
+    "tests/qemu_native_image_protection.py": "aa874156690e33b5537a3b7d08a9622c6669cf68c963b9d0ee78e405c66a40aa",
+    "tests/qemu_wtf_filesystem.py": "cbc714d4733a9f12e19c89418187b8313ec1a31f661d904350622b4e75f9e09e",
+    "tests/test_image_memory_policy.c": "b82c023788a8a4c636e2cfa0b52649ca6e6442cd6e308bb235288f486f071784",
+    "tests/test_libc_mman.c": "417471cbd177ea6c393cecae58cf50d45318817428207f791a56ec063c7a6091",
+    "tests/test_process_caps.c": "9c34d6bd27dcd0cfb5ddc779fc032485b54eeb3cb3c5eaceea8cc16d93bb1a21",
+    "tests/test_user_abi.c": "be236f3867e4604ca69ab25b0e8e08294b24b7a41038281c84991915e6311847",
+    "tests/wtf_filesystem/main.cpp": "ae5640696b0dd9133b8ff833fc7a4b582d01af0c876619188e20fbfeb9a72ea1",
+    "tools/build_native_image_protection.py": "df17b90e15eede3136884800bc43d5ddebacbb413b12606f7058b2bbae8b09d9",
+    "userland/libc/include/sys/mman.h": "3f21ecb104ade4a64fcab12f4aba7fe579ae425935d3ebfa7a8fde3658a7d129",
+    "userland/libc/mman.c": "908a51aada904ae907df056fd6e9d3d4a88ef5245b848f56f15eb2976be24962",
+    "userland/libchos/include/chos/user.h": "1d4f2805ed2834224ba57ddc55cd8f28a6e01c2452f1cea871c3c919c29c544d"
+  },
+  "limits": [
+    "one-way owned image normal-data reductions;not shared file mmap or full engine sandbox",
+    "existing IRQ-masked per-call transaction can touch256pages;no physical-hardware interrupt-latency bound established",
+    "single-CPU ownership/TLB profile;no SMP/IOMMU qualification",
+    "complete engine Thread/GC,engine-sized resources,JavaScript/rendering,remaining production filesystem and browser integration open",
+    "native Pi5 SDIO host/firmware/authentication/radio and all final browser/security/platform gates remain open",
+    "new Fusion/Pi5/laptop source qualification NOT RUN;no new user-test binary or0.50.0 claim"
+  ]
+}

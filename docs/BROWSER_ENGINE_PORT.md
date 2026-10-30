@@ -403,3 +403,10 @@ filesystem paths with native current-thread adoption. The stack-discovery flag
 now accurately reflects current-only kernel bounds. Explicit filesystem/config
 limits, full Thread/GC, engine-sized memory, JavaScript/rendering and every full
 browser/wireless/security/platform gate remain open.
+
+[One-way owned image data protection](NATIVE_IMAGE_PROTECTION.md) adds
+IMAGE_PROTECT78 under the existing MAP35 capability class. The libc adapter now
+enables actual WTF config freezing without permitting image write restoration.
+Anonymous mappings retain reversible protection; image ranges cannot gain write
+or execute access. Engine-sized resources, full Thread/GC, JavaScript/rendering,
+native Wi-Fi and final security/platform acceptance remain open.

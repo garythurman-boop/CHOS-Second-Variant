@@ -68,11 +68,12 @@ process cleanup returns to the cold physical-page baseline.
 
 Unix signal initialization is explicitly excluded on CHOS; user faults remain
 owned by the kernel's process exception boundary. No signal handler initialization
-stub claims success. Config freezing now attempts the real native protection API
-instead of taking the upstream generic no-op branch. The current kernel protects
-anonymous mappings only, so static ELF config-page protection is unavailable and
-is explicitly refused by the fixture. Full engine config hardening, trap services
-and GC suspension are not qualified by this component.
+stub claims success. At this checkpoint the actual config-freeze path attempted
+native protection but static ELF ranges were explicitly unavailable. The later
+[one-way image protection service](NATIVE_IMAGE_PROTECTION.md) now enables the
+real freeze path and verifies a child write fault. The historical results below
+retain their original inputs. Full engine hardening, trap services and GC
+suspension remain separate requirements.
 
 ## Deployment and qualification
 

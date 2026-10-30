@@ -26,6 +26,8 @@ extern "C" {
  * may be ignored. Fixed/file/shared/executable requests fail explicitly. */
 void *mmap(void *,size_t,int,int,int,off_t);
 int munmap(void *,size_t);
+/* Anonymous protections remain reversible. Image data supports only one-way
+ * READ/NONE reductions; no writable/executable restoration or fixed remap. */
 int mprotect(void *,size_t,int);
 int madvise(void *,size_t,int);
 #ifdef __cplusplus

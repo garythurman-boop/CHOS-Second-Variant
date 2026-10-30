@@ -10,6 +10,8 @@
 #include "chos/net6.h"
 #include "chos/storage.h"
 #include "chos/process.h"
+#include "chos/image_memory_api.h"
+#include "chos/image_memory_policy.h"
 #include "chos/file_position.h"
 #include "chos/file_write_api.h"
 #include "chos/network_policy.h"
@@ -48,6 +50,7 @@ typedef struct {
     address_space_handle_t space;
     process_file_handle_t open_files[CHOS_PROCESS_MAX_OPEN_FILES];
     uint64_t code_mapped_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
+    uint64_t image_inaccessible_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
     uint32_t stack_mapped_mask;
     uint32_t sequence;
     uint64_t stack_base_va;
@@ -725,6 +728,29 @@ static int reserve_file_buffer(address_space_handle_t space,size_t capacity,size
 done:
     chos_spin_unlock_irqrestore(&process_lock,flags);return result;
 }
+int process_image_protect(address_space_handle_t space,uint64_t address,uint64_t bytes,uint64_t operation){
+ uint64_t irq=chos_spin_lock_irqsave(&process_lock);
+ size_t index=find_process_slot_for_space_locked(space);int result=-CHOS_ERRNO_ESRCH;
+ if(index==CHOS_PROCESS_MAX)goto done;
+ process_slot_t *slot=&process_slots[index];uint32_t first,count;
+ if(!slot->address_space_live||slot->info.state!=CHOS_PROCESS_RUNNING||slot->info.cleanup_pending)goto done;
+ result=chos_image_memory_range(PROCESS_CODE_VA,slot->info.image_pages,slot->code_mapped_mask,
+  slot->image_inaccessible_mask,address,bytes,operation,&first,&count);
+ if(result)goto done;
+ /* The AS primitive independently validates every already-owned normal data
+  * descriptor before its allocation-free PTE transaction. RX/kernel/device
+  * frames are refused; no write/execute promotion is requested. Lock order is
+  * process->AS, matching owned-file user copies. No scheduling or I/O here. */
+ address_space_error_t error=address_space_protect_user_range(space,address,(size_t)count*PROCESS_PAGE_SIZE,
+  operation==CHOS_MEMORY_PROTECT_NONE?AS_PERM_USER_NONE:AS_PERM_USER_RO);
+ if(error!=AS_OK){result=-CHOS_ERRNO_EINVAL;goto done;}
+ if(operation==CHOS_MEMORY_PROTECT_NONE)for(uint32_t i=first;i<first+count;i++)
+  slot->image_inaccessible_mask[i/64u]|=UINT64_C(1)<<(i%64u);
+ result=0;
+ done:
+ chos_spin_unlock_irqrestore(&process_lock,irq);return result;
+}
+
 int64_t process_file_open_for_address_space(address_space_handle_t space,const char *path){
     if(!path||!romfs_path_is_valid(path))return -CHOS_ERRNO_EINVAL;
     chos_chfs_entry_t entry;chos_romfs_file_t embedded={0};

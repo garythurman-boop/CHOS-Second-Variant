@@ -80,7 +80,8 @@
 #define CHOS_SYS_FILE_METADATA 75u /* x0=owned fd,x1=64B metadata,x2=exact size; READ9 */
 #define CHOS_SYS_PATH_METADATA 76u /* x0=path,x1=64B metadata,x2=exact size; READ9 plus OPEN8 */
 #define CHOS_SYS_DIRECTORY_PAGE 77u /* x0=directory path,x1=in/out640B page,x2=exact size; LIST_DIR20 */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_DIRECTORY_PAGE
+#define CHOS_SYS_IMAGE_PROTECT 78u /* x0=own image data base,x1=bytes,x2=READ1/NONE0; MAP35 */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_IMAGE_PROTECT
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

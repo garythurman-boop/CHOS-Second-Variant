@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "chos/syscall.h"
 #include "chos/memory_api.h"
+#include "chos/image_memory_api.h"
 #include "chos/net_status_api.h"
 #include "chos/net6_api.h"
 #include "chos/net_tcp6_api.h"
@@ -64,6 +65,7 @@ static inline long chos_write(const void *buffer, size_t length) {
 static inline long chos_memory_control(void *base,size_t bytes,unsigned operation) {
     return chos_syscall3(CHOS_SYS_MEMORY_CONTROL,(long)(uintptr_t)base,(long)bytes,(long)operation);
 }
+static inline long chos_image_protect(void *base,size_t bytes,unsigned operation){return chos_syscall3(CHOS_SYS_IMAGE_PROTECT,(long)(uintptr_t)base,(long)bytes,operation);}
 static inline long chos_unmap_range(void *base,size_t bytes) {
     return chos_syscall2(CHOS_SYS_UNMAP_RANGE,(long)(uintptr_t)base,(long)bytes);
 }

@@ -12,6 +12,8 @@ static unsigned maps,unmaps,controls,last_operation;static size_t last_bytes;sta
 long chos_mman_map(size_t n){maps++;last_bytes=n;return map_result;}
 long chos_mman_unmap(void *p,size_t n){assert(p==(void *)0x21001000);unmaps++;last_bytes=n;return unmap_result;}
 long chos_mman_control(void *p,size_t n,unsigned op){assert(p==(void *)0x21001000);controls++;last_bytes=n;last_operation=op;return control_result;}
+static unsigned image_calls;static long image_result;
+long chos_mman_image_protect(void *p,size_t n,unsigned op){assert(p==(void *)0x21001000);image_calls++;last_bytes=n;last_operation=op;return image_result;}
 static long io_result;static size_t io_bytes;static int io_fd;static int64_t io_offset;static unsigned io_origin;
 long chos_posix_getpid(void){return io_result;}
 long chos_posix_read(int fd,void *p,size_t n){(void)p;io_fd=fd;io_bytes=n;return io_result;}
@@ -41,7 +43,14 @@ int main(void){
  assert(mprotect(p,4096,3)==-1&&errno==EBUSY&&last_operation==3);
  assert(munmap(p,1)==-1&&errno==EIO&&last_bytes==1);
  control_result=unmap_result=0;
- assert(!mprotect(p,4096,0)&&!munmap(p,4096));
+ assert(!mprotect(p,4096,0)&&!munmap(p,4096)&&!image_calls);
+ control_result=-EINVAL;image_result=0;assert(!mprotect(p,4096,PROT_READ)&&image_calls==1);
+ assert(!mprotect(p,4096,PROT_NONE)&&image_calls==2);
+ image_result=-EPERM;assert(mprotect(p,4096,PROT_READ)==-1&&errno==EPERM&&image_calls==3);
+ image_result=-ENOSYS;assert(mprotect(p,4096,PROT_READ)==-1&&errno==EINVAL&&image_calls==4);
+ assert(mprotect(p,4096,PROT_READ|PROT_WRITE)==-1&&errno==EINVAL&&image_calls==4);
+ control_result=-EBUSY;assert(mprotect(p,4096,PROT_READ)==-1&&errno==EBUSY&&image_calls==4);
+ control_result=0;
  assert(!madvise(p,4096,MADV_DONTNEED)&&last_operation==CHOS_MEMORY_DISCARD);
  for(int advice=0;advice<4;advice++)assert(!madvise(p,4096,advice)&&last_operation==CHOS_MEMORY_VALIDATE);
  before=controls;assert(madvise(p,4096,99)==-1&&errno==EINVAL&&controls==before);

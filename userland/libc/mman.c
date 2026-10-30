@@ -8,11 +8,13 @@
 extern long chos_mman_map(size_t);
 extern long chos_mman_unmap(void *,size_t);
 extern long chos_mman_control(void *,size_t,unsigned);
+extern long chos_mman_image_protect(void *,size_t,unsigned);
 #else
 #include "chos/user.h"
 #define chos_mman_map chos_map_memory
 #define chos_mman_unmap chos_unmap_range
 #define chos_mman_control chos_memory_control
+#define chos_mman_image_protect chos_image_protect
 #endif
 static int result(long r){if(r<0){errno=(int)-r;return -1;}return 0;}
 static int protection(int prot){
@@ -44,7 +46,13 @@ void *mmap(void *hint,size_t bytes,int prot,int flags,int fd,off_t offset){
 int munmap(void *p,size_t bytes){return result(chos_mman_unmap(p,bytes));}
 int mprotect(void *p,size_t bytes,int prot){
  if(protection(prot))return -1;
- return result(chos_mman_control(p,bytes,(unsigned)prot));
+ long r=chos_mman_control(p,bytes,(unsigned)prot);
+ if(r==-EINVAL&&(prot==PROT_READ||prot==PROT_NONE)){
+  long image=chos_mman_image_protect(p,bytes,(unsigned)prot);
+  /* New SDKs retain the old unsupported-range error on an older kernel. */
+  if(image!=-ENOSYS)r=image;
+ }
+ return result(r);
 }
 int madvise(void *p,size_t bytes,int advice){
  unsigned operation;

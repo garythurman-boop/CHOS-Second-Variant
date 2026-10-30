@@ -34,9 +34,10 @@ try:
  for run in range(3):
   offset=len(g.text());n=g.text().count(marker);g.serial('exec /WTFFS.ELF')
   wait(lambda:g.text().count(marker)>n or '[FAIL]' in g.text(),60,'actual linked WTF filesystem fixture')
-  assert '[FAIL]' not in g.text() and '[USER FAULT]' not in g.text() and '[FATAL]' not in g.text(),g.text()
+  assert '[FAIL]' not in g.text() and '[FATAL]' not in g.text(),g.text()
   assert g.text()[offset:].count('[ OK ] actual WTF current-thread adoption,stack bounds and TLS cleanup passed')==1
-  assert g.text()[offset:].count('[ OK ] unavailable static config protection explicitly refused')==1
+  assert g.text().count('[USER FAULT]')==run+1,g.text()
+  assert g.text()[offset:].count('[ OK ] actual WTF config frozen read-only;write restoration and child write refused')==1
   observed=free_pages()
   pid=re.search(r'pid=(\d+) path=/WTFFS.ELF',g.text()[offset:]).group(1)
   section=g.text().rsplit('CHOS process table (foreground and scheduled EL0 processes)',1)[-1]
@@ -45,8 +46,8 @@ try:
   else:assert observed==baseline,('WTF handles leaked pages',baseline,observed)
  preemptions_after=g.symbol('preemption_switches');assert preemptions_after>preemptions_before
  assert g.symbol('futex_queued_waiters')==0
- (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'application_sha256':app_sha,'source':'disposable CHFS native application','cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'timer_preemptions_before':preemptions_before,'timer_preemptions_after':preemptions_after,  'heap_before_crt_exit':re.findall(r'actual WTF heap before CRT exit: allocations=(\d+) bytes=(\d+)',g.text()),'checks':['actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations','real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations','write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files','native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics','root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters','static ELF config protection explicitly unavailable;no generic no-op freeze success claimed'],
- 'limits':['selected library component,not full WTF/JSC/JavaScript/browser runtime','no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets','native Thread creation/foreign GC suspension and static-config protection remain open','QEMU only;new Fusion/Pi5/laptop qualification NOT RUN']},indent=2)+'\n')
+ (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'application_sha256':app_sha,'source':'disposable CHFS native application','cold_free_pages':cold,'free_pages_before':baseline,'free_pages_after':free_pages(),'timer_preemptions_before':preemptions_before,'timer_preemptions_after':preemptions_after,  'heap_before_crt_exit':re.findall(r'actual WTF heap before CRT exit: allocations=(\d+) bytes=(\d+)',g.text()),'checks':['actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations','real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations','write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files','native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics','root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters','real Config::finalize freezes owned static image pages;write restoration refused and child write faults;strict cold cleanup'],
+ 'limits':['selected library component,not full WTF/JSC/JavaScript/browser runtime','no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets','native Thread creation/foreign GC suspension remain open','QEMU only;new Fusion/Pi5/laptop qualification NOT RUN']},indent=2)+'\n')
 except Exception:
  try:
   g.serial('procinfo');time.sleep(.4);g.serial('threads');time.sleep(.4)

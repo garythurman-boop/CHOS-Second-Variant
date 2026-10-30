@@ -1114,6 +1114,9 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
                 if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
                 frame->x[0]=(uint64_t)(int64_t)chos_user_memory_unmap_range(fault_space,frame->x[0],(size_t)frame->x[1]);return frame;
             }
+            case CHOS_SYS_IMAGE_PROTECT: {
+                frame->x[0]=(uint64_t)(int64_t)process_image_protect(fault_space,frame->x[0],frame->x[1],frame->x[2]);return frame;
+            }
             case CHOS_SYS_MEMORY_CONTROL: {
                 if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
                 if(frame->x[2]>UINT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}

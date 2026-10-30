@@ -15,6 +15,7 @@
 #include "chos/process_caps.h"
 
 int main(void) {
+ assert(CHOS_SYS_IMAGE_PROTECT==78&&chos_process_syscall_capability(78)==CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY));
  assert(CHOS_SYS_DIRECTORY_PAGE==77&&sizeof(chos_directory_page_t)==640&&chos_process_syscall_capability(77)==CHOS_PROCESS_CAP(CHOS_SYS_LIST_DIR));
  assert(CHOS_SYS_FILE_METADATA==75&&CHOS_SYS_PATH_METADATA==76&&sizeof(chos_file_metadata_t)==64&&sizeof(chos_file_identity_t)==24);
  assert(chos_process_syscall_capability(75)==CHOS_PROCESS_CAP(CHOS_SYS_READ)&&chos_process_syscall_capability(76)==CHOS_PROCESS_CAP(CHOS_SYS_READ));
@@ -43,7 +44,7 @@ int main(void) {
     assert(CHOS_SYS_SLEEP == 5u);
     assert(CHOS_SYS_GETSTATUS == 6u);
     assert(CHOS_SYS_WAIT == 7u);
-    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==77u);
+    assert(CHOS_SYS_SEEK==63u&&CHOS_SYSCALL_LIMIT==78u);
     assert(CHOS_SYS_OPEN == 8u);
     assert(CHOS_SYS_READ == 9u);
     assert(CHOS_SYS_CLOSE == 10u);

@@ -170,6 +170,8 @@ int process_get_info_by_pid(uint32_t pid, chos_process_info_t *out);
 /* Returns 1 while live, 0 when terminal, and -1 when the PID is unknown. */
 int process_query_pid(uint32_t pid, chos_process_state_t *state_out, int64_t *status_out);
 /* Read-only process-owned descriptors; fd values are local to the owning EL0 process. */
+/* One-way protection of this live process's already-owned image data pages. */
+int process_image_protect(address_space_handle_t,uint64_t,uint64_t,uint64_t);
 int64_t process_file_open_for_address_space(address_space_handle_t space, const char *path);
 int64_t process_file_read_for_address_space(address_space_handle_t space, int fd,
                                             uint64_t user_destination, size_t length);

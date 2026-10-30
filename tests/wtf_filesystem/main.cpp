@@ -113,12 +113,24 @@ static bool current_threads(){
 }
 static bool run(){
  CHECK(paths()&&files()&&temporary()&&current_threads());
- // Native config hardening cannot use the upstream generic no-op. This current
- // kernel accepts anonymous-page protection only, so static ELF config refuses.
- CHECK(mprotect(WebConfig::g_config,WTF::ConfigSizeToProtect,PROT_READ)==-1&&errno==EINVAL);
- puts("[ OK ] unavailable static config protection explicitly refused");
+ // Exercise the actual library freeze path, not a replacement flag or no-op.
+ WTF::Config::finalize();CHECK(g_wtfConfig.isPermanentlyFrozen);
+ CHECK(mprotect(WebConfig::g_config,WTF::ConfigSizeToProtect,PROT_READ|PROT_WRITE)==-1&&errno==EINVAL);
+ long pid=chos_spawn_limited("/WTFFS.ELF","freeze-write",CHOS_PROCESS_CAP_ALL);CHECK(pid>0);
+ CHECK(chos_wait((uint32_t)pid)==(-128-0x24)&&chos_getstatus(pid)==CHOS_STATUS_FAILED);
+ CHECK(g_wtfConfig.isPermanentlyFrozen);
+ puts("[ OK ] actual WTF config frozen read-only;write restoration and child write refused");
  chos_heap_stats_t heap;CHECK(!chos_libc_heap_info(&heap));
  printf("actual WTF heap before CRT exit: allocations=%llu bytes=%llu\n",(unsigned long long)heap.allocations,(unsigned long long)heap.mapped_bytes);
  puts("[ OK ] linked actual WTF String,Vector and native filesystem operations passed");return true;
 }
-int main(){return run()?0:1;}
+int main(int argc,char **argv){
+ if(argc>1&&!strcmp(argv[1],"freeze-write")){
+  WTF::initialize();WTF::Config::finalize();
+  if(!g_wtfConfig.isPermanentlyFrozen)return 2;
+  auto *p=reinterpret_cast<volatile unsigned char *>(WebConfig::g_config);
+  unsigned char value=*p;*p=value;
+  puts("[FAIL] frozen WTF configuration remained writable");return 3;
+ }
+ return run()?0:1;
+}
