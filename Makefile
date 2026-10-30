@@ -1684,3 +1684,8 @@ test: test-image-memory-policy
 test-sanitize: test-image-memory-policy-sanitize
 .PHONY: test-image-memory-policy test-image-memory-policy-sanitize
 $(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi $(BUILD)/test-process-caps $(SAN_DIR)/test-process-caps: include/chos/image_memory_api.h
+
+.PHONY: test-chrono-vectors
+test-chrono-vectors:
+	python3 tools/generate_chrono_vectors.py --check
+test: test-chrono-vectors

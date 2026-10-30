@@ -231,3 +231,11 @@ enables actual WTF config freezing without permitting image write restoration.
 Anonymous mappings retain reversible protection; image ranges cannot gain write
 or execute access. Engine-sized resources, full Thread/GC, JavaScript/rendering,
 native Wi-Fi and final security/platform acceptance remain open.
+
+The [original native chrono/linked-container component](NATIVE_CHRONO_CONTAINERS.md)
+adds checked standard headers, actual clock queries and independent calendar/
+container execution. JavaScriptCore now builds its precompiled header; native
+platform headers for performance logging and GC register-state handling are the
+next recorded blockers.
+Complete engine link/execution, browser, Wi-Fi and final security/platform gates
+remain open.

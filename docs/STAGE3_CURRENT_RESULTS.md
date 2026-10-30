@@ -42,8 +42,17 @@ engine/security acceptance gate.
 
 The [native ARM64 interpreter boundary](NATIVE_JSC_ARM64_BOUNDARY.md) additionally
 compiles the actual interpreter metadata/assembly and enforces a fail-closed
-no-JIT code-publication boundary. JavaScriptCore's next actual compilation failure
-is the missing standard `<chrono>` header; no JavaScript execution is claimed.
+no-JIT code-publication boundary. At that checkpoint JavaScriptCore stopped at the missing standard `<chrono>`
+header; the subsequent component closes that include dependency. No JavaScript
+execution is claimed.
+
+The [original native chrono/linked-container component](NATIVE_CHRONO_CONTAINERS.md)
+adds checked standard headers, actual clock queries and independent calendar/
+container execution. JavaScriptCore now builds its precompiled header; native
+platform headers for performance logging and GC register-state handling are the
+next recorded blockers.
+Complete engine link/execution, browser, Wi-Fi and final security/platform gates
+remain open.
 
 The following entries retain earlier checkpoint evidence and the limitations
 recorded at those points; use the current status above for remaining work.

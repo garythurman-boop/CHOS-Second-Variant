@@ -57,7 +57,7 @@ extern "C" int main(int argc,char **argv){
  auto original=std::get_terminate();CHECK(original);CHECK(std::set_terminate(handler_return)==original&&std::get_terminate()==handler_return);
  CHECK(std::set_terminate(original)==handler_return&&std::get_terminate()==original);
  CHECK(std::set_terminate(nullptr)==original&&std::get_terminate());
- CHECK(std::thread::hardware_concurrency()==0);CHECK(std::this_thread::get_id()!=std::thread::id());
+ CHECK(std::thread::hardware_concurrency()==1);CHECK(std::this_thread::get_id()!=std::thread::id());
  std::thread empty;CHECK(!empty.joinable()&&empty.get_id()==std::thread::id());
  CHECK(!pthread_key_create(&key,key_destructor));
  for(unsigned cycle=0;cycle<3;cycle++){
