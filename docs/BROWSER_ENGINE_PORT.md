@@ -410,3 +410,8 @@ enables actual WTF config freezing without permitting image write restoration.
 Anonymous mappings retain reversible protection; image ranges cannot gain write
 or execute access. Engine-sized resources, full Thread/GC, JavaScript/rendering,
 native Wi-Fi and final security/platform acceptance remain open.
+
+The [native ARM64 interpreter boundary](NATIVE_JSC_ARM64_BOUNDARY.md) additionally
+compiles the actual interpreter metadata/assembly and enforces a fail-closed
+no-JIT code-publication boundary. JavaScriptCore's next actual compilation failure
+is the missing standard `<chrono>` header; no JavaScript execution is claimed.

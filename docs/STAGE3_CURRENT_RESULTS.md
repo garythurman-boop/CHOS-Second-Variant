@@ -40,6 +40,11 @@ complete owned data ranges before changes and confines deliberate access faults
 to the application. This closes a config-protection prerequisite, not the full
 engine/security acceptance gate.
 
+The [native ARM64 interpreter boundary](NATIVE_JSC_ARM64_BOUNDARY.md) additionally
+compiles the actual interpreter metadata/assembly and enforces a fail-closed
+no-JIT code-publication boundary. JavaScriptCore's next actual compilation failure
+is the missing standard `<chrono>` header; no JavaScript execution is claimed.
+
 The following entries retain earlier checkpoint evidence and the limitations
 recorded at those points; use the current status above for remaining work.
 
