@@ -54,6 +54,13 @@ next recorded blockers.
 Complete engine link/execution, browser, Wi-Fi and final security/platform gates
 remain open.
 
+The [actual native JSC register/context component](NATIVE_JSC_REGISTER_CONTEXT.md)
+retains original ARM64 callee-save capture, maps the native SP field correctly
+and uses actual kernel thread IDs in profiler queries. Own-current visibility
+is separate from foreign-thread GC/sampling coordination. The complete engine
+still has scanner, string/queue and sampler dependencies; no JavaScript/browser
+execution or Stage3 completion is implied.
+
 The following entries retain earlier checkpoint evidence and the limitations
 recorded at those points; use the current status above for remaining work.
 

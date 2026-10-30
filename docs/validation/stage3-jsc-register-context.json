@@ -1,0 +1,215 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "f69ae98c9d2adcfe4c20826bf04624d2f15e04ad",
+  "implementation": "original ARM64 current-register root visibility,native SP accessor and actual profiler thread-ID/timestamp queries",
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "patch_sha256": "35ba7fa79390bdb6a523daf915c1e49286d802554cc5f078a53931c4a33d7ea4",
+  "patched_files": 36,
+  "sdk_manifest_sha256": "75c548d17854d0e95c226bf538e51a7055e8ee4f43a6c9febd05b537145c9bf9",
+  "kernel_runtime_host_sanitizer_regression_baseline": "stage3-native-chrono.json;actual SDK manifest and both new guest kernel/media hashes equal the fourteen-profile baseline;only selected upstream/application source changed",
+  "browser_engine_built": false,
+  "javascript_executed": false,
+  "foreign_thread_GC_qualified": false,
+  "sampling_profiler_qualified": false,
+  "actual_engine_products_sha256": {
+    "Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-runtime-36.cpp.obj": "2f61b36b2e5458c12a1cfee2bed5f3bafaf792347696d3721dcd69dd7c9ada53",
+    "Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-heap-5.cpp.obj": "91f55e3f5ecda71336ec30065d63c2a14f59613711f5982bf94345b8c3bc5ec8"
+  },
+  "final_application": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "engine_built": false,
+    "wtf_archive_built": true,
+    "full_wtf_runtime_qualified": false,
+    "wtf_archive_sha256": "564898ec1544f84c94573e93aef67d518582563dcd601c7a032234453175633e",
+    "engine_executed": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "35ba7fa79390bdb6a523daf915c1e49286d802554cc5f078a53931c4a33d7ea4",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+      "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+      "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+      "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+      "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+      "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+      "ports/webkit/chos/CurrentThreadCHOS.cpp": "5381ec8203c4a33f1a04eed65a83a356024d455eba74232452e465f89c88271a"
+    },
+    "sdk_manifest_sha256": "75c548d17854d0e95c226bf538e51a7055e8ee4f43a6c9febd05b537145c9bf9",
+    "upstream_configuration_sha256": "35c89e177828311e84404b517d7327b9357fed1931cfa67653505295a88d46b8",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-context-engine/cmake",
+        "--target",
+        "WTF",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/jsc_register_platform",
+        "-B",
+        "/workspace/chos-jsc-register-platform3/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-jsc-register-platform3/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 11.948947597004008,
+    "application_sha256": "4cabf692328ceba7d7696f3b9a9a09ad5e33be3446cdb6d172b580e516d9910e",
+    "deployment": "/workspace/chos-jsc-register-platform3/cmake/jsc_register_platform.elf",
+    "debug_application_sha256": "f4c642f7dc6b9ee2cf6ff3d2455a7035beef40b8f250ca244f19987b29a0919a",
+    "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+    "scope": "actual ARM64 RegisterState capture,MachineContext SP and ProfilerSupport queries;not full GC/JavaScript/browser",
+    "limits": [
+      "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+      "foreign Thread lifecycle and GC suspension remain open;own-current register visibility is only a component",
+      "native filesystem has explicit format/service limits,including no coherent shared maps/locks/timestamps/capacity service",
+      "native guest tests required;no new physical/Fusion qualification"
+    ]
+  },
+  "accepted_guest_profiles": [
+    {
+      "profile": "direct1",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "4cabf692328ceba7d7696f3b9a9a09ad5e33be3446cdb6d172b580e516d9910e",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117497,
+        "free_pages_before": 117497,
+        "free_pages_after": 117497,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 51,
+        "checks": [
+          "original ARM64 RegisterState x19..x28 macro executes;all10live real heap pointers visible in registers or callee-save spills",
+          "reference vector and captured-register object excluded from raw spill scan;scan occurs before independent kernel context output",
+          "MachineContext SP matches actual current-thread kernel snapshot;bounds/flags/size/identity verified",
+          "actual ProfilerSupport threadID equals kernel TID and snapshot TID;actual monotonic timestamps",
+          "root and9worker capture/lifecycle cases per process;three process lifecycles,cold PMM equality,zero heap/futex waiters"
+        ],
+        "limits": [
+          "own-current register/profiler-query component,not foreign thread suspension/full GC/sampling profiler/engine/browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "ae69225f04dc9da8a6f7ea72b2887e1f6143f3a29a79ae1062a8324816a33829",
+      "artifacts": {
+        "kernel_sha256": "c746f16e86f8928b5c71f032f5c401ae2db240bcbaf859356eabebb8383882c6"
+      }
+    },
+    {
+      "profile": "uefi1",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "4cabf692328ceba7d7696f3b9a9a09ad5e33be3446cdb6d172b580e516d9910e",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500135,
+        "free_pages_before": 500135,
+        "free_pages_after": 500135,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 51,
+        "checks": [
+          "original ARM64 RegisterState x19..x28 macro executes;all10live real heap pointers visible in registers or callee-save spills",
+          "reference vector and captured-register object excluded from raw spill scan;scan occurs before independent kernel context output",
+          "MachineContext SP matches actual current-thread kernel snapshot;bounds/flags/size/identity verified",
+          "actual ProfilerSupport threadID equals kernel TID and snapshot TID;actual monotonic timestamps",
+          "root and9worker capture/lifecycle cases per process;three process lifecycles,cold PMM equality,zero heap/futex waiters"
+        ],
+        "limits": [
+          "own-current register/profiler-query component,not foreign thread suspension/full GC/sampling profiler/engine/browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "1b8686fa8d49b20045abf7d6b297536fdec126c1c63e836c079267da9e1f33c4",
+      "artifacts": {
+        "kernel_sha256": "417940645ef7fe812e06fd4a36e252b105db986c87fdb0930a1f8b153405c335",
+        "iso_sha256": "0dd9cb13bd54a62da27b2a9bb110304a6d0b4dc09eea9bb6898fcc071ef50dab",
+        "iso_embedded_kernel_sha256": "417940645ef7fe812e06fd4a36e252b105db986c87fdb0930a1f8b153405c335",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "actual_full_JSC_target": {
+    "status": "FAILED",
+    "latest_log_sha256": "2d3d06b4c7450bbfe42dc94c498873f69264f56dedb3f82842207eee8b4a745c",
+    "distinct_blockers": [
+      "missing narrow sscanf in Options.cpp",
+      "missing strncasecmp declaration (native implementation/header already exist)",
+      "sampling-context frame/instruction/LLInt accessors and foreign sampling integration unavailable",
+      "missing queue header in WasmWorklist"
+    ]
+  },
+  "retained_investigations": [
+    {
+      "log": "build1.log",
+      "sha256": "3a1403f3029f1566d91c7c6959d5499749d9dff89457e535fb294dd4a836cea0",
+      "diagnosis": "actual native context type has sp,not generic stackPointer;build deliberately interrupted after known error to correct source;not counted as full target failure inventory"
+    },
+    {
+      "log": "build2.log",
+      "sha256": "c4ad86410bd19f4174883178b229e339f954cbb986a7c74d1c1d1dd384139e88",
+      "diagnosis": "next actual target revealed scanf/string/queue/sampling blockers plus new profiler adapter wrong API name;corrected to real chos_thread_id"
+    },
+    {
+      "log": "app-build1.log",
+      "sha256": "869c7f2400316a7577aa8e2803225c7fedf5a8271e506d2d8eadbf729e9f3fb3",
+      "diagnosis": "component compiler caught wrong API name and preprocessor-only OS/CPU macros used in static_assert;no guest executed"
+    },
+    {
+      "log": "app-build2.log",
+      "sha256": "1722556455ea14bb388b1ddeea46c95b242ee78594d6509f03246e9a2bf55793",
+      "diagnosis": "API corrected;remaining fixture platform check moved to preprocessor before positive build"
+    }
+  ],
+  "native_snapshot_test_contract": [
+    "actual original x19..x28 inline capture unchanged;ten distinct aligned real heap pointers seeded through AAPCS64 assembly",
+    "oracle caller frame and RegisterState object excluded from spill scan;raw scan occurs before independent kernel context query",
+    "all roots visible in captured registers or actual callee-save spills;heap byte markers unchanged",
+    "kernel context version/flags/size/current-stack range and SP accessor match",
+    "actual profiler IDs match direct kernel IDs/snapshot IDs;native monotonic timestamp ordering",
+    "root+nine worker lifecycles per process,three process lifecycles,cold PMM equality,zero heap/futex waiters"
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/jsc-register-platform-qualified.tar.gz",
+    "archive_sha256": "97be652a06fa4808c48fcf0608f6302c35037160c6f685b32c44f429841041da",
+    "archive_bytes": 98295158,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "source_files_sha256": {
+    "docs/BROWSER_ENGINE_PORT.md": "ad578bbc741fa4aff362b17c71e4d2affcef8419dde7103db970bc25e39d600c",
+    "docs/NATIVE_JSC_REGISTER_CONTEXT.md": "3ca0dc58017d408d0b4a06860c5c0b3a85ee17714bbd92c1597ed82012cebc9b",
+    "docs/NATIVE_SDK.md": "fe8e0a1a951b3548c11a04acd890cb1d2cd3b768a30e11bb980fb241446e36f9",
+    "docs/STAGE3_CURRENT_RESULTS.md": "4d22fe95d5f678905790aa28ba4910049f7bef97aaf49e940081c23b09a79541",
+    "docs/dependencies/webkit-jsc-bringup.json": "ec41eb01a8d38a5bec5786a1aa1c2e7962219af3dbfadb999d248a7da1b262c7",
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "35ba7fa79390bdb6a523daf915c1e49286d802554cc5f078a53931c4a33d7ea4",
+    "tests/jsc_register_platform/CMakeLists.txt": "16d5c085e931390662df6ea1fb9ba8b2bd6c85d394405343a07c4a486829f968",
+    "tests/jsc_register_platform/main.cpp": "6023db71b672b6247608fb4f454fb0cffeb6ae8e41d732725c7ded030ea3955d",
+    "tests/jsc_register_platform/seed.S": "a8a2f5a4d95964d0158ddfb4fdd42cb1c4a4c40f045b537f0c6519c520120706",
+    "tests/qemu_jsc_register_platform.py": "8b9741db4e9b9291f82ef58c6143d12a6d67457409988f6d4980fd4f468d5475",
+    "tools/build_jsc_register_platform.py": "75bd024bc66f758ef99b0d3ddbbaab9d6557f230d134fbbd8ddd1cb40abfafcb"
+  },
+  "limits": [
+    "own-current capture,not foreign-thread suspension/complete GC/sampling-profiler operation",
+    "selected ProfilerSupport queries do not qualify its WorkQueue/logging constructor or full module/runtime link",
+    "complete JSC/JavaScript/WebAssembly/browser execution,engine-sized resources and other filesystem/runtime services open",
+    "initial prior synchronization timeout remains unresolved per baseline evidence,despite two identical-artifact passing confirmations",
+    "native Pi5SDIO/WiFi,production security and platform acceptance open;new Fusion/Pi5/laptop NOT RUN",
+    "development0.30.0;no0.50.0 or new user binary milestone claim"
+  ]
+}

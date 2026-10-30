@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSJSCRegisterPlatform LANGUAGES CXX ASM)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_executable(jsc_register_platform main.cpp seed.S "${WEBKIT_SOURCE}/Source/JavaScriptCore/runtime/ProfilerSupport.cpp")
+target_include_directories(jsc_register_platform PRIVATE "${ENGINE_BUILD}" "${ENGINE_BUILD}/JavaScriptCore/PrivateHeaders" "${ENGINE_BUILD}/JavaScriptCore/PrivateHeaders/JavaScriptCore" "${ENGINE_BUILD}/JavaScriptCore/DerivedSources" "${WEBKIT_SOURCE}/Source/JavaScriptCore" "${WEBKIT_SOURCE}/Source/WTF" "${WEBKIT_SOURCE}/Source/bmalloc")
+target_compile_definitions(jsc_register_platform PRIVATE BUILDING_JSCONLY__ BUILDING_WITH_CMAKE=1 HAVE_CONFIG_H=1 BUILDING_WTF=1 NDEBUG=1)
+target_link_libraries(jsc_register_platform PRIVATE "${ENGINE_BUILD}/lib/libWTF.a" "${ENGINE_BUILD}/lib/libbmalloc.a" "${CHOS_SDK_ROOT}/lib/libicuuc.a" "${CHOS_SDK_ROOT}/lib/libicustubdata.a")
