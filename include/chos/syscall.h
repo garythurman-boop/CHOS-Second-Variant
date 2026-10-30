@@ -77,7 +77,9 @@
 #define CHOS_SYS_FILE_TRUNCATE 72u /* x0=owned writable fd,x1=new length; WRITE_FILE18 */
 #define CHOS_SYS_FILE_FLUSH 73u /* x0=owned writable fd; conditional durable commit; WRITE_FILE18 */
 #define CHOS_SYS_FILE_ABORT 74u /* x0=owned fd; discard uncommitted changes and close; CLOSE10 */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_FILE_ABORT
+#define CHOS_SYS_FILE_METADATA 75u /* x0=owned fd,x1=64B metadata,x2=exact size; READ9 */
+#define CHOS_SYS_PATH_METADATA 76u /* x0=path,x1=64B metadata,x2=exact size; READ9 plus OPEN8 */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_PATH_METADATA
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

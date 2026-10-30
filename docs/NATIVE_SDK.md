@@ -200,3 +200,9 @@ musl math archive supplies original `ldexpl` over the selected binary128 scaling
 routine. Archive names/link groups remain compatible. The integer dependency
 manifest/verifier preserves original bytes; this is selected ABI coverage, not
 full compiler-rt or all floating-environment conformance. See `NATIVE_WTF_INT128.md`.
+
+The [native file metadata service](NATIVE_FILE_METADATA.md) supplies actual held
+CHFS/ROMFS identities and source revisions with capability-checked descriptor/path
+queries. Snapshot bytes and their optional identity are captured under one lock;
+virtual-directory identity is explicitly unavailable. This closes a concrete
+filesystem prerequisite, not full WTF/JSC, browser or wireless acceptance.

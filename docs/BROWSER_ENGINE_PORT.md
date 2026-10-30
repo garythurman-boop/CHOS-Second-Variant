@@ -379,3 +379,9 @@ conversion and ldexpl imports are supplied by original pinned LLVM/musl routines
 The actual full WTF attempt now reports five filesystem compilation failures;
 no complete archive/link, engine execution or JavaScript result is claimed.
 `NATIVE_WTF_INT128.md` records independent oracle and native component coverage.
+
+The [native file metadata service](NATIVE_FILE_METADATA.md) supplies actual held
+CHFS/ROMFS identities and source revisions with capability-checked descriptor/path
+queries. Snapshot bytes and their optional identity are captured under one lock;
+virtual-directory identity is explicitly unavailable. This closes a concrete
+filesystem prerequisite, not full WTF/JSC, browser or wireless acceptance.

@@ -5,7 +5,29 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The latest [native positional-read component](NATIVE_POSITIONAL_READS.md) adds
+The current verified source checkpoint is `444b293`. Native writable working-copy
+handles, shared buffer quotas and conditional commits are qualified in
+[NATIVE_WRITABLE_HANDLES.md](NATIVE_WRITABLE_HANDLES.md). Original WTF Int128 and
+the LLVM/musl runtime closure are qualified in
+[NATIVE_WTF_INT128.md](NATIVE_WTF_INT128.md), with ten final guest profiles and full
+host/sanitizer results. Earlier storage ownership work has its separate fault and
+installer evidence in [NATIVE_STORAGE_SNAPSHOTS.md](NATIVE_STORAGE_SNAPSHOTS.md).
+
+The native [file metadata component](NATIVE_FILE_METADATA.md) additionally captures
+held identities with actual snapshot bytes and exposes read-only descriptor/path
+metadata. Fourteen guest profiles and full host/sanitizer suites pass; no full
+engine claim follows from these services.
+
+The actual full WTF compile currently has five filesystem failures. Complete
+library linking, engine Thread/GC and memory services, JavaScript and modern
+rendering, native Wi-Fi, production security policy and platform acceptance remain
+open. Stage 3 is incomplete; version remains 0.30.0. These are software and
+qualification gaps, not solely unavailable-hardware tests.
+
+The following entries retain earlier checkpoint evidence and the limitations
+recorded at those points; use the current status above for remaining work.
+
+The [native positional-read component](NATIVE_POSITIONAL_READS.md) adds
 real owned-snapshot metadata and cursor-independent reads. A live protected-buffer
 test found and fixed a shared copy-to-user prefix-write defect. Fourteen accepted
 guest profiles and the full host/sanitizer suites pass. Initial failure evidence

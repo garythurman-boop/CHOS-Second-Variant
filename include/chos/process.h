@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "chos/file_metadata_api.h"
 #include "chos/address_space.h"
 #include "chos/elf_image.h"
 #include "chos/process_caps.h"
@@ -174,6 +175,8 @@ int64_t process_file_read_for_address_space(address_space_handle_t space, int fd
                                             uint64_t user_destination, size_t length);
 int64_t process_file_read_at_for_address_space(address_space_handle_t,int,uint64_t,size_t,uint64_t);
 int process_file_info_for_address_space(address_space_handle_t,int,chos_file_info_t *);
+int process_file_metadata(address_space_handle_t,int,chos_file_metadata_t *);
+int process_path_metadata(const char *,chos_file_metadata_t *);
 int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,int64_t offset,unsigned origin);
 int64_t process_file_close_for_address_space(address_space_handle_t space, int fd);
 int64_t process_file_open_write(address_space_handle_t,const char *,unsigned,size_t);

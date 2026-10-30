@@ -229,3 +229,9 @@ logging remains explicitly outside the selected no-localization profile, while
 WTF PrintStream bodies remain original. Current full WTF compilation has five
 filesystem blockers; complete engine linking/runtime, memory/GC and all modern
 browser/wireless gates remain separate unfinished work.
+
+The [native file metadata service](NATIVE_FILE_METADATA.md) supplies actual held
+CHFS/ROMFS identities and source revisions with capability-checked descriptor/path
+queries. Snapshot bytes and their optional identity are captured under one lock;
+virtual-directory identity is explicitly unavailable. This closes a concrete
+filesystem prerequisite, not full WTF/JSC, browser or wireless acceptance.

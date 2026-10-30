@@ -40,6 +40,21 @@ static chos_storage_lease_t snapshot(const char *path,const char *expected){
  assert(!storage_read_snapshot(path,buffer,sizeof buffer,&n,&lease)&&n==strlen(expected)&&!memcmp(buffer,expected,n)&&buffer[n]==0xa5);
  assert(lease.mount&&lease.object&&lease.revision&&!lease.reserved);return lease;
 }
+static void metadata_contract(void){
+ unsigned char buffer[32];size_t bytes=999;chos_storage_lease_t view;
+ chos_file_metadata_t metadata,old;memset(&metadata,0xa5,sizeof metadata);old=metadata;
+ assert(storage_file_metadata("/ABSENT",&metadata)==-CHOS_ERRNO_ENOENT&&!memcmp(&metadata,&old,sizeof metadata));
+ assert(storage_file_metadata("/../BAD",&metadata)==-CHOS_ERRNO_EINVAL&&!memcmp(&metadata,&old,sizeof metadata));
+ assert(!storage_read_view("/A",buffer,sizeof buffer,&bytes,&view));
+ assert(!storage_file_metadata("/a",&metadata)&&metadata.version==1&&metadata.size_bytes==64);
+ assert(metadata.flags==(CHOS_FILE_META_REGULAR|CHOS_FILE_META_SIZE_VALID|CHOS_FILE_META_ID_VALID));
+ assert(metadata.length==bytes&&metadata.identity.source==CHOS_FILE_SOURCE_CHFS&&metadata.identity.mount==view.mount&&metadata.identity.object==view.object&&metadata.source_revision==view.revision);
+ assert(!metadata.reserved0&&!metadata.reserved1&&!metadata.identity.reserved);
+ assert(!storage_file_metadata("/",&metadata)&&metadata.flags==CHOS_FILE_META_DIRECTORY&&!metadata.length&&!metadata.identity.object&&!metadata.source_revision);
+ assert(storage_make_directory("/META_DIR")&&!storage_file_metadata("/META_DIR",&metadata));
+ assert(metadata.flags==(CHOS_FILE_META_DIRECTORY|CHOS_FILE_META_ID_VALID)&&!metadata.length&&metadata.identity.object&&metadata.identity.mount);
+ assert(storage_remove_directory("/META_DIR"));
+}
 static void unchanged_output(const chos_storage_lease_t *value){
  chos_storage_lease_t out,old;memset(&out,0xa5,sizeof out);old=out;
  assert(storage_commit_snapshot("/A",value,"bad",3,&out)==-CHOS_ERRNO_ESTALE&&!memcmp(&out,&old,sizeof out));
@@ -59,6 +74,7 @@ static void *creator(void *p){
 }
 int main(void){
  reset();assert(storage_write_file("/A","old",3)&&storage_write_file("/B","other",5));
+ metadata_contract();
  chos_storage_lease_t a=snapshot("/a","old"),b=snapshot("/B","other"),next;
  assert(storage_write_file("/B","updated",7));
  assert(!storage_commit_snapshot("/A",&a,"mine",4,&next)&&next.object==a.object&&next.revision!=a.revision);

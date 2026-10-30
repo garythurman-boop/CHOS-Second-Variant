@@ -304,7 +304,7 @@ void storage_detach(void){
     chos_spin_unlock_irqrestore(&storage_lock,flags);
 }
 
-static int read_snapshot_locked(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease){
+static int read_snapshot_locked(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease,int require_identity){
     if(!path||!bytes||!lease)return -CHOS_ERRNO_EINVAL;
     int result=-CHOS_ERRNO_EIO;
     if(!fs_ready)goto done;
@@ -313,8 +313,8 @@ static int read_snapshot_locked(const char *path,void *buffer,size_t capacity,si
     if(chfs_entry_is_directory(&root_fs.entries[index])){result=-CHOS_ERRNO_EISDIR;goto done;}
     if(root_fs.entries[index].size_bytes>capacity){result=-CHOS_ERRNO_E2BIG;goto done;}
     if(root_fs.entries[index].size_bytes&&!buffer){result=-CHOS_ERRNO_EINVAL;goto done;}
-    chos_storage_lease_t value;
-    if(!chos_storage_versions_get(&file_versions,index,&value))goto done;
+    chos_storage_lease_t value={0};
+    if(!chos_storage_versions_get(&file_versions,index,&value)&&require_identity)goto done;
     size_t amount=0;operation_begin();
     if(!chfs_read_file(&root_fs,path,buffer,capacity,&amount)||operation_failed)goto done;
     *lease=value;*bytes=amount;result=0;
@@ -323,7 +323,41 @@ done:
 }
 int storage_read_snapshot(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease){
     uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
-    int result=read_snapshot_locked(path,buffer,capacity,bytes,lease);
+    int result=read_snapshot_locked(path,buffer,capacity,bytes,lease,1);
+    chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
+}
+int storage_read_view(const char *path,void *buffer,size_t capacity,size_t *bytes,chos_storage_lease_t *lease){
+    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);
+    int result=read_snapshot_locked(path,buffer,capacity,bytes,lease,0);
+    chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
+}
+int storage_file_metadata(const char *path,chos_file_metadata_t *out){
+    if(!path||!out)return -CHOS_ERRNO_EINVAL;
+    if(!(path[0]=='/'&&!path[1])&&!romfs_path_is_valid(path))return -CHOS_ERRNO_EINVAL;
+    uint64_t flags=chos_spin_lock_irqsave(&storage_lock);int result=-CHOS_ERRNO_ENOENT;
+    if(!fs_ready)goto done;
+    size_t index=catalogue_index(path);
+    chos_file_metadata_t value={.version=CHOS_FILE_METADATA_VERSION,.size_bytes=sizeof(value),
+        .identity={.source=CHOS_FILE_SOURCE_CHFS}};
+    if(index==SIZE_MAX){
+        /* Legacy implicit directories and the physical root have no record
+         * identity. Report the real directory without inventing an inode. */
+        if(!chfs_is_directory(&root_fs,path))goto done;
+        value.flags=CHOS_FILE_META_DIRECTORY;
+        if(!write_ready_locked())value.flags|=CHOS_FILE_META_READ_ONLY;
+        *out=value;result=0;goto done;
+    }
+    chos_chfs_entry_t *entry=&root_fs.entries[index];
+    if(chfs_entry_is_directory(entry))value.flags=CHOS_FILE_META_DIRECTORY;
+    else{value.flags=CHOS_FILE_META_REGULAR|CHOS_FILE_META_SIZE_VALID;value.length=entry->size_bytes;}
+    if(!write_ready_locked())value.flags|=CHOS_FILE_META_READ_ONLY;
+    chos_storage_lease_t lease;
+    if(chos_storage_versions_get(&file_versions,index,&lease)){
+        value.identity.mount=lease.mount;value.identity.object=lease.object;
+        value.source_revision=lease.revision;value.flags|=CHOS_FILE_META_ID_VALID;
+    }
+    *out=value;result=0;
+done:
     chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
 }
 int storage_open_snapshot(const char *path,unsigned options,void *buffer,size_t capacity,
@@ -359,7 +393,7 @@ int storage_open_snapshot(const char *path,unsigned options,void *buffer,size_t 
    result=operation_failed?-CHOS_ERRNO_EIO:-CHOS_ERRNO_ENOSPC;goto done;
   }
  }
- result=read_snapshot_locked(path,buffer,capacity,bytes,lease);
+ result=read_snapshot_locked(path,buffer,capacity,bytes,lease,1);
 done:
  chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
 }

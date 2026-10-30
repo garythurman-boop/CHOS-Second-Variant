@@ -5,6 +5,7 @@
 #include "chos/blockdev.h"
 #include "chos/chfs.h"
 #include "chos/storage_versions.h"
+#include "chos/file_metadata_api.h"
 
 int storage_init(void);
 /* Single-CPU installer ownership transfer: no filesystem I/O may be active. */
@@ -25,6 +26,10 @@ int storage_write_file(const char *path, const void *data, size_t size);
  * A mount/identity/content change makes the old lease stale; unrelated files do
  * not invalidate it. No inode persistence or public user-token authority implied. */
 int storage_read_snapshot(const char *,void *,size_t,size_t *,chos_storage_lease_t *);
+/* Readable data remains available when identity is unavailable. The zero lease
+ * then explicitly supplies no object identity; it cannot authorize a commit. */
+int storage_read_view(const char *,void *,size_t,size_t *,chos_storage_lease_t *);
+int storage_file_metadata(const char *,chos_file_metadata_t *);
 int storage_open_snapshot(const char *,unsigned,void *,size_t,size_t *,chos_storage_lease_t *);
 int storage_commit_snapshot(const char *,const chos_storage_lease_t *,const void *,size_t,chos_storage_lease_t *);
 int storage_write_ready(void);

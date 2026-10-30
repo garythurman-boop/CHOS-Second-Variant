@@ -728,7 +728,7 @@ done:
 int64_t process_file_open_for_address_space(address_space_handle_t space,const char *path){
     if(!path||!romfs_path_is_valid(path))return -CHOS_ERRNO_EINVAL;
     chos_chfs_entry_t entry;chos_romfs_file_t embedded={0};
-    size_t capacity=0,bytes=0,index,i;void *owned=NULL;
+    size_t capacity=0,bytes=0,index,i;void *owned=NULL;chos_storage_lease_t lease={0};
     int persistent=storage_lookup(path,&entry);
     if(persistent){
         if(chfs_entry_is_directory(&entry))return -CHOS_ERRNO_EISDIR;
@@ -740,12 +740,20 @@ int64_t process_file_open_for_address_space(address_space_handle_t space,const c
     if(persistent){
         owned=kheap_alloc(capacity);
         if(!owned)result=-CHOS_ERRNO_ENOMEM;
-        else if(!storage_read_file(path,owned,capacity,&bytes))result=-CHOS_ERRNO_EIO;
-    }else bytes=embedded.size;
+        else result=storage_read_view(path,owned,capacity,&bytes,&lease);
+    }else{
+        bytes=embedded.size;
+        for(size_t ordinal=0;ordinal<romfs_file_count();ordinal++){
+            chos_romfs_file_t candidate;
+            if(romfs_get_at(ordinal,&candidate)&&romfs_path_equal(candidate.path,path)){
+                lease.object=(uint64_t)ordinal+1u;break;
+            }
+        }
+    }
     uint64_t flags=chos_spin_lock_irqsave(&process_lock);
     process_slot_t *slot=&process_slots[index];process_file_handle_t *file=&slot->open_files[i];
     if(!result&&(!space_equal(slot->space,space)||slot->info.state!=CHOS_PROCESS_RUNNING||slot->info.cleanup_pending))result=-CHOS_ERRNO_ESRCH;
-    if(!result){file->data=persistent?owned:embedded.data;file->owned_data=owned;file->size=bytes;file->active=1;}
+    if(!result){file->data=persistent?owned:embedded.data;file->owned_data=owned;file->size=bytes;file->lease=lease;file->active=1;}
     else zero_bytes(file,sizeof(*file));
     chos_spin_unlock_irqrestore(&process_lock,flags);
     if(result&&owned)(void)kheap_free(owned);
@@ -819,6 +827,70 @@ int process_file_info_for_address_space(address_space_handle_t space,int fd,chos
         .length=file->size,.position=file->offset};
     if(file->owned_data)value.flags|=CHOS_FILE_INFO_CHFS_SOURCE;
     *out=value;chos_spin_unlock_irqrestore(&process_lock,flags);return 0;
+}
+
+int process_file_metadata(address_space_handle_t space,int fd,chos_file_metadata_t *out){
+    if(!out)return -CHOS_ERRNO_EINVAL;
+    if(fd<CHOS_PROCESS_FD_BASE||fd>=CHOS_PROCESS_FD_BASE+(int)CHOS_PROCESS_MAX_OPEN_FILES)return -CHOS_ERRNO_EBADF;
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    size_t index=find_process_slot_for_space_locked(space),i=(size_t)(fd-CHOS_PROCESS_FD_BASE);
+    int result=-CHOS_ERRNO_EBADF;
+    if(index==CHOS_PROCESS_MAX||process_slots[index].open_files[i].active!=1)goto done;
+    process_file_handle_t *file=&process_slots[index].open_files[i];
+    if(file->busy){result=-CHOS_ERRNO_EBUSY;goto done;}
+    chos_file_metadata_t value={.version=CHOS_FILE_METADATA_VERSION,.size_bytes=sizeof(value),
+        .flags=CHOS_FILE_META_REGULAR|CHOS_FILE_META_SIZE_VALID,.length=file->size,
+        .identity={.source=file->owned_data?CHOS_FILE_SOURCE_CHFS:CHOS_FILE_SOURCE_ROMFS}};
+    if(file->writable)value.flags|=CHOS_FILE_META_WORKING_COPY|(file->dirty?CHOS_FILE_META_DIRTY:0);
+    else value.flags|=CHOS_FILE_META_READ_ONLY;
+    if(file->lease.object&&(file->owned_data?file->lease.mount!=0:1)){
+        value.flags|=CHOS_FILE_META_ID_VALID;value.identity.mount=file->lease.mount;
+        value.identity.object=file->lease.object;value.source_revision=file->lease.revision;
+    }
+    *out=value;result=0;
+done:
+    chos_spin_unlock_irqrestore(&process_lock,flags);return result;
+}
+static int embedded_directory_exists(const char *path){
+    size_t length=0;while(path[length])++length;
+    for(size_t ordinal=0;ordinal<romfs_file_count();ordinal++){
+        chos_romfs_file_t candidate;if(!romfs_get_at(ordinal,&candidate))continue;
+        size_t i=0;
+        for(;i<length;i++){
+            int a=(unsigned char)path[i],b=(unsigned char)candidate.path[i];
+            if(a>='A'&&a<='Z')a+='a'-'A';if(b>='A'&&b<='Z')b+='a'-'A';
+            if(a!=b)break;
+        }
+        if(i==length&&candidate.path[i]=='/')return 1;
+    }
+    return 0;
+}
+int process_path_metadata(const char *path,chos_file_metadata_t *out){
+    if(!path||!out)return -CHOS_ERRNO_EINVAL;
+    if(!(path[0]=='/'&&!path[1])&&!romfs_path_is_valid(path))return -CHOS_ERRNO_EINVAL;
+    int result=storage_file_metadata(path,out);
+    if(result!=-CHOS_ERRNO_ENOENT)return result;
+    chos_romfs_file_t embedded;
+    if(romfs_lookup(path,&embedded)){
+        chos_file_metadata_t value={.version=CHOS_FILE_METADATA_VERSION,.size_bytes=sizeof(value),
+            .flags=CHOS_FILE_META_REGULAR|CHOS_FILE_META_SIZE_VALID|CHOS_FILE_META_READ_ONLY,
+            .identity={.source=CHOS_FILE_SOURCE_ROMFS},.length=embedded.size};
+        for(size_t ordinal=0;ordinal<romfs_file_count();ordinal++){
+            chos_romfs_file_t candidate;
+            if(romfs_get_at(ordinal,&candidate)&&romfs_path_equal(candidate.path,path)){
+                value.identity.object=(uint64_t)ordinal+1u;value.flags|=CHOS_FILE_META_ID_VALID;break;
+            }
+        }
+        *out=value;return 0;
+    }
+    if((path[0]=='/'&&!path[1])||embedded_directory_exists(path)){
+        /* The merged/implicit namespace is real but has no physical file ID. */
+        *out=(chos_file_metadata_t){.version=CHOS_FILE_METADATA_VERSION,.size_bytes=sizeof(*out),
+            .flags=CHOS_FILE_META_DIRECTORY|CHOS_FILE_META_READ_ONLY,
+            .identity={.source=CHOS_FILE_SOURCE_NAMESPACE}};
+        return 0;
+    }
+    return -CHOS_ERRNO_ENOENT;
 }
 
 int64_t process_file_seek_for_address_space(address_space_handle_t space,int fd,int64_t offset,unsigned origin){
