@@ -23,6 +23,7 @@
 #include "chos/file_api.h"
 #include "chos/file_write_api.h"
 #include "chos/file_metadata_api.h"
+#include "chos/directory_snapshot.h"
 #include "chos/file_position.h"
 #include "chos/storage.h"
 #include "chos/chfs.h"
@@ -666,6 +667,17 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
                 int result=process_file_info_for_address_space(fault_space,(int)frame->x[0],&info);
                 if(result){frame->x[0]=(uint64_t)(int64_t)result;return frame;}
                 frame->x[0]=address_space_copy_to_user(fault_space,frame->x[1],&info,sizeof(info))?0u:neg_errno(CHOS_ERRNO_EFAULT);return frame;
+            }
+            case CHOS_SYS_DIRECTORY_PAGE: {
+                chos_directory_page_t request,value;char path[CHOS_FILE_PATH_CAPACITY];
+                if(!process_pid_for_address_space(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[2]!=sizeof(request)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[1],sizeof(value))||
+                   !address_space_copy_from_user(fault_space,&request,frame->x[1],sizeof(request))||
+                   !syscall_copy_user_path(fault_space,frame->x[0],path,sizeof(path))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int result=chos_directory_collect_page(path,&request,&value);
+                if(result){frame->x[0]=(uint64_t)(int64_t)result;return frame;}
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[1],&value,sizeof(value))?0u:neg_errno(CHOS_ERRNO_EFAULT);return frame;
             }
             case CHOS_SYS_FILE_METADATA:
             case CHOS_SYS_PATH_METADATA: {

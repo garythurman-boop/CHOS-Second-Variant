@@ -391,3 +391,8 @@ upstream lifecycle to owned CHOS I/O, actual identities, conditional durable flu
 and real private mapped copies. Shared file mappings and locks fail explicitly.
 Three full-WTF filesystem compilation failures remain; no complete engine link,
 JavaScript, modern browser or native wireless success is implied.
+
+The [complete native directory-page service](NATIVE_DIRECTORY_PAGES.md) adds
+read-only restartable enumeration beyond the old global64-entry catalogue.
+Mount/revision/authority tokens reject changed observations; no inode or persistent
+cursor is fabricated. Higher-level engine filesystem adaptation remains open.

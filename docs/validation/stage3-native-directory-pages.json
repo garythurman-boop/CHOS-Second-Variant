@@ -1,0 +1,1729 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "5ce5772ca8388f1287c52626c6a72b588592a3b6",
+  "implementation": "complete restartable CHFS/ROMFS directory pages with actual mount/revision/authority observations",
+  "syscall_limit": 77,
+  "capability": "77aliasesLIST_DIR20;registeredprocess;positivebits1..62 unchanged",
+  "sdk_files": 1179,
+  "sdk_manifest_sha256": "5912cf1676579b6f835746ac6846699452dfe58fdfd18d318ccc1b2cde0c54aa",
+  "host_checks": {
+    "host5": {
+      "exit": 0,
+      "log_sha256": "31fc4b1ce85b3d14436bd1fa5060ece829ff97e9e42957f02b2929400268c1cd"
+    },
+    "full-host": {
+      "exit": 0,
+      "log_sha256": "2da7778eb8428720ef9b1af4373653c95529731d0b3b0c5d6a8e563acd95ee10"
+    },
+    "full-sanitize": {
+      "exit": 0,
+      "log_sha256": "25811eb4ed02969b9d7872f5ed1938ef316688b552a1c7f356a8fb6f124415f9"
+    },
+    "final-build": {
+      "exit": 0,
+      "log_sha256": "c9af2432baadf7ec2f10d1e60906e5ca02bd3736f230a5c980e74f2e19654347"
+    },
+    "full-capacity-host": {
+      "exit": 0,
+      "log_sha256": "417a04394f7aebb3d8dbfb7f6bedcd8466302146b87836051ff4c8802d86b8e5"
+    }
+  },
+  "host_scope": "30seeded511-entry oracle permutations;actual storage/paging at511physicalrecords/512mergedchildren,201children,override/OOM/noIO/remount/write-uncertainty;only allocator+2ROMFS inputs modeled",
+  "final_application": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "sdk_manifest_sha256": "5912cf1676579b6f835746ac6846699452dfe58fdfd18d318ccc1b2cde0c54aa",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_directory_pages",
+        "-B",
+        "/workspace/chos-native-directory-pages-qualified/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-native-directory-pages-qualified/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "application_sha256": "aa4abf06db166461df7e12f0837fb6e5cd309dc43cdb6a19faeb2200223cc28f",
+    "limits": [
+      "real complete paged namespace;not full engine filesystem/browser",
+      "native guest qualification required;no hardware target claim"
+    ]
+  },
+  "accepted_guest_profiles": [
+    {
+      "profile": "directory-direct",
+      "exit": 0,
+      "seconds": 62.446085004005,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "aa4abf06db166461df7e12f0837fb6e5cd309dc43cdb6a19faeb2200223cc28f",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117497,
+        "free_pages_before": 117497,
+        "free_pages_after": 117497,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 2874,
+        "maximum_observed_page_us": 43941,
+        "checks": [
+          "full175-file directory after175 unrelated files plus10 explicit subdirectories,real ROMFS merge and empty directories",
+          "immutable pages within one token,write/rename/state-change refusal with unchanged output and explicit restart",
+          "capability refusal,invalid size/version/flags/reserved/path,index overflow and protected crosspage output",
+          "three concurrent enumeration threads;three process lifecycles,cold PMM equality and zero user heap/futex waiters"
+        ],
+        "limits": [
+          "read-only restartable native directory pages,not full engine filesystem/browser",
+          "global mutations conservatively invalidate token;bounded whole catalogue CPU work and native CHFS path limits",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "4dd473c0a190f6a16a4c071e34d4e8136b43b5e300f36d398ea0de7dce80cdab",
+      "artifacts": {
+        "kernel_sha256": "96ad7c91ba7ff372592032b9f60e0da05725856ad7d9666a72216a9970cf936b"
+      }
+    },
+    {
+      "profile": "directory-uefi",
+      "exit": 0,
+      "seconds": 67.06777728399902,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "aa4abf06db166461df7e12f0837fb6e5cd309dc43cdb6a19faeb2200223cc28f",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 2752,
+        "maximum_observed_page_us": 37901,
+        "checks": [
+          "full175-file directory after175 unrelated files plus10 explicit subdirectories,real ROMFS merge and empty directories",
+          "immutable pages within one token,write/rename/state-change refusal with unchanged output and explicit restart",
+          "capability refusal,invalid size/version/flags/reserved/path,index overflow and protected crosspage output",
+          "three concurrent enumeration threads;three process lifecycles,cold PMM equality and zero user heap/futex waiters"
+        ],
+        "limits": [
+          "read-only restartable native directory pages,not full engine filesystem/browser",
+          "global mutations conservatively invalidate token;bounded whole catalogue CPU work and native CHFS path limits",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "603e970d67b2d55a9d9e3a34b0430dba054c28a10a76ca2ef3519d532842b93c",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "metadata-uefi",
+      "exit": 0,
+      "seconds": 17.545416595996358,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "0c9c13adfb0106e37d80d6436f55e760d24329d6d60ebc0041860eb8ca4355cb",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 241,
+        "checks": [
+          "actual CHFS runtime ledger and compiled ROMFS ordinal identities;unknown virtual-directory identity explicitly unavailable",
+          "immutable open-view metadata survives rewrite/rename/unlink/recreate;working-copy source revision changes only after successful commit",
+          "300 readonly snapshots against50 commits compare captured data with independently recorded source revisions",
+          "reduced READ/OPEN/WRITE capabilities,foreign descriptors,full64bit fd refusal,malformed/RO/crosspage output with unchanged bytes",
+          "three process lifecycles,cold PMM equality,zero user heap/futex waiters"
+        ],
+        "limits": [
+          "read-only native metadata;no POSIX timestamps/inodes or full engine filesystem/browser",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "7566b798e3ff2fe8994a735765a6dab82b92d77dd4254ab87bb1f171f8db4613",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "write-uefi",
+      "exit": 0,
+      "seconds": 17.81552959799592,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "4331eaa89ed9176a5dc078e47bb7733bef2ec1bebe2489fc8335cf1e1c0e2d05",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 162,
+        "checks": [
+          "real native writable descriptor API with strict request ABI,owner and reduced capability refusals",
+          "384 thread-shared atomic record writes,zero-filled holes,truncate,partial reads and immutable old snapshots",
+          "stale flush/close retain dirty data;explicit abort;concurrent conditional commits choose exactly one winner",
+          "shared8MiB owned-buffer budget reserved before allocation,atomic quota refusal without file creation",
+          "guard-page bad input preserves bytes/cursor;64-bit fd alias refusal",
+          "main/worker dirty exit discards uncommitted changes,three process lifecycles/cold PMM equality/zero heap and futex waiters"
+        ],
+        "limits": [
+          "whole-file CHFS commit latency,4MiB/file and path limits remain;no full engine filesystem/browser",
+          "QEMU qualification;new Fusion/Pi/laptop tests NOT RUN"
+        ]
+      },
+      "result_sha256": "d837241025b871890eae29a878cb0f07187dc605b1150301cfdcf713b0433378",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "wtf-handles-uefi",
+      "exit": 0,
+      "seconds": 15.39425375200517,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "821c5ec68b7a359b33d18ebdf4bf4684d5b20bfa4b289a0322a663534359e675",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 272,
+        "checks": [
+          "actual upstream FileHandle lifecycle with native reads/writes larger than transfer limit",
+          "held metadata and snapshot bytes survive rewrite;durable flush and stale-close refusal with explicit discard",
+          "real private read/write mapped copy does not alter descriptor bytes or cursor;read protection and empty-file mapping;shared/unsupported lock refusal",
+          "three concurrent file writers and three process lifecycles,cold PMM equality and zero user heap/futex waiters"
+        ],
+        "limits": [
+          "FileHandle component only;readAll/append String+Vector paths/full WTF link/runtime not executed",
+          "private copied mappings only;no coherent shared file maps or advisory locks",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "57d6d10dbec222ff0a8b82904df383cdaa17c4250bd78c955f7384c97f5a4752",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "stdio-uefi",
+      "exit": 0,
+      "seconds": 15.71792728600849,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "91cd42f075bbcfe8c17829a032808d8302d0a47bdfd161f33e029639601170bf",
+        "source": "disposable CHFS SDK/application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 109,
+        "checks": [
+          "read-only buffered streams over actual CHFS snapshots",
+          "raw seek arithmetic,EOF,overflow,invalid origin and failed user-copy preserve cursor",
+          "separate process cannot use parent descriptor; READ permission reduction denies seek63",
+          "three std::thread workers consume each byte once across three lifecycles",
+          "three process executions,zero heap allocations after joins,stable warm physical frames,no futex waiters"
+        ],
+        "limits": [
+          "four process-owned snapshot descriptors,read-only C streams; no POSIX device fd or writable/formatting streams",
+          "ICU full data and browser engine not qualified",
+          "QEMU evidence; new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "c9aba658dd11535f1bb0747cf1475b66ff5d237b5e840b315464e388e17c63b3",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "native-uefi",
+      "exit": 0,
+      "seconds": 12.377682556005311,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "bcf97a45f971b1fa1ab26f36cebb4172fc5465a4a065af644054517a8ab39824",
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "checks": [
+          "native AArch64 ELF executes in EL0 with arguments and separate RX/R/RW segments",
+          "sparse image spans more than128 pages with256KiB zeroed writable BSS",
+          "W+X and absent CHOS ABI note refused before execution",
+          "writes to read-only segment and unmapped gap fault only the process",
+          "execute-never data call faults only the process",
+          "EL0 read of actual privileged kernel text is denied",
+          "normal/fault/scheduled exit and process slot reuse reclaim all owned frames"
+        ]
+      },
+      "result_sha256": "69fc504208f273d27be8006dc555409d97392998d33f1a1bcf989da918c49ab6",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "icu-uefi",
+      "exit": 0,
+      "seconds": 27.893205729997135,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "794a9aaf19e634c2d53b5a49080163ba5a180056423864d224c3f08f0b9bc6e4",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 551,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,strict cold PMM equality and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "1eb35edda875fe8588c92ecb796e2bad993bf01b2451c97ec0b726a415bb38aa",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls-uefi",
+      "exit": 0,
+      "seconds": 46.96479500900023,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "b1403f90f6c4a5ff4a76b777ee5ff94eb7f370f97acc30875410e8677474a926",
+        "ipv6": false,
+        "tcp6_wire_frames": 0,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7932583130022977,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8607466219982598,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5900688270048704,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6915362149884459,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6906817889976082,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8739352989941835,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.5293767549883341,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.594042928001727,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5483101429999806,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5686143389903009,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6161161630006973,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.47058579200529493,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8136671779939206,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.37764769900241,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.2847580389934592,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.41079598700162023,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0077377289999276,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8170808869908797,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.5660333019914106,
+            "stalled_network_gui_response_seconds": 0.04549183399649337,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.1605948159995023,
+            "stalled_network_gui_response_seconds": 0.05019652200280689,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 59418)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 34502)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 48398)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 57688)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 53504)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45478)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 50648)"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 50656)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 50664)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 52886)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 52898)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 52888)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 52906)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 52918)"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "2fb351545db14829f77c65dd0acaca9ca5f3b4c418fa658e10539af8f0266ddd",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls6-uefi",
+      "exit": 0,
+      "seconds": 47.01729024898668,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "b1403f90f6c4a5ff4a76b777ee5ff94eb7f370f97acc30875410e8677474a926",
+        "ipv6": true,
+        "tcp6_wire_frames": 354,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500142,
+        "free_pages_before": 500142,
+        "free_pages_after": 500142,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.916871171008097,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.93469744300819,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7743768030049978,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6934946949913865,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6298711559938965,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9387443199957488,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.5921643439942272,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5090656930115074,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6112607630057028,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6667631240125047,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.48774415500520263,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.3664269860018976,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6859274430025835,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.393608089987538,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.3610755900008371,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.36746270400180947,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.3872873850050382,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8287481379957171,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.3941602400009288,
+            "stalled_network_gui_response_seconds": 0.046053508995100856,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.909955497001647,
+            "stalled_network_gui_response_seconds": 0.06573937401117291,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 57738, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 59104, 0, 0)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 60640, 0, 0)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 53480, 0, 0)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 53704, 0, 0)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: SSLV3_ALERT_BAD_CERTIFICATE] ssl/tls alert bad certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: SSLV3_ALERT_UNSUPPORTED_CERTIFICATE] ssl/tls alert unsupported certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_EXPIRED] ssl/tls alert certificate expired (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_UNKNOWN] ssl/tls alert certificate unknown (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 54492, 0, 0)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 45226, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 48228, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 45230, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 45158, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 45170, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 55212, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 45172, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 45178, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "3a58b447d6368e28c33a25a520d5ed397de83835fa3c737eff8026bdd106bbe2",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "typing-uefi",
+      "exit": 0,
+      "seconds": 46.8457003430085,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "02672d455c87eb2402745132f02105f7c60a69feed575d79dd8bd32014692910",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "result_sha256": "6d4e710e3dcb04d83b0cf65734ddc346cba51fd3d4eb8f1b67d962772c8e8066",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "platform-uefi",
+      "exit": 0,
+      "seconds": 47.337306695990264,
+      "result": {
+        "mode": "uefi",
+        "checks": [
+          "32 fast USB keypress/release pairs",
+          "PCI VirtIO CHFS write/flush/read",
+          "PCI VirtIO hardware RNG",
+          "82574L e1000e DHCP/ARP/ICMP",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "20 USB hot-unplug/reconnect cycles with ring wraps",
+          "3 mixed input/storage cycles",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 7.012,
+        "desktop_ready_seconds": 10.022,
+        "keyboard_visible_ms": 31.02,
+        "pointer_visible_ms": 45.13,
+        "maximize_visible_ms": 183.3,
+        "drag_visible_ms": 225.71,
+        "stress_seconds": 5.613,
+        "idle_cpu_percent": 13.0,
+        "status": "PASS"
+      },
+      "result_sha256": "c4cb43fc1123116dc950eec8d3774a1df9ced728f8c1e754359f8eee3b2e03c1",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "platform-direct",
+      "exit": 0,
+      "seconds": 10.36062222700275,
+      "result": {
+        "mode": "direct",
+        "checks": [
+          "EL0 RNG invalid pointers, length bound, guard bytes and hardware receipt",
+          "CHFS write/flush/read",
+          "DHCP/ARP/ICMP",
+          "MMU permissions, guard pages and dynamic aliases with 512 MiB RAM",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "3 mixed input/storage cycles",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 0.203,
+        "desktop_ready_seconds": 3.29,
+        "keyboard_visible_ms": 61.28,
+        "pointer_visible_ms": 45.45,
+        "maximize_visible_ms": 195.55,
+        "drag_visible_ms": 250.57,
+        "stress_seconds": 0.128,
+        "idle_cpu_percent": 5.49,
+        "status": "PASS"
+      },
+      "result_sha256": "0116de80eff44d9cb00fd3143151c2e755df4fac513b1c032c8eaa3bc85360d2",
+      "artifacts": {
+        "kernel_sha256": "96ad7c91ba7ff372592032b9f60e0da05725856ad7d9666a72216a9970cf936b"
+      }
+    },
+    {
+      "profile": "installer",
+      "exit": 0,
+      "seconds": 116.77826535899658,
+      "result": {
+        "status": "PASS",
+        "install_seconds": 60.572,
+        "three_key_focus_ms": 454.33,
+        "max_install_step_ms": 89.792,
+        "keyboard_wizard": true,
+        "physical_mode_change": true,
+        "shutdown_seconds": 5.112,
+        "checks": [
+          "no writes before target selection and final confirmation",
+          "guest GPT/FAT32/EFI/CHFS creation and verification",
+          "ISO detached: disk-only desktop and native input",
+          "scheduled shell file write survives a fresh reboot; native editor checked separately",
+          "ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback",
+          "keyboard focus remains responsive during installation",
+          "installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits"
+        ]
+      },
+      "result_sha256": "8963ce357df0981fe58e61e423399ebcfab49f6a93cbdd4cf041332213491f62",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "installer-write-fault",
+      "exit": 0,
+      "seconds": 16.25961770900176,
+      "result": {
+        "status": "PASS",
+        "checks": [
+          "real guest NVMe write error",
+          "no false success",
+          "no disk mutation on first failed write",
+          "GUI and timer remain responsive"
+        ]
+      },
+      "result_sha256": "0a3962e02b0b426ff6b572865dd28d7f960a8f3cde37163cb1d24becdbb4726d",
+      "artifacts": {
+        "kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "iso_sha256": "ca6a64791056607f3ee91fff84791d91ae059192f8039aac8d2897f0d917d08d",
+        "iso_embedded_kernel_sha256": "5400c08179af2e28b268a746bfbb2e953e476efab387a2828516ad7c04e4ba37",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "retained_investigations": [
+    {
+      "log": "build1.log",
+      "diagnosis": "incorrect make target and unused ROMFS validation import;corrected target and function-section collection before execution"
+    },
+    {
+      "log": "build2.log",
+      "diagnosis": "LeakSanitizer rejected managed ptrace sandbox;same tests pass with escalated execution;not a product failure"
+    },
+    {
+      "log": "host4.log",
+      "diagnosis": "host fixture misleading-indentation warning corrected"
+    },
+    {
+      "log": "app-build1.log",
+      "diagnosis": "selected SDK has no chrono header;fixture timing changed to actual native clock_gettime,not a fake compatibility header"
+    },
+    {
+      "directory": "direct1",
+      "diagnosis": "guest not started;application missing because initial compile failed"
+    },
+    {
+      "directory": "direct2",
+      "diagnosis": "passed preliminary kernel;comparison loop subsequently avoids repeated validation of already canonical names;final profiles qualify optimized kernel"
+    }
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/directory-pages-qualified.tar.gz",
+    "archive_sha256": "dfff5ee1608504bcb7d7021a654bd7df3fe518773840b1962fb8e696731cbace",
+    "archive_bytes": 112183174,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "source_files_sha256": {
+    "Makefile": "23d0d3b49a04c08d61f5f6671eabee4fed8c441309af28157f6d949e41022fbd",
+    "docs/BROWSER_ENGINE_PORT.md": "7121db0cc0e7c10e00efafd44bf8fabd3abf8139d360c7b7d5d144463b917165",
+    "docs/NATIVE_SDK.md": "2107cc10bfa40b0f13ed3d70b0c9748583011c11a68c9d5fcc2ed14efaa22f91",
+    "docs/STAGE3_ARCHITECTURE.md": "6b62453eab58fbc5b26c83f3bf85a02091c2c73a63ad1550e343cef19c97473e",
+    "docs/STAGE3_CURRENT_RESULTS.md": "19c2fabea2fa528f07a60d2e5f7f96317eab60ae6bf1d59c6c47d4ffe34f62ba",
+    "include/chos/process_caps.h": "37dfdd632e670e5202f6453ae856e6ee08fa806b745ea01afb901646ff055cdf",
+    "include/chos/storage.h": "c40f060d8cf1eb82a506af55f920079cdb48d479f2c048d97708882b7db50b4b",
+    "include/chos/syscall.h": "e142ace4ac9eae799a719edcdea12451e85f52d5d2e23bd369f526f0eb677444",
+    "kernel/core/syscall.c": "af1abde8edc451652743bc5b77cbd7e78a9fd169e5d67a0d04b183d87fbc7d41",
+    "kernel/fs/storage.c": "d2bed959aed7c1c7c85171e0a261bc33e15536e06ca3e9dcc58f77a1b08b77c9",
+    "tests/test_process_caps.c": "a3bec057fedb8dc58d7ba20b1797b369ade8a97cf0204f78e9eea0826194d6f2",
+    "tests/test_storage_snapshots.c": "193a5f85bba5a94398d29542a3a58feb2af182ee48bc504ede0a1ace6d17578c",
+    "tests/test_user_abi.c": "9a00f7da7108f55a141f3df18fb4eb388dc0cc1e86f69d7cd20ac6b0c67ab446",
+    "userland/libchos/include/chos/user.h": "ffbdd5feba9d6317da1d8f8d2336a49b991dc689c1454b97c683f9d0522a21ea",
+    "docs/NATIVE_DIRECTORY_PAGES.md": "1926167bb147cfefd30c52106c23d7e51289c737da8b493a01ed7bf452e23424",
+    "include/chos/directory_api.h": "eeb1bdba7eaf302e0e6f7ce3e6006d112a2da736bf463d00621cb8cf17aa0d08",
+    "include/chos/directory_snapshot.h": "20fa162a6638b76fc274945694c65eb2eb9d167794523c6e0dad9c718670c8e7",
+    "kernel/fs/directory.c": "91f72e71f5148c0e2b42999bd67133cedd6487e33f5339e08ba52c8ef5eb47cb",
+    "kernel/fs/directory_snapshot.c": "cc285ab6e74a8bba736f79162482e8a05915c69530b9a87d565473e615fe07bb",
+    "tests/native_directory_pages/CMakeLists.txt": "1338de2ccfda52b5d15fee38b79de6a8bc0dbbf70c83c58449d7da49edff4f6b",
+    "tests/native_directory_pages/main.cpp": "f9f1f6a6fb759d607fea173dc08196b858f3d4404bc7d6abb5293c574a0a9320",
+    "tests/qemu_native_directory_pages.py": "e1692fc5ac9a42f08de3c9f347e15501b48bd1e27b1d81fb88cc389970f7f478",
+    "tests/test_directory_snapshot.c": "be39ca76b88d3d8a8fa96357fcba74a7d00ec2a029b23af2c2be99345b8dced5",
+    "tools/build_native_directory_pages.py": "2409dd96d2da899eae077ca84db610ab0774a5ec3da8047cdbb45084a12a086a"
+  },
+  "limits": [
+    "restartable observations,not persistent inode IDs/capabilities/cursors;global changes can starve a continuous scan",
+    "old LIST_FILES/LIST_DIR global64-entry interface unchanged;clients must adopt new paging",
+    "CHFS path/size/whole-file I/O latency remain;read-only temporary catalogue collection performs bounded CPU work with about69KiB kernel scratch",
+    "measured page roundtrips include scheduling;not a worst-case blocking bound",
+    "higher WTF filesystem,full library/link,engine Thread/GC/memory/JavaScript/rendering,Pi5 Wi-Fi and production/platform gates open",
+    "QEMU only;new Fusion/Pi5/laptop NOT RUN"
+  ]
+}

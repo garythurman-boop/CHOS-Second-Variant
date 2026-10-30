@@ -1,13 +1,28 @@
 /* Actual CHFS/storage wrappers over an owned memory block device. Only the
  * unavailable hardware discovery entry is modeled; filesystem code is real. */
 #include "chos/storage.h"
+#include "chos/romfs.h"
 #include "chos/syscall.h"
 #include "chos/file_write_api.h"
+#include "chos/directory_api.h"
+#include "chos/directory_snapshot.h"
+#include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
 #define SECTORS 1024u
+/* Namespace input and scratch allocation are modeled; CHFS, storage locking,
+ * snapshot capture and the entire paging implementation below are real. */
+static int fail_allocation,live_allocations;
+void *kheap_alloc(size_t n){if(fail_allocation)return NULL;void *p=malloc(n);if(p)live_allocations++;return p;}
+int kheap_free(void *p){if(p){assert(live_allocations>0);live_allocations--;free(p);}return 1;}
+size_t romfs_file_count(void){return 2;}
+int romfs_get_at(size_t index,chos_romfs_file_t *out){
+ static const char *paths[]={"/BIN/HELLO.CHX","/BIN/SECOND.TXT"};static const uint8_t data[4]={1,2,3,4};
+ if(index>=2||!out)return 0;
+ *out=(chos_romfs_file_t){paths[index],data,4};return 1;
+}
 static unsigned char disk[SECTORS*512u];
 static int backend_context;
 static int reads,writes,flushes,fail_read,fail_write,fail_flush,tear_write;
@@ -72,7 +87,64 @@ static void *creator(void *p){
  else assert(!bytes&&out.mount&&out.object&&out.revision);
  return NULL;
 }
+static void directory_contract(void){
+ chos_directory_page_t p={.version=1,.size_bytes=640,.flags=CHOS_DIRECTORY_START},next,unchanged;
+ int before_reads=reads,before_writes=writes,before_flushes=flushes;
+ size_t observed=0;
+ do{
+  assert(!chos_directory_collect_page("/",&p,&next)&&next.total==201&&next.index==observed+next.count&&next.count<=8);
+  for(size_t i=0;i<next.count;i++,observed++){
+   if(!observed)assert(!strcmp(next.entries[i].path,"/BIN")&&next.entries[i].flags==(CHOS_FILE_FLAG_DIRECTORY|CHOS_FILE_FLAG_READ_ONLY));
+   else{char name[40];snprintf(name,sizeof name,"/FILE%03zu",observed-1);assert(!strcmp(next.entries[i].path,name)&&next.entries[i].flags==CHOS_FILE_FLAG_PERSISTENT);}
+  }
+  p=next;
+ }while(!(p.flags&CHOS_DIRECTORY_END));
+ assert(observed==201&&reads==before_reads&&writes==before_writes&&flushes==before_flushes&&!live_allocations);
+ unchanged=p;fail_allocation=1;assert(chos_directory_collect_page("/",&p,&p)==-CHOS_ERRNO_ENOMEM&&!memcmp(&p,&unchanged,sizeof p));fail_allocation=0;
+ assert(storage_make_directory("/BIN")&&storage_write_file("/BIN/HELLO.CHX","owned",5));
+ p=(chos_directory_page_t){.version=1,.size_bytes=640,.flags=CHOS_DIRECTORY_START};
+ assert(!chos_directory_collect_page("/bin",&p,&p)&&p.total==2&&p.count==2);
+ assert(!strcmp(p.entries[0].path,"/BIN/HELLO.CHX")&&p.entries[0].size_bytes==5&&p.entries[0].flags==CHOS_FILE_FLAG_PERSISTENT);
+ assert(!strcmp(p.entries[1].path,"/BIN/SECOND.TXT")&&p.entries[1].flags==CHOS_FILE_FLAG_READ_ONLY);
+ unchanged=p;fail_flush=flushes+1;assert(!storage_write_file("/BIN/HELLO.CHX","uncertain",9));
+ assert(chos_directory_collect_page("/bin",&p,&p)==-CHOS_ERRNO_ESTALE&&!memcmp(&p,&unchanged,sizeof p)&&!live_allocations);fail_flush=0;
+ assert(storage_mount());p=(chos_directory_page_t){.version=1,.size_bytes=640,.flags=CHOS_DIRECTORY_START};
+ assert(!chos_directory_collect_page("/",&p,&p));unchanged=p;assert(storage_mount());
+ assert(chos_directory_collect_page("/",&p,&p)==-CHOS_ERRNO_ESTALE&&!memcmp(&p,&unchanged,sizeof p)&&!live_allocations);
+}
+static void full_directory_contract(void){
+ reset();
+ for(unsigned i=0;i<CHOS_CHFS_MAX_FILES;i++){char name[40];snprintf(name,sizeof name,"/FILE%03u",i);assert(storage_write_file(name,&i,4));}
+ chos_directory_page_t page={.version=1,.size_bytes=640,.flags=CHOS_DIRECTORY_START};size_t count=0;
+ int before_writes=writes;assert(!storage_write_file("/OVERFLOW","x",1)&&writes==before_writes&&storage_write_ready());
+ do{
+  assert(!chos_directory_collect_page("/",&page,&page)&&page.total==512&&page.index==count+page.count);
+  for(unsigned i=0;i<page.count;i++,count++){
+   if(!count)assert(!strcmp(page.entries[i].path,"/BIN")&&(page.entries[i].flags&CHOS_FILE_FLAG_DIRECTORY));
+   else{char name[40];snprintf(name,sizeof name,"/FILE%03zu",count-1);assert(!strcmp(name,page.entries[i].path)&&page.entries[i].size_bytes==4);}
+  }
+ }while(!(page.flags&CHOS_DIRECTORY_END));
+ assert(count==512&&!live_allocations);
+}
+static void catalogue_contract(void){
+ static chos_chfs_entry_t entries[CHOS_CHFS_MAX_FILES],old[CHOS_CHFS_MAX_FILES];
+ uint64_t mount,revision,next_mount,next_revision;unsigned state;
+ reset();
+ for(unsigned i=0;i<200;i++){char p[40];snprintf(p,sizeof p,"/FILE%03u",i);assert(storage_write_file(p,&i,sizeof i));}
+ assert(!storage_copy_catalogue(entries,CHOS_CHFS_MAX_FILES,&mount,&revision,&state)&&mount&&revision&&state==CHOS_DIRECTORY_CHFS_PRESENT);
+ size_t count=0;for(size_t i=0;i<CHOS_CHFS_MAX_FILES;i++)if(entries[i].path[0]){assert(entries[i].size_bytes==4);count++;}assert(count==200);
+ directory_contract();
+ assert(!storage_copy_catalogue(entries,CHOS_CHFS_MAX_FILES,&mount,&revision,&state));
+ memcpy(old,entries,sizeof old);assert(storage_rename_file("/FILE199","/RENAMED"));
+ assert(!storage_copy_catalogue(entries,CHOS_CHFS_MAX_FILES,&next_mount,&next_revision,&state)&&next_mount==mount&&next_revision!=revision);
+ assert(!memcmp(old[199].path,"/FILE199",9)&&!memcmp(entries[199].path,"/RENAMED",9));
+ assert(storage_mount()&&!storage_copy_catalogue(entries,CHOS_CHFS_MAX_FILES,&next_mount,&next_revision,&state)&&next_mount!=mount);
+ storage_detach();assert(!storage_copy_catalogue(entries,CHOS_CHFS_MAX_FILES,&next_mount,&next_revision,&state)&&!next_mount&&state==CHOS_DIRECTORY_READ_ONLY);
+ for(size_t i=0;i<sizeof entries;i++)assert(!((unsigned char *)entries)[i]);
+}
 int main(void){
+ full_directory_contract();
+ catalogue_contract();
  reset();assert(storage_write_file("/A","old",3)&&storage_write_file("/B","other",5));
  metadata_contract();
  chos_storage_lease_t a=snapshot("/a","old"),b=snapshot("/B","other"),next;

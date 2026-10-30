@@ -5,7 +5,7 @@ verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 
-The metadata source checkpoint is `79b8161`. Native writable working-copy
+The WTF file-handle source checkpoint is `5ce5772`. Native writable working-copy
 handles, shared buffer quotas and conditional commits are qualified in
 [NATIVE_WRITABLE_HANDLES.md](NATIVE_WRITABLE_HANDLES.md). Original WTF Int128 and
 the LLVM/musl runtime closure are qualified in
@@ -21,6 +21,9 @@ engine claim follows from these services.
 The [native WTF file-handle adapter](NATIVE_WTF_FILE_HANDLES.md) now executes
 actual upstream lifecycle operations with native durable I/O and private mapped
 copies. Shared writeback mappings and advisory locks remain explicitly unavailable.
+The [complete directory-page service](NATIVE_DIRECTORY_PAGES.md) additionally
+avoids the old global64-entry catalogue and rejects changed observations between
+pages. This is native namespace access, not yet the higher-level WTF filesystem.
 The actual full WTF compile currently has three filesystem failures. Complete
 library linking, engine Thread/GC and memory services, JavaScript and modern
 rendering, native Wi-Fi, production security policy and platform acceptance remain

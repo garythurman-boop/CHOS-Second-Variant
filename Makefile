@@ -17,7 +17,7 @@ LDFLAGS := -T linker.ld -nostdlib -static -z max-page-size=4096
 SOURCES_C := kernel/core/installer_io.c kernel/core/browser_runtime.c userland/examples/browser_core.c kernel/core/kernel.c kernel/core/memory.c kernel/core/shell.c kernel/core/scheduler.c kernel/core/scheduler_core.c kernel/core/spinlock.c \
              kernel/core/exception.c kernel/core/resource_accounting.c kernel/core/thread_context.c kernel/core/threads.c kernel/core/futex.c kernel/core/ipc.c kernel/core/installer_plan.c kernel/core/syscall.c kernel/core/user_mode.c kernel/core/power.c kernel/core/process.c kernel/core/process_format.c kernel/core/elf_image.c kernel/core/fdt.c kernel/fs/romfs.c kernel/fs/romfs_core.c \
              kernel/mm/pmm.c kernel/mm/kheap.c kernel/mm/vmm.c kernel/mm/vmm_layout.c kernel/mm/uefi_vmm.c kernel/mm/uefi_vmm_boot.c kernel/mm/address_space.c kernel/mm/address_space_layout.c kernel/mm/user_memory.c kernel/platform/qemu_virt.c kernel/platform/clock.c kernel/platform/driver_registry.c kernel/platform/drivers.c kernel/platform/driver_report.c kernel/platform/boot_info.c kernel/platform/acpi.c kernel/platform/pci.c kernel/platform/nvme_parse.c kernel/platform/usb_hid.c kernel/platform/usb.c kernel/platform/input.c kernel/platform/xhci_ring.c kernel/platform/xhci.c kernel/platform/virtio_rng.c kernel/platform/virtio_transport.c kernel/platform/uefi_console.c \
-             kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage_versions.c kernel/fs/storage.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
+             kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/chfs.c kernel/fs/storage_versions.c kernel/fs/storage.c kernel/fs/directory_snapshot.c kernel/fs/directory.c kernel/gfx/gfx_core.c kernel/gfx/display_modes.c kernel/gfx/gui.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c \
              kernel/arch/aarch64/virtio_snd.c kernel/arch/aarch64/virtio_gpu.c kernel/arch/aarch64/virtio_input.c kernel/arch/aarch64/virtio_net.c kernel/net/net_packet.c kernel/net/net_services.c kernel/net/net_stack.c kernel/net/net_device.c kernel/net/net_profile.c kernel/net/net_manager.c kernel/platform/vmxnet3.c kernel/platform/e1000e.c kernel/net/net_tcp.c kernel/arch/aarch64/gicv2.c kernel/arch/aarch64/gicv3.c kernel/arch/aarch64/timer.c kernel/arch/aarch64/uart.c kernel/arch/aarch64/virtio_blk.c kernel/arch/aarch64/nvme.c
 LWIP_CORE_NAMES := init def mem memp netif pbuf raw stats sys timeouts udp inet_chksum ip tcp tcp_in tcp_out
 LWIP_SOURCES := $(addprefix third_party/lwip/src/core/,$(addsuffix .c,$(LWIP_CORE_NAMES))) $(wildcard third_party/lwip/src/core/ipv6/*.c) third_party/lwip/src/netif/ethernet.c
@@ -1635,7 +1635,7 @@ test: test-storage-versions
 test-sanitize: test-storage-versions-sanitize
 .PHONY: test-storage-versions test-storage-versions-sanitize
 
-STORAGE_SNAPSHOT_TEST_SOURCES := tests/test_storage_snapshots.c kernel/fs/storage.c kernel/fs/storage_versions.c kernel/fs/chfs.c kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/romfs_core.c kernel/core/spinlock.c
+STORAGE_SNAPSHOT_TEST_SOURCES := kernel/fs/directory.c kernel/fs/directory_snapshot.c tests/test_storage_snapshots.c kernel/fs/storage.c kernel/fs/storage_versions.c kernel/fs/chfs.c kernel/fs/blockdev.c kernel/fs/gpt.c kernel/fs/romfs_core.c kernel/core/spinlock.c
 $(BUILD)/test-storage-snapshots: $(STORAGE_SNAPSHOT_TEST_SOURCES) include/chos/storage.h include/chos/storage_versions.h include/chos/syscall.h
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -D_DEFAULT_SOURCE -DCHOS_HOST_TEST -std=c11 -Wall -Wextra -Werror -O2 -ffunction-sections -fdata-sections -Iinclude $(STORAGE_SNAPSHOT_TEST_SOURCES) -Wl,--gc-sections -pthread -o $@
@@ -1651,3 +1651,20 @@ test-sanitize: test-storage-snapshots-sanitize
 .PHONY: test-storage-snapshots test-storage-snapshots-sanitize
 
 $(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi $(BUILD)/test-process-caps $(SAN_DIR)/test-process-caps $(BUILD)/test-storage-snapshots $(SAN_DIR)/test-storage-snapshots: include/chos/file_write_api.h include/chos/file_api.h include/chos/file_metadata_api.h
+
+DIRECTORY_TEST_SOURCES := tests/test_directory_snapshot.c kernel/fs/directory_snapshot.c kernel/fs/romfs_core.c
+$(BUILD)/test-directory-snapshot: $(DIRECTORY_TEST_SOURCES) include/chos/directory_api.h include/chos/directory_snapshot.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 -ffunction-sections -fdata-sections -Iinclude $(DIRECTORY_TEST_SOURCES) -Wl,--gc-sections -o $@
+$(SAN_DIR)/test-directory-snapshot: $(DIRECTORY_TEST_SOURCES) include/chos/directory_api.h include/chos/directory_snapshot.h include/chos/syscall.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer -ffunction-sections -fdata-sections -Iinclude $(DIRECTORY_TEST_SOURCES) -Wl,--gc-sections -o $@
+test-directory-snapshot: $(BUILD)/test-directory-snapshot
+	./$(BUILD)/test-directory-snapshot
+test-directory-snapshot-sanitize: $(SAN_DIR)/test-directory-snapshot
+	./$(SAN_DIR)/test-directory-snapshot
+test: test-directory-snapshot
+test-sanitize: test-directory-snapshot-sanitize
+.PHONY: test-directory-snapshot test-directory-snapshot-sanitize
+$(BUILD)/test-user-abi $(SAN_DIR)/test-user-abi $(BUILD)/test-process-caps $(SAN_DIR)/test-process-caps: include/chos/directory_api.h
+$(BUILD)/test-storage-snapshots $(SAN_DIR)/test-storage-snapshots: include/chos/directory_api.h include/chos/directory_snapshot.h

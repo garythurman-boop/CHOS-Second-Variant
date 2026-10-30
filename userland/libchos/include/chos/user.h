@@ -19,6 +19,7 @@
 #include "chos/file_api.h"
 #include "chos/file_write_api.h"
 #include "chos/file_metadata_api.h"
+#include "chos/directory_api.h"
 #include "chos/net_tcp_api.h"
 #include "chos/net_dns_api.h"
 
@@ -102,6 +103,7 @@ static inline long chos_read(int fd, void *buffer, size_t length) {
 }
 static inline long chos_file_info(int fd,chos_file_info_t *out){return chos_syscall3(CHOS_SYS_FILE_INFO,fd,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_file_metadata(int fd,chos_file_metadata_t *out){return chos_syscall3(CHOS_SYS_FILE_METADATA,fd,(long)(uintptr_t)out,sizeof(*out));}
+static inline long chos_directory_page(const char *path,chos_directory_page_t *page){return chos_syscall3(CHOS_SYS_DIRECTORY_PAGE,(long)(uintptr_t)path,(long)(uintptr_t)page,sizeof(*page));}
 static inline long chos_path_metadata(const char *path,chos_file_metadata_t *out){return chos_syscall3(CHOS_SYS_PATH_METADATA,(long)(uintptr_t)path,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_read_at(int fd,void *buffer,size_t length,uint64_t offset){
     if(length>UINT32_MAX)return -CHOS_ERRNO_E2BIG;

@@ -5,6 +5,7 @@
 #include "chos/gpt.h"
 #include "chos/syscall.h"
 #include "chos/file_write_api.h"
+#include "chos/directory_api.h"
 
 static chos_block_device_t boot_disk; /* whole physical device */
 static chos_block_device_t gpt_fs_disk; /* bounded CHOS partition view, if present */
@@ -416,4 +417,14 @@ int storage_commit_snapshot(const char *path,const chos_storage_lease_t *lease,c
     *updated=value;result=0;
 done:
     chos_spin_unlock_irqrestore(&storage_lock,flags);return result;
+}
+
+int storage_copy_catalogue(chos_chfs_entry_t *out,size_t capacity,uint64_t *mount,uint64_t *revision,unsigned *state){
+ if(!out||capacity!=CHOS_CHFS_MAX_FILES||!mount||!revision||!state)return -CHOS_ERRNO_EINVAL;
+ uint64_t irq=chos_spin_lock_irqsave(&storage_lock);
+ if(fs_ready&&!file_versions.live){chos_spin_unlock_irqrestore(&storage_lock,irq);return -CHOS_ERRNO_EIO;}
+ for(size_t i=0;i<CHOS_CHFS_MAX_FILES;i++)out[i]=fs_ready?root_fs.entries[i]:(chos_chfs_entry_t){0};
+ *mount=fs_ready?file_versions.mount:0;*revision=file_versions.last_issued;
+ *state=(fs_ready?CHOS_DIRECTORY_CHFS_PRESENT:0)|(write_ready_locked()?0:CHOS_DIRECTORY_READ_ONLY);
+ chos_spin_unlock_irqrestore(&storage_lock,irq);return 0;
 }

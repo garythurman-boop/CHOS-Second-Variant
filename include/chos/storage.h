@@ -29,6 +29,8 @@ int storage_read_snapshot(const char *,void *,size_t,size_t *,chos_storage_lease
 /* Readable data remains available when identity is unavailable. The zero lease
  * then explicitly supplies no object identity; it cannot authorize a commit. */
 int storage_read_view(const char *,void *,size_t,size_t *,chos_storage_lease_t *);
+/* Full locked catalogue observation for restartable read-only directory pages. */
+int storage_copy_catalogue(chos_chfs_entry_t *,size_t,uint64_t *,uint64_t *,unsigned *);
 int storage_file_metadata(const char *,chos_file_metadata_t *);
 int storage_open_snapshot(const char *,unsigned,void *,size_t,size_t *,chos_storage_lease_t *);
 int storage_commit_snapshot(const char *,const chos_storage_lease_t *,const void *,size_t,chos_storage_lease_t *);
