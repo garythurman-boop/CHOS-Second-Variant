@@ -235,3 +235,9 @@ CHFS/ROMFS identities and source revisions with capability-checked descriptor/pa
 queries. Snapshot bytes and their optional identity are captured under one lock;
 virtual-directory identity is explicitly unavailable. This closes a concrete
 filesystem prerequisite, not full WTF/JSC, browser or wireless acceptance.
+
+The [native WTF file-handle adapter](NATIVE_WTF_FILE_HANDLES.md) now binds the real
+upstream lifecycle to owned CHOS I/O, actual identities, conditional durable flush
+and real private mapped copies. Shared file mappings and locks fail explicitly.
+Three full-WTF filesystem compilation failures remain; no complete engine link,
+JavaScript, modern browser or native wireless success is implied.

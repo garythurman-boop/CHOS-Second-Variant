@@ -76,6 +76,86 @@ index f4b97e56..5a7e0a11 100644
  #elif OS(LINUX) || OS(OPENBSD)
      struct timespec ts { };
      clock_gettime(CLOCK_BOOTTIME, &ts);
+diff --git a/Source/WTF/wtf/FileHandle.cpp b/Source/WTF/wtf/FileHandle.cpp
+index e2f48ce8..d7376e83 100644
+--- a/Source/WTF/wtf/FileHandle.cpp
++++ b/Source/WTF/wtf/FileHandle.cpp
+@@ -28,6 +28,10 @@
+
+ #include <wtf/FileSystem.h>
+ #include <wtf/MappedFileData.h>
++#if OS(CHOS)
++#include <chos/user.h>
++#include <cerrno>
++#endif
+
+ namespace WTF::FileSystemImpl {
+
+@@ -36,7 +40,15 @@ FileHandle::FileHandle() = default;
+ FileHandle::FileHandle(PlatformFileHandle handle, OptionSet<FileLockMode> lockMode)
+     : m_handle(handle)
+ {
+-#if USE(FILE_LOCK)
++#if OS(CHOS)
++    // Adoption consumes ownership. Never silently accept an unsupported lock.
++    if (lockMode) {
++        if (m_handle)
++            chos_file_abort(*m_handle);
++        m_handle = std::nullopt;
++        errno = ENOTSUP;
++    }
++#elif USE(FILE_LOCK)
+     if (lockMode)
+         lock(lockMode);
+ #else
+diff --git a/Source/WTF/wtf/FileHandle.h b/Source/WTF/wtf/FileHandle.h
+index b3675206..f82a89ab 100644
+--- a/Source/WTF/wtf/FileHandle.h
++++ b/Source/WTF/wtf/FileHandle.h
+@@ -33,6 +33,8 @@
+
+ #if OS(WINDOWS)
+ #include <wtf/win/Win32Handle.h>
++#elif OS(CHOS)
++#include <chos/file_metadata_api.h>
+ #elif OS(UNIX)
+ #include <sys/types.h>
+ #endif
+@@ -59,7 +61,11 @@ using PlatformHandleTraits = Win32HandleMarkableTraits;
+ #else
+ typedef int PlatformFileHandle;
+ const PlatformFileHandle invalidPlatformFileHandle = -1;
++#if OS(CHOS)
++using PlatformFileID = chos_file_identity_t;
++#else
+ typedef ino_t PlatformFileID;
++#endif
+ using PlatformHandleTraits = IntegralMarkableTraits<int, invalidPlatformFileHandle>;
+ #endif
+
+diff --git a/Source/WTF/wtf/FileSystem.h b/Source/WTF/wtf/FileSystem.h
+index 6195096c..0bb36bf2 100644
+--- a/Source/WTF/wtf/FileSystem.h
++++ b/Source/WTF/wtf/FileSystem.h
+@@ -32,6 +32,9 @@
+
+ #include <span>
+ #include <sys/types.h>
++#if OS(CHOS)
++#include <chos/file_metadata_api.h>
++#endif
+ #include <time.h>
+ #include <utility>
+ #include <wtf/FileLockMode.h>
+@@ -68,6 +71,8 @@ enum class MappedFileMode : bool;
+
+ #if OS(WINDOWS)
+ typedef FILE_ID_128 PlatformFileID;
++#elif OS(CHOS)
++using PlatformFileID = chos_file_identity_t;
+ #else
+ typedef ino_t PlatformFileID;
+ #endif
 diff --git a/Source/WTF/wtf/Int128.cpp b/Source/WTF/wtf/Int128.cpp
 index 7b11278c..c1914dec 100644
 --- a/Source/WTF/wtf/Int128.cpp
@@ -201,7 +281,7 @@ index 1e131303..842b94cf 100644
 
  } // namespace WTF
 diff --git a/Source/WTF/wtf/PlatformJSCOnly.cmake b/Source/WTF/wtf/PlatformJSCOnly.cmake
-index a2328be2..92d80907 100644
+index a2328be2..75a41310 100644
 --- a/Source/WTF/wtf/PlatformJSCOnly.cmake
 +++ b/Source/WTF/wtf/PlatformJSCOnly.cmake
 @@ -36,14 +36,25 @@ else ()
@@ -232,7 +312,21 @@ index a2328be2..92d80907 100644
          list(APPEND WTF_SOURCES
              fuchsia/CPUTimeFuchsia.cpp
          )
-@@ -76,6 +87,11 @@ if (WIN32)
+@@ -62,8 +73,12 @@ else ()
+         )
+     endif ()
+
++    if (WTF_OS_CHOS)
++        list(APPEND WTF_SOURCES "${CHOS_WTF_PLATFORM_DIR}/FileHandleCHOS.cpp")
++    else ()
++        list(APPEND WTF_SOURCES posix/FileHandlePOSIX.cpp)
++    endif ()
+     list(APPEND WTF_SOURCES
+-        posix/FileHandlePOSIX.cpp
+         posix/FileSystemPOSIX.cpp
+         posix/MappedFileDataPOSIX.cpp
+
+@@ -76,6 +91,11 @@ if (WIN32)
          win/MemoryFootprintWin.cpp
          win/MemoryPressureHandlerWin.cpp
      )
