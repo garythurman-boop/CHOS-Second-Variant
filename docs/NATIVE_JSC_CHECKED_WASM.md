@@ -56,3 +56,9 @@ Thread lifecycle, foreign GC coordination, engine-sized admitted resources,
 remaining browser services, production security, native Pi5 Wi-Fi and independent
 platform acceptance remain open. The development version remains0.30.0; no new
 Fusion/Pi5/laptop, browser or Stage3/version0.50.0 qualification is claimed.
+
+The [complete static framework closure and VM link probe](NATIVE_JSC_FRAMEWORK_CLOSURE.md)
+now includes the original53-member object subtarget, separate from the141-member
+archive described above. All compile; a real full-ICU VM link still fails with
+five unresolved symbols and an unadmitted image. Archive compilation is not VM
+link/execution or complete engine qualification.

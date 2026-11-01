@@ -680,3 +680,12 @@ allocator/owned memory, refusal children and exact cold cleanup. Three rebuilt
 WTF/JSC components also pass UEFI regressions. See [scope and evidence](NATIVE_WTF_THREADS.md).
 Foreign GC, engine-sized resources, full VM/JavaScript/WebAssembly, WebCore/browser,
 Wi-Fi and the other revised gates remain open; this is development0.30.0.
+
+### Complete static framework object closure and full-VM probe
+
+The original53-member bytecode/interpreter object subtarget now compiles in
+addition to the141-member JSC archive. The real full-ICU C API VM link now records
+five unresolved runtime/foreign-GC symbols and a50,659,328-byte image rejected by
+the unchanged4MiB arena. See [the complete closure and next admission work](NATIVE_JSC_FRAMEWORK_CLOSURE.md).
+This supersedes archive-only dependency diagnoses; no VM/JavaScript/Intl execution
+or Stage3/version0.50.0 success is claimed.

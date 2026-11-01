@@ -460,3 +460,9 @@ The [actual WTF worker lifecycle adapter](NATIVE_WTF_THREADS.md) now adds
 original WebKit worker creation/join/detach with direct/UEFI qualification. This
 supersedes earlier missing-creation diagnoses above; foreign GC and full engine/
 browser/resource qualification remain open.
+
+The [complete static framework closure and VM link probe](NATIVE_JSC_FRAMEWORK_CLOSURE.md)
+now includes the original53-member object subtarget, separate from the141-member
+archive described above. All compile; a real full-ICU VM link still fails with
+five unresolved symbols and an unadmitted image. Archive compilation is not VM
+link/execution or complete engine qualification.
