@@ -2,7 +2,8 @@
 
 Stage3 remains incomplete. The latest runtime work provides real managed
 detached-thread cleanup; the actual native JSC static archive builds, and
-selected JSC/WTF components execute. A JavaScript VM and modern browser do not
+selected JSC/WTF components execute, including actual WTF-created worker lifecycles.
+A JavaScript VM and modern browser do not
 yet run. Earlier milestone descriptions below retain their historical scope;
 later results supersede earlier dependency diagnoses.
 
@@ -10,7 +11,7 @@ later results supersede earlier dependency diagnoses.
 |---|---|
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
-| Native runtime | Owned EL0 memory/I/O, ICU and bounded C/C++ threads including detach; full WTF Thread/foreign GC and engine-sized resources remain open |
+| Native runtime | Owned EL0 memory/I/O, ICU and bounded C/C++ threads including detach; actual WTF worker lifecycle is qualified; foreign GC and engine-sized resources remain open |
 | Modern browser | WPE/WebKit selected; JSC archive and selected components build/run; full VM, JavaScript, WebCore rendering and browser features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
@@ -669,3 +670,13 @@ configured sanitizer suites pass; [exact evidence](validation/stage3-native-deta
 retains the actual engine/runtime inputs and limitations. See [scope and current qualification](NATIVE_DETACHED_THREADS.md).
 Full WTF thread/GC, engine-sized resources, JavaScript/rendering, Wi-Fi, production
 security and final platform acceptance remain required for Stage3/version0.50.0.
+
+### Actual WTF-created workers
+
+The pinned WTF library now creates and joins/detaches native workers through its
+original context handshake and TLS/ThreadGroup lifecycle. Final direct/UEFI
+profiles each pass228 secondary-worker cases across18 processes, stable warm
+allocator/owned memory, refusal children and exact cold cleanup. Three rebuilt
+WTF/JSC components also pass UEFI regressions. See [scope and evidence](NATIVE_WTF_THREADS.md).
+Foreign GC, engine-sized resources, full VM/JavaScript/WebAssembly, WebCore/browser,
+Wi-Fi and the other revised gates remain open; this is development0.30.0.

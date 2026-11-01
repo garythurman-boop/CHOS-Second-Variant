@@ -263,3 +263,8 @@ detached attributes/detach and the native std::thread::detach binding. Raw reque
 version1 remains compatible; managed version2 retains stack ownership until
 collection/disposal. The whole engine and foreign GC still need implementation
 and qualification beyond these runtime services.
+
+The [actual WTF worker lifecycle adapter](NATIVE_WTF_THREADS.md) now adds
+original WebKit worker creation/join/detach with direct/UEFI qualification. This
+supersedes earlier missing-creation diagnoses above; foreign GC and full engine/
+browser/resource qualification remain open.

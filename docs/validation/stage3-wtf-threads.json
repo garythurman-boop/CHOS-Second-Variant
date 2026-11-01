@@ -1,0 +1,797 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "9336ee66d315dae03bbc05754631119c4bb4ade1",
+  "implementation": "actual pinned WTF Thread worker creation/join/detach with original context,TLS,registry and ThreadGroup lifecycle",
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "original_postimage_count": 39,
+  "new_native_kernel_or_SDK_contract": false,
+  "accepted_guest_profiles": [
+    {
+      "profile": "direct-final",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "de4d6ce3fa17e6c50ad47d0ce101279e46d72fb508d1d990156180f8fd0c3546",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117493,
+        "free_pages_before": 117493,
+        "free_pages_after": 117493,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 596,
+        "checks": [
+          "actual upstream Thread::create context handshake;default32K and explicit64K/128K owned native stacks",
+          "actual Function captures,current identity,ThreadGroup add/duplicate/removal and allThreads lifecycle",
+          "join,live/self/after-exit detach,self-join refusal and post-join/post-detach EINVAL before native TCB access",
+          "original C++ TLS and twice-reset pthread key destructors;steady-state allocator/mapped/resident equality",
+          "five isolated refusal children per parent:invalid size,custom stack,scheduling policy,worker quota,double detach",
+          "three parent process lifecycles,cold PMM equality,zero futex waiters"
+        ],
+        "limits": [
+          "bounded ordinary native WTF Thread component,not foreign suspension/full GC,engine-sized resources,JavaScript or browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "1c871334f348ed2d3df5b2396e7d29f7b452071479f49a1b3b42c7007e89523e",
+      "artifacts": {
+        "kernel_sha256": "c38686e387eada2343d1fb38342a1acebb33b8b1c61c12f26bac567d7a049c0f"
+      }
+    },
+    {
+      "profile": "uefi-final",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "de4d6ce3fa17e6c50ad47d0ce101279e46d72fb508d1d990156180f8fd0c3546",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500132,
+        "free_pages_before": 500132,
+        "free_pages_after": 500132,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 599,
+        "checks": [
+          "actual upstream Thread::create context handshake;default32K and explicit64K/128K owned native stacks",
+          "actual Function captures,current identity,ThreadGroup add/duplicate/removal and allThreads lifecycle",
+          "join,live/self/after-exit detach,self-join refusal and post-join/post-detach EINVAL before native TCB access",
+          "original C++ TLS and twice-reset pthread key destructors;steady-state allocator/mapped/resident equality",
+          "five isolated refusal children per parent:invalid size,custom stack,scheduling policy,worker quota,double detach",
+          "three parent process lifecycles,cold PMM equality,zero futex waiters"
+        ],
+        "limits": [
+          "bounded ordinary native WTF Thread component,not foreign suspension/full GC,engine-sized resources,JavaScript or browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "dbf5775fba3172f42c4e124d529ad91d68bd39b9a797c519c9430e45056bca38",
+      "artifacts": {
+        "kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "iso_sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+        "iso_embedded_kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "wtf-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "1e16491f5fcc6ee95fa4c0537fdc0ad4904f3b8003bfa8c6d31085b79fb6939c",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500132,
+        "free_pages_before": 500132,
+        "free_pages_after": 500132,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 558,
+        "heap_before_crt_exit": [
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ]
+        ],
+        "checks": [
+          "actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations",
+          "real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations",
+          "write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files",
+          "native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics",
+          "root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters",
+          "real Config::finalize freezes owned static image pages;write restoration refused and child write faults;strict cold cleanup"
+        ],
+        "limits": [
+          "selected library component,not full WTF/JSC/JavaScript/browser runtime",
+          "no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets",
+          "native Thread creation/foreign GC suspension remain open",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "da590356b1e3d1ec9643deb31ee6a8a63e0b4608d05c1142398276794bcb4dce",
+      "artifacts": {
+        "kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "iso_sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+        "iso_embedded_kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "jsc-options-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "77bc1f52876b1f061f70a8669abf0bf5f535034b19206c69b2da84525ca6debf",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500132,
+        "free_pages_before": 500132,
+        "free_pages_after": 500132,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 376,
+        "checks": [
+          "actual full native JavaScriptCore archive built and linked selected options/platform component;not VM execution",
+          "original option initialization exactly once,real numeric/boolean parsing and failed invalid inputs",
+          "Wasm/LLInt remain enabled;JIT disabled;fast/fault memory cannot be enabled by verified option updates",
+          "actual prepare/activate accept checked policy;null-fault elision offset is zero",
+          "two children directly forcing unsupported fault mode abort134;parent policy and process isolation preserved",
+          "nine concurrent native worker lifecycles per process;stable initialized heap;three process lifecycles,cold PMM equality and no futex waiters"
+        ],
+        "limits": [
+          "actual options/platform component,not JavaScript/WebAssembly VM or browser execution",
+          "bounds-checked Wasm memory allocator/interpreter still needs engine-sized resource/runtime qualification",
+          "bootstrap ICU linked for this component only;not full data/Intl qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "bf9116ceeb418ca938518f19532953bf6966c09f226387658b1d43f0bf8b1658",
+      "artifacts": {
+        "kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "iso_sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+        "iso_embedded_kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "jsc-register-uefi",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "594fd65cf38c35a4462ed8c220485bcfb0386d58776ecdbb080b0561ea83b2f6",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500132,
+        "free_pages_before": 500132,
+        "free_pages_after": 500132,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 51,
+        "checks": [
+          "original ARM64 RegisterState x19..x28 macro executes;all10live real heap pointers visible in registers or callee-save spills",
+          "reference vector and captured-register object excluded from raw spill scan;scan occurs before independent kernel context output",
+          "MachineContext SP matches actual current-thread kernel snapshot;bounds/flags/size/identity verified",
+          "actual ProfilerSupport threadID equals kernel TID and snapshot TID;actual monotonic timestamps",
+          "root and9worker capture/lifecycle cases per process;three process lifecycles,cold PMM equality,zero heap/futex waiters"
+        ],
+        "limits": [
+          "own-current register/profiler-query component,not foreign thread suspension/full GC/sampling profiler/engine/browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "b0a30a32268006f7f656d0c829ff86ab672b9bcd7fc3b6fbbb04900c8b37a719",
+      "artifacts": {
+        "kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "iso_sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+        "iso_embedded_kernel_sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "secondary_workers_per_lifecycle_profile": 228,
+  "processes_per_lifecycle_profile": 18,
+  "expected_abort134_children_per_lifecycle_profile": 15,
+  "final_builds": {
+    "lifecycle": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "4640af248557f59c86f0c3a492bd865c874c44133a740e4baad4aaad9b207d91",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "a79b708e0d4fbacee8951722fbae5708550865639aa23fb7eb0e61c417c0c9eb",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "5b43249e6b41a494dd84092977c9b549a01ebcc35e791235948029986ac9056e"
+      },
+      "sdk_manifest_sha256": "d8efcae139c63259c7de966c7f7c332240a3133f2580eb7ec9781b9a0b34dbc2",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j2"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/wtf_threads",
+          "-B",
+          "/workspace/chos-wtf-threads-qualified/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-wtf-threads-qualified/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 4.095044164001592,
+      "application_sha256": "de4d6ce3fa17e6c50ad47d0ce101279e46d72fb508d1d990156180f8fd0c3546",
+      "deployment": "/workspace/chos-wtf-threads-qualified/cmake/wtf_threads.elf",
+      "debug_application_sha256": "a00423ae27fc4bfc5042ef2070c6c7a1e553f86e1d65a26548480d63a262f21c",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "real native WTF archive;worker create/join/detach,owned stack and TLS lifecycle execution;not JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "foreign GC suspension and engine-sized resources remain open;bounded native thread lifecycle tested separately",
+        "ordinary scheduling and owned anonymous stacks only;name/QOS are unapplied hints;no arbitrary custom stacks or full POSIX claim",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    },
+    "wtf": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "4640af248557f59c86f0c3a492bd865c874c44133a740e4baad4aaad9b207d91",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "a79b708e0d4fbacee8951722fbae5708550865639aa23fb7eb0e61c417c0c9eb",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "5b43249e6b41a494dd84092977c9b549a01ebcc35e791235948029986ac9056e"
+      },
+      "sdk_manifest_sha256": "d8efcae139c63259c7de966c7f7c332240a3133f2580eb7ec9781b9a0b34dbc2",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j4"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/wtf_filesystem",
+          "-B",
+          "/workspace/chos-wtf-threads-fs-compat/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-wtf-threads-fs-compat/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 5.7697991949971765,
+      "application_sha256": "1e16491f5fcc6ee95fa4c0537fdc0ad4904f3b8003bfa8c6d31085b79fb6939c",
+      "deployment": "/workspace/chos-wtf-threads-fs-compat/cmake/wtf_filesystem.elf",
+      "debug_application_sha256": "33e691cbaf1a4e014b95a029776e255c1688c49b37a251ff32d59f43688f9ee6",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "real native WTF archive;String/Vector/path/file/directory component execution;not JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "full engine Thread lifecycle and foreign GC suspension remain open;current-thread stack/context services are separately qualified",
+        "native filesystem has explicit format/service limits,including no coherent shared maps/locks/timestamps/capacity service",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    },
+    "jsc_options": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "javascriptcore_archive_built": true,
+      "javascriptcore_archive_sha256": "150fce6ccf0aded3f6c722b642e83d67685c306ef0ac24e27016cbee44537b3f",
+      "javascriptcore_archive_members": 141,
+      "javascript_vm_executed": false,
+      "wasm_executed": false,
+      "browser_built": false,
+      "wtf_archive_sha256": "4640af248557f59c86f0c3a492bd865c874c44133a740e4baad4aaad9b207d91",
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "a79b708e0d4fbacee8951722fbae5708550865639aa23fb7eb0e61c417c0c9eb",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "5b43249e6b41a494dd84092977c9b549a01ebcc35e791235948029986ac9056e"
+      },
+      "sdk_manifest_sha256": "d8efcae139c63259c7de966c7f7c332240a3133f2580eb7ec9781b9a0b34dbc2",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "JavaScriptCore",
+          "-j2"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/jsc_options_wasm",
+          "-B",
+          "/workspace/chos-wtf-threads-jsc-compat2/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-wtf-threads-jsc-compat2/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 14.172109687991906,
+      "application_sha256": "77bc1f52876b1f061f70a8669abf0bf5f535034b19206c69b2da84525ca6debf",
+      "deployment": "/workspace/chos-wtf-threads-jsc-compat2/cmake/jsc_options_wasm.elf",
+      "debug_application_sha256": "9903e484526c8725afe94379ef508d86154c99dd3b25e7f29dc0701a5095486d",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "actual JSC option initialization/parsing and native checked-Wasm activation policy;not a running VM",
+      "limits": [
+        "full archive compilation does not establish complete VM link,JavaScript/WebAssembly execution or browser rendering",
+        "foreign Thread lifecycle/GC and engine-sized admitted resources remain open",
+        "bootstrap ICU library used only for the options/platform component;full data/Intl execution not claimed",
+        "native guest qualification required;new Fusion/Pi5/laptop qualification NOT RUN"
+      ]
+    },
+    "jsc_register": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "4640af248557f59c86f0c3a492bd865c874c44133a740e4baad4aaad9b207d91",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "a79b708e0d4fbacee8951722fbae5708550865639aa23fb7eb0e61c417c0c9eb",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "5b43249e6b41a494dd84092977c9b549a01ebcc35e791235948029986ac9056e"
+      },
+      "sdk_manifest_sha256": "d8efcae139c63259c7de966c7f7c332240a3133f2580eb7ec9781b9a0b34dbc2",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j4"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/jsc_register_platform",
+          "-B",
+          "/workspace/chos-wtf-threads-reg-compat/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-wtf-threads-reg-compat/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 9.804450544994324,
+      "application_sha256": "594fd65cf38c35a4462ed8c220485bcfb0386d58776ecdbb080b0561ea83b2f6",
+      "deployment": "/workspace/chos-wtf-threads-reg-compat/cmake/jsc_register_platform.elf",
+      "debug_application_sha256": "e2fa25914a5ff7dc2e35308aa3e7e2d33c80252e165f95815f43dec8a968c367",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "actual ARM64 RegisterState capture,MachineContext SP and ProfilerSupport queries;not full GC/JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "foreign Thread lifecycle and GC suspension remain open;own-current register visibility is only a component",
+        "native filesystem has explicit format/service limits,including no coherent shared maps/locks/timestamps/capacity service",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    }
+  },
+  "baseline_reuse": {
+    "source_commit": "9336ee66d315dae03bbc05754631119c4bb4ade1",
+    "complete_archive": "/workspace/chos-evidence/detached-threads-qualified.tar.gz",
+    "archive_sha256": "216b9b18455394fe4949d878b12e2ff3f640bfd433addcec0d6c8b52f78e489f",
+    "member_prefix": "qualified-inputs",
+    "verified_unchanged_inputs": {
+      "chos.elf": "c38686e387eada2343d1fb38342a1acebb33b8b1c61c12f26bac567d7a049c0f",
+      "uefi-kernel/chos.elf": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+      "chos-0.30.0.iso": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+      "native-sdk/chos-sdk.json": "d8efcae139c63259c7de966c7f7c332240a3133f2580eb7ec9781b9a0b34dbc2"
+    },
+    "JSC_PCH_sha256": "6ad6053451f260fe5d77797b1d78733aa540f3e5011d7698d5bc07b6530b716e",
+    "full_host_sanitizer_and20_guest_baseline": "docs/validation/stage3-native-detach.json",
+    "reason": "only original native WTF worker adapter changed;all SDK/kernel/media/JSC/bmalloc objects match by hash;new native lifecycle and actual WTF/JSC components separately tested"
+  },
+  "engine_libraries": {
+    "libJavaScriptCore.a": {
+      "sha256": "150fce6ccf0aded3f6c722b642e83d67685c306ef0ac24e27016cbee44537b3f",
+      "members": 141,
+      "changed_members_from_baseline": [],
+      "preservation": "exact complete preceding baseline archive/thin members reused by hash"
+    },
+    "libWTF.a": {
+      "sha256": "4640af248557f59c86f0c3a492bd865c874c44133a740e4baad4aaad9b207d91",
+      "members": 173,
+      "changed_members_from_baseline": [
+        "Source/WTF/wtf/CMakeFiles/WTF.dir/workspace/CHOS-Second-Variant/ports/webkit/chos/CurrentThreadCHOS.cpp.obj"
+      ],
+      "preservation": "complete local archive/thin members"
+    },
+    "libbmalloc.a": {
+      "sha256": "4d23708bd1fdad4a124d39f77c095e2cbcf438c05acc48414512f2effef6d499",
+      "members": 168,
+      "changed_members_from_baseline": [],
+      "preservation": "exact complete preceding baseline archive/thin members reused by hash"
+    }
+  },
+  "retained_investigations": [
+    {
+      "log": "app-build1.log",
+      "sha256": "a468ef2a4f5dfa6551a8c08c523b70795b74b022353eb2c0cf381884bf3a91b7",
+      "diagnosis": "fixture used incorrect existing wrapper/state/resource member names;corrected to actual published APIs before guest execution"
+    },
+    {
+      "log": "direct1.log",
+      "sha256": "bec3b15937574457fe3992165dfbd779a9a2082e18bba2484f8736d535620a00",
+      "diagnosis": "fixture expected exited Thread weak group back-references to vanish before group destruction;corrected test to original upstream lifetime;no adapter change"
+    },
+    {
+      "log": "direct2.log",
+      "sha256": "539e1c3c38390abf1c10ff8d32fac6e33ee99495769255e1708915c92cba5ca0",
+      "diagnosis": "aggregate worker error retained;direct3 adds exact worker diagnostics"
+    },
+    {
+      "log": "direct3.log",
+      "sha256": "2de5a0009ee63490ae9a929c154f10dca05de2734a20f852f7d2e3209f7d9c6f",
+      "diagnosis": "self-join test raced existing parent join claim;parent was correctly returning EINVAL to competing operation;sequenced worker self-join acknowledgement before parent claim"
+    },
+    {
+      "log": "direct4.log",
+      "sha256": "084ed15f76ac5c95a715aa8b0c825a331b8f3a413188d5a98caea4257a14fdce",
+      "diagnosis": "all worker/memory loops passed;negative children did not initialize shared callback TLS key;added real child key creation"
+    },
+    {
+      "log": "jsc-compat-build.log",
+      "sha256": "aa83b42381d710a97beef83db15b788927174455cd3402fae913db2554e9d4d9",
+      "diagnosis": "build environment omitted prepared Ruby stdlib paths;offset generator could not import digest/sha1;corrected RUBYOPT/RUBYLIB build2 passes"
+    }
+  ],
+  "nested_guest_evidence": [
+    {
+      "profile": "direct1",
+      "exit": 1,
+      "archive": "completed-profiles/direct1.tar.gz",
+      "archive_sha256": "67ffbc81b7796042e987a4d859847d8ee5d7979ce2b4aa1e9b38d41f42974a05",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "305204b9b6a81f254b92c8e4cbb8d879ba2531058300ebd7c36b40b73f19150a",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c38686e387eada2343d1fb38342a1acebb33b8b1c61c12f26bac567d7a049c0f",
+          "bytes": 7033760,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "direct2",
+      "exit": 1,
+      "archive": "completed-profiles/direct2.tar.gz",
+      "archive_sha256": "70be8d8fa4e5c30952623111dcbfcfd6931bb2ca696bd9dd8257da4c55e652aa",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "872481e9148036359447275721a4929546b863395255206ba763057cc3d3fca1",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c38686e387eada2343d1fb38342a1acebb33b8b1c61c12f26bac567d7a049c0f",
+          "bytes": 7033760,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "direct3",
+      "exit": 1,
+      "archive": "completed-profiles/direct3.tar.gz",
+      "archive_sha256": "eb16a65124e044caaaaef7cab1ea58a12fd6b4cbc6a989c08b715f522b903152",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "9f5c5f02c293a7c1607735d9756648d332357cd53e36d300e8f5e235f8b3e6c3",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c38686e387eada2343d1fb38342a1acebb33b8b1c61c12f26bac567d7a049c0f",
+          "bytes": 7033760,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "direct4",
+      "exit": 1,
+      "archive": "completed-profiles/direct4.tar.gz",
+      "archive_sha256": "2a13bfdbb50935c2042d04770b22252003472eeb2cb2cf5deee4f0ea987b450b",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "16cfff3ba561cfed7a412a85b510cc2688219fdd3daf520438113c23ca8f5035",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c38686e387eada2343d1fb38342a1acebb33b8b1c61c12f26bac567d7a049c0f",
+          "bytes": 7033760,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "direct-final",
+      "exit": 0,
+      "archive": "completed-profiles/direct-final.tar.gz",
+      "archive_sha256": "d3341212fad8a6fa0c38599a8025be8ba98006d74b0a5219c130a93d73fa5549",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "12687aa7608ae5203723ab1440b44a689888e2dfaaffc66049018fe3b3b6d552",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c38686e387eada2343d1fb38342a1acebb33b8b1c61c12f26bac567d7a049c0f",
+          "bytes": 7033760,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "uefi-final",
+      "exit": 0,
+      "archive": "completed-profiles/uefi-final.tar.gz",
+      "archive_sha256": "a336736689086002254a6c8810f4bbb74d3620da5556afa734e2205f29d33fee",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "12687aa7608ae5203723ab1440b44a689888e2dfaaffc66049018fe3b3b6d552",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+          "bytes": 7042400,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "wtf-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/wtf-uefi.tar.gz",
+      "archive_sha256": "4712fdc216632b08953fee1d6d1832551a48cccf27b8fae99e77730917dd8240",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "c6d448aca9b6095f059d774062a5994b2809006baa8335ae9a7df2bcb1c270fc",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+          "bytes": 7042400,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "jsc-options-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/jsc-options-uefi.tar.gz",
+      "archive_sha256": "387f3de2d0678a09b6fdb1d6bffe55b5f606b7eb801eab16a4a4375315d32f67",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "e88ede847cc86bfa1ce50013a591ba940c8ec979704b39300d449da407d36f88",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+          "bytes": 7042400,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "jsc-register-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/jsc-register-uefi.tar.gz",
+      "archive_sha256": "b80da1c8aaca1f6e5f7028e6462c189ac3e9300eaaf8afa07bebfd9dcd8f58b6",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "db7f43f34b3d72b7f70dddffe87716addfde2d85aa0749b89c1372c44a414adc",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "a7fae4b47b574ae10b170a62e3cf0f2d03653af5517010768544002f828b6f2a",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "d49ad8a9cdf7c906470a05648180cdc746f77b50f04ad6c56ec626a5bb76150c",
+          "bytes": 7042400,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    }
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/wtf-thread-lifecycle-qualified.tar.gz",
+    "archive_sha256": "4cad70c6139e8da17c0271c236317837afc3343582e7b351bd2fd87f6db2ac3d",
+    "archive_bytes": 45043930,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "source_files_sha256": {
+    "docs/BROWSER_ENGINE_PORT.md": "50245fc8a0c0fb00013ac157dda46d55a378514b71269c5a066612a0a6439e21",
+    "docs/NATIVE_DETACHED_THREADS.md": "02eee351d6028817e0329c50af37437717388c744a258cc8e1a22f0130d0b76e",
+    "docs/NATIVE_SDK.md": "04f5a796bde0bd2a8da1e159d594406931da6b31cc37d4da5819ce22892ac99f",
+    "docs/NATIVE_WTF_THREADS.md": "0eefa6c45223dcc2b099a384ffdbe4eeb0ea1d770f10d99dd67d902d10ff1f95",
+    "docs/STAGE3_CURRENT_RESULTS.md": "a8d20b316ef4cd6b87d6dda4dcc7490fa71ff319ee8c1bc205bb99b6211a6da2",
+    "docs/dependencies/webkit-jsc-bringup.json": "24ce061264320e7475d894c5ad9629b7578282fd525e3e58303aba6db415e5f1",
+    "ports/webkit/chos/CurrentThreadCHOS.cpp": "5b43249e6b41a494dd84092977c9b549a01ebcc35e791235948029986ac9056e",
+    "tests/qemu_wtf_threads.py": "dd43b44f643ff8d9c8f98461fd47c9931966fb54b2cb152e26a20d468dec56b6",
+    "tests/wtf_threads/CMakeLists.txt": "f670211cad140ef388893274605f2ff20c0e3ed39ca6a66d143a52dda763dd0a",
+    "tests/wtf_threads/main.cpp": "fa0720a433787b5785049354a349ebd806b8b44fa5ce2199523374610ce0e28f",
+    "tools/build_wtf_threads.py": "85f9fa9f996ddd3dc130d949d71ed8c42fcacb9e61d1da8a6c52b9af754bb3e1"
+  },
+  "limits": [
+    "bounded native WTF worker lifecycle,not every Thread/WTF service or full POSIX",
+    "ordinary scheduler workers only;QOS/demotion/names unapplied;custom stack locations and FIFO/realtime refused",
+    "foreign suspend/resume/register capture and signal delivery remain unavailable;no GC or sampling success fabricated",
+    "default32KiB stacks do not satisfy64KiB GC reserve;engine-sized admitted resource profile remains open",
+    "full VM link,JavaScript/WebAssembly,modern WebCore/browser,Pi5 native WiFi,production security and final independent platform acceptance remain open",
+    "prior synchronization timeout cause remains unresolved;passing baseline/new components are not a causal-fix claim",
+    "development0.30.0;not Stage3/version0.50.0;no new binary completion claim"
+  ]
+}

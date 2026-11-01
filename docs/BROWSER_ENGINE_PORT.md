@@ -455,3 +455,8 @@ pthread and std::thread ownership transfer, preserving raw version1 semantics
 and rejecting foreign/reduced authority. This closes the native detach service
 prerequisite. The complete WTF Thread creation/join/detach binding and foreign GC
 coordination are still separate work; no complete VM or web execution is implied.
+
+The [actual WTF worker lifecycle adapter](NATIVE_WTF_THREADS.md) now adds
+original WebKit worker creation/join/detach with direct/UEFI qualification. This
+supersedes earlier missing-creation diagnoses above; foreign GC and full engine/
+browser/resource qualification remain open.

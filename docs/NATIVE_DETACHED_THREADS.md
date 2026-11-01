@@ -78,3 +78,8 @@ profile. The complete WTF thread adapter, engine-sized resources, VM/JavaScript/
 WebAssembly execution, browser, native Pi5 Wi-Fi, production security and final
 platform acceptance remain open. Development remains0.30.0; this does not qualify
 new Fusion/Pi5/laptop hardware or complete Stage3/version0.50.0.
+
+The [actual WTF worker lifecycle adapter](NATIVE_WTF_THREADS.md) now adds
+original WebKit worker creation/join/detach with direct/UEFI qualification. This
+supersedes earlier missing-creation diagnoses above; foreign GC and full engine/
+browser/resource qualification remain open.
