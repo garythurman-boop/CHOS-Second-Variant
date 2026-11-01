@@ -246,3 +246,9 @@ and uses actual kernel thread IDs in profiler queries. Own-current visibility
 is separate from foreign-thread GC/sampling coordination. The complete engine
 still has scanner, string/queue and sampler dependencies; no JavaScript/browser
 execution or Stage3 completion is implied.
+
+The SDK now stages original libc++ deque/queue headers and bounded memory
+sscanf/vsscanf. The scanner uses a checked generated musl conversion copy over
+private input storage, with UTF-8 wide fields and explicit unsupported non-ASCII
+wide scanset patterns. It does not expose public FILE scanning. See
+[native scope and build instructions](NATIVE_MEMORY_SCAN_QUEUE.md).

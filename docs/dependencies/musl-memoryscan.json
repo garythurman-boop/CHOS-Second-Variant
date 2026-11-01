@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "project": "musl narrow memory scanning",
+  "version": "1.2.5",
+  "commit": "0784374d561435f7c787a555aeab8ede699ed298",
+  "source": "https://git.musl-libc.org/cgit/musl",
+  "scope": "original vfscanf/intscan/sscanf with a checked generated vfscanf hardening copy and bounded memory-only vsscanf frontend;private FILE view,not public fscanf/stdio stream compatibility",
+  "sources": [
+    "src/stdio/vfscanf.c",
+    "src/stdio/sscanf.c",
+    "src/internal/intscan.c"
+  ],
+  "files": {
+    "src/stdio/vfscanf.c": "d4940fce26d88baa8d0c0f84fb68230c93323f518d0153f0dd293b5c78113b0c",
+    "src/stdio/sscanf.c": "5eb4ae1a1527b41a0a5ad9c2b0d122952f246827e8deb5ff47162ffa7692b847",
+    "src/internal/intscan.c": "ed96c758c94666f2557059bd8fca26db8340b9e6b417852f1599e7c30f67deca",
+    "src/internal/intscan.h": "0fda860250bd54a01384bb693be886e5f64fe01316d2be8e21b4db72244220f9"
+  },
+  "provenance": "Every imported byte matched the immutable pinned local Git object;existing source/commit identity retained;no new signature claim",
+  "private_adapter": "userland/libc/memoryscan;no public vfscanf or isoc99 compatibility aliases",
+  "generated_vfscanf_sha256": "0b7659cf6fc41dca60b20031fe1ea5c132ccbfce13b67952075dbff359babce0",
+  "native_adjustments": [
+    "explicit NULL cleanup pointers;original%m branch alsoinitializes these,avoids GCCmaybe-uninitialized falsepositive",
+    "checked INT_MAX field-width accumulation before conversion",
+    "positional selector0 rejected before reading a vararg",
+    "UTF8 wide field widths count complete characters;no pushback after stopping exactly at the width;assignment-suppressed wide fields still advance character counts",
+    "truncated wide sequences report EILSEQ;non-ASCII wide scanset patterns explicitly ENOTSUP rather than bytewise misclassification"
+  ]
+}

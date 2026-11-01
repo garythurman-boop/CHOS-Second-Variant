@@ -77,6 +77,20 @@ index 2ac8b24f..f4efbaf2 100644
  }
  #endif // OS(WINDOWS) || HAVE(MACHINE_CONTEXT)
 
+diff --git a/Source/JavaScriptCore/runtime/Options.cpp b/Source/JavaScriptCore/runtime/Options.cpp
+index 683bc60a..569e5234 100644
+--- a/Source/JavaScriptCore/runtime/Options.cpp
++++ b/Source/JavaScriptCore/runtime/Options.cpp
+@@ -25,6 +25,9 @@
+
+ #include "config.h"
+ #include "Options.h"
++#if OS(CHOS)
++#include <strings.h>
++#endif
+
+ #include "CPU.h"
+ #include "JITOperationValidation.h"
 diff --git a/Source/JavaScriptCore/runtime/ProfilerSupport.cpp b/Source/JavaScriptCore/runtime/ProfilerSupport.cpp
 index d1388620..5a5c1256 100644
 --- a/Source/JavaScriptCore/runtime/ProfilerSupport.cpp
@@ -1149,6 +1163,29 @@ index 036636ce..01efa3b5 100644
      BUNUSED(flags);
      BUNUSED(tag);
      int result = madvise(p, vmSize, MADV_DONTNEED);
+diff --git a/Source/cmake/OptionsJSCOnly.cmake b/Source/cmake/OptionsJSCOnly.cmake
+index bac11011..cee51574 100644
+--- a/Source/cmake/OptionsJSCOnly.cmake
++++ b/Source/cmake/OptionsJSCOnly.cmake
+@@ -25,8 +25,18 @@ endif ()
+ WEBKIT_OPTION_DEFINE(ENABLE_JSC_GLIB_API "Whether to enable the JavaScriptCore GLib API." PUBLIC OFF)
+ WEBKIT_OPTION_DEFINE(USE_SYSTEM_UNIFDEF "Whether to use a system-provided unifdef" PRIVATE OFF)
+
++if (CMAKE_SYSTEM_NAME STREQUAL "CHOS")
++    # Native context snapshots are current-thread only. Do not advertise a
++    # foreign-thread sampling backend before suspension is implemented.
++    WEBKIT_OPTION_DEFAULT_PORT_VALUE(ENABLE_SAMPLING_PROFILER PRIVATE OFF)
++endif ()
++
+ WEBKIT_OPTION_END()
+
++if (CMAKE_SYSTEM_NAME STREQUAL "CHOS" AND ENABLE_SAMPLING_PROFILER)
++    message(FATAL_ERROR "CHOS sampling profiler requires an implemented foreign-thread context backend")
++endif ()
++
+ set(ALL_EVENT_LOOP_TYPES
+     GLib
+     Generic
 diff --git a/Source/cmake/WebKitCommon.cmake b/Source/cmake/WebKitCommon.cmake
 index d96e1850..f258145e 100644
 --- a/Source/cmake/WebKitCommon.cmake

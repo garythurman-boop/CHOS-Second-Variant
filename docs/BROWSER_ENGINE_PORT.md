@@ -431,3 +431,13 @@ and uses actual kernel thread IDs in profiler queries. Own-current visibility
 is separate from foreign-thread GC/sampling coordination. The complete engine
 still has scanner, string/queue and sampler dependencies; no JavaScript/browser
 execution or Stage3 completion is implied.
+
+The [native memory scanner and original queue/deque component](NATIVE_MEMORY_SCAN_QUEUE.md)
+closes those parsing/container includes. The optional sampling profiler is
+explicitly unavailable until its foreign-thread capture backend exists; enabling
+it is rejected at configuration. The next actual full JSC compilation records
+one failed compilation command: WasmFaultSignalHandler lacks native fault-context
+instruction/instance access and instruction-pointer rewriting. The complete
+archive and JavaScript execution remain unqualified. A correct bounds-checked
+WebAssembly platform path must precede engine execution; no fake fault recovery
+or signal-handler success is provided.

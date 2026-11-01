@@ -1354,6 +1354,7 @@ include userland/libc/Makefile.inc
 include userland/libc/mman.Makefile.inc
 include userland/libm/Makefile.inc
 include userland/libc/floatscan/Makefile.inc
+include userland/libc/memoryscan/Makefile.inc
 include userland/libc/wide.Makefile.inc
 include userland/libc/stdio.Makefile.inc
 include userland/libc/format/Makefile.inc

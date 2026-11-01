@@ -38,6 +38,9 @@ int puts(const char *);
 int setvbuf(FILE *,char *,int,size_t);
 int snprintf(char *,size_t,const char *,...);
 int vsnprintf(char *,size_t,const char *,va_list);
+/* Bounded string input only; filesystem/stdin scanf streams are not provided. */
+int sscanf(const char *,const char *,...);
+int vsscanf(const char *,const char *,va_list);
 FILE *fopen(const char *, const char *);
 int fclose(FILE *);
 size_t fread(void *, size_t, size_t, FILE *);

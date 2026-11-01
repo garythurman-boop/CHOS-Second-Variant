@@ -621,3 +621,14 @@ independent host/sanitizer and native arithmetic fixtures qualify the selected
 operations. The current full WTF compile attempt is blocked by five filesystem
 units. Full library linking/engine execution and the other Stage3 gates remain
 open. See [NATIVE_WTF_INT128.md](NATIVE_WTF_INT128.md) for scope and retained failures.
+
+### Native memory scanner and original queues
+
+The SDK now provides bounded memory sscanf/vsscanf with checked width and UTF-8
+field behavior, plus original libc++ deque/queue/priority_queue. Direct and
+isolated UEFI component lifecycles pass, including concurrent workers and cold
+page cleanup. See [scope and qualification](NATIVE_MEMORY_SCAN_QUEUE.md).
+The next full JSC target records one failed compilation command in the native
+WebAssembly fault-handler unit; its missing fault-context services remain a real
+blocker. No JavaScript, modern browser, native Wi-Fi or Stage3/version0.50.0
+completion is claimed.
