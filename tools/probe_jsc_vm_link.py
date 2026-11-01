@@ -51,7 +51,13 @@ if not code:
 log=(out/'link.log').read_text() if (out/'link.log').exists() else ''
 mapfile=out/'cmake/jsc_vm_probe.map'
 if mapfile.exists():
- for line in mapfile.read_text().splitlines():
+ lines=mapfile.read_text().splitlines()
+ assert lines and 'Out' in lines[0] and 'Symbol' in lines[0]
+ out_column=lines[0].index('Out')
+ for line in lines[1:]:
+  # LLD indents input sections and symbols into later columns. Numeric fields
+  # and a five-token row alone do not distinguish them from output sections.
+  if len(line)<=out_column or line[out_column].isspace():continue
   fields=line.split()
   if len(fields)!=5:continue
   try:address,lma,size,align=(int(v,16) for v in fields[:4])
