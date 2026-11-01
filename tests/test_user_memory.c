@@ -105,5 +105,27 @@ int main(void){
  assert(chos_user_memory_unmap_range(a,va+4096,4096)==-CHOS_ERRNO_EIO&&used(0)==3);
  assert(chos_user_memory_control(a,va,4096,3)==-CHOS_ERRNO_EINVAL);
  unmap_fail=0;assert(chos_user_memory_release(a));
- puts("anonymous user mappings: bounds, owner separation, rollback, quota, non-executable pages and quarantine passed");
+ /* Managed stacks retain their pin until one atomic ownership/disposal step.
+  * Rejected owners/partial sizes cannot release it or consume a new mapping. */
+ reset();va=chos_user_memory_map(a,8192,0);assert(chos_user_memory_pin(a,va,8192));
+ assert(chos_user_memory_retire_stack(b,va,8192)==-CHOS_ERRNO_EINVAL&&used(0)==2);
+ assert(chos_user_memory_retire_stack(a,va,4096)==-CHOS_ERRNO_EINVAL&&used(0)==2);
+ assert(chos_user_memory_retire_stack(a,va+1,8192)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_unmap(a,va,8192)==-CHOS_ERRNO_EBUSY);
+ assert(!chos_user_memory_retire_stack(a,va,8192)&&!used(0));
+ int64_t reused=chos_user_memory_map(a,8192,0);assert(reused==va);
+ assert(chos_user_memory_retire_stack(a,va,8192)==-CHOS_ERRNO_EINVAL&&used(0)==2);
+ assert(!chos_user_memory_unmap(a,reused,8192)&&!used(0));
+ /* Failed disposal consumes the pin into quarantine: the process reaper can
+  * finish unmapping and AS destruction retains every uncertain owned frame. */
+ reset();va=chos_user_memory_map(a,8192,0);assert(chos_user_memory_pin(a,va,8192));unmap_fail=1;
+ assert(chos_user_memory_retire_stack(a,va,8192)==-CHOS_ERRNO_EIO&&used(0)==2);
+ unmap_fail=0;assert(chos_user_memory_release(a)&&used(0)==2);
+ reset();va=chos_user_memory_map(a,8192,0);assert(chos_user_memory_pin(a,va,8192));free_fail=1;
+ assert(chos_user_memory_retire_stack(a,va,8192)==-CHOS_ERRNO_EIO&&used(0)==2);
+ free_fail=0;assert(chos_user_memory_release(a)&&used(0)==2);
+ reset();va=chos_user_memory_map(a,8192,0);assert(chos_user_memory_pin(a,va,8192));mappings[0][index_of(va)]=0;
+ assert(chos_user_memory_retire_stack(a,va,8192)==-CHOS_ERRNO_EIO&&used(0)==2);
+ assert(chos_user_memory_release(a));
+ puts("anonymous user mappings: bounds, owner separation, rollback, quota, non-executable pages, managed stack disposal and quarantine passed");
 }

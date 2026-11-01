@@ -4,6 +4,12 @@ int main(void){
  chos_thread_request_t good={.version=1,.size_bytes=64,.entry=0x20000000,.stack_base=0x21001000,.stack_bytes=32768,.tls=0x20080000};
  assert(chos_thread_request_valid(&good));assert(!chos_thread_request_valid(0));
  chos_thread_request_t r=good;r.version=2;assert(!chos_thread_request_valid(&r));
+ r=good;r.version=CHOS_THREAD_MANAGED_VERSION;r.reserved[0]=CHOS_THREAD_MANAGED_STACK;assert(chos_thread_request_valid(&r)&&chos_thread_request_managed(&r));
+ r.reserved[0]|=CHOS_THREAD_CREATE_DETACHED;assert(chos_thread_request_valid(&r));
+ r.reserved[0]=CHOS_THREAD_CREATE_DETACHED;assert(!chos_thread_request_valid(&r));
+ r.reserved[0]=CHOS_THREAD_MANAGED_STACK|4;assert(!chos_thread_request_valid(&r));
+ r.reserved[0]=CHOS_THREAD_MANAGED_STACK;r.reserved[1]=1;assert(!chos_thread_request_valid(&r));
+ r=good;r.version=3;assert(!chos_thread_request_valid(&r));
  r=good;r.size_bytes=63;assert(!chos_thread_request_valid(&r));
  r=good;r.reserved[0]=1;assert(!chos_thread_request_valid(&r));
  r=good;r.reserved[1]=1;assert(!chos_thread_request_valid(&r));

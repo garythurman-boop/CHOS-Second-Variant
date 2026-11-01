@@ -257,3 +257,9 @@ The same SDK now builds the complete native JSC static archive and links the
 selected [options/checked-Wasm platform fixture](NATIVE_JSC_CHECKED_WASM.md).
 The fixture executes real upstream code; archive compilation and component
 execution do not establish a complete VM, JavaScript/WebAssembly or browser.
+
+The [managed thread extension](NATIVE_DETACHED_THREADS.md) adds actual pthread
+detached attributes/detach and the native std::thread::detach binding. Raw request
+version1 remains compatible; managed version2 retains stack ownership until
+collection/disposal. The whole engine and foreign GC still need implementation
+and qualification beyond these runtime services.

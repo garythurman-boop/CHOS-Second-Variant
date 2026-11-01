@@ -13,7 +13,7 @@ typedef struct {
  uint32_t tid,task_id,state,error;
  chos_thread_request_t request;
  int64_t status;
- int pinned;
+ int pinned,detached,reported;
 } thread_t;
 typedef struct {
  address_space_handle_t space;
@@ -45,6 +45,16 @@ static thread_t *find(address_space_handle_t h,uint32_t tid){
 static int live(const thread_t *t){return t->state==PENDING||t->state==READY||t->state==RUNNING;}
 static void unpin(thread_t *t){
  if(t->pinned&&chos_user_memory_unpin(t->space,t->request.stack_base,t->request.stack_bytes))t->pinned=0;
+}
+/* Called with the thread lock/IRQs held, only after the EL0 task has returned
+ * to its separate kernel stack. Creation acknowledgement keeps a fast exiting
+ * detached worker observable until its creator receives the actual TID. */
+static int dispose_detached(thread_t *t){
+ if(!t->detached||!t->reported||live(t))return 0;
+ int rc=chos_user_memory_retire_stack(t->space,t->request.stack_base,t->request.stack_bytes);
+ if(!rc){*t=(thread_t){0};return 0;}
+ if(rc==-CHOS_ERRNO_EIO)t->pinned=0;
+ t->state=FAILED;t->status=rc;return rc;
 }
 int64_t chos_thread_self(address_space_handle_t h){
  uint32_t task=current_task();if(!scheduler_is_running()||!task)return -CHOS_ERRNO_ENOSYS;
@@ -100,7 +110,8 @@ int64_t chos_thread_enqueue(address_space_handle_t h,const chos_thread_request_t
  for(unsigned i=0;i<THREAD_SLOTS;i++){if(threads[i].state&&equal(threads[i].space,h))++count;if(!threads[i].state)slot=i;}
  if(count>=CHOS_THREAD_MAX_PER_PROCESS||slot==THREAD_SLOTS){chos_spin_unlock_irqrestore(&lock,f);return -CHOS_ERRNO_EAGAIN;}
  if(!chos_user_memory_pin(h,r->stack_base,r->stack_bytes)){chos_spin_unlock_irqrestore(&lock,f);return -CHOS_ERRNO_EBUSY;}
- thread_t *t=&threads[slot];*t=(thread_t){.space=h,.tid=next_tid++,.state=PENDING,.request=*r,.pinned=1};
+ thread_t *t=&threads[slot];*t=(thread_t){.space=h,.tid=next_tid++,.state=PENDING,.request=*r,.pinned=1,
+  .detached=chos_thread_request_managed(r)&&!!(r->reserved[0]&CHOS_THREAD_CREATE_DETACHED)};
  int64_t tid=t->tid;chos_spin_unlock_irqrestore(&lock,f);return tid;
 }
 void chos_thread_cancel_pending(address_space_handle_t h,uint32_t tid){
@@ -109,12 +120,12 @@ void chos_thread_cancel_pending(address_space_handle_t h,uint32_t tid){
  chos_spin_unlock_irqrestore(&lock,f);
 }
 int chos_thread_create_result(address_space_handle_t h,uint32_t id){
- uint64_t f=chos_spin_lock_irqsave(&lock);thread_t *t=find(h,id);int result;
+ uint64_t f=chos_spin_lock_irqsave(&lock);thread_t *t=find(h,id);int result,dispose_error=0;
  if(!t)result=-CHOS_ERRNO_ESRCH;
- else if(t->task_id)result=1;
+ else if(t->task_id){t->reported=1;result=1;dispose_error=dispose_detached(t);if(dispose_error)result=dispose_error;}
  else if(t->state==FAILED){result=-(int)t->error;unpin(t);if(!t->pinned)*t=(thread_t){0};}
  else result=0;
- chos_spin_unlock_irqrestore(&lock,f);return result;
+ chos_spin_unlock_irqrestore(&lock,f);if(dispose_error)chos_threads_stop(h,-CHOS_ERRNO_EIO,1);return result;
 }
 int chos_thread_info(address_space_handle_t h,uint32_t id,chos_thread_info_t *out){
  if(!out||!id)return -CHOS_ERRNO_EINVAL;
@@ -128,10 +139,20 @@ int chos_thread_info(address_space_handle_t h,uint32_t id,chos_thread_info_t *ou
 int chos_thread_reap(address_space_handle_t h,uint32_t id){
  uint32_t task=current_task();uint64_t f=chos_spin_lock_irqsave(&lock);thread_t *t=find(h,id);int rc=0;
  if(!t)rc=-CHOS_ERRNO_ESRCH;
+ else if(t->detached)rc=-CHOS_ERRNO_EINVAL;
  else if(t->task_id==task)rc=-CHOS_ERRNO_EDEADLK;
  else if(live(t))rc=-CHOS_ERRNO_EAGAIN;
  else {unpin(t);if(t->pinned)rc=-CHOS_ERRNO_EIO;else *t=(thread_t){0};}
  chos_spin_unlock_irqrestore(&lock,f);return rc;
+}
+int chos_thread_detach(address_space_handle_t h,uint32_t id){
+ if(!id)return -CHOS_ERRNO_EINVAL;
+ uint64_t f=chos_spin_lock_irqsave(&lock);thread_t *t=find(h,id);int rc=0,dispose_error=0;
+ if(!t)rc=-CHOS_ERRNO_ESRCH;
+ else if(!chos_thread_request_managed(&t->request))rc=-CHOS_ERRNO_ENOTSUP;
+ else if(t->detached)rc=-CHOS_ERRNO_EINVAL;
+ else {t->detached=1;rc=dispose_error=dispose_detached(t);}
+ chos_spin_unlock_irqrestore(&lock,f);if(dispose_error)chos_threads_stop(h,-CHOS_ERRNO_EIO,1);return rc;
 }
 void chos_threads_stop(address_space_handle_t h,int64_t status,int faulted){
  uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,0,0);
@@ -170,8 +191,11 @@ static void thread_entry(void *argument){
  if(!entered||faulted)chos_threads_stop(h,status,1);
  /* The EL0 return trampoline keeps IRQs masked here. No other user task can
   * observe DONE until this task has committed to scheduler_exit_current(). */
- f=chos_spin_lock_irqsave(&lock);t=&threads[index];unpin(t);t->status=status;t->state=entered&&!faulted?DONE:FAILED;
- chos_spin_unlock_irqrestore(&lock,f);scheduler_exit_current();
+ f=chos_spin_lock_irqsave(&lock);t=&threads[index];
+ if(!chos_thread_request_managed(&t->request))unpin(t);
+ t->status=status;t->state=entered&&!faulted?DONE:FAILED;
+ int dispose_error=dispose_detached(t);
+ chos_spin_unlock_irqrestore(&lock,f);if(dispose_error)chos_threads_stop(h,-CHOS_ERRNO_EIO,1);scheduler_exit_current();
 }
 void chos_threads_service(void){
  if(!scheduler_current_is_kernel_task()||vmm_current_root_table_address()!=vmm_kernel_root_table_address())return;

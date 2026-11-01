@@ -167,6 +167,7 @@ static inline long chos_wake_word(volatile uint32_t *word,unsigned count){return
 static inline long chos_thread_create(const chos_thread_request_t *r){return chos_syscall2(CHOS_SYS_THREAD_CREATE,(long)(uintptr_t)r,sizeof(*r));}
 static inline long chos_thread_status(uint32_t tid,chos_thread_info_t *out){return chos_syscall3(CHOS_SYS_THREAD_INFO,tid,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_thread_collect(uint32_t tid){return chos_syscall1(CHOS_SYS_THREAD_REAP,tid);}
+static inline long chos_thread_detach(uint32_t tid){return chos_syscall3(CHOS_SYS_THREAD_DETACH,tid,0,0);}
 static inline long chos_thread_id(void){return chos_syscall0(CHOS_SYS_THREAD_SELF);}
 static inline long chos_resource_info(chos_resource_info_t *out){return chos_syscall3(CHOS_SYS_RESOURCE_INFO,(long)(uintptr_t)out,sizeof(*out),0);}
 static inline long chos_thread_context(chos_thread_context_t *out){return chos_syscall3(CHOS_SYS_THREAD_CONTEXT,(long)(uintptr_t)out,sizeof(*out),0);}

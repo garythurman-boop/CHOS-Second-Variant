@@ -57,7 +57,9 @@ int main(int argc,char **argv){
   CHECK(exited==1&&restart_count==2&&restart_once==2);say("[ OK ] pthread once retries initialization after owner exits\n");return 0;
  }
  pthread_attr_t attr;CHECK(!pthread_attr_init(&attr));size_t stack;CHECK(!pthread_attr_getstacksize(&attr,&stack)&&stack==32768);
- CHECK(pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED)==ENOTSUP);
+ int detached;CHECK(!pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED));
+ CHECK(!pthread_attr_getdetachstate(&attr,&detached)&&detached==PTHREAD_CREATE_DETACHED);
+ CHECK(!pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_JOINABLE));
  CHECK(pthread_attr_setstacksize(&attr,4096)==EINVAL);
  CHECK(pthread_attr_setstacksize(&attr,CHOS_THREAD_STACK_MAX+1u)==EINVAL);
  CHECK(!pthread_attr_setstacksize(&attr,32769)&&!pthread_attr_getstacksize(&attr,&stack)&&stack==36864);

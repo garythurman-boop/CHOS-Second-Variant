@@ -529,6 +529,9 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
             case CHOS_SYS_THREAD_REAP:
                 if(frame->x[0]>UINT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 frame->x[0]=(uint64_t)(int64_t)chos_thread_reap(fault_space,(uint32_t)frame->x[0]);return frame;
+            case CHOS_SYS_THREAD_DETACH:
+                if(frame->x[0]>UINT32_MAX||frame->x[1]||frame->x[2]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_thread_detach(fault_space,(uint32_t)frame->x[0]);return frame;
             case CHOS_SYS_THREAD_INFO: {
                 chos_thread_info_t info;
                 if(frame->x[0]>UINT32_MAX||frame->x[2]<sizeof(info)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
@@ -541,6 +544,9 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
                 chos_thread_request_t request;
                 if(frame->x[1]!=sizeof(request)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 if(!address_space_copy_from_user(fault_space,&request,frame->x[0],sizeof(request))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                if(!chos_thread_request_valid(&request)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(chos_thread_request_managed(&request)&&(request.reserved[0]&CHOS_THREAD_CREATE_DETACHED)&&
+                   !(permissions&CHOS_PROCESS_CAP(CHOS_SYS_THREAD_REAP))){frame->x[0]=neg_errno(CHOS_ERRNO_EPERM);return frame;}
                 int64_t tid=chos_thread_enqueue(fault_space,&request);
                 if(tid<0){frame->x[0]=(uint64_t)tid;return frame;}
                 uint64_t started=timer_ticks();

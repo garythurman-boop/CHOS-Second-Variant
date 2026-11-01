@@ -22,6 +22,7 @@
 #define pthread_exit chos_test_pthread_exit
 #define pthread_getspecific chos_test_pthread_getspecific
 #define pthread_join chos_test_pthread_join
+#define pthread_detach chos_test_pthread_detach
 #define pthread_key_create chos_test_pthread_key_create
 #define pthread_key_delete chos_test_pthread_key_delete
 #define pthread_mutex_destroy chos_test_pthread_mutex_destroy

@@ -38,6 +38,7 @@ int pthread_attr_setdetachstate(pthread_attr_t *,int);
 int pthread_attr_getdetachstate(const pthread_attr_t *,int *);
 int pthread_create(pthread_t *,const pthread_attr_t *,void *(*)(void *),void *);
 int pthread_join(pthread_t,void **);
+int pthread_detach(pthread_t);
 void pthread_exit(void *) __attribute__((noreturn));
 pthread_t pthread_self(void);
 int pthread_equal(pthread_t,pthread_t);

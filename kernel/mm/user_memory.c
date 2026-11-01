@@ -96,6 +96,29 @@ static int pin_change(address_space_handle_t h,uint64_t base,size_t bytes,int ad
 int chos_user_memory_pin(address_space_handle_t h,uint64_t base,size_t bytes){return pin_change(h,base,bytes,1);}
 int chos_user_memory_unpin(address_space_handle_t h,uint64_t base,size_t bytes){return pin_change(h,base,bytes,0);}
 
+int chos_user_memory_retire_stack(address_space_handle_t h,uint64_t base,size_t bytes){
+ uint32_t pages;
+ if((base&4095u)||(bytes&4095u)||!length_pages(bytes,&pages))return -CHOS_ERRNO_EINVAL;
+ uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);
+ if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
+ for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+  region_t *r=&o->regions[i];
+  if(r->state!=1||r->first!=base||r->pages!=pages||r->pins!=1)continue;
+  /* The pin has never been relinquished. No other thread can unmap/remap this
+   * address between ownership validation and disposal (including an ABA). */
+  r->pins=0;
+  for(uint32_t p=0;p<pages;p++){
+   vmm_mapping_info_t m;
+   if(!address_space_query(h,base+(uint64_t)p*VMM_PAGE_SIZE,&m)){
+    r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;
+   }
+  }
+  int ok=remove_pages(h,r,1);chos_spin_unlock_irqrestore(&memory_lock,irq);
+  return ok?0:-CHOS_ERRNO_EIO;
+ }
+ chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EINVAL;
+}
+
 static region_t *containing_region(map_owner_t *o,uint64_t address,uint32_t pages){
  if(!o || address>UINT64_MAX-(uint64_t)pages*VMM_PAGE_SIZE)return NULL;
  uint64_t end=address+(uint64_t)pages*VMM_PAGE_SIZE;

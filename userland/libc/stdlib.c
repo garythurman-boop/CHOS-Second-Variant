@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include "chos/libc.h"
 #include "chos/user.h"
+#include "chos/tls_runtime.h"
 _Static_assert(_Alignof(max_align_t)<=CHOS_HEAP_ALIGNMENT,"malloc must meet target max alignment");
 
 static chos_heap_t process_heap;
@@ -21,6 +22,11 @@ static chos_heap_t *heap(void){
 static void *allocation_result(void *p){if(!p)errno=process_heap.error;return p;}
 void *malloc(size_t bytes){int rc=pthread_mutex_lock(&heap_lock);if(rc){errno=rc;return 0;}void *p=allocation_result(chos_heap_alloc(heap(),bytes,CHOS_HEAP_ALIGNMENT));pthread_mutex_unlock(&heap_lock);return p;}
 void free(void *p){int rc=pthread_mutex_lock(&heap_lock);if(rc){errno=rc;return;}if(chos_heap_free(heap(),p))errno=process_heap.error;pthread_mutex_unlock(&heap_lock);}
+int __chos_libc_free_thread_storage(void *p){
+ int rc=pthread_mutex_lock(&heap_lock);if(rc)return rc;
+ rc=chos_heap_free(heap(),p)?process_heap.error:0;
+ int unlocked=pthread_mutex_unlock(&heap_lock);return rc?rc:unlocked;
+}
 void *calloc(size_t n,size_t bytes){int rc=pthread_mutex_lock(&heap_lock);if(rc){errno=rc;return 0;}void *p=allocation_result(chos_heap_calloc(heap(),n,bytes));pthread_mutex_unlock(&heap_lock);return p;}
 void *realloc(void *p,size_t bytes){
     int rc=pthread_mutex_lock(&heap_lock);if(rc){errno=rc;return 0;}

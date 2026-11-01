@@ -16,5 +16,9 @@ int chos_user_memory_control(address_space_handle_t,uint64_t,size_t,unsigned);
 /* Process reaper: unmap before address_space_destroy frees all owned frames. */
 int chos_user_memory_pin(address_space_handle_t,uint64_t,size_t);
 int chos_user_memory_unpin(address_space_handle_t,uint64_t,size_t);
+/* Consumes an exact stack pin and disposes its region under one memory lock.
+ * 0 means released; EIO consumes the pin but quarantines uncertain mappings.
+ * Argument/ownership refusals leave the pin unchanged. Kernel threads only. */
+int chos_user_memory_retire_stack(address_space_handle_t,uint64_t,size_t);
 int chos_user_memory_release(address_space_handle_t);
 #endif

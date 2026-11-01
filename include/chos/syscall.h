@@ -81,7 +81,8 @@
 #define CHOS_SYS_PATH_METADATA 76u /* x0=path,x1=64B metadata,x2=exact size; READ9 plus OPEN8 */
 #define CHOS_SYS_DIRECTORY_PAGE 77u /* x0=directory path,x1=in/out640B page,x2=exact size; LIST_DIR20 */
 #define CHOS_SYS_IMAGE_PROTECT 78u /* x0=own image data base,x1=bytes,x2=READ1/NONE0; MAP35 */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_IMAGE_PROTECT
+#define CHOS_SYS_THREAD_DETACH 79u /* x0=own managed TID,x1=x2=0; REAP58; automatic owned-stack disposal */
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_THREAD_DETACH
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u
@@ -118,6 +119,7 @@
 #define CHOS_ERRNO_EFAULT 14
 #define CHOS_ERRNO_EINVAL 22
 #define CHOS_ERRNO_ENOSYS 38
+#define CHOS_ERRNO_ENOTSUP 95
 #define CHOS_ERRNO_EOVERFLOW 75
 #define CHOS_ERRNO_ECHILD 10
 #define CHOS_ERRNO_EDEADLK 35

@@ -13,13 +13,31 @@ typedef struct {uint32_t generation,live,late;void (*destroy)(void *);} key_t;
 static key_t keys[PTHREAD_KEYS_MAX];
 static pthread_mutex_t keys_lock=PTHREAD_MUTEX_INITIALIZER;
 static uint32_t active_c_threads=1;
+enum { JOINABLE=0,JOINING=1,DETACHED=2 };
+/* This lock deliberately has no pthread/TLS owner. A detached worker must
+ * release it after its original TCB has been freed. No user callback or heap
+ * allocation runs while acquiring it. Heap backends never acquire this lock. */
+static uint32_t lifetime_word;
+static _Alignas(16) chos_libc_tcb_t finalizer_tcb;
+static void lifetime_lock(void){
+ uint32_t zero=0;
+ if(__atomic_compare_exchange_n(&lifetime_word,&zero,1,0,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED))return;
+ for(;;){
+  if(!__atomic_exchange_n(&lifetime_word,2,__ATOMIC_ACQUIRE))return;
+  long rc=chos_wait_word(&lifetime_word,2,60000);
+  if(rc&&rc!=-EAGAIN&&rc!=-ETIMEDOUT)chos_exit(127);
+ }
+}
+static void lifetime_unlock(void){
+ if(__atomic_exchange_n(&lifetime_word,0,__ATOMIC_RELEASE)==2&&chos_wake_word(&lifetime_word,1)<0)chos_exit(127);
+}
 pthread_t pthread_self(void){return (pthread_t)(uintptr_t)__chos_libc_tls();}
 int pthread_equal(pthread_t a,pthread_t b){return a==b;}
 int pthread_attr_init(pthread_attr_t *a){if(!a)return EINVAL;*a=(pthread_attr_t){ATTR_MAGIC,32768,0};return 0;}
 int pthread_attr_destroy(pthread_attr_t *a){if(!a||a->magic!=ATTR_MAGIC)return EINVAL;a->magic=0;return 0;}
 int pthread_attr_setstacksize(pthread_attr_t *a,size_t n){if(!a||a->magic!=ATTR_MAGIC||n<PTHREAD_STACK_MIN||n>CHOS_THREAD_STACK_MAX)return EINVAL;a->stack_bytes=(n+4095u)&~(size_t)4095u;return 0;}
 int pthread_attr_getstacksize(const pthread_attr_t *a,size_t *out){if(!a||a->magic!=ATTR_MAGIC||!out)return EINVAL;*out=a->stack_bytes;return 0;}
-int pthread_attr_setdetachstate(pthread_attr_t *a,int state){if(!a||a->magic!=ATTR_MAGIC)return EINVAL;if(state==PTHREAD_CREATE_DETACHED)return ENOTSUP;if(state!=PTHREAD_CREATE_JOINABLE)return EINVAL;a->detached=state;return 0;}
+int pthread_attr_setdetachstate(pthread_attr_t *a,int state){if(!a||a->magic!=ATTR_MAGIC||(state!=PTHREAD_CREATE_JOINABLE&&state!=PTHREAD_CREATE_DETACHED))return EINVAL;a->detached=state;return 0;}
 int pthread_attr_getdetachstate(const pthread_attr_t *a,int *out){if(!a||a->magic!=ATTR_MAGIC||!out)return EINVAL;*out=a->detached;return 0;}
 static int key_lookup(pthread_key_t key,unsigned *index){
  unsigned slot=key&((1u<<KEY_INDEX_BITS)-1u),generation=key>>KEY_INDEX_BITS;
@@ -93,13 +111,32 @@ void pthread_exit(void *result){
   if(__atomic_fetch_sub(&active_c_threads,1,__ATOMIC_ACQ_REL)==1)exit(0);
  }
  phase_destructors(t,1);
- t->result=result;__atomic_store_n(&t->done,1,__ATOMIC_RELEASE);(void)chos_wake_word(&t->done,8);
+ unsigned main_thread=t->main_thread;
+ lifetime_lock();
+ t->result=result;__atomic_store_n(&t->done,1,__ATOMIC_RELEASE);
+ if(chos_wake_word(&t->done,8)<0)chos_exit(127);
+ int cleanup_error=0;
+ if(t->joining==DETACHED&&!t->main_thread){
+  /* Every user/key/compiler TLS destructor has completed. malloc/free must
+   * still unlock their own pthread heap mutex after unmapping this TCB's
+   * arena, so give that private final cleanup a valid, serialized TLS owner.
+   * No user code observes this owner and no TLS access follows unlock. */
+  finalizer_tcb=(chos_libc_tcb_t){.magic=CHOS_TCB_MAGIC,.tid=t->tid,.exiting=1,.exit_counted=1,.terminating=1};
+  __asm__ volatile("msr tpidr_el0,%0\n\tisb"::"r"((uintptr_t)&finalizer_tcb):"memory");
+  t->magic=0;cleanup_error=__chos_libc_free_thread_storage(t);
+ }
+ lifetime_unlock();
+ if(cleanup_error)chos_exit(127);
  long rc=chos_syscall1(CHOS_SYS_THREAD_EXIT,(long)(uintptr_t)result);
  /* The synchronous single-task profile has no siblings to preserve. */
- chos_exit(t->main_thread&&rc==-CHOS_ERRNO_ENOSYS?0:127);
+ chos_exit(main_thread&&rc==-CHOS_ERRNO_ENOSYS?0:127);
 }
 static void start_thread(void *p){
  chos_libc_tcb_t *t=p;
+ while(!__atomic_load_n(&t->tid,__ATOMIC_ACQUIRE)){
+  long rc=chos_wait_word(&t->tid,0,60000);
+  if(rc&&rc!=-EAGAIN&&rc!=-ETIMEDOUT)chos_exit(127);
+ }
  /* Raw kernel workers start with zero FP state; the C pthread contract inherits
   * only its creating thread's FP environment, never another process's Q data. */
  __chos_pthread_set_fp(t->initial_fpcr,t->initial_fpsr);
@@ -108,24 +145,32 @@ static void start_thread(void *p){
 int pthread_create(pthread_t *out,const pthread_attr_t *a,void *(*start)(void *),void *argument){
  if(!out||!start||(a&&a->magic!=ATTR_MAGIC))return EINVAL;
  if(!__atomic_load_n(&active_c_threads,__ATOMIC_ACQUIRE)||__chos_libc_tls()->process_exiting)return EAGAIN;
- if(a&&a->detached!=PTHREAD_CREATE_JOINABLE)return ENOTSUP;
+ if(a&&a->detached!=PTHREAD_CREATE_JOINABLE&&a->detached!=PTHREAD_CREATE_DETACHED)return EINVAL;
  size_t bytes=a?a->stack_bytes:32768;if(bytes<PTHREAD_STACK_MIN||bytes>CHOS_THREAD_STACK_MAX||(bytes&4095u))return EINVAL;
  uint64_t fpcr,fpsr;__chos_pthread_get_fp(&fpcr,&fpsr);
  (void)__chos_libc_tls();chos_libc_tcb_t *t=calloc(1,sizeof(*t));if(!t)return ENOMEM;
  long base=chos_map_memory(bytes);if(base<0){free(t);return (int)-base;}
  t->magic=CHOS_TCB_MAGIC;t->start=start;t->argument=argument;t->stack_base=(uint64_t)base;t->stack_bytes=bytes;
  t->initial_fpcr=fpcr;t->initial_fpsr=fpsr;
- chos_thread_request_t r={.version=1,.size_bytes=sizeof(r),.entry=(uint64_t)(uintptr_t)start_thread,.stack_base=(uint64_t)base,
-  .stack_bytes=bytes,.argument=(uint64_t)(uintptr_t)t,.tls=(uint64_t)(uintptr_t)t};
+ t->joining=a&&a->detached==PTHREAD_CREATE_DETACHED?DETACHED:JOINABLE;
+ chos_thread_request_t r={.version=CHOS_THREAD_MANAGED_VERSION,.size_bytes=sizeof(r),.entry=(uint64_t)(uintptr_t)start_thread,.stack_base=(uint64_t)base,
+  .stack_bytes=bytes,.argument=(uint64_t)(uintptr_t)t,.tls=(uint64_t)(uintptr_t)t,
+  .reserved={CHOS_THREAD_MANAGED_STACK|(t->joining==DETACHED?CHOS_THREAD_CREATE_DETACHED:0),0}};
  __atomic_add_fetch(&active_c_threads,1,__ATOMIC_ACQ_REL);
  long id=chos_thread_create(&r);
  if(id<0){__atomic_sub_fetch(&active_c_threads,1,__ATOMIC_ACQ_REL);chos_unmap_memory((void *)(uintptr_t)base,bytes);t->magic=0;free(t);return (int)-id;}
- __atomic_store_n(&t->tid,(uint32_t)id,__ATOMIC_RELEASE);*out=(pthread_t)(uintptr_t)t;return 0;
+ lifetime_lock();*out=(pthread_t)(uintptr_t)t;
+ __atomic_store_n(&t->tid,(uint32_t)id,__ATOMIC_RELEASE);
+ if(chos_wake_word(&t->tid,1)<0)chos_exit(127);
+ lifetime_unlock();return 0;
 }
 int pthread_join(pthread_t thread,void **result){
  if(!thread)return ESRCH;chos_libc_tcb_t *t=(void *)(uintptr_t)thread;
- if(t==__chos_libc_tls())return EDEADLK;if(t->magic!=CHOS_TCB_MAGIC)return ESRCH;
- uint32_t zero=0;if(!__atomic_compare_exchange_n(&t->joining,&zero,1,0,__ATOMIC_ACQUIRE,__ATOMIC_RELAXED))return EINVAL;
+ if(t==__chos_libc_tls())return EDEADLK;
+ lifetime_lock();
+ if(t->magic!=CHOS_TCB_MAGIC){lifetime_unlock();return ESRCH;}
+ if(t->joining!=JOINABLE){lifetime_unlock();return EINVAL;}
+ t->joining=JOINING;lifetime_unlock();
  int rc=0;
  while(!__atomic_load_n(&t->done,__ATOMIC_ACQUIRE)){
   long wait=chos_wait_word(&t->done,0,60000);if(wait&&wait!=-EAGAIN&&wait!=-ETIMEDOUT){rc=(int)-wait;goto failed;}
@@ -141,5 +186,16 @@ int pthread_join(pthread_t thread,void **result){
  if(chos_unmap_memory((void *)(uintptr_t)t->stack_base,t->stack_bytes)<0){rc=EIO;goto failed;}
  if(result)*result=t->result;t->magic=0;free(t);return 0;
 failed:
- __atomic_store_n(&t->joining,0,__ATOMIC_RELEASE);return rc;
+ lifetime_lock();t->joining=JOINABLE;lifetime_unlock();return rc;
+}
+int pthread_detach(pthread_t thread){
+ if(!thread)return ESRCH;chos_libc_tcb_t *t=(void *)(uintptr_t)thread;
+ lifetime_lock();
+ if(t->magic!=CHOS_TCB_MAGIC){lifetime_unlock();return ESRCH;}
+ if(t->joining!=JOINABLE){lifetime_unlock();return EINVAL;}
+ long rc=t->main_thread?0:chos_thread_detach(__atomic_load_n(&t->tid,__ATOMIC_ACQUIRE));
+ if(rc<0){lifetime_unlock();return (int)-rc;}
+ t->joining=DETACHED;
+ if(__atomic_load_n(&t->done,__ATOMIC_ACQUIRE)&&!t->main_thread){t->magic=0;if(__chos_libc_free_thread_storage(t))chos_exit(127);}
+ lifetime_unlock();return 0;
 }

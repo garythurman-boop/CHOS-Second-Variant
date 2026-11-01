@@ -1,5 +1,10 @@
 # Bounded native threads and saved thread-local state
 
+The [managed detached-stack extension](NATIVE_DETACHED_THREADS.md) adds opt-in
+request version2 and DETACH79 under REAP58. Version1 and the information ABI
+retain their recorded behavior. This is bounded native runtime work, not full
+WTF thread/GC or browser completion.
+
 The native EL0 API now creates actual scheduled workers within the caller's
 address space. Workers share globals, PID, file handles and process permissions;
 other processes retain private mappings. No user entry runs at EL1. This supplies

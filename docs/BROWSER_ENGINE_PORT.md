@@ -449,3 +449,9 @@ checked-memory policy checks in direct and UEFI profiles. This remains a selecte
 component: no VM, JavaScript, WebAssembly execution or modern rendering result is
 claimed. Full Thread/GC, engine-sized resource admission and subsequent browser,
 wireless, security and platform acceptance remain required.
+
+The [managed native detach service](NATIVE_DETACHED_THREADS.md) now provides real
+pthread and std::thread ownership transfer, preserving raw version1 semantics
+and rejecting foreign/reduced authority. This closes the native detach service
+prerequisite. The complete WTF Thread creation/join/detach binding and foreign GC
+coordination are still separate work; no complete VM or web execution is implied.

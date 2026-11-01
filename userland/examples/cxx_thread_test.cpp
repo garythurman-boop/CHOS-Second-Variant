@@ -43,7 +43,16 @@ extern "C" int main(int argc,char **argv){
  if(argc>1){
   if(!std::strcmp(argv[1],"join-empty")){say("empty join refusal begins\n");std::thread t;t.join();return 1;}
   if(!std::strcmp(argv[1],"joinable-destructor")){say("joinable destructor refusal begins\n");{std::thread t(wait_gate);}return 1;}
-  if(!std::strcmp(argv[1],"detach")){say("detach refusal begins\n");std::thread t(wait_gate);t.detach();return 1;}
+  if(!std::strcmp(argv[1],"detach")){
+   say("detach lifecycle begins\n");std::atomic<uint32_t> tid{};std::atomic<unsigned> done{};
+   std::thread t([&]{tid=(uint32_t)chos_thread_id();wait_gate();done=1;});t.detach();CHECK(!t.joinable());release_gate(1);
+   for(unsigned i=0;;i++){
+    CHECK(i<1000);chos_thread_info_t info;chos_heap_stats_t heap;CHECK(!chos_libc_heap_info(&heap));
+    if(done&&tid&&chos_thread_status(tid,&info)==-CHOS_ERRNO_ESRCH&&!heap.allocations&&!heap.mapped_bytes)break;
+    CHECK(!chos_sleep_ticks(1));
+   }
+   say("[ OK ] detached C++ worker lifecycle passed\n");return 0;
+  }
   if(!std::strcmp(argv[1],"capacity")){say("fourth C++ worker refusal begins\n");std::thread a(wait_gate),b(wait_gate),c(wait_gate),d(wait_gate);return 1;}
   if(!std::strcmp(argv[1],"pthread-exit")){say("C++ callable pthread_exit refusal begins\n");std::thread t([]{pthread_exit(nullptr);});t.join();return 1;}
   if(!std::strcmp(argv[1],"move-over-live")){say("move over joinable refusal begins\n");std::thread a(wait_gate),b(wait_gate);a=std::move(b);return 1;}

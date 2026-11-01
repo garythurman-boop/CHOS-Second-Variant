@@ -1,5 +1,10 @@
 # Native C thread runtime
 
+Current source adds real [managed detached workers](NATIVE_DETACHED_THREADS.md),
+superseding the original detach exclusion below. Earlier validation describes
+its recorded snapshot. Selected interim binaries are now allowed by the user;
+full Stage3/version0.50.0 still require every revised acceptance gate.
+
 The freestanding user C library now supplies a bounded pthread subset over actual
 EL0 threads and private futex waits. This is a prerequisite for the browser port,
 not a modern browser or a complete POSIX/C++ runtime. Development remains 0.30.0;

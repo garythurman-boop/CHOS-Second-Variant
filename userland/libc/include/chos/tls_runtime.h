@@ -34,6 +34,9 @@ void __chos_cxx_guard_abandon(chos_libc_tcb_t *);
 int __chos_pthread_key_create_late(pthread_key_t *,void (*)(void *));
 int __chos_pthread_key_create_final(pthread_key_t *,void (*)(void *));
 void __chos_cxx_thread_finalize(chos_libc_tcb_t *);
+/* Internal checked release; caller must retain a valid current TLS owner until
+ * the heap mutex has been unlocked (detached self cleanup switches owner). */
+int __chos_libc_free_thread_storage(void *);
 #ifdef __cplusplus
 }
 #endif

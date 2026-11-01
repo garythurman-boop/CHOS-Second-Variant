@@ -48,7 +48,7 @@ int __libcpp_thread_create(__libcpp_thread_t *t,void*(*fn)(void*),void *p){
 __libcpp_thread_id __libcpp_thread_get_current_id(){return pthread_self();}
 __libcpp_thread_id __libcpp_thread_get_id(const __libcpp_thread_t *t){return *t;}
 int __libcpp_thread_join(__libcpp_thread_t *t){return pthread_join(*t,nullptr);}
-int __libcpp_thread_detach(__libcpp_thread_t*){return ENOTSUP;}
+int __libcpp_thread_detach(__libcpp_thread_t *t){return pthread_detach(*t);}
 void __libcpp_thread_yield(){if(chos_yield()<0)__throw_system_error(EIO,"native yield failed");}
 void __libcpp_thread_sleep_for(const chrono::nanoseconds& ns){
  if(ns.count()<=0)return;

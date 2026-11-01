@@ -12,6 +12,7 @@ int64_t chos_thread_self(address_space_handle_t);
 int chos_thread_current_stack(address_space_handle_t,uint32_t *,uint64_t *,uint64_t *);
 int chos_thread_info(address_space_handle_t,uint32_t,chos_thread_info_t *);
 int chos_thread_reap(address_space_handle_t,uint32_t);
+int chos_thread_detach(address_space_handle_t,uint32_t);
 int chos_threads_main_exit(address_space_handle_t);
 int chos_thread_is_secondary(address_space_handle_t);
 void chos_threads_service(void);

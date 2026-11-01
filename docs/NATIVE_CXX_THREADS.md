@@ -1,5 +1,10 @@
 # Native C++ threads and ordered exit notification
 
+Current source supplies real [native managed detach](NATIVE_DETACHED_THREADS.md)
+through the original std::thread::detach wrapper. This supersedes the historical
+detach refusal below; other no-exception failure cases remain explicit. Selected
+interim binaries are allowed; Stage3/version0.50.0 remain fully gated.
+
 This supplies a bounded native runtime prerequisite for ICU/JavaScriptCore. It
 is not full libc++, a modern browser, or completion of revised Stage 3. New
 binaries remain held and version0.50.0 remains reserved for full acceptance.
