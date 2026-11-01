@@ -441,3 +441,11 @@ instruction/instance access and instruction-pointer rewriting. The complete
 archive and JavaScript execution remain unqualified. A correct bounds-checked
 WebAssembly platform path must precede engine execution; no fake fault recovery
 or signal-handler success is provided.
+
+The [native checked-Wasm/options milestone](NATIVE_JSC_CHECKED_WASM.md) closes
+that compilation failure. The actual JavaScriptCore archive now builds with141
+members. A native executable linked from it runs original option parsing and
+checked-memory policy checks in direct and UEFI profiles. This remains a selected
+component: no VM, JavaScript, WebAssembly execution or modern rendering result is
+claimed. Full Thread/GC, engine-sized resource admission and subsequent browser,
+wireless, security and platform acceptance remain required.

@@ -78,7 +78,7 @@ index 2ac8b24f..f4efbaf2 100644
  #endif // OS(WINDOWS) || HAVE(MACHINE_CONTEXT)
 
 diff --git a/Source/JavaScriptCore/runtime/Options.cpp b/Source/JavaScriptCore/runtime/Options.cpp
-index 683bc60a..569e5234 100644
+index 683bc60a..305fa604 100644
 --- a/Source/JavaScriptCore/runtime/Options.cpp
 +++ b/Source/JavaScriptCore/runtime/Options.cpp
 @@ -25,6 +25,9 @@
@@ -91,6 +91,20 @@ index 683bc60a..569e5234 100644
 
  #include "CPU.h"
  #include "JITOperationValidation.h"
+@@ -1039,6 +1042,13 @@ void Options::notifyOptionsChanged()
+     if (!Options::useMachForExceptions() || Options::useJITCage())
+         Options::allowNonSPTagging() = true;
+
++#if OS(CHOS)
++    // CHOS cannot register a resumable user fault handler. Keep the original
++    // bounds-checked Wasm memory path, including after explicit option changes.
++    Options::useWasmFaultSignalHandler() = false;
++    Options::useWasmFastMemory() = false;
++#endif
++
+     if (!Options::useWasmFaultSignalHandler())
+         Options::useWasmFastMemory() = false;
+
 diff --git a/Source/JavaScriptCore/runtime/ProfilerSupport.cpp b/Source/JavaScriptCore/runtime/ProfilerSupport.cpp
 index d1388620..5a5c1256 100644
 --- a/Source/JavaScriptCore/runtime/ProfilerSupport.cpp
@@ -120,6 +134,75 @@ index d1388620..5a5c1256 100644
      return static_cast<uint32_t>(syscall(__NR_gettid));
  #elif OS(DARWIN)
      // Ideally we would like to use pthread_threadid_np. But this is 64bit, while required one is 32bit.
+diff --git a/Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp b/Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp
+index 516fbdc0..e40fb8f9 100644
+--- a/Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp
++++ b/Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp
+@@ -42,7 +42,9 @@
+ #include "WasmThunks.h"
+ #include <wtf/CodePtr.h>
+ #include <wtf/Lock.h>
++#if !OS(CHOS)
+ #include <wtf/threads/Signals.h>
++#endif
+
+ WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
+
+@@ -54,6 +56,7 @@ using WTF::CodePtr;
+ void* presignedTrampoline { nullptr };
+ #endif
+
++#if !OS(CHOS)
+ namespace {
+ namespace WasmFaultSignalHandlerInternal {
+ static constexpr bool verbose = false;
+@@ -130,8 +133,15 @@ static SignalAction trapHandler(Signal signal, SigInfo& sigInfo, PlatformRegiste
+     return SignalAction::NotHandled;
+ }
+
++#endif // !OS(CHOS)
++
+ void activateSignalingMemory()
+ {
++#if OS(CHOS)
++    // No signal registration or instruction-pointer rewriting is available.
++    // Option normalization must select explicit bounds checking instead.
++    RELEASE_ASSERT(!Options::useWasmFaultSignalHandler());
++#else
+     static std::once_flag once;
+     std::call_once(once, [] {
+         if (!Wasm::isSupported())
+@@ -142,10 +152,16 @@ void activateSignalingMemory()
+
+         activateSignalHandlersFor(Signal::AccessFault);
+     });
++#endif
+ }
+
+ void prepareSignalingMemory()
+ {
++#if OS(CHOS)
++    // No signal registration or instruction-pointer rewriting is available.
++    // Option normalization must select explicit bounds checking instead.
++    RELEASE_ASSERT(!Options::useWasmFaultSignalHandler());
++#else
+     static std::once_flag once;
+     std::call_once(once, [] {
+         if (!Wasm::isSupported())
+@@ -161,11 +177,12 @@ void prepareSignalingMemory()
+             return trapHandler(signal, sigInfo, ucontext);
+         });
+     });
++#endif
+ }
+
+ ptrdiff_t maxAcceptableOffsetForNullReference()
+ {
+-#if CPU(ADDRESS64)
++#if CPU(ADDRESS64) && !OS(CHOS)
+     if (!Options::useWasmFaultSignalHandler())
+         return 0;
+
 diff --git a/Source/WTF/wtf/CurrentTime.cpp b/Source/WTF/wtf/CurrentTime.cpp
 index f4b97e56..5a7e0a11 100644
 --- a/Source/WTF/wtf/CurrentTime.cpp

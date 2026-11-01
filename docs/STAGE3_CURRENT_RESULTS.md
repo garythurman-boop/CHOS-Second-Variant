@@ -632,3 +632,12 @@ The next full JSC target records one failed compilation command in the native
 WebAssembly fault-handler unit; its missing fault-context services remain a real
 blocker. No JavaScript, modern browser, native Wi-Fi or Stage3/version0.50.0
 completion is claimed.
+
+### Complete JSC archive and native checked-Wasm options
+
+The actual pinned JavaScriptCore target now builds its141-member native archive.
+Original options initialization/parsing and native checked-memory activation
+policy execute in direct and isolated UEFI components, including forced-mode
+child refusal and cold process cleanup. See [scope and evidence](NATIVE_JSC_CHECKED_WASM.md).
+Full VM linking/execution, JavaScript/WebAssembly, rendering, native Wi-Fi and
+the other revised acceptance gates remain open; this is not Stage3/version0.50.0.

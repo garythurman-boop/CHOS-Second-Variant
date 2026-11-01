@@ -1,0 +1,254 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "18b597ad4af6e81a30da3bd6fc2add6ac012d179",
+  "implementation": "complete actual native JSC static archive and original option initialization/parsing with enforced native bounds-checked Wasm platform policy",
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "patch_sha256": "a79b708e0d4fbacee8951722fbae5708550865639aa23fb7eb0e61c417c0c9eb",
+  "patched_files": 39,
+  "javascriptcore_archive_built": true,
+  "javascriptcore_archive_members": 141,
+  "javascript_VM_link_qualified": false,
+  "javascript_executed": false,
+  "Wasm_executed": false,
+  "modern_browser_built": false,
+  "final_application": {
+    "status": "BUILT_NOT_EXECUTED",
+    "stage3_complete": false,
+    "javascriptcore_archive_built": true,
+    "javascriptcore_archive_sha256": "150fce6ccf0aded3f6c722b642e83d67685c306ef0ac24e27016cbee44537b3f",
+    "javascriptcore_archive_members": 141,
+    "javascript_vm_executed": false,
+    "wasm_executed": false,
+    "browser_built": false,
+    "wtf_archive_sha256": "564898ec1544f84c94573e93aef67d518582563dcd601c7a032234453175633e",
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "a79b708e0d4fbacee8951722fbae5708550865639aa23fb7eb0e61c417c0c9eb",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+      "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+      "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+      "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+      "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+      "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+      "ports/webkit/chos/CurrentThreadCHOS.cpp": "5381ec8203c4a33f1a04eed65a83a356024d455eba74232452e465f89c88271a"
+    },
+    "sdk_manifest_sha256": "d448d426be294ef0ec50cee29928ba17d9dd27ea3c86480a70d65f52541dae26",
+    "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-context-engine/cmake",
+        "--target",
+        "JavaScriptCore",
+        "-j2"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/jsc_options_wasm",
+        "-B",
+        "/workspace/chos-jsc-options-wasm-qualified/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-jsc-options-wasm-qualified/cmake",
+        "-j4"
+      ]
+    ],
+    "returncode": 0,
+    "seconds": 4.423440350001329,
+    "application_sha256": "d6ce0c8f14576aa188a4fb6cefd868c3a674158e92c4d60ae220744065b903bc",
+    "deployment": "/workspace/chos-jsc-options-wasm-qualified/cmake/jsc_options_wasm.elf",
+    "debug_application_sha256": "34eced6ef87a638ef85b0b21609be5c00a266682b8bd255a27fb84e2c44b96f9",
+    "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+    "scope": "actual JSC option initialization/parsing and native checked-Wasm activation policy;not a running VM",
+    "limits": [
+      "full archive compilation does not establish complete VM link,JavaScript/WebAssembly execution or browser rendering",
+      "foreign Thread lifecycle/GC and engine-sized admitted resources remain open",
+      "bootstrap ICU library used only for the options/platform component;full data/Intl execution not claimed",
+      "native guest qualification required;new Fusion/Pi5/laptop qualification NOT RUN"
+    ]
+  },
+  "accepted_guest_profiles": [
+    {
+      "profile": "direct1",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "d6ce0c8f14576aa188a4fb6cefd868c3a674158e92c4d60ae220744065b903bc",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117497,
+        "free_pages_before": 117497,
+        "free_pages_after": 117497,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 372,
+        "checks": [
+          "actual full native JavaScriptCore archive built and linked selected options/platform component;not VM execution",
+          "original option initialization exactly once,real numeric/boolean parsing and failed invalid inputs",
+          "Wasm/LLInt remain enabled;JIT disabled;fast/fault memory cannot be enabled by verified option updates",
+          "actual prepare/activate accept checked policy;null-fault elision offset is zero",
+          "two children directly forcing unsupported fault mode abort134;parent policy and process isolation preserved",
+          "nine concurrent native worker lifecycles per process;stable initialized heap;three process lifecycles,cold PMM equality and no futex waiters"
+        ],
+        "limits": [
+          "actual options/platform component,not JavaScript/WebAssembly VM or browser execution",
+          "bounds-checked Wasm memory allocator/interpreter still needs engine-sized resource/runtime qualification",
+          "bootstrap ICU linked for this component only;not full data/Intl qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "ddb65d9203a953feb2c5ef0b586f4ebc05e0a1b1feb6114041c9b7bbb1b89506",
+      "artifacts": {
+        "kernel_sha256": "2319ddb3ac8ffe6386a4a1bdf64ae03e14064e0ca7b1301c38ec97734f7588c4"
+      }
+    },
+    {
+      "profile": "uefi1",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "d6ce0c8f14576aa188a4fb6cefd868c3a674158e92c4d60ae220744065b903bc",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500135,
+        "free_pages_before": 500135,
+        "free_pages_after": 500135,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 379,
+        "checks": [
+          "actual full native JavaScriptCore archive built and linked selected options/platform component;not VM execution",
+          "original option initialization exactly once,real numeric/boolean parsing and failed invalid inputs",
+          "Wasm/LLInt remain enabled;JIT disabled;fast/fault memory cannot be enabled by verified option updates",
+          "actual prepare/activate accept checked policy;null-fault elision offset is zero",
+          "two children directly forcing unsupported fault mode abort134;parent policy and process isolation preserved",
+          "nine concurrent native worker lifecycles per process;stable initialized heap;three process lifecycles,cold PMM equality and no futex waiters"
+        ],
+        "limits": [
+          "actual options/platform component,not JavaScript/WebAssembly VM or browser execution",
+          "bounds-checked Wasm memory allocator/interpreter still needs engine-sized resource/runtime qualification",
+          "bootstrap ICU linked for this component only;not full data/Intl qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "57579ce366d88ea35410197196696478a18e274bea7c75c4d88f27b6bd79a740",
+      "artifacts": {
+        "kernel_sha256": "f6fded027fb3658d777c2b7614d3e35964f8778fae17f77ef1f8c6d449c5469c",
+        "iso_sha256": "f06fa762eeb6e553e1a99cb3d8303830c96656bf1fb900ddf2ea758c6c72a52a",
+        "iso_embedded_kernel_sha256": "f6fded027fb3658d777c2b7614d3e35964f8778fae17f77ef1f8c6d449c5469c",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "baseline_reuse": {
+    "qualification": "stage3-native-memory-scan.json",
+    "unchanged_inputs": {
+      "source_checkpoint": "18b597ad4af6e81a30da3bd6fc2add6ac012d179",
+      "complete_archive": "/workspace/chos-evidence/scan-queue-native-qualified.tar.gz",
+      "archive_sha256": "855435f7ef96d01fedacd0bd2091831c99e7efc00b0495031103e5970bf890b9",
+      "archive_member_prefix": "qualified-inputs",
+      "verified_current_unchanged": {
+        "build/chos.elf": "2319ddb3ac8ffe6386a4a1bdf64ae03e14064e0ca7b1301c38ec97734f7588c4",
+        "build/uefi-kernel/chos.elf": "f6fded027fb3658d777c2b7614d3e35964f8778fae17f77ef1f8c6d449c5469c",
+        "build/chos-0.30.0.iso": "f06fa762eeb6e553e1a99cb3d8303830c96656bf1fb900ddf2ea758c6c72a52a",
+        "build/native-sdk/chos-sdk.json": "d448d426be294ef0ec50cee29928ba17d9dd27ea3c86480a70d65f52541dae26",
+        "engine/lib/libWTF.a": {
+          "sha256": "564898ec1544f84c94573e93aef67d518582563dcd601c7a032234453175633e",
+          "all_member_hashes_match": true,
+          "members": 173
+        },
+        "engine/lib/libbmalloc.a": {
+          "sha256": "4d23708bd1fdad4a124d39f77c095e2cbcf438c05acc48414512f2effef6d499",
+          "all_member_hashes_match": true,
+          "members": 168
+        },
+        "engine/Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/cmake_pch.hxx.pch": "5d89b9b047d8f1af30f79b8ccf9d643ecf156ba8414a928654102db4931242b7"
+      },
+      "SDK": "complete SDK verified by native verifier;manifest byte-identical to frozen baseline;not recopied"
+    },
+    "reason": "only selected upstream/application sources changed;SDK,kernels,ISO and every WTF/bmalloc archive member plus JSC PCH match the full host/sanitizer/thirteen-profile baseline by hash"
+  },
+  "native_effective_policy": [
+    "WebAssembly/IPInt/JavaScript LLInt remain enabled;JIT/DFG/FTL/sampling profile remain disabled",
+    "every normalized option update forces fault/fast memory OFF;original explicit bounds-checked memory implementation retained",
+    "native prepare/activate assert unsupported fault flag is false;direct forced child attempts abort134",
+    "native null-reference fault-elision offset zero;no signal registration/context rewrite success fabricated"
+  ],
+  "retained_investigations": [
+    {
+      "log": "app-build1.log",
+      "sha256": "464d738538ffd7040cb4dfa2671c565a1c9504fdc6d1d0479b6c063e525e3b0f",
+      "diagnosis": "fixture included nonexistent wtf/WTF.h;corrected to actual Threading.h declaration before build/runtime;no native service stub introduced"
+    }
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/jsc-checked-wasm-qualified.tar.gz",
+    "archive_sha256": "718197d61d8cf7d09abb8d75e4192c8cb59763592e5422bb11704f17b07c5203",
+    "archive_bytes": 29435882,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "nested_guest_evidence": [
+    {
+      "profile": "direct1",
+      "nested_archive": "completed-profiles/direct1.tar.gz",
+      "archive_sha256": "efe3efb62d65cd23393cb9c65932e5299ed2d8ffc0b23b59a0ad760cd482ab98",
+      "removed_duplicate_test_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "660921170855d561c95e0224f3c5e21801bfceaed65d479bd6ab703fe1450c7d",
+          "bytes": 16777216,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "uefi1",
+      "nested_archive": "completed-profiles/uefi1.tar.gz",
+      "archive_sha256": "8a07f72c656157eeaecbdfd513e30f5cf569cd9a9c6c6d9e3ab8001eddb6463d",
+      "removed_duplicate_test_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "660921170855d561c95e0224f3c5e21801bfceaed65d479bd6ab703fe1450c7d",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    }
+  ],
+  "source_files_sha256": {
+    "docs/BROWSER_ENGINE_PORT.md": "e82994a2ada6c0cffff9b65bbcc9957cbc99d49020e6c4f251b057b3d835cebc",
+    "docs/NATIVE_JSC_CHECKED_WASM.md": "f2977dfe2cef2ccdbbcbba98c68cd1278977743f7234b774b976b2f8da0f3888",
+    "docs/NATIVE_SDK.md": "a63535392675b6ae369dae9d54c62f917a862a05c570335f7a5755a3b8ee65a9",
+    "docs/STAGE3_CURRENT_RESULTS.md": "a7e949112c344c544ac074204c55421c47b715493d1793dc634ec8536d55cdf7",
+    "docs/dependencies/webkit-jsc-bringup.json": "0056a9fdf5d95b2acaac22993dc2b2f690c86e0ccf350b0e31aec156a6b272b1",
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "a79b708e0d4fbacee8951722fbae5708550865639aa23fb7eb0e61c417c0c9eb",
+    "tests/jsc_options_wasm/CMakeLists.txt": "d3663341f3b1c91dd8a97d2750a220e8aa2c2094093dc376e0f8c09a6c92c08f",
+    "tests/jsc_options_wasm/main.cpp": "af8ba17bbac3fc12b0e8c42a254716fde74d1dd55e31c4ee30d88092cd41c34a",
+    "tests/qemu_jsc_options_wasm.py": "a8542776b79240386bb16d7dbf634111b56d0c24bf65f8cf6fcd0f9053eed4e2",
+    "tools/build_jsc_options_wasm.py": "221e3e53d041e767ef7a105ff7ff0299922c5d6fd9276489ad6e25b434136316"
+  },
+  "limits": [
+    "archive compilation/selected options execution not a complete VM link or JavaScript/WebAssembly/browser execution",
+    "Wasm memory allocation,interpreter/out-of-bounds behavior and full engine resource profile remain unqualified",
+    "bootstrap ICU used only by component;not full-data/Intl execution",
+    "full native Thread lifecycle,foreign GC and other browser/runtime services remain open",
+    "earlier synchronization timeout cause remains unresolved per baseline qualification,despite passing confirmations",
+    "Pi5 native SDIO/firmware/auth/WiFi,production security and independent Fusion/Pi5/laptop acceptance open",
+    "development0.30.0;no0.50.0 or new binary completion claim"
+  ]
+}

@@ -252,3 +252,8 @@ sscanf/vsscanf. The scanner uses a checked generated musl conversion copy over
 private input storage, with UTF-8 wide fields and explicit unsupported non-ASCII
 wide scanset patterns. It does not expose public FILE scanning. See
 [native scope and build instructions](NATIVE_MEMORY_SCAN_QUEUE.md).
+
+The same SDK now builds the complete native JSC static archive and links the
+selected [options/checked-Wasm platform fixture](NATIVE_JSC_CHECKED_WASM.md).
+The fixture executes real upstream code; archive compilation and component
+execution do not establish a complete VM, JavaScript/WebAssembly or browser.
