@@ -12,3 +12,5 @@
 #define __floattidf chos_test_floattidf
 #define __floatuntidf chos_test_floatuntidf
 #define __clzti2 chos_test_clzti2
+
+#define __muloti4 chos_test_muloti4

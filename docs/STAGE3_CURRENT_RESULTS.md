@@ -689,3 +689,13 @@ five unresolved runtime/foreign-GC symbols and a50,659,328-byte image rejected b
 the unchanged4MiB arena. See [the complete closure and next admission work](NATIVE_JSC_FRAMEWORK_CLOSURE.md).
 This supersedes archive-only dependency diagnoses; no VM/JavaScript/Intl execution
 or Stage3/version0.50.0 success is claimed.
+
+### Original VM math runtime
+
+Original LLVM checked signed128 multiply and musl binary128 sqrt/hypot now pass
+independent host and native vector checks, worker lifecycles and direct/UEFI cold
+cleanup. Both math symbols resolve in the full-ICU VM link; the remaining three
+foreign-thread GC methods and50,663,424-byte unadmitted image still prevent VM
+execution. See [math scope and qualification](NATIVE_VM_MATH.md). Full Stage3,
+JavaScript/WebAssembly, browser, native Wi-Fi, security and platform gates remain
+open; development remains0.30.0.

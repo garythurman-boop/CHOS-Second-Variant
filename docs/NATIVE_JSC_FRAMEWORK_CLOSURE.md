@@ -15,13 +15,17 @@ checkpoint. JIT/DFG/FTL/sampling remain OFF and WebAssembly remains enabled.
 
 The real public C API probe links context creation/release, JavaScript/JSON,
 full original ICU Intl and GC calls. Including the separate objects reduces its
-undefined-symbol list from367 to five:
+initial undefined-symbol list from367 to five:
 
 - Compiler runtime `__muloti4`.
 - Binary128 long-double `hypotl`.
 - Actual foreign `Thread::suspend`, `Thread::resume` and `Thread::getRegisters`.
 
-The original linker additionally rejects a proposed50,659,328-byte image under
+The subsequent [native VM math component](NATIVE_VM_MATH.md) closes the first two
+symbols with original upstream routines and native vector qualification. The
+current VM link still lacks all three foreign-thread methods.
+
+The initial linker additionally rejects a proposed50,659,328-byte image under
 the current4MiB application bound. That image also overlaps the current anonymous
 mapping base16MiB above the application base. Increasing one constant cannot
 admit it safely: loader/storage limits, address layout, physical-page ownership,

@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSNativeVMMath LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_executable(native_vm_math main.cpp)
+target_include_directories(native_vm_math PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+target_compile_options(native_vm_math PRIVATE -frounding-math -fno-builtin)

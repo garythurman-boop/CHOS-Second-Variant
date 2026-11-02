@@ -268,3 +268,8 @@ The [actual WTF worker lifecycle adapter](NATIVE_WTF_THREADS.md) now adds
 original WebKit worker creation/join/detach with direct/UEFI qualification. This
 supersedes earlier missing-creation diagnoses above; foreign GC and full engine/
 browser/resource qualification remain open.
+
+The [original VM math runtime](NATIVE_VM_MATH.md) adds checked signed128 multiply
+and native binary128 sqrt/hypot with independent vector qualification. The full
+VM link resolves those math imports, but foreign GC and engine-sized admission
+still prevent VM/JavaScript/browser execution. This remains development0.30.0.

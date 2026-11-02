@@ -466,3 +466,8 @@ now includes the original53-member object subtarget, separate from the141-member
 archive described above. All compile; a real full-ICU VM link still fails with
 five unresolved symbols and an unadmitted image. Archive compilation is not VM
 link/execution or complete engine qualification.
+
+The [original VM math runtime](NATIVE_VM_MATH.md) adds checked signed128 multiply
+and native binary128 sqrt/hypot with independent vector qualification. The full
+VM link resolves those math imports, but foreign GC and engine-sized admission
+still prevent VM/JavaScript/browser execution. This remains development0.30.0.

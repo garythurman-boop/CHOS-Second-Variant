@@ -4,7 +4,7 @@
   "commit": "0784374d561435f7c787a555aeab8ede699ed298",
   "upstream": "https://git.musl-libc.org/cgit/musl",
   "mirror": "https://github.com/ifduyue/musl",
-  "scope": "unmodified selected ARM64 binary32/binary64 math and real fenv,plus bounded binary128 classification/sign/modulus/scaling/frexp and nexttoward support; not full musl libc or long-double transcendental/FENV support;original ldexpl wrapper over the selected binary128 scalbnl",
+  "scope": "unmodified selected ARM64 binary32/binary64 math and real fenv,plus bounded binary128 classification/sign/modulus/scaling/frexp and nexttoward support; not full musl libc or long-double transcendental/FENV support;original ldexpl wrapper over the selected binary128 scalbnl;original binary128 sqrtl/hypotl with native RNE vector qualification,not full long-double rounding/exception conformance",
   "license": "MIT with retained per-file notices; see COPYRIGHT",
   "sources": [
     "src/fenv/__flt_rounds.c",
@@ -186,7 +186,10 @@
     "src/math/copysignl.c",
     "src/math/nexttoward.c",
     "src/math/nexttowardf.c",
-    "src/math/ldexpl.c"
+    "src/math/ldexpl.c",
+    "src/math/hypotl.c",
+    "src/math/sqrtl.c",
+    "src/math/__math_invalidl.c"
   ],
   "files": {
     "COPYRIGHT": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
@@ -433,7 +436,10 @@
     "src/math/copysignl.c": "17851a8156e37d0c412e9347a48739b0c33b92ad7eb868a9825b865984b9534c",
     "src/math/nexttoward.c": "ad4a0c12aae4a1d1c52abb2c38bdc025228883844706a606f4f763f24be12382",
     "src/math/nexttowardf.c": "5041be5f1cfd74da514cda3b1165390c62a5fe25892032eccdcdf04f07cec9a0",
-    "src/math/ldexpl.c": "8a4a5d7a93efa6f46c4ad7c0e56102a972bdc9acf21038f26219978cc2fd22fc"
+    "src/math/ldexpl.c": "8a4a5d7a93efa6f46c4ad7c0e56102a972bdc9acf21038f26219978cc2fd22fc",
+    "src/math/hypotl.c": "a6a4b8ee90aec01a225f4a135f506faa96ae4a50c2b16ef8d7a7f2216903abcb",
+    "src/math/sqrtl.c": "55d20e817e8b685f0f18618dd30390842c3a074b249b0b6da3f4edabd3d15f3d",
+    "src/math/__math_invalidl.c": "8199ee40bc69573df684543f30e18aaaf2e84de7c838afda7647600362fc3d0b"
   },
   "host_sources": [
     "src/math/__cos.c",
