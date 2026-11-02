@@ -1558,7 +1558,7 @@ test: $(BUILD)/userland/futex_test.elf
 
 # Staged native headers, CRT and actual static runtime archives for external ports.
 NATIVE_SDK_ROOT ?= $(BUILD)/native-sdk
-native-sdk: $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(WIDE_ARCHIVE) $(STDIO_ARCHIVE) $(FORMAT_ARCHIVE) $(ICU_COMMON_ARCHIVE) $(ICU_BOOTSTRAP_DATA) $(ICU_I18N_ARCHIVE) $(ICU_FULL_DATA_ARCHIVE)
+native-sdk: $(BUILD)/userland/native_engine_abi.o $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(WIDE_ARCHIVE) $(STDIO_ARCHIVE) $(FORMAT_ARCHIVE) $(ICU_COMMON_ARCHIVE) $(ICU_BOOTSTRAP_DATA) $(ICU_I18N_ARCHIVE) $(ICU_FULL_DATA_ARCHIVE)
 	python3 tools/install_native_sdk.py --build $(BUILD) --out $(NATIVE_SDK_ROOT) $(foreach obj,$(LIBC_OBJECTS),--libc-object $(obj))
 .PHONY: native-sdk
 
@@ -1719,3 +1719,11 @@ test-sanitize: test-resource-profile-sanitize
 test-resource-profile-sanitize: $(SAN_DIR)/test-resource-profile
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-resource-profile
 .PHONY: test-resource-profile test-resource-profile-sanitize
+
+$(BUILD)/test-elf-image $(SAN_DIR)/test-elf-image $(BUILD)/test-process-format $(SAN_DIR)/test-process-format $(BUILD)/test-romfs $(SAN_DIR)/test-romfs $(BUILD)/test-chfs $(SAN_DIR)/test-chfs $(BUILD)/test-installer-io $(SAN_DIR)/test-installer-io $(BUILD)/test-user-memory $(SAN_DIR)/test-user-memory $(BUILD)/test-address-space $(SAN_DIR)/test-address-space: include/chos/resource_profile.h
+
+$(BUILD)/userland/native_engine_abi.o: userland/native_engine_abi.S
+	@mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+
+$(BUILD)/test-user-allocator $(SAN_DIR)/test-user-allocator: include/chos/resource_profile.h

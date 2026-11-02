@@ -17,6 +17,7 @@ SECTIONS {
  . = ALIGN(4096);
  .data : { *(.data .data.*) *(.got .got.*) } :writable
  .bss (NOLOAD) : { *(.bss .bss.* COMMON) } :writable
+ __chos_image_end = ALIGN(4096);
  /DISCARD/ : { *(.comment) *(.note*) *(.eh_frame*) *(.llvm_addrsig) }
  ASSERT(. <= 0x20400000,"Native application exceeds bounded4MiB arena")
  ASSERT(SIZEOF(.note.chos) == 24,"Native ELF requires a CHOS ABI note")

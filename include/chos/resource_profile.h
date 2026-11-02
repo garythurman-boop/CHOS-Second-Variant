@@ -7,6 +7,12 @@
 #define CHOS_RESOURCE_ENGINE_FRAMES 49152u
 #define CHOS_RESOURCE_ENGINE_BUCKETS 131072u
 #define CHOS_RESOURCE_COMMITTED_FRAMES 65536u
+#define CHOS_RESOURCE_LEGACY_IMAGE_SPAN (4u*1024u*1024u)
+#define CHOS_RESOURCE_ENGINE_IMAGE_SPAN (64u*1024u*1024u)
+#define CHOS_RESOURCE_ENGINE_MAP_BASE UINT64_C(0x28000000)
+#define CHOS_RESOURCE_ENGINE_MAP_BYTES (UINT64_C(96)*1024u*1024u)
+#define CHOS_RESOURCE_ENGINE_REGIONS 512u
+#define CHOS_RESOURCE_ENGINE_STACK_PAGES 32u
 #define CHOS_RESOURCE_SYSTEM_RESERVE_FRAMES 16384u /* 64 MiB */
 typedef struct {
     uint32_t id, frame_limit, buckets;
@@ -19,6 +25,28 @@ static inline int chos_resource_profile_get(uint32_t id, chos_resource_profile_t
         *out = (chos_resource_profile_t){id, CHOS_RESOURCE_ENGINE_FRAMES, CHOS_RESOURCE_ENGINE_BUCKETS};
     else return 0;
     return 1;
+}
+/* Executable policy is selected by the validated ABI note, independently of
+ * user runtime hints. Both profiles use the existing private256MiB window. */
+typedef struct {
+    uint32_t id, image_span, root_stack_pages, map_regions, default_worker_stack_bytes;
+    uint64_t map_base, map_bytes;
+} chos_execution_profile_t;
+static inline int chos_execution_profile_get(uint32_t id, chos_execution_profile_t *out) {
+    if (!out) return 0;
+    if (id == CHOS_RESOURCE_LEGACY)
+        *out = (chos_execution_profile_t){id, CHOS_RESOURCE_LEGACY_IMAGE_SPAN, 8u, 16u, 32768u,
+            UINT64_C(0x21000000), UINT64_C(2)*1024u*1024u};
+    else if (id == CHOS_RESOURCE_ENGINE)
+        *out = (chos_execution_profile_t){id, CHOS_RESOURCE_ENGINE_IMAGE_SPAN,
+            CHOS_RESOURCE_ENGINE_STACK_PAGES, CHOS_RESOURCE_ENGINE_REGIONS, 128u*1024u,
+            CHOS_RESOURCE_ENGINE_MAP_BASE, CHOS_RESOURCE_ENGINE_MAP_BYTES};
+    else return 0;
+    return 1;
+}
+static inline uint32_t chos_execution_stack_mask(uint32_t pages) {
+    if(!pages || pages>32u)return 0u;
+    return pages==32u?UINT32_MAX:((UINT32_C(1)<<pages)-1u);
 }
 /* Logical commitment is independent of actual physical allocation. Arithmetic
  * is subtraction-based so an overflowing or inconsistent reservation refuses. */

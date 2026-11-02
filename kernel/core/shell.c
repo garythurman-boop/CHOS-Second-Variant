@@ -902,7 +902,7 @@ static void print_address_space_info(void) {
     uart_puts("; live: "); print_decimal(address_space_count()); uart_puts("\n");
     uart_puts("User virtual window: "); print_hex64(CHOS_AS_USER_VA_BASE);
     uart_puts(" - "); print_hex64(CHOS_AS_USER_VA_LIMIT - 1u); uart_puts(" (4 KiB pages)\n");
-    uart_puts("User-frame limit per space: "); print_decimal(CHOS_AS_MAX_USER_FRAMES);
+    uart_puts("Default user-frame limit per space: "); print_decimal(CHOS_AS_MAX_USER_FRAMES);
     uart_puts(" pages ("); print_decimal((CHOS_AS_MAX_USER_FRAMES * VMM_PAGE_SIZE) / 1024u);
     uart_puts(" KiB); EL0 entry: available through the controlled CHCX process runner; shell runs at EL1\n");
     uart_puts("Kernel root: "); print_hex64(vmm_kernel_root_table_address());
@@ -921,6 +921,8 @@ static void print_address_space_info(void) {
             uart_puts(address_space_is_active(handle) ? " [ACTIVE]" : "");
             uart_puts(" user-pages="); print_decimal(info.mapped_user_pages);
             uart_puts(" owned-frames="); print_decimal(info.owned_user_frames);
+            uart_puts(" profile="); print_decimal(info.resource_profile);
+            if(info.destroying)uart_puts(" [DESTROYING/QUARANTINED]");
             uart_puts(" task-refs="); print_decimal(info.task_references);
             uart_puts(" L3-tables="); print_decimal(info.user_l3_tables);
             uart_puts("\n");

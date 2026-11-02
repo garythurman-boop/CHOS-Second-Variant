@@ -6,14 +6,14 @@
 #include "chos/allocator.h"
 
 typedef struct {
-    struct { void *p; size_t n; } maps[CHOS_HEAP_REGIONS];
+    struct { void *p; size_t n; } maps[CHOS_RESOURCE_ENGINE_REGIONS];
     unsigned maps_total,unmaps_total,fail_map,fail_unmap;
 } backend_t;
 static void *mapping(void *context,size_t bytes){
     backend_t *b=context;
     assert(bytes && !(bytes%CHOS_HEAP_PAGE) && bytes<=CHOS_HEAP_MAP_MAX);
     if(b->fail_map)return 0;
-    for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++)if(!b->maps[i].p){
+    for(unsigned i=0;i<CHOS_RESOURCE_ENGINE_REGIONS;i++)if(!b->maps[i].p){
         void *p=aligned_alloc(CHOS_HEAP_PAGE,bytes);assert(p);memset(p,0xa5,bytes);
         b->maps[i].p=p;b->maps[i].n=bytes;b->maps_total++;return p;
     }
@@ -21,13 +21,13 @@ static void *mapping(void *context,size_t bytes){
 }
 static int unmapping(void *context,void *p,size_t bytes){
     backend_t *b=context;b->unmaps_total++;
-    for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++)if(b->maps[i].p==p){
+    for(unsigned i=0;i<CHOS_RESOURCE_ENGINE_REGIONS;i++)if(b->maps[i].p==p){
         assert(b->maps[i].n==bytes);if(b->fail_unmap)return -1;
         memset(p,0,bytes);free(p);b->maps[i].p=0;b->maps[i].n=0;return 0;
     }
     assert(!"foreign or repeated unmap");return -1;
 }
-static void cleanup(backend_t *b){for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++)free(b->maps[i].p);memset(b,0,sizeof(*b));}
+static void cleanup(backend_t *b){for(unsigned i=0;i<CHOS_RESOURCE_ENGINE_REGIONS;i++)free(b->maps[i].p);memset(b,0,sizeof(*b));}
 static void begin(chos_heap_t *h,backend_t *b){memset(b,0,sizeof(*b));chos_heap_init(h,mapping,unmapping,b);}
 static void empty(chos_heap_t *h){chos_heap_stats_t s;assert(!chos_heap_stats(h,&s));assert(!s.allocations&&!s.regions&&!s.mapped_bytes);}
 static void basics(void){
@@ -101,4 +101,30 @@ static void stress(void){
     }
     for(unsigned i=0;i<SLOTS;i++)assert(!chos_heap_free(&h,p[i]));empty(&h);assert(!chos_heap_destroy(&h));cleanup(&b);
 }
-int main(void){basics();alignment_and_coalescing();failure_and_quarantine();stress();puts("user allocator: PASS (actual core, alignment, overflow, coalescing, rollback, quarantine, 12000 mixed operations)");return 0;}
+static void external_capacity(void){
+    chos_heap_t h,old;backend_t b;begin(&h,&b);
+    static chos_heap_region_t external[CHOS_RESOURCE_ENGINE_REGIONS];
+    old=h;
+    assert(chos_heap_init_external(&h,mapping,unmapping,&b,external,0));
+    assert(chos_heap_init_external(&h,mapping,unmapping,&b,external,CHOS_RESOURCE_ENGINE_REGIONS+1u));
+    assert(chos_heap_init_external(&h,mapping,unmapping,&b,h.regions,CHOS_HEAP_REGIONS));
+    assert(!memcmp(&old,&h,sizeof(h)));
+    h.region_limit=CHOS_HEAP_REGIONS+1u;assert(!chos_heap_alloc(&h,1,16)&&h.error==CHOS_HEAP_EIO);
+    chos_heap_init(&h,mapping,unmapping,&b);
+    assert(!chos_heap_init_external(&h,mapping,unmapping,&b,external,CHOS_RESOURCE_ENGINE_REGIONS));
+    void *ptrs[CHOS_RESOURCE_ENGINE_REGIONS];
+    for(unsigned i=0;i<CHOS_RESOURCE_ENGINE_REGIONS;i++){
+        ptrs[i]=chos_heap_alloc(&h,100000,16);assert(ptrs[i]);
+        memset(ptrs[i],(unsigned char)i,100000);
+    }
+    assert(!chos_heap_alloc(&h,100000,16)&&h.error==CHOS_HEAP_ENOMEM);
+    chos_heap_stats_t stats;assert(!chos_heap_stats(&h,&stats));
+    assert(stats.regions==CHOS_RESOURCE_ENGINE_REGIONS&&stats.allocations==CHOS_RESOURCE_ENGINE_REGIONS);
+    for(unsigned k=0;k<CHOS_RESOURCE_ENGINE_REGIONS;k++){
+        unsigned i=(k*13u)%CHOS_RESOURCE_ENGINE_REGIONS;
+        unsigned char *p=ptrs[i];assert(p[0]==(unsigned char)i&&p[99999]==(unsigned char)i);
+        assert(!chos_heap_free(&h,p));
+    }
+    empty(&h);assert(!chos_heap_destroy(&h));assert(b.maps_total==b.unmaps_total);cleanup(&b);
+}
+int main(void){basics();alignment_and_coalescing();failure_and_quarantine();stress();external_capacity();puts("user allocator: PASS (actual core, alignment, overflow, coalescing, rollback, quarantine, 12000 mixed operations)");return 0;}

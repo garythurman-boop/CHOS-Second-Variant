@@ -7,7 +7,7 @@ int chos_elf_validate(const void *data,size_t size,chos_elf_image_t *out){
     const uint8_t *p=data;
     chos_elf_image_t plan={0};
     if(out)*out=plan;
-    if(!p || !out || size<64 || size>CHOS_ELF_MAX_FILE)return 0;
+    if(!p || !out || size<64 || size>CHOS_ELF_MAX_LOAD_FILE)return 0;
     if(p[0]!=0x7f || p[1]!='E' || p[2]!='L' || p[3]!='F' ||
        p[4]!=2 || p[5]!=1 || p[6]!=1 || p[7]!=0 || p[8]!=0)return 0;
     for(unsigned i=9;i<16;i++)if(p[i])return 0;
@@ -20,36 +20,47 @@ int chos_elf_validate(const void *data,size_t size,chos_elf_image_t *out){
     int have_entry=0,have_abi=0;
     for(unsigned n=0;n<count;n++){
         const uint8_t *h=p+(size_t)table+n*56u;
+        uint32_t type=le32(h);
+        uint64_t offset=le64(h+8),files=le64(h+32);
+        if(!range(offset,files,size))return 0;
+        if(type!=4)continue;
+        if(files>4096)return 0;
+        uint64_t pos=0;
+        while(pos<files){
+            if(!range(pos,12,files))return 0;
+            const uint8_t *note=p+(size_t)offset+(size_t)pos;
+            uint32_t names=le32(note),desc=le32(note+4);
+            uint64_t name_span=((uint64_t)names+3u)&~UINT64_C(3);
+            uint64_t desc_span=((uint64_t)desc+3u)&~UINT64_C(3);
+            if(!range(pos+12,name_span,files) || !range(pos+12+name_span,desc_span,files))return 0;
+            if(le32(note+8)==0x43484f53u && names==5 && note[12]=='C' && note[13]=='H' &&
+               note[14]=='O' && note[15]=='S' && note[16]==0){
+                if(have_abi || (desc!=4 && desc!=8) || le32(note+12+(size_t)name_span)!=1)return 0;
+                if(desc==8){
+                    uint32_t profile=le32(note+16+(size_t)name_span);
+                    if(profile!=CHOS_RESOURCE_ENGINE)return 0;
+                    plan.resource_profile=profile;
+                }
+                have_abi=1;
+            }
+            pos+=12+name_span+desc_span;
+        }
+    }
+    chos_execution_profile_t profile;
+    if(!have_abi || !chos_execution_profile_get(plan.resource_profile,&profile) ||
+        size>(uint64_t)profile.image_span+4096u)return 0;
+    for(unsigned n=0;n<count;n++){
+        const uint8_t *h=p+(size_t)table+n*56u;
         uint32_t type=le32(h),flags=le32(h+4);
         uint64_t offset=le64(h+8),va=le64(h+16),files=le64(h+32),memory=le64(h+40),align=le64(h+48);
-        if(!range(offset,files,size))return 0;
-        if(type==0)continue;
-        if(type==0x6474e551u){if(flags&1u)return 0;continue;} /* non-executable GNU_STACK */
-        if(type==4){
-            if(files>4096)return 0;
-            uint64_t pos=0;
-            while(pos<files){
-                if(!range(pos,12,files))return 0;
-                const uint8_t *note=p+(size_t)offset+(size_t)pos;
-                uint32_t names=le32(note),desc=le32(note+4);
-                uint64_t name_span=((uint64_t)names+3u)&~UINT64_C(3);
-                uint64_t desc_span=((uint64_t)desc+3u)&~UINT64_C(3);
-                if(!range(pos+12,name_span,files) || !range(pos+12+name_span,desc_span,files))return 0;
-                if(le32(note+8)==0x43484f53u && names==5 && note[12]=='C' && note[13]=='H' &&
-                   note[14]=='O' && note[15]=='S' && note[16]==0){
-                    if(have_abi || desc!=4 || le32(note+12+(size_t)name_span)!=1)return 0;
-                    have_abi=1;
-                }
-                pos+=12+name_span+desc_span;
-            }
-            continue;
-        }
+        if(type==0 || type==4)continue;
+        if(type==0x6474e551u){if(flags&1u)return 0;continue;}
         if(type==6 || type==0x6474e550u)continue; /* PHDR/EH_FRAME metadata */
         if(type!=1)return 0; /* DYNAMIC, INTERP, TLS and unsupported RELRO fail closed. */
         if((flags&~7u) || !(flags&4u) || (flags&3u)==3u || files>memory)return 0;
         if(!memory){if(files)return 0;continue;}
-        if(va<CHOS_AS_USER_VA_BASE || !range(va-CHOS_AS_USER_VA_BASE,memory,CHOS_ELF_MAX_SPAN) ||
-           (va&4095u) || (offset&4095u) || align<4096 || align>CHOS_ELF_MAX_SPAN ||
+        if(va<CHOS_AS_USER_VA_BASE || !range(va-CHOS_AS_USER_VA_BASE,memory,profile.image_span) ||
+           (va&4095u) || (offset&4095u) || align<4096 || align>profile.image_span ||
            (align&(align-1u)) || (va&(align-1u))!=(offset&(align-1u)))return 0;
         uint32_t relative=(uint32_t)(va-CHOS_AS_USER_VA_BASE);
         uint32_t end=(relative+(uint32_t)memory+4095u)&~4095u;

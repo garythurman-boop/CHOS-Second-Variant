@@ -21,6 +21,9 @@ static void valid(void){
     uint8_t *h=bytes+64+3*56;w32(h,4);w64(h+8,512);w64(h+32,24);
     w32(bytes+512,5);w32(bytes+516,4);w32(bytes+520,0x43484f53);memcpy(bytes+524,"CHOS",5);w32(bytes+532,1);
 }
+static void engine(void){
+    valid();w32(bytes+516,8);w32(bytes+536,CHOS_RESOURCE_ENGINE);w64(bytes+64+3*56+32,28);
+}
 int main(void){
     chos_elf_image_t plan;chos_elf_page_t page;
     valid();assert(chos_elf_validate(bytes,sizeof(bytes),&plan));assert(plan.virtual_size==0xc2000 && plan.segment_count==3);
@@ -35,6 +38,22 @@ int main(void){
     assert(chos_elf_page(&plan,0x210000,&page)&&page.permissions==AS_PERM_USER_RO&&page.file_bytes==17);
     assert(!chos_elf_page(&plan,0x200000,&page));
     assert(chos_elf_page(&plan,CHOS_ELF_MAX_SPAN-4096u,&page)&&page.permissions==AS_PERM_USER_RW&&page.file_bytes==7);
+    engine();segment(2,6,12288,CHOS_AS_USER_VA_BASE+0x80000,7,48u*1024u*1024u);
+    assert(chos_elf_validate(bytes,sizeof(bytes),&plan)&&plan.resource_profile==CHOS_RESOURCE_ENGINE);
+    assert(plan.virtual_size==0x80000u+48u*1024u*1024u);
+    assert(chos_elf_page(&plan,plan.virtual_size-4096u,&page)&&page.permissions==AS_PERM_USER_RW&&!page.file_bytes);
+    valid();segment(2,6,12288,CHOS_AS_USER_VA_BASE+0x80000,7,48u*1024u*1024u);
+    assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
+    engine();w32(bytes+536,0);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
+    engine();w32(bytes+536,2);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
+    engine();w32(bytes+532,2);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
+    engine();w64(bytes+64+3*56+32,24);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
+    engine();segment(2,6,12288,CHOS_AS_USER_VA_BASE+CHOS_ELF_MAX_LOAD_SPAN-4096u,7,4096);
+    assert(chos_elf_validate(bytes,sizeof(bytes),&plan)&&plan.virtual_size==CHOS_ELF_MAX_LOAD_SPAN);
+    engine();segment(2,6,12288,CHOS_AS_USER_VA_BASE+CHOS_ELF_MAX_LOAD_SPAN-4096u,7,4097);
+    assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
+    engine();w64(bytes+64+3*56+32,56);memcpy(bytes+540,bytes+512,28);
+    assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
     for(size_t n=0;n<64;n++)assert(!chos_elf_validate(bytes,n,&plan));
     valid();w64(bytes+32,UINT64_MAX);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));
     valid();w16(bytes+56,9);assert(!chos_elf_validate(bytes,sizeof(bytes),&plan));

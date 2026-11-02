@@ -21,6 +21,25 @@ static void copy_bytes(void *dst,const void *src,size_t n){
 static void zero_bytes(void *dst,size_t n){unsigned char *p=dst;while(n--)*p++=0;}
 void chos_heap_init(chos_heap_t *h,chos_heap_map_fn map,chos_heap_unmap_fn unmap,void *context){
     if(!h)return;zero_bytes(h,sizeof(*h));h->map=map;h->unmap=unmap;h->context=context;
+    h->active_regions=h->regions;h->region_limit=CHOS_HEAP_REGIONS;
+}
+int chos_heap_init_external(chos_heap_t *h,chos_heap_map_fn map,chos_heap_unmap_fn unmap,
+        void *context,chos_heap_region_t *storage,unsigned count){
+    if(!h||!storage||!count||count>CHOS_RESOURCE_ENGINE_REGIONS||
+       ((uintptr_t)storage%_Alignof(chos_heap_region_t)))return -1;
+    size_t bytes=(size_t)count*sizeof(*storage);
+    uintptr_t start=(uintptr_t)storage,object=(uintptr_t)h;
+    if(start>UINTPTR_MAX-bytes||object>UINTPTR_MAX-sizeof(*h)||
+       (start<object+sizeof(*h)&&object<start+bytes))return -1;
+    chos_heap_init(h,map,unmap,context);
+    zero_bytes(storage,bytes);h->active_regions=storage;h->region_limit=count;return 0;
+}
+static int configured(chos_heap_t *h){
+    if(!h->active_regions||!h->region_limit||h->region_limit>CHOS_RESOURCE_ENGINE_REGIONS||
+       (h->active_regions==h->regions&&h->region_limit>CHOS_HEAP_REGIONS)){
+        h->error=CHOS_HEAP_EIO;return 0;
+    }
+    return 1;
 }
 static int corrupt(chos_heap_t *h,chos_heap_region_t *r){r->quarantined=1;h->error=CHOS_HEAP_EIO;return -1;}
 static int region_valid(chos_heap_t *h,chos_heap_region_t *r){
@@ -55,20 +74,21 @@ static void *from_region(chos_heap_t *h,chos_heap_region_t *r,size_t need,size_t
 }
 void *chos_heap_alloc(chos_heap_t *h,size_t size,size_t alignment){
     if(!h)return 0;h->error=0;
+    if(!configured(h))return 0;
     if(!h->map||!h->unmap||alignment<CHOS_HEAP_ALIGNMENT||
        (alignment&(alignment-1u))){h->error=CHOS_HEAP_EINVAL;return 0;}
     if(alignment>CHOS_HEAP_MAP_MAX){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t requested=size; if(!size)size=1;
     if(size>CHOS_HEAP_MAP_MAX-HEADER){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t need=(size+CHOS_HEAP_ALIGNMENT-1u)&~(size_t)(CHOS_HEAP_ALIGNMENT-1u);
-    for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++){
-        chos_heap_region_t *r=&h->regions[i];
+    for(unsigned i=0;i<h->region_limit;i++){
+        chos_heap_region_t *r=&h->active_regions[i];
         if(r->base&&!r->quarantined){void *p=from_region(h,r,need,alignment);
             if(p){block_t *b=(block_t *)((unsigned char *)p-HEADER);b->requested=requested;b->magic=stamp(b);return p;}}
     }
-    unsigned slot=CHOS_HEAP_REGIONS;
-    for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++)if(!h->regions[i].base){slot=i;break;}
-    if(slot==CHOS_HEAP_REGIONS){h->error=CHOS_HEAP_ENOMEM;return 0;}
+    unsigned slot=h->region_limit;
+    for(unsigned i=0;i<h->region_limit;i++)if(!h->active_regions[i].base){slot=i;break;}
+    if(slot==h->region_limit){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t extra=alignment>CHOS_HEAP_ALIGNMENT ? alignment+MIN_SPAN : 0;
     if(need>CHOS_HEAP_MAP_MAX-HEADER || extra>CHOS_HEAP_MAP_MAX-HEADER-need){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t bytes=need+HEADER+extra;
@@ -76,7 +96,7 @@ void *chos_heap_alloc(chos_heap_t *h,size_t size,size_t alignment){
     if(bytes<DEFAULT_MAP)bytes=DEFAULT_MAP;
     void *base=h->map(h->context,bytes);
     if(!base){h->error=CHOS_HEAP_ENOMEM;return 0;}
-    chos_heap_region_t *r=&h->regions[slot];r->base=base;r->bytes=bytes;r->quarantined=0;
+    chos_heap_region_t *r=&h->active_regions[slot];r->base=base;r->bytes=bytes;r->quarantined=0;
     if(((uintptr_t)base&(CHOS_HEAP_PAGE-1u)) || (uintptr_t)base>UINTPTR_MAX-bytes){
         /* A broken mapping backend cannot be used for aligned metadata. */
         r->quarantined=1;h->error=CHOS_HEAP_EIO;return 0;
@@ -87,9 +107,10 @@ void *chos_heap_alloc(chos_heap_t *h,size_t size,size_t alignment){
     block_t *b=(block_t *)((unsigned char *)p-HEADER);b->requested=requested;b->magic=stamp(b);return p;
 }
 static block_t *lookup(chos_heap_t *h,void *p,chos_heap_region_t **region){
+    if(!configured(h))return 0;
     uintptr_t addr=(uintptr_t)p;
-    for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++){
-        chos_heap_region_t *r=&h->regions[i];uintptr_t base=(uintptr_t)r->base;
+    for(unsigned i=0;i<h->region_limit;i++){
+        chos_heap_region_t *r=&h->active_regions[i];uintptr_t base=(uintptr_t)r->base;
         if(!r->base||r->quarantined||addr<base||addr-base>=r->bytes)continue;
         if(region_valid(h,r))return 0;
         for(size_t off=0;off<r->bytes;){block_t *b=(block_t *)((unsigned char *)r->base+off);
@@ -129,18 +150,18 @@ void *chos_heap_realloc(chos_heap_t *h,void *p,size_t size){
     copy_bytes(next,p,old);(void)chos_heap_free(h,p);return next;
 }
 int chos_heap_destroy(chos_heap_t *h){
-    if(!h)return -1;h->error=0;int failed=0;
-    for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++){
-        chos_heap_region_t *r=&h->regions[i];if(!r->base)continue;
+    if(!h)return -1;h->error=0;if(!configured(h))return -1;int failed=0;
+    for(unsigned i=0;i<h->region_limit;i++){
+        chos_heap_region_t *r=&h->active_regions[i];if(!r->base)continue;
         if(r->quarantined||h->unmap(h->context,r->base,r->bytes)){corrupt(h,r);failed=1;continue;}
         r->base=0;r->bytes=0;r->quarantined=0;
     }
     return failed?-1:0;
 }
 int chos_heap_stats(chos_heap_t *h,chos_heap_stats_t *out){
-    if(!h||!out)return -1;h->error=0;zero_bytes(out,sizeof(*out));int failed=0;
-    for(unsigned i=0;i<CHOS_HEAP_REGIONS;i++){
-        chos_heap_region_t *r=&h->regions[i];if(!r->base)continue;
+    if(!h||!out)return -1;h->error=0;if(!configured(h))return -1;zero_bytes(out,sizeof(*out));int failed=0;
+    for(unsigned i=0;i<h->region_limit;i++){
+        chos_heap_region_t *r=&h->active_regions[i];if(!r->base)continue;
         out->regions++;out->mapped_bytes+=r->bytes;
         if(r->quarantined||region_valid(h,r)){out->quarantined_regions++;failed=1;continue;}
         for(size_t off=0;off<r->bytes;){block_t *b=(block_t *)((unsigned char *)r->base+off);

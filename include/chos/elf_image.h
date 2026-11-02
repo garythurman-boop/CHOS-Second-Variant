@@ -4,14 +4,16 @@
 #include <stdint.h>
 #include "chos/address_space.h"
 #define CHOS_ELF_MAX_SEGMENTS 8u
-#define CHOS_ELF_MAX_SPAN (4u*1024u*1024u)
+#define CHOS_ELF_MAX_SPAN CHOS_RESOURCE_LEGACY_IMAGE_SPAN
+#define CHOS_ELF_MAX_LOAD_SPAN CHOS_RESOURCE_ENGINE_IMAGE_SPAN
+#define CHOS_ELF_MAX_LOAD_FILE (CHOS_ELF_MAX_LOAD_SPAN+4096u)
 #define CHOS_ELF_MAX_FILE (CHOS_ELF_MAX_SPAN+4096u)
 typedef struct {
     uint32_t offset,virtual_offset,file_size,memory_size;
     address_space_user_permissions_t permissions;
 } chos_elf_segment_t;
 typedef struct {
-    uint32_t entry_offset,virtual_size,segment_count;
+    uint32_t entry_offset,virtual_size,segment_count,resource_profile;
     chos_elf_segment_t segments[CHOS_ELF_MAX_SEGMENTS];
 } chos_elf_image_t;
 typedef struct {

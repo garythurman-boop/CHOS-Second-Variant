@@ -30,5 +30,17 @@ int main(void) {
         assert(!chos_resource_admit(0, UINT64_MAX, &forged));
     }
     assert(!chos_resource_admit(0, UINT64_MAX, NULL));
+    chos_execution_profile_t x,y;
+    assert(chos_execution_profile_get(CHOS_RESOURCE_LEGACY,&x));
+    assert(chos_execution_profile_get(CHOS_RESOURCE_ENGINE,&y));
+    assert(x.image_span==4u*1024u*1024u&&x.root_stack_pages==8&&x.map_regions==16&&x.default_worker_stack_bytes==32768);
+    assert(y.image_span==64u*1024u*1024u&&y.root_stack_pages==32&&y.map_regions==512&&y.default_worker_stack_bytes==128u*1024u);
+    assert(UINT64_C(0x20000000)+x.image_span<x.map_base&&UINT64_C(0x20000000)+y.image_span<y.map_base);
+    assert(x.map_base+x.map_bytes<UINT64_C(0x30000000)-x.root_stack_pages*4096u);
+    assert(y.map_base+y.map_bytes<UINT64_C(0x30000000)-y.root_stack_pages*4096u);
+    assert(!chos_execution_stack_mask(0)&&!chos_execution_stack_mask(33));
+    for(unsigned n=1;n<=32;n++)assert(chos_execution_stack_mask(n)==(uint32_t)((UINT64_C(1)<<n)-1u));
+    chos_execution_profile_t saved;memcpy(&saved,&y,sizeof(y));assert(!chos_execution_profile_get(UINT32_MAX,&y));
+    assert(!memcmp(&saved,&y,sizeof(y)));
     puts("resource admission: exact profiles, unknown/forged refusal, reservation/physical-floor boundaries and overflow passed");
 }

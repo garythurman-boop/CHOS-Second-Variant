@@ -3,6 +3,7 @@
 #include <errno.h>
 #include "chos/user.h"
 #include "chos/tls_runtime.h"
+#include "chos/resource_profile_user.h"
 #define ATTR_MAGIC UINT32_C(0x50544154)
 #define KEY_INDEX_BITS 6u
 #define KEY_GENERATION_MAX (UINT32_MAX>>KEY_INDEX_BITS)
@@ -33,7 +34,7 @@ static void lifetime_unlock(void){
 }
 pthread_t pthread_self(void){return (pthread_t)(uintptr_t)__chos_libc_tls();}
 int pthread_equal(pthread_t a,pthread_t b){return a==b;}
-int pthread_attr_init(pthread_attr_t *a){if(!a)return EINVAL;*a=(pthread_attr_t){ATTR_MAGIC,32768,0};return 0;}
+int pthread_attr_init(pthread_attr_t *a){if(!a)return EINVAL;*a=(pthread_attr_t){ATTR_MAGIC,chos_native_worker_stack_bytes(),0};return 0;}
 int pthread_attr_destroy(pthread_attr_t *a){if(!a||a->magic!=ATTR_MAGIC)return EINVAL;a->magic=0;return 0;}
 int pthread_attr_setstacksize(pthread_attr_t *a,size_t n){if(!a||a->magic!=ATTR_MAGIC||n<PTHREAD_STACK_MIN||n>CHOS_THREAD_STACK_MAX)return EINVAL;a->stack_bytes=(n+4095u)&~(size_t)4095u;return 0;}
 int pthread_attr_getstacksize(const pthread_attr_t *a,size_t *out){if(!a||a->magic!=ATTR_MAGIC||!out)return EINVAL;*out=a->stack_bytes;return 0;}
@@ -146,7 +147,7 @@ int pthread_create(pthread_t *out,const pthread_attr_t *a,void *(*start)(void *)
  if(!out||!start||(a&&a->magic!=ATTR_MAGIC))return EINVAL;
  if(!__atomic_load_n(&active_c_threads,__ATOMIC_ACQUIRE)||__chos_libc_tls()->process_exiting)return EAGAIN;
  if(a&&a->detached!=PTHREAD_CREATE_JOINABLE&&a->detached!=PTHREAD_CREATE_DETACHED)return EINVAL;
- size_t bytes=a?a->stack_bytes:32768;if(bytes<PTHREAD_STACK_MIN||bytes>CHOS_THREAD_STACK_MAX||(bytes&4095u))return EINVAL;
+ size_t bytes=a?a->stack_bytes:chos_native_worker_stack_bytes();if(bytes<PTHREAD_STACK_MIN||bytes>CHOS_THREAD_STACK_MAX||(bytes&4095u))return EINVAL;
  uint64_t fpcr,fpsr;__chos_pthread_get_fp(&fpcr,&fpsr);
  (void)__chos_libc_tls();chos_libc_tcb_t *t=calloc(1,sizeof(*t));if(!t)return ENOMEM;
  long base=chos_map_memory(bytes);if(base<0){free(t);return (int)-base;}

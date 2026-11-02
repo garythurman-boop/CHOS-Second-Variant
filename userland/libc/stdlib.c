@@ -4,9 +4,11 @@
 #include "chos/libc.h"
 #include "chos/user.h"
 #include "chos/tls_runtime.h"
+#include "chos/resource_profile_user.h"
 _Static_assert(_Alignof(max_align_t)<=CHOS_HEAP_ALIGNMENT,"malloc must meet target max alignment");
 
 static chos_heap_t process_heap;
+static chos_heap_region_t engine_heap_regions[CHOS_RESOURCE_ENGINE_REGIONS];
 static unsigned initialized;
 static pthread_mutex_t heap_lock=PTHREAD_MUTEX_INITIALIZER;
 static void *map_pages(void *context,size_t bytes){
@@ -16,7 +18,13 @@ static int unmap_pages(void *context,void *base,size_t bytes){
     (void)context;return chos_unmap_memory(base,bytes)<0?-1:0;
 }
 static chos_heap_t *heap(void){
-    if(!initialized){chos_heap_init(&process_heap,map_pages,unmap_pages,0);initialized=1;}
+    if(!initialized){
+        if(chos_native_resource_profile()==CHOS_RESOURCE_ENGINE)
+            (void)chos_heap_init_external(&process_heap,map_pages,unmap_pages,0,
+                                         engine_heap_regions,CHOS_RESOURCE_ENGINE_REGIONS);
+        else chos_heap_init(&process_heap,map_pages,unmap_pages,0);
+        initialized=1;
+    }
     return &process_heap;
 }
 static void *allocation_result(void *p){if(!p)errno=process_heap.error;return p;}

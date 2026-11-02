@@ -3,18 +3,24 @@
 #include "chos/spinlock.h"
 _Static_assert(CHOS_USER_MAP_MAX_BYTES+2u*VMM_PAGE_SIZE<=CHOS_USER_MAP_BYTES,"mapping cap must retain both guards");
 typedef struct {uint64_t first;uint32_t pages,state,pins;} region_t;
-typedef struct {uint32_t generation,id;region_t regions[CHOS_USER_MAP_REGIONS];} map_owner_t;
+typedef struct {uint32_t generation,id,region_limit,releasing,release_busy;
+ uint64_t map_base,map_end;region_t regions[CHOS_RESOURCE_ENGINE_REGIONS];} map_owner_t;
 static map_owner_t owners[CHOS_AS_MAX_SPACES];
 static chos_spinlock_t memory_lock=CHOS_SPINLOCK_INITIALIZER;
-static map_owner_t *owner(address_space_handle_t h){
+static map_owner_t *owner_locked(address_space_handle_t h,int releasing){
  address_space_info_t info;
  if(h.slot>=CHOS_AS_MAX_SPACES || !address_space_get_info(h,&info))return NULL;
  map_owner_t *o=&owners[h.slot];
  if(o->generation!=h.generation||o->id!=h.id){
-  *o=(map_owner_t){.generation=h.generation,.id=h.id};
+  chos_execution_profile_t profile;
+  if(!chos_execution_profile_get(info.resource_profile,&profile))return NULL;
+  *o=(map_owner_t){.generation=h.generation,.id=h.id,.region_limit=profile.map_regions,
+   .map_base=profile.map_base,.map_end=profile.map_base+profile.map_bytes};
  }
+ if(o->releasing&&!releasing)return NULL;
  return o;
 }
+static map_owner_t *owner(address_space_handle_t h){return owner_locked(h,0);}
 static int length_pages(size_t n,uint32_t *pages){
  if(!n||n>CHOS_USER_MAP_MAX_BYTES)return 0;
  *pages=(uint32_t)((n+VMM_PAGE_SIZE-1u)/VMM_PAGE_SIZE);return 1;
@@ -34,13 +40,13 @@ int64_t chos_user_memory_map(address_space_handle_t h,size_t n,unsigned flags){
  uint32_t pages;if(flags||!length_pages(n,&pages))return -CHOS_ERRNO_EINVAL;
  uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);
  if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
- unsigned slot;for(slot=0;slot<CHOS_USER_MAP_REGIONS && o->regions[slot].state;slot++){}
- if(slot==CHOS_USER_MAP_REGIONS){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOMEM;}
- uint64_t candidate=CHOS_USER_MAP_BASE+VMM_PAGE_SIZE,end=CHOS_USER_MAP_BASE+CHOS_USER_MAP_BYTES;
+ unsigned slot;for(slot=0;slot<o->region_limit && o->regions[slot].state;slot++){}
+ if(slot==o->region_limit){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOMEM;}
+ uint64_t candidate=o->map_base+VMM_PAGE_SIZE,end=o->map_end;
  for(;;){
   if(candidate+(uint64_t)(pages+1u)*VMM_PAGE_SIZE>end){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOMEM;}
   int overlap=0;
-  for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+  for(unsigned i=0;i<o->region_limit;i++){
    const region_t *r=&o->regions[i];if(!r->state)continue;
    uint64_t high=r->first+(uint64_t)(r->pages+1u)*VMM_PAGE_SIZE;
    if(candidate-VMM_PAGE_SIZE<high && candidate+(uint64_t)(pages+1u)*VMM_PAGE_SIZE>r->first-VMM_PAGE_SIZE){candidate=high+VMM_PAGE_SIZE;overlap=1;break;}
@@ -63,7 +69,7 @@ int chos_user_memory_unmap(address_space_handle_t h,uint64_t address,size_t n){
  uint32_t pages;if((address&(VMM_PAGE_SIZE-1u))||!length_pages(n,&pages))return -CHOS_ERRNO_EINVAL;
  uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);
  if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
- for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+ for(unsigned i=0;i<o->region_limit;i++){
   region_t *r=&o->regions[i];
   if(r->state==1 && r->first==address && r->pages==pages){
    if(r->pins){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EBUSY;}
@@ -74,17 +80,35 @@ int chos_user_memory_unmap(address_space_handle_t h,uint64_t address,size_t n){
  chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EINVAL;
 }
 int chos_user_memory_release(address_space_handle_t h){
- uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);int ok=1;
- if(o)for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++)if(o->regions[i].state){
-  if(o->regions[i].pins||!remove_pages(h,&o->regions[i],0))ok=0;
+ uint64_t irq=chos_spin_lock_irqsave(&memory_lock);
+ map_owner_t *o=owner_locked(h,1);address_space_info_t info;
+ if(!o||o->release_busy||!address_space_get_info(h,&info)||info.task_references){
+  chos_spin_unlock_irqrestore(&memory_lock,irq);return 0;
  }
- chos_spin_unlock_irqrestore(&memory_lock,irq);return ok;
+ for(unsigned i=0;i<o->region_limit;i++)if(o->regions[i].state&&o->regions[i].pins){
+  chos_spin_unlock_irqrestore(&memory_lock,irq);return 0;
+ }
+ /* Pin the quiescent AS across the unlocked unmap loop. Its slot/generation
+  * cannot be destroyed/reused while region metadata is being disposed. */
+ if(address_space_task_retain(h)!=AS_OK){chos_spin_unlock_irqrestore(&memory_lock,irq);return 0;}
+ o->releasing=o->release_busy=1;
+ unsigned limit=o->region_limit;
+ chos_spin_unlock_irqrestore(&memory_lock,irq);
+ int ok=1;
+ for(unsigned i=0;i<limit;i++)if(o->regions[i].state&&!remove_pages(h,&o->regions[i],0))ok=0;
+ irq=chos_spin_lock_irqsave(&memory_lock);
+ o->release_busy=0;
+ /* Releasing stays set: ordinary operations cannot reopen this terminal owner.
+  * A failed unmap may be retried by the reaper, with the same owned AS handle. */
+ chos_spin_unlock_irqrestore(&memory_lock,irq);
+ if(address_space_task_release(h)!=AS_OK)return 0;
+ return ok;
 }
 
 static int pin_change(address_space_handle_t h,uint64_t base,size_t bytes,int add){
  if(!bytes||(bytes&4095u)||(base&4095u))return 0;
  uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);int ok=0;
- if(o)for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+ if(o)for(unsigned i=0;i<o->region_limit;i++){
   region_t *r=&o->regions[i];
   if(r->state==1&&r->first==base&&(uint64_t)r->pages*4096u==bytes){
    if(add&&!r->pins){r->pins=1;ok=1;}
@@ -101,7 +125,7 @@ int chos_user_memory_retire_stack(address_space_handle_t h,uint64_t base,size_t 
  if((base&4095u)||(bytes&4095u)||!length_pages(bytes,&pages))return -CHOS_ERRNO_EINVAL;
  uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);
  if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
- for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+ for(unsigned i=0;i<o->region_limit;i++){
   region_t *r=&o->regions[i];
   if(r->state!=1||r->first!=base||r->pages!=pages||r->pins!=1)continue;
   /* The pin has never been relinquished. No other thread can unmap/remap this
@@ -122,7 +146,7 @@ int chos_user_memory_retire_stack(address_space_handle_t h,uint64_t base,size_t 
 static region_t *containing_region(map_owner_t *o,uint64_t address,uint32_t pages){
  if(!o || address>UINT64_MAX-(uint64_t)pages*VMM_PAGE_SIZE)return NULL;
  uint64_t end=address+(uint64_t)pages*VMM_PAGE_SIZE;
- for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++){
+ for(unsigned i=0;i<o->region_limit;i++){
   region_t *r=&o->regions[i];
   if(r->state==1 && address>=r->first && end<=r->first+(uint64_t)r->pages*VMM_PAGE_SIZE)return r;
  }
@@ -162,7 +186,7 @@ int chos_user_memory_unmap_range(address_space_handle_t h,uint64_t address,size_
  uint32_t left=(uint32_t)((address-r->first)/VMM_PAGE_SIZE),right=r->pages-left-pages;
  region_t *tail=NULL;
  if(left&&right){
-  for(unsigned i=0;i<CHOS_USER_MAP_REGIONS;i++)if(!o->regions[i].state){tail=&o->regions[i];break;}
+  for(unsigned i=0;i<o->region_limit;i++)if(!o->regions[i].state){tail=&o->regions[i];break;}
   if(!tail){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOMEM;}
  }
  /* Preflight and reserve metadata before modifying any page. On an unexpected

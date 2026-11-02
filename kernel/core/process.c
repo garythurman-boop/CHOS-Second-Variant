@@ -30,6 +30,8 @@
 #define PROCESS_NAME_DEFAULT "process"
 _Static_assert((CHOS_ELF_MAX_SPAN % PROCESS_PAGE_SIZE)==0u,"Native span must be page aligned");
 _Static_assert(PROCESS_CODE_VA+CHOS_ELF_MAX_SPAN<CHOS_USER_MAP_BASE,"Native images must not overlap anonymous memory");
+_Static_assert(CHOS_RESOURCE_ENGINE_STACK_PAGES<=32u,"Root stack must fit the32-bit page mask");
+_Static_assert(PROCESS_CODE_VA+CHOS_RESOURCE_ENGINE_IMAGE_SPAN<CHOS_RESOURCE_ENGINE_MAP_BASE,"Engine image and anonymous window must not overlap");
 _Static_assert(CHOS_PROCESS_IMAGE_PAGES>=CHOS_EXEC_MAX_IMAGE_PAGES,"CHCX images must fit the mapping ledger");
 
 typedef struct {
@@ -51,6 +53,7 @@ typedef struct {
     process_file_handle_t open_files[CHOS_PROCESS_MAX_OPEN_FILES];
     uint64_t code_mapped_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
     uint64_t image_inaccessible_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
+    uint32_t resource_profile;
     uint32_t stack_mapped_mask;
     uint32_t sequence;
     uint64_t stack_base_va;
@@ -58,6 +61,8 @@ typedef struct {
     uint64_t argument_count;
     uint64_t argv_address;
     int address_space_live;
+    int cleanup_busy;
+    int execution_busy;
 } process_slot_t;
 
 static process_slot_t process_slots[CHOS_PROCESS_MAX];
@@ -146,7 +151,8 @@ static void copy_name(char destination[CHOS_PROCESS_NAME_CAPACITY], const char *
 }
 
 static int state_reusable(const process_slot_t *slot) {
-    if (slot == NULL || slot->address_space_live || slot->info.cleanup_pending) return 0;
+    if (slot == NULL || slot->address_space_live || slot->info.cleanup_pending ||
+        slot->cleanup_busy || slot->execution_busy) return 0;
     return slot->info.state == CHOS_PROCESS_EMPTY ||
            slot->info.state == CHOS_PROCESS_EXITED ||
            slot->info.state == CHOS_PROCESS_FAILED;
@@ -156,7 +162,8 @@ static size_t choose_slot_locked(void) {
     size_t i, chosen = CHOS_PROCESS_MAX;
     uint32_t oldest_sequence = UINT32_MAX;
     for (i = 0u; i < CHOS_PROCESS_MAX; ++i) {
-        if (process_slots[i].info.state == CHOS_PROCESS_EMPTY) return i;
+        if (process_slots[i].info.state == CHOS_PROCESS_EMPTY && !process_slots[i].cleanup_busy &&
+            !process_slots[i].execution_busy) return i;
         if (state_reusable(&process_slots[i]) && process_slots[i].sequence <= oldest_sequence) {
             oldest_sequence = process_slots[i].sequence;
             chosen = i;
@@ -175,7 +182,7 @@ static void close_all_process_files(process_slot_t *slot) {
     }
 }
 
-static int reap_slot(size_t index) {
+static int reap_slot_owned(size_t index) {
     process_slot_t *slot;
     size_t i;
     if (index >= CHOS_PROCESS_MAX) return 0;
@@ -227,6 +234,24 @@ static int reap_slot(size_t index) {
     }
     slot->info.cleanup_pending = 1;
     return 0;
+}
+
+static int reap_slot(size_t index) {
+    if(index>=CHOS_PROCESS_MAX)return 0;
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    if(process_slots[index].cleanup_busy){chos_spin_unlock_irqrestore(&process_lock,flags);return 0;}
+    process_slots[index].cleanup_busy=1;
+    chos_spin_unlock_irqrestore(&process_lock,flags);
+    int result=reap_slot_owned(index);
+    flags=chos_spin_lock_irqsave(&process_lock);
+    process_slots[index].cleanup_busy=0;
+    chos_spin_unlock_irqrestore(&process_lock,flags);
+    return result;
+}
+static void release_execution_slot(size_t index) {
+    uint64_t flags=chos_spin_lock_irqsave(&process_lock);
+    process_slots[index].execution_busy=0;
+    chos_spin_unlock_irqrestore(&process_lock,flags);
 }
 
 void process_reap_pending(void) {
@@ -288,6 +313,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
     }
     zero_bytes(&process_slots[index], sizeof(process_slots[index]));
     slot = &process_slots[index];
+    slot->resource_profile = image.version==CHOS_EXEC_VERSION_ELF ? image.elf.resource_profile : CHOS_RESOURCE_LEGACY;
     slot->allowed_syscalls=CHOS_PROCESS_CAP_ALL;
     slot->info.state = CHOS_PROCESS_LOADING;
     slot->info.exit_status = -1;
@@ -315,7 +341,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
         return fail_and_cleanup(index, PROCESS_ERR_FORMAT);
 
     pmm_get_stats(before_out);
-    if (address_space_create(&slot->space) != AS_OK)
+    if (address_space_create_profile(slot->resource_profile, &slot->space) != AS_OK)
         return fail_and_cleanup(index, PROCESS_ERR_ADDRESS_SPACE);
     slot->address_space_live = 1;
     slot->info.address_space_id = slot->space.id;
@@ -463,6 +489,9 @@ chos_process_error_t process_run_image(const char *name, const void *file_bytes,
     error = process_load_image(name, file_bytes, file_size, NULL, 0u, &index, &before);
     if (error != PROCESS_OK) return error;
     slot = &process_slots[index];
+    irq_flags=chos_spin_lock_irqsave(&process_lock);
+    slot->execution_busy=1;
+    chos_spin_unlock_irqrestore(&process_lock,irq_flags);
     process_mark_running(index);
     irq_flags = chos_spin_lock_irqsave(&process_lock);
     foreground_process_slot = index;
@@ -481,7 +510,9 @@ chos_process_error_t process_run_image(const char *name, const void *file_bytes,
         result->pid = slot->info.pid;
         result->exit_status = exit_status;
         result->completed = 1;
-        return fail_and_cleanup(index, PROCESS_ERR_EXECUTION);
+        error=fail_and_cleanup(index, PROCESS_ERR_EXECUTION);
+        release_execution_slot(index);
+        return error;
     }
 
     irq_flags = chos_spin_lock_irqsave(&process_lock);
@@ -494,6 +525,7 @@ chos_process_error_t process_run_image(const char *name, const void *file_bytes,
         slot->info.state = CHOS_PROCESS_FAILED;
         slot->info.cleanup_pending = 1;
         record_process_failure();
+        release_execution_slot(index);
         return PROCESS_ERR_CLEANUP;
     }
     pmm_get_stats(&after);
@@ -504,8 +536,10 @@ chos_process_error_t process_run_image(const char *name, const void *file_bytes,
         slot->info.state = CHOS_PROCESS_FAILED;
         slot->info.exit_status = exit_status;
         record_process_failure();
+        release_execution_slot(index);
         return PROCESS_ERR_CLEANUP;
     }
+    release_execution_slot(index);
     return PROCESS_OK;
 }
 
@@ -697,8 +731,10 @@ int process_main_stack_bounds(address_space_handle_t space,uint64_t *base,uint64
  int rc=-CHOS_ERRNO_ESRCH;
  if(index<CHOS_PROCESS_MAX){
   process_slot_t *slot=&process_slots[index];uint32_t pages=slot->info.stack_pages;
-  if(slot->info.state==CHOS_PROCESS_RUNNING&&pages&&pages<=CHOS_EXEC_MAX_STACK_PAGES&&
-     slot->stack_mapped_mask==((UINT32_C(1)<<pages)-1u)){
+  chos_execution_profile_t profile;
+  if(chos_execution_profile_get(slot->resource_profile,&profile)&&
+     slot->info.state==CHOS_PROCESS_RUNNING&&pages&&pages<=profile.root_stack_pages&&pages<=32u&&
+     slot->stack_mapped_mask==chos_execution_stack_mask(pages)){
    *base=slot->stack_base_va;*bytes=(uint64_t)pages*PROCESS_PAGE_SIZE;rc=0;
   }
  }

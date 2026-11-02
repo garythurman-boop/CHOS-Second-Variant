@@ -1,5 +1,10 @@
 # Kernel engine-frame admission and incremental teardown
 
+This records the kernel-only checkpoint. The later
+[executable profile](NATIVE_ENGINE_EXECUTION_PROFILE.md) now integrates these
+budgets with the loader, anonymous memory and native runtime. Statements below
+about the absence of an application profile describe this earlier checkpoint.
+
 The kernel now has a distinct engine frame profile with 49,152 owned pages
 (192 MiB). Its ownership index has 131,072 buckets, separate from the four legacy
 address-space tables. Exactly one engine space may hold this pool at a time.

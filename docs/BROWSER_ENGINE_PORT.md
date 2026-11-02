@@ -1,5 +1,11 @@
 # Modern browser engine port decision
 
+Current checkpoint: the [explicit engine execution profile](NATIVE_ENGINE_EXECUTION_PROFILE.md)
+passes large-image resource tests. The full original-ICU JavaScriptCore VM links
+without unresolved symbols and passes actual kernel loader policy, but has not
+yet executed. Earlier dependency descriptions below are historical snapshots;
+they do not override the current results or establish a complete browser.
+
 This assessment implements the research/architecture portion of the revised Stage
 3 request. It does not claim an integrated engine, JavaScript execution or modern
 web rendering. The existing HTTP preview remains separate recovery functionality.

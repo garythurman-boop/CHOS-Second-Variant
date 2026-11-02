@@ -1,5 +1,10 @@
 # Revised Stage 3: internet platform architecture
 
+The latest [engine execution profile](NATIVE_ENGINE_EXECUTION_PROFILE.md) adds
+explicit image/heap/stack admission and large-application QEMU evidence. The full
+original-ICU JavaScriptCore VM links and passes loader policy; execution and modern
+browser integration remain open. Earlier limits below record earlier checkpoints.
+
 The user-provided [revised specification](STAGE3_REVISED_PROMPT.md) supersedes the
 Stage 3 section of the earlier Word document. Full modern web rendering and real
 wireless support remain completion requirements. This document does not certify

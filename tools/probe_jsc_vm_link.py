@@ -8,7 +8,7 @@ import argparse,hashlib,json,pathlib,re,shutil,subprocess,time
 root=pathlib.Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__)
 for n in ('source','native-sdk','engine-build','out'):p.add_argument('--'+n,type=pathlib.Path,required=True)
-p.add_argument('--cmake',default='cmake');p.add_argument('--ninja',default='ninja');o=p.parse_args()
+p.add_argument('--cmake',default='cmake');p.add_argument('--ninja',default='ninja');p.add_argument('--application-profile',choices=['legacy','engine'],default='legacy');o=p.parse_args()
 source=o.source.resolve();sdk=o.native_sdk.resolve();engine=o.engine_build.resolve();out=o.out.resolve()
 m=json.loads((root/'docs/dependencies/webkit-jsc-bringup.json').read_text())
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -25,12 +25,22 @@ system=systems[0].read_text();assert 'set(CMAKE_SYSTEM_NAME "CHOS")' in system a
 assert 'CHOS_SDK_ROOT:UNINITIALIZED='+str(sdk) in cache and 'CHOS_WTF_PLATFORM_DIR:UNINITIALIZED='+str(root/'ports/webkit/chos') in cache
 for n,v in [('ENABLE_JIT','OFF'),('ENABLE_DFG_JIT','OFF'),('ENABLE_FTL_JIT','OFF'),('ENABLE_SAMPLING_PROFILER','OFF'),('ENABLE_WEBASSEMBLY','ON'),('USE_SYSTEM_MALLOC','ON')]:assert n+':BOOL='+v in cache
 ninja=pathlib.Path(shutil.which(o.ninja)).resolve();out.mkdir(parents=True,exist_ok=False)
-commands=[];started=time.monotonic();objects=[];code=0;phase='engine-build';sections=[]
+commands=[];started=time.monotonic();objects=[];archive_members=[];code=0;phase='engine-build';sections=[]
 def run(command,log):
  commands.append(command)
  with (out/log).open('wb') as f:return subprocess.run(command,stdout=f,stderr=subprocess.STDOUT).returncode
 code=run([o.cmake,'--build',str(engine),'--target','JavaScriptCore','JavaScriptCoreJIT','-j2'],'engine-build.log')
 if not code:
+ # Thin archives contain paths rather than object bytes. Hash every referenced
+ # member before linking, then verify it again after the linker finishes.
+ for name,count in [('libJavaScriptCore.a',141),('libWTF.a',173),('libbmalloc.a',168)]:
+  archive=engine/'lib'/name
+  members=subprocess.check_output([str(sdk/'bin/llvm-ar'),'t',str(archive)],text=True).splitlines() if (sdk/'bin/llvm-ar').exists() else subprocess.check_output(['llvm-ar','t',str(archive)],text=True).splitlines()
+  assert len(members)==count and len(set(members))==count
+  for member in members:
+   path=(archive.parent/member).resolve()
+   assert path.is_file() and path.is_relative_to(engine)
+   archive_members.append({'archive':name,'path':str(path.relative_to(engine)),'bytes':path.stat().st_size,'sha256':sha(path)})
  def inputs(target,label):
   result=subprocess.check_output([str(ninja),'-C',str(engine),'-t','query',target],text=True);(out/label).write_text(result)
   lines=result.split('  input:',1)[1].split('  outputs:',1)[0].splitlines()[1:]
@@ -45,9 +55,22 @@ if not code:
   objects.append({'path':str(path.relative_to(engine)),'bytes':path.stat().st_size,'sha256':sha(path)})
  (out/'link-objects.cmake').write_text('set(JSC_LINK_OBJECTS\n'+''.join('  "'+str(engine/v['path'])+'"\n' for v in objects)+')\n')
  phase='configure'
- code=run([o.cmake,'-S',str(root/'tests/jsc_vm_probe'),'-B',str(out/'cmake'),'-G','Ninja','-DCMAKE_MAKE_PROGRAM='+str(ninja),'-DCMAKE_TOOLCHAIN_FILE='+str(root/'ports/native/chos-toolchain.cmake'),'-DCHOS_SDK_ROOT='+str(sdk),'-DENGINE_BUILD='+str(engine),'-DJSC_LINK_OBJECTS_FILE='+str(out/'link-objects.cmake'),'-DCMAKE_BUILD_TYPE=Release'],'configure.log')
+ code=run([o.cmake,'-S',str(root/'tests/jsc_vm_probe'),'-B',str(out/'cmake'),'-G','Ninja','-DCMAKE_MAKE_PROGRAM='+str(ninja),'-DCMAKE_TOOLCHAIN_FILE='+str(root/'ports/native/chos-toolchain.cmake'),'-DCHOS_SDK_ROOT='+str(sdk),'-DCHOS_APPLICATION_PROFILE='+o.application_profile,'-DENGINE_BUILD='+str(engine),'-DJSC_LINK_OBJECTS_FILE='+str(out/'link-objects.cmake'),'-DCMAKE_BUILD_TYPE=Release'],'configure.log')
  if not code:
   phase='link';code=run([o.cmake,'--build',str(out/'cmake'),'-j2'],'link.log')
+loader_policy=None
+for member in archive_members:
+ path=engine/member['path']
+ assert path.stat().st_size==member['bytes'] and sha(path)==member['sha256']
+for member in objects:
+ path=engine/member['path']
+ assert path.stat().st_size==member['bytes'] and sha(path)==member['sha256']
+if not code and o.application_profile=='engine':
+ phase='loader-policy'
+ code=run(['cc','-std=c11','-O2','-Wall','-Wextra','-Werror','-I'+str(root/'include'),str(root/'tools/validate_native_elf.c'),str(root/'kernel/core/elf_image.c'),str(root/'kernel/core/process_format.c'),'-o',str(out/'validate-native-elf')],'loader-policy-build.log')
+ if not code:
+  code=run([str(out/'validate-native-elf'),str(out/'cmake/jsc_vm_probe'),'1'],'loader-policy.json')
+  if not code:loader_policy=json.loads((out/'loader-policy.json').read_text())
 log=(out/'link.log').read_text() if (out/'link.log').exists() else ''
 mapfile=out/'cmake/jsc_vm_probe.map'
 if mapfile.exists():
@@ -66,4 +89,9 @@ if mapfile.exists():
   sections.append({'name':fields[4],'address':address,'bytes':size})
 span=max((v['address']+v['bytes']-0x20000000 for v in sections),default=None)
 report={'status':'LINKED_NOT_EXECUTED' if not code else phase.upper()+'_FAILED','returncode':code,'stage3_complete':False,'VM_executed':False,'JavaScript_executed':False,'Intl_executed':False,'runtime_admitted':False,'upstream_commit':m['commit'],'patch_sha256':m['patch_sha256'],'native_port_files_sha256':m['native_port_files_sha256'],'sdk_manifest_sha256':sha(sdk/'chos-sdk.json'),'configuration_sha256':sha(engine/'cmakeconfig.h'),'commands':commands,'seconds':time.monotonic()-started,'object_subtarget':'JavaScriptCoreJIT (includes bytecode/interpreter;JIT stays OFF)','original_subtarget_objects':objects,'libraries':{n:{'sha256':sha(d/n),'bytes':(d/n).stat().st_size} for d,n in [(engine/'lib','libJavaScriptCore.a'),(engine/'lib','libWTF.a'),(engine/'lib','libbmalloc.a'),(sdk/'lib','libicui18n.a'),(sdk/'lib','libicuuc.a'),(sdk/'lib','libicudata.a')]},'undefined_symbols':list(dict.fromkeys(re.findall(r'ld.lld: error: undefined symbol: (.+)',log))),'bounded_image_rejected':'Native application exceeds bounded4MiB arena' in log,'proposed_image_sections':sections,'proposed_image_span_bytes':span,'limits':['diagnostic link only;no engine output executed,published or admitted','original4MiB arena/linker assertion and native resource limits retained;no ignored symbols or bootstrap ICU substituted','full original CAPI VM creation,JavaScript/JSON,Intl and GC calls are linked;not evidence they execute','static framework consumers also require original separate object subtarget even with JIT/DFG/FTL OFF','foreign GC coordination,admitted resource profile,WebCore/browser,WiFi/security/platform gates remain open']}
+report['application_profile']=o.application_profile
+report['engine_archive_members']=archive_members
+report['loader_policy']=loader_policy
+if o.application_profile=='engine':
+ report['limits']=['Explicit64MiB engine ELF link;actual kernel file/span/profile policy checked;physical runtime admission and packaging not attempted','No VM/JavaScript/Intl/GC/WebAssembly or WebCore/browser execution is claimed','JIT/DFG/FTL/sampling remainOFF;checked Wasm remainsON;full original ICU and actual53object subtarget retained','Anonymous map size,threads,real engine runtime,modern browser,WiFi/security/platform gates remain open']
 (out/'result.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({k:report[k] for k in ['status','returncode','undefined_symbols','bounded_image_rejected','proposed_image_span_bytes']},indent=2));raise SystemExit(code)

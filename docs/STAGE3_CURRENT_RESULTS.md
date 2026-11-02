@@ -1,18 +1,19 @@
 # Revised Stage 3 current evidence
 
-Stage3 remains incomplete. The latest runtime work provides real managed
-detached-thread cleanup; the actual native JSC static archive builds, and
-selected JSC/WTF components execute, including actual WTF-created worker lifecycles.
-A JavaScript VM and modern browser do not
-yet run. Earlier milestone descriptions below retain their historical scope;
+Stage3 remains incomplete. The latest runtime work admits an explicit native
+engine resource profile and executes a real 48 MiB application fixture. The
+full JavaScriptCore VM now links with original ICU data and passes the kernel
+loader policy; it has not yet executed. Selected JSC/WTF components execute,
+including actual workers and foreign-thread GC coordination. A modern browser
+does not yet run. Earlier milestone descriptions below retain their historical scope;
 later results supersede earlier dependency diagnoses.
 
 | Requirement | Current boundary |
 |---|---|
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
-| Native runtime | Owned EL0 memory/I/O, ICU and bounded C/C++ threads including detach; actual WTF worker/foreign-pause components work; full VM/GC execution and engine-sized resources remain open |
-| Modern browser | WPE/WebKit selected; JSC archive and selected components build/run; full VM, JavaScript, WebCore rendering and browser features remain open |
+| Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads and foreign pause; explicit engine image/heap/stack profile runs in QEMU; full VM/GC execution remains open |
+| Modern browser | WPE/WebKit selected; full original-ICU JSC VM links and passes loader policy; VM execution, JavaScript, WebCore rendering and browser features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
 | Release | Development0.30.0;0.50.0 requires all revised gates |
@@ -21,6 +22,10 @@ Current publication policy: the user now authorizes interim binaries for critica
 verified milestones suitable for Fusion testing. This supersedes historical hold
 statements below. Version 0.50.0 still requires full Stage 3 acceptance.
 See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
+
+See [native engine execution profile](NATIVE_ENGINE_EXECUTION_PROFILE.md) for
+the current resource contract, actual large-image qualification and full VM
+link boundary. No new browser or hardware support is inferred from that link.
 
 The complete linked WTF filesystem source checkpoint is `e438245`. Native writable working-copy
 handles, shared buffer quotas and conditional commits are qualified in
