@@ -471,3 +471,8 @@ The [original VM math runtime](NATIVE_VM_MATH.md) adds checked signed128 multipl
 and native binary128 sqrt/hypot with independent vector qualification. The full
 VM link resolves those math imports, but foreign GC and engine-sized admission
 still prevent VM/JavaScript/browser execution. This remains development0.30.0.
+
+The [native foreign-pause/WTF coordination component](NATIVE_FOREIGN_GC.md) now
+supersedes earlier missing-foreign-method diagnoses: the full VM link has no
+undefined symbols. Its image remains unadmitted; full VM/GC/browser execution and
+the remaining revised Stage3 gates are still open.

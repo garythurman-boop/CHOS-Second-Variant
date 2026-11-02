@@ -82,7 +82,10 @@
 #define CHOS_SYS_DIRECTORY_PAGE 77u /* x0=directory path,x1=in/out640B page,x2=exact size; LIST_DIR20 */
 #define CHOS_SYS_IMAGE_PROTECT 78u /* x0=own image data base,x1=bytes,x2=READ1/NONE0; MAP35 */
 #define CHOS_SYS_THREAD_DETACH 79u /* x0=own managed TID,x1=x2=0; REAP58; automatic owned-stack disposal */
-#define CHOS_SYSCALL_LIMIT CHOS_SYS_THREAD_DETACH
+#define CHOS_SYS_THREAD_SUSPEND 80u
+#define CHOS_SYS_THREAD_PAUSED_CONTEXT 81u
+#define CHOS_SYS_THREAD_RESUME 82u
+#define CHOS_SYSCALL_LIMIT CHOS_SYS_THREAD_RESUME
 #define CHOS_STATUS_LOADING 1u
 #define CHOS_STATUS_QUEUED  2u
 #define CHOS_STATUS_RUNNING 3u

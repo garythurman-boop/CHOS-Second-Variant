@@ -5,6 +5,9 @@
 #include "chos/file_metadata_api.h"
 #include "chos/directory_api.h"
 int main(void){
+ assert(chos_process_syscall_capability(CHOS_SYS_THREAD_SUSPEND)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_REAP));
+ assert(chos_process_syscall_capability(CHOS_SYS_THREAD_RESUME)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_REAP));
+ assert(chos_process_syscall_capability(CHOS_SYS_THREAD_PAUSED_CONTEXT)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_INFO));
  assert(CHOS_SYS_THREAD_DETACH==79&&chos_process_syscall_capability(79)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_REAP));
  assert(CHOS_SYS_IMAGE_PROTECT==78&&chos_process_syscall_capability(78)==CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY));
  assert(CHOS_SYS_DIRECTORY_PAGE==77&&sizeof(chos_directory_page_t)==640&&chos_process_syscall_capability(77)==CHOS_PROCESS_CAP(CHOS_SYS_LIST_DIR));
@@ -21,7 +24,7 @@ int main(void){
  assert(chos_process_syscall_capability(64)==CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY));
  assert(chos_process_syscall_capability(65)==CHOS_PROCESS_CAP(CHOS_SYS_UNMAP_MEMORY));
  assert((int64_t)CHOS_PROCESS_CAP_ALL>0);
- assert(CHOS_SYS_SEEK==63&&CHOS_SYSCALL_LIMIT==79);
+ assert(CHOS_SYS_SEEK==63&&CHOS_SYSCALL_LIMIT==82);
  assert(chos_process_syscall_capability(CHOS_SYS_SEEK)==CHOS_PROCESS_CAP(CHOS_SYS_READ));
  assert(CHOS_PROCESS_CAP_SEEK==CHOS_PROCESS_CAP(CHOS_SYS_READ));
  assert(!chos_process_syscall_capability(0)&&!chos_process_syscall_capability(CHOS_SYSCALL_LIMIT+1u)&&!chos_process_syscall_capability(UINT32_MAX));

@@ -11,7 +11,7 @@ later results supersede earlier dependency diagnoses.
 |---|---|
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
-| Native runtime | Owned EL0 memory/I/O, ICU and bounded C/C++ threads including detach; actual WTF worker lifecycle is qualified; foreign GC and engine-sized resources remain open |
+| Native runtime | Owned EL0 memory/I/O, ICU and bounded C/C++ threads including detach; actual WTF worker/foreign-pause components work; full VM/GC execution and engine-sized resources remain open |
 | Modern browser | WPE/WebKit selected; JSC archive and selected components build/run; full VM, JavaScript, WebCore rendering and browser features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
@@ -699,3 +699,14 @@ foreign-thread GC methods and50,663,424-byte unadmitted image still prevent VM
 execution. See [math scope and qualification](NATIVE_VM_MATH.md). Full Stage3,
 JavaScript/WebAssembly, browser, native Wi-Fi, security and platform gates remain
 open; development remains0.30.0.
+
+### Real foreign-thread GC coordination
+
+Native pause/snapshot/resume now freezes actual same-process user contexts while
+preserving wait/wake state, ownership and cleanup. The pinned WTF adapter uses
+stable native IDs and real full-register snapshots; initial direct/UEFI raw and
+WTF components pass. The complete VM link now has zero unresolved symbols, but
+its50,663,424-byte image is still rejected under unchanged admission limits. See
+[the exact scope and qualification](NATIVE_FOREIGN_GC.md). No VM/JavaScript,
+full conservative collection, WebCore/browser or Stage3/version0.50.0 completion
+is claimed.

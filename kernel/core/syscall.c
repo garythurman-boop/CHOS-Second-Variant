@@ -522,6 +522,7 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
             case CHOS_SYS_THREAD_SELF:
                 frame->x[0]=(uint64_t)chos_thread_self(fault_space);return frame;
             case CHOS_SYS_THREAD_EXIT:
+                chos_thread_pause_owner_exit(fault_space);
                 if(!chos_thread_is_secondary(fault_space)){
                     int rc=chos_threads_main_exit(fault_space);if(rc<0){frame->x[0]=(uint64_t)(int64_t)rc;return frame;}
                 }
@@ -529,6 +530,17 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
             case CHOS_SYS_THREAD_REAP:
                 if(frame->x[0]>UINT32_MAX){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 frame->x[0]=(uint64_t)(int64_t)chos_thread_reap(fault_space,(uint32_t)frame->x[0]);return frame;
+            case CHOS_SYS_THREAD_SUSPEND:
+            case CHOS_SYS_THREAD_RESUME:
+                if(!frame->x[0]||frame->x[0]>UINT32_MAX||frame->x[1]||frame->x[2]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                frame->x[0]=(uint64_t)(int64_t)chos_thread_pause(fault_space,(uint32_t)frame->x[0],number==CHOS_SYS_THREAD_SUSPEND?0:2,NULL);return frame;
+            case CHOS_SYS_THREAD_PAUSED_CONTEXT: {
+                chos_thread_context_t context;
+                if(!frame->x[0]||frame->x[0]>UINT32_MAX||frame->x[2]!=sizeof(context)){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[1],sizeof(context))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                int rc=chos_thread_pause(fault_space,(uint32_t)frame->x[0],1,&context);
+                frame->x[0]=rc?(uint64_t)(int64_t)rc:(address_space_copy_to_user(fault_space,frame->x[1],&context,sizeof(context))?0u:neg_errno(CHOS_ERRNO_EFAULT));return frame;
+            }
             case CHOS_SYS_THREAD_DETACH:
                 if(frame->x[0]>UINT32_MAX||frame->x[1]||frame->x[2]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 frame->x[0]=(uint64_t)(int64_t)chos_thread_detach(fault_space,(uint32_t)frame->x[0]);return frame;
@@ -1356,7 +1368,9 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
  * separately handles interruptions and dispatches while a syscall blocks. */
 chos_irq_context_t *exception_lower_sync_dispatch(chos_irq_context_t *frame) {
     scheduler_account_kernel_entry();
+    scheduler_lower_context_enter(frame);
     chos_irq_context_t *result = chos_threads_cancel_return(lower_sync_dispatch_inner(frame));
+    scheduler_lower_context_leave(frame);
     scheduler_account_exception_return(result);
     return result;
 }

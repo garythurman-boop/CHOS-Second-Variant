@@ -57,3 +57,8 @@ math execution does not establish a running JavaScript VM, JavaScript/WebAssembl
 Intl in the full VM or modern browser. Native Pi5 Wi-Fi, production security and
 final Fusion/Pi5/laptop acceptance remain open. Development stays0.30.0; Stage3
 and version0.50.0 remain incomplete.
+
+The [native foreign-pause/WTF coordination component](NATIVE_FOREIGN_GC.md) now
+supersedes earlier missing-foreign-method diagnoses: the full VM link has no
+undefined symbols. Its image remains unadmitted; full VM/GC/browser execution and
+the remaining revised Stage3 gates are still open.

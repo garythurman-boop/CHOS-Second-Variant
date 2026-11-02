@@ -66,3 +66,8 @@ open. Current32KiB default stacks do not satisfy the engine's64KiB GC reserve.
 Native Pi5 Wi-Fi, production security and final independent Fusion/Pi5/laptop
 acceptance remain required. Development stays0.30.0 until all revised Stage3
 gates justify0.50.0; no new distribution binary follows from this component.
+
+The [native foreign-pause/WTF coordination component](NATIVE_FOREIGN_GC.md) now
+supersedes earlier missing-foreign-method diagnoses: the full VM link has no
+undefined symbols. Its image remains unadmitted; full VM/GC/browser execution and
+the remaining revised Stage3 gates are still open.

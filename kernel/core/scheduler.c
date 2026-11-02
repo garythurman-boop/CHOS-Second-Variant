@@ -3,6 +3,7 @@
 #include "chos/scheduler.h"
 #include "chos/timer.h"
 #include "chos/uart.h"
+#include "chos/syscall.h"
 #include "chos/resource_accounting.h"
 
 #define SCHED_CONTEXT_GPR_COUNT 12u
@@ -28,6 +29,7 @@ typedef struct {
     scheduler_task_entry_t entry;
     void *argument;
     chos_irq_context_t *irq_frame;
+    chos_irq_context_t *lower_frame;
     address_space_handle_t address_space;
     int has_address_space;
     uint32_t id;
@@ -46,6 +48,7 @@ static size_t accounting_slot = CHOS_SCHED_NO_INDEX;
 static scheduler_task_state_t task_states[CHOS_SCHED_MAX_TASKS];
 static uint64_t task_wake_ticks[CHOS_SCHED_MAX_TASKS];
 static uint8_t task_reap_pending[CHOS_SCHED_MAX_TASKS];
+static uint8_t task_paused[CHOS_SCHED_MAX_TASKS];
 /* Each slot is one unmapped guard page followed by four mapped stack pages. */
 static uint8_t task_stack_slots[CHOS_SCHED_MAX_TASKS][CHOS_TASK_STACK_SLOT_SIZE]
     __attribute__((aligned(CHOS_TASK_STACK_GUARD_SIZE), section(".bss.task_stacks")));
@@ -206,7 +209,7 @@ static void copy_name(char *destination, const char *source) {
 }
 
 static int choose_next(size_t after, size_t *next) {
-    return scheduler_pick_next(task_states, CHOS_SCHED_MAX_TASKS, after, next);
+    return scheduler_pick_next_unpaused(task_states, task_paused, CHOS_SCHED_MAX_TASKS, after, next);
 }
 
 static void clear_usable_task_stack(size_t slot) {
@@ -295,6 +298,7 @@ static void reap_dead_tasks_locked(void) {
         tasks[slot].entry = NULL;
         tasks[slot].argument = NULL;
         tasks[slot].irq_frame = NULL;
+        tasks[slot].lower_frame = NULL; task_paused[slot] = 0;
         task_wake_ticks[slot] = 0u;
         task_reap_pending[slot] = 0u;
         ++reaped_tasks;
@@ -315,6 +319,7 @@ void scheduler_init(void) {
         tasks[i].entry = NULL;
         tasks[i].argument = NULL;
         tasks[i].irq_frame = NULL;
+        tasks[i].lower_frame = NULL; task_paused[i] = 0;
         tasks[i].address_space = (address_space_handle_t){0u, 0u, 0u};
         tasks[i].has_address_space = 0;
         tasks[i].id = 0u;
@@ -383,6 +388,7 @@ static int scheduler_create_task_internal(const char *name,
     }
 
     task_reap_pending[slot] = 0u;
+    task_paused[slot] = 0; tasks[slot].lower_frame = NULL;
     /* Slot reuse is permitted only from the scheduler/console context. */
     clear_usable_task_stack(slot);
     for (i = 0u; i < SCHED_CONTEXT_GPR_COUNT; ++i) tasks[slot].context.x19_x30[i] = 0u;
@@ -790,7 +796,7 @@ chos_irq_context_t *scheduler_on_timer_irq(chos_irq_context_t *interrupted_conte
             }
         }
         wakeups += due_count;
-        action = scheduler_preemption_plan(task_states, task_wake_ticks,
+        action = scheduler_preemption_plan_unpaused(task_states, task_wake_ticks, task_paused,
                                            CHOS_SCHED_MAX_TASKS, interrupted,
                                            now, &next);
     }
@@ -1017,4 +1023,55 @@ const char *scheduler_state_name(scheduler_task_state_t state) {
         case SCHED_TASK_DEAD: return "dead";
         default: return "invalid";
     }
+}
+
+/* The only borrowed user frame is on the pinned task's own kernel stack. No
+ * saved pointer is accepted from EL0 or retained beyond the lower-EL handler. */
+static int task_frame_valid(size_t slot,const chos_irq_context_t *frame) {
+ uintptr_t p=(uintptr_t)frame,first=(uintptr_t)&task_stack_slots[slot][CHOS_TASK_STACK_GUARD_SIZE];
+ uintptr_t end=(uintptr_t)&task_stack_slots[slot][CHOS_TASK_STACK_SLOT_SIZE];
+ return frame && !(p&15u) && p>=first && p<=end-sizeof(*frame);
+}
+static int task_space_equal(size_t slot,address_space_handle_t h) {
+ address_space_handle_t a=tasks[slot].address_space;
+ return tasks[slot].has_address_space && a.id==h.id && a.slot==h.slot && a.generation==h.generation;
+}
+void scheduler_lower_context_enter(chos_irq_context_t *frame) {
+ uint64_t f=scheduler_critical_enter();size_t slot=current_slot;
+ if(scheduler_running && slot<CHOS_SCHED_MAX_TASKS && tasks[slot].has_address_space &&
+    task_frame_valid(slot,frame) && !(frame->spsr&15u)) tasks[slot].lower_frame=frame;
+ scheduler_critical_leave(f);
+}
+void scheduler_lower_context_leave(chos_irq_context_t *frame) {
+ uint64_t f=scheduler_critical_enter();size_t slot=current_slot;
+ if(slot<CHOS_SCHED_MAX_TASKS && tasks[slot].lower_frame==frame)tasks[slot].lower_frame=NULL;
+ /* This is the exception-return boundary, not an ordinary scheduler call.
+  * Keep IRQs masked until ERET restores the target PSTATE; otherwise a timer
+  * could expose an EL1 return window after the owned user-frame pointer ends. */
+ (void)f;
+}
+int scheduler_pause_user_task(address_space_handle_t h,uint32_t id,chos_irq_context_t *out) {
+ uint64_t f=scheduler_critical_enter();int rc=-CHOS_ERRNO_ESRCH;
+ if(!scheduler_running || !preemption_requested){scheduler_critical_leave(f);return -CHOS_ERRNO_ENOSYS;}
+ for(size_t slot=0;slot<CHOS_SCHED_MAX_TASKS;slot++) {
+  if(tasks[slot].id!=id || task_states[slot]==SCHED_TASK_UNUSED || task_states[slot]==SCHED_TASK_DEAD)continue;
+  if(!task_space_equal(slot,h)){rc=-CHOS_ERRNO_EPERM;break;}
+  if(slot==current_slot){rc=-CHOS_ERRNO_EDEADLK;break;}
+  if(task_paused[slot]){rc=-CHOS_ERRNO_EBUSY;break;}
+  const chos_irq_context_t *frame=tasks[slot].irq_frame;
+  if(!task_frame_valid(slot,frame) || (frame->spsr&15u))frame=tasks[slot].lower_frame;
+  if(!out || !task_frame_valid(slot,frame) || (frame->spsr&15u)){rc=-CHOS_ERRNO_EAGAIN;break;}
+  *out=*frame;task_paused[slot]=1;rc=0;break;
+ }
+ scheduler_critical_leave(f);return rc;
+}
+int scheduler_resume_user_task(address_space_handle_t h,uint32_t id) {
+ uint64_t f=scheduler_critical_enter();int rc=-CHOS_ERRNO_ESRCH;
+ for(size_t slot=0;slot<CHOS_SCHED_MAX_TASKS;slot++) {
+  if(tasks[slot].id!=id || task_states[slot]==SCHED_TASK_UNUSED || task_states[slot]==SCHED_TASK_DEAD)continue;
+  if(!task_space_equal(slot,h)){rc=-CHOS_ERRNO_EPERM;break;}
+  if(!task_paused[slot])rc=-CHOS_ERRNO_EINVAL;
+  else{task_paused[slot]=0;rc=0;}break;
+ }
+ scheduler_critical_leave(f);return rc;
 }

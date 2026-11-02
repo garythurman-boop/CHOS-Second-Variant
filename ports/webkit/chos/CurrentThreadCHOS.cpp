@@ -31,8 +31,8 @@
  */
 
 // Native worker creation and current-thread adoption, using the upstream
-// context handshake and two-pass TLS destruction. Foreign GC suspension needs
-// a separate kernel coordination service and is deliberately not provided here.
+// context handshake and two-pass TLS destruction. Foreign GC uses the actual
+// owned native pause service, not a POSIX signal/context emulation.
 #include "config.h"
 #include <wtf/Threading.h>
 #include <wtf/Locker.h>
@@ -159,4 +159,47 @@ void Thread::yield()
 {
     RELEASE_ASSERT(!chos_yield());
 }
+ThreadIdentifier Thread::currentID()
+{
+    auto id = chos_thread_id();
+    RELEASE_ASSERT(id > 0 && static_cast<uint64_t>(id) <= UINT32_MAX);
+    return static_cast<ThreadIdentifier>(id);
+}
+auto Thread::suspend(const ThreadSuspendLocker&) -> Expected<void, PlatformSuspendError>
+{
+    RELEASE_ASSERT(this != &Thread::currentSingleton() && m_id);
+    long result;
+    // A just-preempted lower-EL entry may not have published its frame yet.
+    // Yield to that actual task; never supply a current-thread/zero substitute.
+    unsigned attempts = 0;
+    do {
+        result = chos_thread_suspend(m_id);
+        if (result != -EAGAIN)
+            break;
+        Thread::yield();
+    } while (++attempts < 64);
+    if (result) {
+        // Upstream skips failed suspensions in its stack marker. Only actual
+        // dead/nonexistent targets may be skipped; live failures abort safely.
+        RELEASE_ASSERT(result == -ESRCH);
+        return makeUnexpected(ESRCH);
+    }
+    ++m_suspendCount;
+    return { };
+}
+void Thread::resume(const ThreadSuspendLocker&)
+{
+    RELEASE_ASSERT(m_suspendCount && m_id);
+    RELEASE_ASSERT(!chos_thread_resume(m_id));
+    --m_suspendCount;
+}
+size_t Thread::getRegisters(const ThreadSuspendLocker&, PlatformRegisters& registers)
+{
+    RELEASE_ASSERT(m_suspendCount && m_id);
+    RELEASE_ASSERT(!chos_thread_paused_context(m_id, &registers));
+    RELEASE_ASSERT(registers.version == CHOS_THREAD_CONTEXT_VERSION && registers.size_bytes == sizeof(registers));
+    RELEASE_ASSERT(registers.tid == m_id && registers.flags == (CHOS_THREAD_CONTEXT_SUSPENDED | CHOS_THREAD_CONTEXT_REGISTERS_VALID | CHOS_THREAD_CONTEXT_STACK_VALID));
+    return sizeof(registers);
+}
+
 }

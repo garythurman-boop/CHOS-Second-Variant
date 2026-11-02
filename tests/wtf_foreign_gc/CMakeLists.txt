@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSWTFForeignGC LANGUAGES CXX ASM)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_executable(wtf_foreign_gc main.cpp ../native_pause/seed.S)
+target_include_directories(wtf_foreign_gc PRIVATE "${ENGINE_BUILD}" "${WEBKIT_SOURCE}/Source/WTF" "${WEBKIT_SOURCE}/Source/bmalloc" "${CMAKE_CURRENT_SOURCE_DIR}/../native_pause")
+target_compile_definitions(wtf_foreign_gc PRIVATE BUILDING_JSCONLY__ BUILDING_WITH_CMAKE=1 HAVE_CONFIG_H=1 BUILDING_WTF=1 NDEBUG=1)
+target_link_libraries(wtf_foreign_gc PRIVATE "${ENGINE_BUILD}/lib/libWTF.a" "${ENGINE_BUILD}/lib/libbmalloc.a" "${CHOS_SDK_ROOT}/lib/libicuuc.a" "${CHOS_SDK_ROOT}/lib/libicustubdata.a")

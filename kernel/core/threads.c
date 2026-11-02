@@ -5,19 +5,25 @@
 #include "chos/syscall.h"
 #include "chos/user_memory.h"
 #include "chos/user_mode.h"
+#include "chos/thread_context.h"
+#include "chos/thread_pause.h"
 #include "chos/vmm.h"
 #define THREAD_SLOTS (CHOS_AS_MAX_SPACES*CHOS_THREAD_MAX_PER_PROCESS)
 enum { FREE=0,PENDING,READY,RUNNING,DONE,FAILED };
+typedef struct {uint32_t depth;chos_thread_context_t context;} paused_t;
 typedef struct {
  address_space_handle_t space;
  uint32_t tid,task_id,state,error;
  chos_thread_request_t request;
  int64_t status;
  int pinned,detached,reported;
+ paused_t paused;
 } thread_t;
 typedef struct {
  address_space_handle_t space;
  uint32_t main_tid,main_task;
+ chos_pause_owner_t pause_owner;
+ paused_t paused;
  int stopping,faulted,main_exited;
  int64_t status;
 } owner_t;
@@ -75,6 +81,64 @@ int chos_thread_current_stack(address_space_handle_t h,uint32_t *id,uint64_t *ba
  /* Keep thread and process locks separate; no borrowed record survives unlock. */
  if(main_thread)rc=process_main_stack_bounds(h,base,bytes);
  if(!rc)*id=(uint32_t)current;return rc;
+}
+
+/* Called with thread lock/IRQs held. The scheduler only masks IRQs and never
+ * takes AS/process/heap locks. Resume preserves real sleep/wake state. */
+static void release_pauses_locked(owner_t *o){
+ if(o->paused.depth){(void)scheduler_resume_user_task(o->space,o->main_task);o->paused=(paused_t){0};}
+ for(unsigned i=0;i<THREAD_SLOTS;i++)if(equal(threads[i].space,o->space)&&threads[i].paused.depth){
+  (void)scheduler_resume_user_task(o->space,threads[i].task_id);threads[i].paused=(paused_t){0};
+ }
+ o->pause_owner=(chos_pause_owner_t){0};
+}
+void chos_thread_pause_owner_exit(address_space_handle_t h){
+ int64_t self=chos_thread_self(h);if(self<0)return;
+ uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,0,0);
+ if(o&&o->pause_owner.controller==(uint32_t)self)release_pauses_locked(o);
+ chos_spin_unlock_irqrestore(&lock,f);
+}
+/* op0 acquires/nests,op1 returns the immutable owned snapshot,op2 resumes.
+ * Main-stack lookup happens before thread lock to preserve process lock order. */
+int chos_thread_pause(address_space_handle_t h,uint32_t id,unsigned op,chos_thread_context_t *out){
+ int64_t self=chos_thread_self(h);if(self<0)return (int)self;
+ if(!id || op>2 || (op==1&&!out))return -CHOS_ERRNO_EINVAL;
+ if(id==(uint32_t)self)return -CHOS_ERRNO_EDEADLK;
+ uint64_t main_base=0,main_bytes=0;
+ (void)process_main_stack_bounds(h,&main_base,&main_bytes);
+ uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,0,0);thread_t *t=find(h,id);
+ int rc=-CHOS_ERRNO_ESRCH;paused_t *p=NULL;uint32_t task=0;uint64_t base=0,bytes=0;
+ if(o&&!o->stopping){
+  if(t&&t->state==RUNNING&&t->pinned){p=&t->paused;task=t->task_id;base=t->request.stack_base;bytes=t->request.stack_bytes;}
+  else if(id==o->main_tid&&!o->main_exited){p=&o->paused;task=o->main_task;base=main_base;bytes=main_bytes;}
+ }
+ if(!p){if(t&&live(t)&&t->state!=RUNNING)rc=-CHOS_ERRNO_EAGAIN;goto done;}
+ if(op==0){
+  rc=chos_pause_can_acquire(&o->pause_owner,(uint32_t)self,p->depth);if(rc)goto done;
+  if(!p->depth){
+   chos_irq_context_t frame;
+   rc=scheduler_pause_user_task(h,task,&frame);
+   /* A selected RUNNING thread owns a live scheduler task. An inconsistent
+    * missing scheduler record is not permission to skip a live GC stack. */
+   if(rc==-CHOS_ERRNO_ESRCH)rc=-CHOS_ERRNO_EIO;
+   if(rc)goto done;
+   if(!chos_thread_context_capture(&frame,id,base,bytes,&p->context)){
+    (void)scheduler_resume_user_task(h,task);rc=-CHOS_ERRNO_EFAULT;goto done;
+   }
+   p->context.flags=CHOS_THREAD_CONTEXT_SUSPENDED|CHOS_THREAD_CONTEXT_REGISTERS_VALID|CHOS_THREAD_CONTEXT_STACK_VALID;
+  }
+  rc=chos_pause_acquire(&o->pause_owner,(uint32_t)self,&p->depth);
+ }else{
+  if(o->pause_owner.controller!=(uint32_t)self){rc=-CHOS_ERRNO_EPERM;goto done;}
+  if(!p->depth){rc=-CHOS_ERRNO_EINVAL;goto done;}
+  if(op==1){*out=p->context;rc=0;}
+  else{
+   rc=p->depth==1?scheduler_resume_user_task(h,task):0;if(rc)goto done;
+   rc=chos_pause_release(&o->pause_owner,(uint32_t)self,&p->depth);
+   if(!p->depth)p->context=(chos_thread_context_t){0};
+  }
+ }
+done:chos_spin_unlock_irqrestore(&lock,f);return rc;
 }
 
 int chos_threads_main_exit(address_space_handle_t h){
@@ -158,7 +222,7 @@ void chos_threads_stop(address_space_handle_t h,int64_t status,int faulted){
  uint64_t f=chos_spin_lock_irqsave(&lock);owner_t *o=owner(h,0,0);
  if(o){
   if(!o->stopping||(faulted&&!o->faulted)){o->status=status;o->faulted=faulted;}
-  o->stopping=1;
+  o->stopping=1;release_pauses_locked(o);
   for(unsigned i=0;i<THREAD_SLOTS;i++){
    thread_t *t=&threads[i];if(!equal(t->space,h))continue;
    if(t->state==PENDING){t->state=FAILED;t->error=CHOS_ERRNO_EINTR;unpin(t);}
@@ -188,6 +252,7 @@ static void thread_entry(void *argument){
  chos_spin_unlock_irqrestore(&lock,f);
  int64_t status=0;int faulted=0,entered=1;
  if(!stop)entered=user_mode_execute_with_tls(h,r.entry,r.stack_base+r.stack_bytes,r.argument,0,&status,&faulted,r.tls);
+ chos_thread_pause_owner_exit(h);
  if(!entered||faulted)chos_threads_stop(h,status,1);
  /* The EL0 return trampoline keeps IRQs masked here. No other user task can
   * observe DONE until this task has committed to scheduler_exit_current(). */

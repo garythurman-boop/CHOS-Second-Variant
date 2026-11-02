@@ -4,10 +4,12 @@
 #include <stddef.h>
 #define CHOS_THREAD_CONTEXT_VERSION 1u
 #define CHOS_THREAD_CONTEXT_CURRENT 1u
+#define CHOS_THREAD_CONTEXT_SUSPENDED 8u
 #define CHOS_THREAD_CONTEXT_REGISTERS_VALID 2u
 #define CHOS_THREAD_CONTEXT_STACK_VALID 4u
-/* Read-only snapshot of the calling EL0 thread at SVC entry. No foreign thread,
- * kernel context, signal frame, register modification or suspension is exposed. */
+/* Service66: current EL0 SVC-entry snapshot (CURRENT). Service81: owned stable
+ * paused foreign EL0 snapshot (SUSPENDED). No kernel or writable/resumable
+ * context is exposed. Both have REGISTERS_VALID and STACK_VALID on success. */
 typedef struct {
  uint32_t version,size_bytes,tid,flags;
  uint64_t stack_base,stack_bytes;

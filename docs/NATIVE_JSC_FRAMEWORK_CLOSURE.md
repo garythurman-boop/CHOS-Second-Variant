@@ -54,3 +54,8 @@ link is reported as LINKED_NOT_EXECUTED and requires separate resource admission
 and native runtime/JavaScript/Intl/WebAssembly tests. Full WebCore/browser,
 Pi5 Wi-Fi, production security and platform acceptance remain open. Development
 stays0.30.0; this does not complete Stage3 or justify version0.50.0.
+
+The [native foreign-pause/WTF coordination component](NATIVE_FOREIGN_GC.md) now
+supersedes earlier missing-foreign-method diagnoses: the full VM link has no
+undefined symbols. Its image remains unadmitted; full VM/GC/browser execution and
+the remaining revised Stage3 gates are still open.

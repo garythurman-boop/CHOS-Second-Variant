@@ -153,7 +153,22 @@ static void test_preemptive_irq_plan_bad_arguments(void) {
     assert(scheduler_preemption_plan(states, deadlines, 1u, 0u, 0u, NULL) == SCHED_IRQ_FINISHED);
 }
 
+static void test_pauses_preserve_wait_events(void) {
+ scheduler_task_state_t s[]={SCHED_TASK_RUNNING,SCHED_TASK_SLEEPING,SCHED_TASK_READY};
+ uint64_t wake[]={0,5,0};uint8_t paused[]={0,1,1};size_t next=99;
+ assert(scheduler_preemption_plan_unpaused(s,wake,paused,3,0,5,&next)==SCHED_IRQ_RESUME_TASK&&next==0);
+ assert(s[1]==SCHED_TASK_READY&&wake[1]==0&&s[2]==SCHED_TASK_READY);
+ s[0]=SCHED_TASK_SLEEPING;wake[0]=50;
+ assert(scheduler_preemption_plan_unpaused(s,wake,paused,3,0,6,&next)==SCHED_IRQ_RESUME_IDLE);
+ paused[1]=0;
+ assert(scheduler_preemption_plan_unpaused(s,wake,paused,3,CHOS_SCHED_NO_INDEX,7,&next)==SCHED_IRQ_RESUME_TASK&&next==1);
+ s[1]=SCHED_TASK_SLEEPING;wake[1]=500;paused[1]=1;
+ assert(scheduler_wake_sleeping(s,wake,3,1));assert(!scheduler_pick_next_unpaused(s,paused,3,0,&next));
+ paused[2]=0;assert(scheduler_pick_next_unpaused(s,paused,3,0,&next)&&next==2);
+}
+
 int main(void) {
+    test_pauses_preserve_wait_events();
     test_first_ready_from_start();
     test_round_robin_wrap();
     test_no_ready_tasks();

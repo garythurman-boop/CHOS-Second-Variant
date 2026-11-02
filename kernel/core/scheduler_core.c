@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "chos/scheduler.h"
 
-int scheduler_pick_next(const scheduler_task_state_t *states, size_t count,
+int scheduler_pick_next_unpaused(const scheduler_task_state_t *states, const uint8_t *paused, size_t count,
                         size_t after_index, size_t *next_index) {
     size_t start;
     size_t offset;
@@ -18,12 +18,16 @@ int scheduler_pick_next(const scheduler_task_state_t *states, size_t count,
     for (offset = 0u; offset < count; ++offset) {
         size_t index = start + offset;
         if (index >= count) index -= count;
-        if (states[index] == SCHED_TASK_READY) {
+        if (states[index] == SCHED_TASK_READY && (!paused || !paused[index])) {
             *next_index = index;
             return 1;
         }
     }
     return 0;
+}
+
+int scheduler_pick_next(const scheduler_task_state_t *states,size_t count,size_t after,size_t *next) {
+ return scheduler_pick_next_unpaused(states,NULL,count,after,next);
 }
 
 size_t scheduler_wake_due(scheduler_task_state_t *states, uint64_t *wake_ticks,
@@ -86,8 +90,8 @@ int scheduler_slot_reusable(scheduler_task_state_t state, uint8_t reap_pending) 
 
 /* Decide what an EL1 timer IRQ should resume. This function touches only scheduler
  * policy arrays, so the transition logic can be tested on the host without hardware. */
-scheduler_irq_action_t scheduler_preemption_plan(
-    scheduler_task_state_t *states, uint64_t *wake_ticks, size_t count,
+scheduler_irq_action_t scheduler_preemption_plan_unpaused(
+    scheduler_task_state_t *states, uint64_t *wake_ticks, const uint8_t *paused, size_t count,
     size_t interrupted_slot, uint64_t now_tick, size_t *resume_slot) {
     if (states == NULL || wake_ticks == NULL || resume_slot == NULL || count == 0u) {
         return SCHED_IRQ_FINISHED;
@@ -98,10 +102,14 @@ scheduler_irq_action_t scheduler_preemption_plan(
     }
     (void)scheduler_wake_due(states, wake_ticks, count, now_tick);
 
-    if (scheduler_pick_next(states, count, interrupted_slot, resume_slot)) {
+    if (scheduler_pick_next_unpaused(states, paused, count, interrupted_slot, resume_slot)) {
         states[*resume_slot] = SCHED_TASK_RUNNING;
         return SCHED_IRQ_RESUME_TASK;
     }
     return scheduler_has_live_tasks(states, count)
         ? SCHED_IRQ_RESUME_IDLE : SCHED_IRQ_FINISHED;
+}
+
+scheduler_irq_action_t scheduler_preemption_plan(scheduler_task_state_t *s,uint64_t *w,size_t n,size_t current,uint64_t now,size_t *next) {
+ return scheduler_preemption_plan_unpaused(s,w,NULL,n,current,now,next);
 }

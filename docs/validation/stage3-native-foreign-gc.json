@@ -1,0 +1,4647 @@
+{
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "source_base": "dbefcf15578079126a7cf12adeddf361b57aab27",
+  "implementation": "actual same-process native pause/context/resume and pinned WTF foreign GC coordination with stable native TIDs",
+  "ABI": {
+    "suspend": 80,
+    "paused_context": 81,
+    "resume": 82,
+    "control_capability_class": 58,
+    "read_capability_class": 57,
+    "positive_mask_bits_unchanged": true,
+    "context_bytes": 832,
+    "context_version": 1,
+    "current_flags_unchanged": 7,
+    "suspended_flags": 14,
+    "nested_depth_max": 32
+  },
+  "kernel_contract": [
+    "single-CPU preemptive scheduled private address spaces only;complete generation-bound identities",
+    "real EL0 timer frame or owned actual SVC-entry frame on target kernel stack;no EL1 or invented register conversion",
+    "held tasks retain wait/wake/deadline state but cannot dispatch;controller exit and process stop/fault release kernel leases",
+    "owned/pinned exact stack and stable kernel snapshot;no writable registers,PC rewrite,foreign-process authority or stale pthread TCB lookup",
+    "only real ESRCH may be skipped by upstream stack-marker failure path;other live failures fail closed"
+  ],
+  "accepted_guest_profiles": [
+    {
+      "profile": "pause-direct",
+      "exit": 0,
+      "seconds": 27.428330484995968,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "38569685c5c4a90ccc20c716d2f1b130991a5780bcac7e809bbd6a81331f2398",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117493,
+        "free_pages_before": 117493,
+        "free_pages_after": 117493,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 922,
+        "checks": [
+          "actual seeded x19..28 and all32full128-bit SIMD registers with FPCR/FPSR;EL0 busy and blocked SVC snapshots",
+          "stable owned snapshot and non-dispatch through wake while paused;32nested pauses and final resume",
+          "self/stale/other-controller/invalid-output refusals,main-thread capture,owner-exit automatic release;reduced-cap/foreign-process denial and process exit/fault with live held workers",
+          "actual register restoration and original cold-page baseline across three process lifecycles"
+        ],
+        "limits": [
+          "single-CPU bounded native pause component,not full GC/VM/browser or physical platform qualification"
+        ]
+      },
+      "result_sha256": "d5b7536ece45a41012c477052c38f00089e50e36fdabd60b3883253c494f97a5",
+      "artifacts": {
+        "kernel_sha256": "7f992d6a62999e26903b3e3df7931bbe2586efe0fcc92425fdeb985a94bba2be"
+      }
+    },
+    {
+      "profile": "pause-uefi",
+      "exit": 0,
+      "seconds": 36.41897844099731,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "38569685c5c4a90ccc20c716d2f1b130991a5780bcac7e809bbd6a81331f2398",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 923,
+        "checks": [
+          "actual seeded x19..28 and all32full128-bit SIMD registers with FPCR/FPSR;EL0 busy and blocked SVC snapshots",
+          "stable owned snapshot and non-dispatch through wake while paused;32nested pauses and final resume",
+          "self/stale/other-controller/invalid-output refusals,main-thread capture,owner-exit automatic release;reduced-cap/foreign-process denial and process exit/fault with live held workers",
+          "actual register restoration and original cold-page baseline across three process lifecycles"
+        ],
+        "limits": [
+          "single-CPU bounded native pause component,not full GC/VM/browser or physical platform qualification"
+        ]
+      },
+      "result_sha256": "e4265fb98d527918cc2236118dc3c42fe76468960a197eb4833df7d8675c0101",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "foreign-direct",
+      "exit": 0,
+      "seconds": 11.123321434002719,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "92fab1d970a02afaf44e4bca067239a0d3d2e3a6fcdb4a0b807047697adeeb13",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 117493,
+        "free_pages_before": 117493,
+        "free_pages_after": 117493,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 230,
+        "checks": [
+          "actual pinned WTF ThreadSuspendLocker and Thread suspend/getRegisters/resume call real native leases",
+          "seeded x19..28/all32SIMD128-bit registers,FPCR/FPSR,SP/PC;busy EL0 and blocked-SVC workers;128K owned stacks",
+          "nested pauses,held wake and real restore;join/detach and stable ID after native TCB disposal;dead target ESRCH",
+          "self/unsuspended read/permission-denied live targets fail closed in isolated abort134 children",
+          "three parent lifecycles,cold page equality,zero futex waiters"
+        ],
+        "limits": [
+          "actual foreign-thread coordination component,not full conservative-GC/VM/browser/resource admission qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "861e1c043070c442787476a32e1cdfc29fab5a4c8d092f10adda797a6084d00d",
+      "artifacts": {
+        "kernel_sha256": "7f992d6a62999e26903b3e3df7931bbe2586efe0fcc92425fdeb985a94bba2be"
+      }
+    },
+    {
+      "profile": "foreign-uefi",
+      "exit": 0,
+      "seconds": 17.27313440600119,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "92fab1d970a02afaf44e4bca067239a0d3d2e3a6fcdb4a0b807047697adeeb13",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 231,
+        "checks": [
+          "actual pinned WTF ThreadSuspendLocker and Thread suspend/getRegisters/resume call real native leases",
+          "seeded x19..28/all32SIMD128-bit registers,FPCR/FPSR,SP/PC;busy EL0 and blocked-SVC workers;128K owned stacks",
+          "nested pauses,held wake and real restore;join/detach and stable ID after native TCB disposal;dead target ESRCH",
+          "self/unsuspended read/permission-denied live targets fail closed in isolated abort134 children",
+          "three parent lifecycles,cold page equality,zero futex waiters"
+        ],
+        "limits": [
+          "actual foreign-thread coordination component,not full conservative-GC/VM/browser/resource admission qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "6556dc0eb18ba53bde73cd6364a94252914726c016ddfaa66b9a0244ba4b08a0",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "raw-direct",
+      "exit": 0,
+      "seconds": 14.454214659999707,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "f66ac5a467e751fe089a3f90869a41b11d738030c1f17bdfa8bd08402118c18a",
+        "cold_free_pages": 117493,
+        "free_pages_before": 117493,
+        "free_pages_after": 117493,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 257,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "bf6c05e166371e497bdf9fd9ca7935316c6a22b99c401c8dc01cf450b79cdfa3",
+      "artifacts": {
+        "kernel_sha256": "7f992d6a62999e26903b3e3df7931bbe2586efe0fcc92425fdeb985a94bba2be"
+      }
+    },
+    {
+      "profile": "raw-uefi",
+      "exit": 0,
+      "seconds": 23.12823096899956,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "f66ac5a467e751fe089a3f90869a41b11d738030c1f17bdfa8bd08402118c18a",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 274,
+        "checks": [
+          "three scheduled EL0 workers share process globals and PID",
+          "atomic increments preserve all concurrent updates",
+          "distinct TPIDR_EL0 values across timer IRQ, SVC, sleep and yield",
+          "dedicated stack mappings reject unmap while pinned and release after join",
+          "foreign PID cannot inspect/reap worker IDs",
+          "main process exit cancels sleeping and CPU-bound workers",
+          "worker fault cancels siblings, records owner failure and reaps complete group",
+          "normal relaunch after fault preserves stable free physical pages"
+        ],
+        "limits": [
+          "bounded native threads, not full POSIX pthreads or compiler ELF TLS",
+          "new Fusion/physical thread qualification NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "b7605c04430039aa5b607a2560c3080ad47156f690597a52a0884b8c6a30a938",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "pthread-uefi",
+      "exit": 0,
+      "seconds": 34.59361406399694,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "b9241cc185462ee9ce6c2a528693bac70072d6bc035930a736b45ee0431dc326",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 621,
+        "checks": [
+          "real pthread create/join return values, same-process synchronization and repeated lifetime cleanup",
+          "concurrent malloc/calloc/realloc/free with data and zero checks",
+          "per-thread errno and generation-tagged specific keys remain isolated across actual scheduling",
+          "normal/errorcheck/recursive mutex and condition predicate/signal/broadcast",
+          "absolute monotonic condition timeout reacquires original mutex",
+          "exactly-once initialization under contention and retry if initializer calls pthread_exit",
+          "key destructor reset/repeat, deleted key generation and quota refusal",
+          "main pthread_exit preserves worker, join result and final normal process teardown",
+          "no remaining kernel futex waiters and stable physical pages"
+        ],
+        "limits": [
+          "bounded native pthread subset, not full POSIX/compiler ELF TLS or C++ standard library",
+          "managed detach is separately qualified;process-shared/robust/PI/cancellation/signal/priority/affinity APIs not supplied",
+          "new Fusion/physical behavior NOT RUN",
+          "modern engine and Stage3 remain incomplete"
+        ]
+      },
+      "result_sha256": "ad5951c3a014c1a8d76466ed71dcc87d18accdc7efd7557fca69fb66fb9f3ec5",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "cxx20-uefi",
+      "exit": 0,
+      "seconds": 20.962281868007267,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "cxx_standard": "20",
+        "cases": [
+          {
+            "argument": "normal",
+            "pid": 1,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "normal",
+            "pid": 2,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "normal",
+            "pid": 3,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "join-empty",
+            "pid": 4,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "joinable-destructor",
+            "pid": 5,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "detach",
+            "pid": 6,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "capacity",
+            "pid": 7,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "pthread-exit",
+            "pid": 8,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "move-over-live",
+            "pid": 9,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "self-join",
+            "pid": 10,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-return",
+            "pid": 11,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-exit",
+            "pid": 12,
+            "expected_exit": 77,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-recursive",
+            "pid": 13,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-thread-exit",
+            "pid": 14,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "relaunch",
+            "pid": 15,
+            "expected_exit": 0,
+            "status": "PASS"
+          }
+        ],
+        "application_sha256": "d6b1a362c25538844c0da35d435746d4ad3664e9bb6acb324c171b0748666161",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 76,
+        "checks": [
+          "original LLVM thread.cpp create/move/swap/id/join lifecycle over native workers",
+          "three workers and repeated processes free native heap and kernel frames",
+          "C++ TLS and post-key TLS destructors precede original notify_all_at_thread_exit unlock/notification",
+          "per-thread standard-library exit state survives TLS and then releases its allocations before join",
+          "native nanosecond/integer-millisecond/floating-second sleep,steady sleep_until/yield and one logical CPU hardware_concurrency query",
+          "actual detached C++ worker exits and releases its TCB/stack;empty/self join,capacity,joinable destruction/move and forbidden callable pthread_exit fail closed",
+          "atomic terminate handler get/set,return/reentry refusal and explicit handler process exit",
+          "successful relaunch after every refusal set and no queued futexes"
+        ],
+        "limits": [
+          "static C++20/23 -O2 no-exceptions/no-RTTI profile,three live worker/join records per process",
+          "native managed detach supported;pthread_exit from a std::thread callable remains unsupported;no stack unwinding/cancellation",
+          "original future.cpp supplies the private readiness callback only; public future/exception_ptr ABI is not supplied",
+          "binary128 arithmetic helpers,arbitrary duration/clock types and unoptimized compiler lowering are not qualified",
+          "full ICU/engine,memory/isolation,production TLS and real Pi5 wireless remain open; Stage3 incomplete",
+          "new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "c4c31db691997662fa9e6a4977062e743772a88349cd513da56fc6045bca2d3e",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "cxx23-uefi",
+      "exit": 0,
+      "seconds": 20.528006947002723,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "cxx_standard": "23",
+        "cases": [
+          {
+            "argument": "normal",
+            "pid": 1,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "normal",
+            "pid": 2,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "normal",
+            "pid": 3,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "join-empty",
+            "pid": 4,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "joinable-destructor",
+            "pid": 5,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "detach",
+            "pid": 6,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "capacity",
+            "pid": 7,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "pthread-exit",
+            "pid": 8,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "move-over-live",
+            "pid": 9,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "self-join",
+            "pid": 10,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-return",
+            "pid": 11,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-exit",
+            "pid": 12,
+            "expected_exit": 77,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-recursive",
+            "pid": 13,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "handler-thread-exit",
+            "pid": 14,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "relaunch",
+            "pid": 15,
+            "expected_exit": 0,
+            "status": "PASS"
+          }
+        ],
+        "application_sha256": "e7c19c79109c8a34bd94289d74f58da7b9bf6b1a01135e4fb19f2395904ab819",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 73,
+        "checks": [
+          "original LLVM thread.cpp create/move/swap/id/join lifecycle over native workers",
+          "three workers and repeated processes free native heap and kernel frames",
+          "C++ TLS and post-key TLS destructors precede original notify_all_at_thread_exit unlock/notification",
+          "per-thread standard-library exit state survives TLS and then releases its allocations before join",
+          "native nanosecond/integer-millisecond/floating-second sleep,steady sleep_until/yield and one logical CPU hardware_concurrency query",
+          "actual detached C++ worker exits and releases its TCB/stack;empty/self join,capacity,joinable destruction/move and forbidden callable pthread_exit fail closed",
+          "atomic terminate handler get/set,return/reentry refusal and explicit handler process exit",
+          "successful relaunch after every refusal set and no queued futexes"
+        ],
+        "limits": [
+          "static C++20/23 -O2 no-exceptions/no-RTTI profile,three live worker/join records per process",
+          "native managed detach supported;pthread_exit from a std::thread callable remains unsupported;no stack unwinding/cancellation",
+          "original future.cpp supplies the private readiness callback only; public future/exception_ptr ABI is not supplied",
+          "binary128 arithmetic helpers,arbitrary duration/clock types and unoptimized compiler lowering are not qualified",
+          "full ICU/engine,memory/isolation,production TLS and real Pi5 wireless remain open; Stage3 incomplete",
+          "new Fusion/Pi/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "9e69e73a52b4303d3caa904cbaef412ecfebcf63961529b3cf399e9f5d439f05",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "sync-uefi",
+      "exit": 0,
+      "seconds": 56.252478100999724,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "component": "cxx",
+        "cases": [
+          {
+            "argument": "normal",
+            "pid": 1,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "normal",
+            "pid": 2,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "normal",
+            "pid": 3,
+            "expected_exit": 0,
+            "status": "PASS"
+          },
+          {
+            "argument": "recursive",
+            "pid": 4,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "quota",
+            "pid": 5,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "unlocked-wait",
+            "pid": 6,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "double-lock",
+            "pid": 7,
+            "expected_exit": 134,
+            "status": "PASS"
+          },
+          {
+            "argument": "relaunch",
+            "pid": 8,
+            "expected_exit": 0,
+            "status": "PASS"
+          }
+        ],
+        "application_sha256": "ccccbcc36e814fd57b9abba8e095e5d9f089e8ce103e736a70a49fd422c121ac",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 515,
+        "checks": [
+          "upstream mutex/recursive/timed/recursive-timed algorithms with native pthread bindings",
+          "three contending workers,condition predicates,notify_one/all,unique_lock/scoped_lock and memory publication",
+          "original shared_ptr/weak_ptr concurrent ownership and exact destruction; condition_variable_any with recursive_mutex",
+          "real system/steady clocks,monotonic wait_for/until and timeout followed by lock reacquisition",
+          "once_flag full-width completion,argument forwarding,16 nested initializers and retry after pthread_exit including key destructor",
+          "recursive/depth17 once,unowned wait and double unique_lock abort134 without kernel failure",
+          "three process runs and relaunch after refusals,stable warm physical pages and no queued futexes"
+        ],
+        "limits": [
+          "bounded native no-exceptions/no-RTTI libc++ subset,not full standard library",
+          "std::thread/notify-at-exit are separately qualified; public futures and dynamic loading remain open",
+          "Only the ICU threading component is qualified; full ICU cleanup registry/common/i18n/data and modern engine remain absent",
+          "new Fusion/Pi behavior NOT RUN; Stage3 incomplete"
+        ]
+      },
+      "result_sha256": "da69f19916b1f7bc5d3c6829b8b371be5575a25f43e44489a8b6c3aed05b695d",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "emutls-uefi",
+      "exit": 0,
+      "seconds": 18.09466051099298,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "f309bf049512ca523ecab8f3faa9ce069b482228cc748708c730f1c98fbb8a9a",
+        "compiler_tls_controls": 48,
+        "elf_pt_tls": false,
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 149,
+        "checks": [
+          "real clang -femulated-tls C11 and C++17 variables, initialization and4096-byte alignment",
+          "at least48 compiler TLS controls trigger upstream per-thread address-array growth",
+          "three workers preserve isolated TLS values across SVC/yield/preemption and repeated launches",
+          "C++ thread_local constructors once per thread, destructors in reverse order before C key callbacks",
+          "ordinary key callbacks access retained compiler TLS through all four destructor passes",
+          "compiler storage and C++ cleanup nodes reclaimed after join; user heap returns to exact main baseline",
+          "normal main return and explicit main pthread_exit run C++ TLS destructors with valid values",
+          "main pthread_exit preserves worker and join result",
+          "key/dtor quotas and recursive destructor registration fail closed with bounded exit134 and stable pages",
+          "no queued futex records, no unresolved runtime imports and no PT_TLS dependency"
+        ],
+        "limits": [
+          "explicit -femulated-tls static-link profile, not native ELF TLS relocations/dynamic loader",
+          "no full C++ standard library, exceptions or DSO unload support; this sparse fixture excludes global constructor arrays",
+          "C++ thread-local callback registration64 pending per thread, cleanup bound256 invocations",
+          "native heap, thread and key quotas remain in force",
+          "new Fusion/physical behavior NOT RUN; modern engine and Stage3 incomplete"
+        ]
+      },
+      "result_sha256": "a5d1b445c3bce6e960551df59817ad8bf78e531962c59c49ba621118c4f468db",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "startup-uefi",
+      "exit": 0,
+      "seconds": 28.647416851992602,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "applications_sha256": {
+          "/BIN/START.ELF": "58af1175a430295aa59a01856fc2dc06888430aedbaa2957df595c443a7bac4d",
+          "/BIN/EARLY.ELF": "f1c2f21a5a372e9ce62528400d8c1abe8fc511f9b7587be991f2920273b55e9a"
+        },
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "cases": [
+          {
+            "mode": "return",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 17,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 1.2755087900004582,
+            "status": "PASS"
+          },
+          {
+            "mode": "exit",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 23,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9361566300067352,
+            "status": "PASS"
+          },
+          {
+            "mode": "last-thread",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 0,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 1.0821655430045212,
+            "status": "PASS"
+          },
+          {
+            "mode": "worker-exit",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 37,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 1.0583362720062723,
+            "status": "PASS"
+          },
+          {
+            "mode": "c-quota",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 18,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9148565670038806,
+            "status": "PASS"
+          },
+          {
+            "mode": "immediate",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 77,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9173638430074789,
+            "status": "PASS"
+          },
+          {
+            "mode": "return",
+            "path": "/BIN/EARLY.ELF",
+            "expected_exit": 9,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.2729008750029607,
+            "status": "PASS"
+          },
+          {
+            "mode": "cxx-quota",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 134,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9169946579932002,
+            "status": "PASS"
+          },
+          {
+            "mode": "loop",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 134,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9203483619930921,
+            "status": "PASS"
+          },
+          {
+            "mode": "recursion",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 134,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9156577599933371,
+            "status": "PASS"
+          },
+          {
+            "mode": "thread-in-exit",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 134,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 1.064420942988363,
+            "status": "PASS"
+          },
+          {
+            "mode": "thread-in-finalize",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 134,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9565318199893227,
+            "status": "PASS"
+          },
+          {
+            "mode": "recursive-exit",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 134,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 1.0043590330024017,
+            "status": "PASS"
+          },
+          {
+            "mode": "pure-virtual",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 134,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9180375049909344,
+            "status": "PASS"
+          },
+          {
+            "mode": "array-ro",
+            "path": "/BIN/START.ELF",
+            "expected_exit": null,
+            "fault_expected": true,
+            "free_pages": 500124,
+            "seconds": 0.9384022779995576,
+            "status": "PASS"
+          },
+          {
+            "mode": "return",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 17,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 1.0007544719992438,
+            "status": "PASS"
+          },
+          {
+            "mode": "return",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 17,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9364882070076419,
+            "status": "PASS"
+          },
+          {
+            "mode": "return",
+            "path": "/BIN/START.ELF",
+            "expected_exit": 17,
+            "fault_expected": false,
+            "free_pages": 500124,
+            "seconds": 0.9386018049990525,
+            "status": "PASS"
+          }
+        ],
+        "checks": [
+          "real preinit/init priorities before main,including native worker creation/join during a constructor",
+          "argc/argv preserved through startup and native C++ vector/global/local-static constructors execute",
+          "typed C/C++ LIFO,DSO-selective/repeated/concurrent finalization and exactly-once destruction",
+          "C++ thread-local destructors precede process statics; objects created in key destructors also finalize before compiler TLS release; current compiler TLS survives global teardown",
+          "normal main return,exit,last pthread_exit,worker-initiated exit and early-constructor exit",
+          "_Exit bypasses all callbacks and global fini arrays",
+          "callback quotas,rearm/recursion and forbidden pthread_exit/recursive exit fail closed",
+          "constructor arrays are file-backed RO; actual attempted store faults only that process",
+          "fini priorities run after process callbacks and can register additional atexit cleanup,clean relaunch and stable warm frames/no queued futexes"
+        ],
+        "limits": [
+          "bounded static native ELF profile,128 process callbacks,512 callback budget,16 recursive finalizations",
+          "no exceptions/unwinding,DSO loading,full libc++/POSIX or modern engine",
+          "new Fusion/Pi/laptop behavior NOT RUN; Stage3 incomplete"
+        ]
+      },
+      "result_sha256": "9c043128b7dd2cde381d667cc914e45b7093040de85103fa0dda3f41d596c208",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "vm-uefi",
+      "exit": 0,
+      "seconds": 14.10667778000061,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "6b38f70921e1ef8f85c460662078c4755441b69976cce667c54881d0a20b0c48",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 77,
+        "contained_faults": [
+          {
+            "mode": "read-none",
+            "esr": 2449473551,
+            "far": 553652224
+          },
+          {
+            "mode": "write-ro",
+            "esr": 2449473615,
+            "far": 553652224
+          },
+          {
+            "mode": "execute-ro",
+            "esr": 2181038095,
+            "far": 553652224
+          },
+          {
+            "mode": "unmapped-middle",
+            "esr": 2449473543,
+            "far": 553656320
+          }
+        ],
+        "operation_timings_ns": [
+          {
+            "operation": "map-none",
+            "nanoseconds": 14098768
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 586992
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 2111792
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3133008
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 4868288
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 716352
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 1897136
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 14568272
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 15168000
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 1414192
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 12893152
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 3299344
+          },
+          {
+            "operation": "map-none",
+            "nanoseconds": 4007408
+          },
+          {
+            "operation": "protect-rw",
+            "nanoseconds": 588912
+          },
+          {
+            "operation": "discard-none",
+            "nanoseconds": 3050720
+          },
+          {
+            "operation": "unmap-read",
+            "nanoseconds": 2816688
+          }
+        ],
+        "checks": [
+          "real owned anonymous mmap at NONE/R/RW;zero-on-discard with protection retained;RW restoration",
+          "partial middle unmap/prefix/suffix trim;split-quota failure changes no live data",
+          "three concurrent native worker lifecycles;all cleanup returns heap and warm physical pages",
+          "actual foreign address-space and reduced syscall-permission attempts denied;code permissions cannot be promoted",
+          "architectural read-NONE/write-RO/execute-XN/unmapped-hole faults at exact announced addresses;subsequent execution works",
+          "real sysconf/getpagesize/getpid and bounded process-owned read/lseek/close;write invalid fd fails"
+        ],
+        "limits": [
+          "bounded private anonymous subset;no fixed/file/shared/executable mappings;no sparse demand paging or swap",
+          "munmap/mprotect/madvise must fit one live owned region;unsupported holes/multiple regions fail",
+          "1MiB mapping,2MiB aperture,16 regions,4MiB image,8MiB owned frames;not engine-sized",
+          "not full POSIX,JavaScriptCore/browser or Stage3 completion;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "a9d9b01b050e4d77e0538a481d7d9b2d7eff7d340842276df937d7f9c578c323",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "detach-uefi",
+      "exit": 0,
+      "seconds": 44.9696485720051,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "e39c1b807680b0fd32da50259a5b25f46acb427a50ea14afd7cc0edb6c63e3c6",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 871,
+        "checks": [
+          "native pthread attr/live/self/after-exit detach and actual std::thread.detach;112 managed library workers in each parent plus eight in its children and26 raw ownership cases",
+          "C++ TLS,twice-reset ordinary keys and post-key TLS finish before real thread-exit notifications;FP inheritance and errno isolation",
+          "kernel-managed exact stack disposal and zero allocator/owned-frame growth;fast creation acknowledgement and stale TID/address reuse safety",
+          "legacy raw V1 exit/unpin/collect behavior preserved;managed stack pin and collect/double-detach refusal",
+          "REAP58 denial blocks both detach79 and initially-detached creation;foreign process cannot inspect,collect or detach parent worker",
+          "detached main exits with live worker;normal process exit and actual EL0 fault cancel three live detached workers",
+          "three process lifecycles,cold physical page equality,no remaining futex waiters;exactly three expected isolated child data aborts"
+        ],
+        "limits": [
+          "bounded single-CPU native pthread/managed stack component,not complete POSIX,foreign GC or engine/browser qualification",
+          "forced process termination does not promise user TLS destructors;all owned kernel resources must still be reclaimed",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "c97e39a9829885e4ca2ab4f66b32e5df9a3c855ef158037d3f75ea1ec588264c",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "wtf-threads-uefi",
+      "exit": 0,
+      "seconds": 36.30590086999291,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "525e9c0eadffa176b11bf1f6c06ffcf781b90187a09d4d83f55717157fdea70b",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 610,
+        "checks": [
+          "actual upstream Thread::create context handshake;default32K and explicit64K/128K owned native stacks",
+          "actual Function captures,current identity,ThreadGroup add/duplicate/removal and allThreads lifecycle",
+          "join,live/self/after-exit detach,self-join refusal and post-join/post-detach EINVAL before native TCB access",
+          "original C++ TLS and twice-reset pthread key destructors;steady-state allocator/mapped/resident equality",
+          "five isolated refusal children per parent:invalid size,custom stack,scheduling policy,worker quota,double detach",
+          "three parent process lifecycles,cold PMM equality,zero futex waiters"
+        ],
+        "limits": [
+          "bounded ordinary native WTF Thread component,not foreign suspension/full GC,engine-sized resources,JavaScript or browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "affa73d8a7399874fbf010978158170387b8ea253bc06a0c4f5f7dded6789d19",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "wtf-fs-uefi",
+      "exit": 0,
+      "seconds": 21.846302760008257,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "18ae639abc114593f37ce43f474f229c879adcb46bfbf729b23f9e81c202a88e",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 585,
+        "heap_before_crt_exit": [
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ],
+          [
+            "3",
+            "65536"
+          ]
+        ],
+        "checks": [
+          "actual native WTF archive,String,Vector,path/file/directory operations with no replacement class implementations",
+          "real readAll and512KiB append path,large durable overwrite/copy/move and recursive directory operations",
+          "write-only Truncate modes survive moves;unsupported locks/shared maps fail before creating files",
+          "native entropy-backed temporary names and persisted salt;explicit unsupported format/service semantics",
+          "root and3 adopted workers registered live,9worker lifecycles/AtomString tables per process,two-pass TLS cleanup/stable warm heap;three process lifecycles,cold PMM equality and zero futex waiters",
+          "real Config::finalize freezes owned static image pages;write restoration refused and child write faults;strict cold cleanup"
+        ],
+        "limits": [
+          "selected library component,not full WTF/JSC/JavaScript/browser runtime",
+          "no shared file writeback/locks/timestamps/capacity API,descriptor duplication or inheritance;native move does not replace existing targets",
+          "native Thread creation/foreign GC suspension remain open",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "9d92e19b01f0373668c2e6d060107da8e854b7125608e932b2e85b95c6b6e346",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "jsc-options-uefi",
+      "exit": 0,
+      "seconds": 27.93734135600971,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "4d722b6ff9cf72e580dcc3f0371de48992fad8fb76bd4a4592f496219fbf2948",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 380,
+        "checks": [
+          "actual full native JavaScriptCore archive built and linked selected options/platform component;not VM execution",
+          "original option initialization exactly once,real numeric/boolean parsing and failed invalid inputs",
+          "Wasm/LLInt remain enabled;JIT disabled;fast/fault memory cannot be enabled by verified option updates",
+          "actual prepare/activate accept checked policy;null-fault elision offset is zero",
+          "two children directly forcing unsupported fault mode abort134;parent policy and process isolation preserved",
+          "nine concurrent native worker lifecycles per process;stable initialized heap;three process lifecycles,cold PMM equality and no futex waiters"
+        ],
+        "limits": [
+          "actual options/platform component,not JavaScript/WebAssembly VM or browser execution",
+          "bounds-checked Wasm memory allocator/interpreter still needs engine-sized resource/runtime qualification",
+          "bootstrap ICU linked for this component only;not full data/Intl qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "3c3f8afad67ee55f5a75ce87494e9ef5efe711c7dad948539e923b14c06581fd",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "jsc-register-uefi",
+      "exit": 0,
+      "seconds": 13.328854051011149,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "594fd65cf38c35a4462ed8c220485bcfb0386d58776ecdbb080b0561ea83b2f6",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 55,
+        "checks": [
+          "original ARM64 RegisterState x19..x28 macro executes;all10live real heap pointers visible in registers or callee-save spills",
+          "reference vector and captured-register object excluded from raw spill scan;scan occurs before independent kernel context output",
+          "MachineContext SP matches actual current-thread kernel snapshot;bounds/flags/size/identity verified",
+          "actual ProfilerSupport threadID equals kernel TID and snapshot TID;actual monotonic timestamps",
+          "root and9worker capture/lifecycle cases per process;three process lifecycles,cold PMM equality,zero heap/futex waiters"
+        ],
+        "limits": [
+          "own-current register/profiler-query component,not foreign thread suspension/full GC/sampling profiler/engine/browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "5a2559feb3414cbe953819bcd45b206512be0b3560afbb0445cd6357686eabdc",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "math-uefi",
+      "exit": 0,
+      "seconds": 13.386802936001914,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "9568fc23da345c53e21df6f694363cb016af619ca23edc56b0a0fcd6678ff9dd",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 42,
+        "checks": [
+          "original LLVM signed128 multiply wrapped result and overflow against independent Python-int vectors",
+          "original musl binary128 sqrt exact integer-isqrt vectors;hypot one RNE ULP and exact Pythagorean/scaling vectors",
+          "NaN/infinity/signed-zero and extreme scaling,subnormal/overflow boundaries;default rounding retained",
+          "root plus nine std::thread workers per process;three process lifecycles,cold PMM equality,zero heap/futex waiters"
+        ],
+        "limits": [
+          "native RNE math component,not full long-double rounding/exception conformance,VM or browser qualification",
+          "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN"
+        ]
+      },
+      "result_sha256": "a7efcea5cecaa5a5b27f6e27461edc3255fdc6f7692973be07dde2476fe6d780",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "icu-uefi",
+      "exit": 0,
+      "seconds": 45.26435756699357,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "3ffcaf79076eb30bf5436e3a04be47012cb9fcddba46f4d1377ac6aae31794ee",
+        "source": "disposable CHFS native application",
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "timer_preemptions_before": 0,
+        "timer_preemptions_after": 844,
+        "checks": [
+          "selected files extracted with individual hashes from actual upstream default4321-resource package",
+          "native u_init/data version,en/de/fr decimal format and parse,Windows1252/ShiftJIS conversion and strict errors",
+          "actual word and extended-grapheme break data;missing data and unsupported converter fail",
+          "143KiB locale/193KiB currency pools and235KiB supplemental resources use actual larger bounded allocation path",
+          "three native workers and three lifecycles,u_cleanup,heap0,strict cold PMM equality and zero private futex waiters"
+        ],
+        "limits": [
+          "selected deployed resources,not execution of the entire embedded32MiB library or full ICU/Intl conformance",
+          "current4MiB image,2MiB anonymous aperture,1MiB mapping and8MiB frame limits;not a browser-ready runtime",
+          "no JavaScriptCore/WebKit/browser or live WiFi success inferred;new Fusion/Pi/laptop NOT RUN"
+        ]
+      },
+      "result_sha256": "085fcf9e3bd439f89d85e17f0b6923974dc0194fd520ea17db9adce445a1e558",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls-uefi",
+      "exit": 0,
+      "seconds": 52.475807494993205,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "e3fcc736ae26f706929f7dbb262119af17e2cebd3f5099af34dfcdfe89e0a594",
+        "ipv6": false,
+        "tcp6_wire_frames": 0,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0125541710003745,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0423783809965244,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7744204170012381,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8766658960084897,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0933810889982851,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.0581761930079665,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.8568976009992184,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.691015468997648,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7717824999999721,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8150650230090832,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8150963709922507,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5700716150022345,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.917164768994553,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.447670508990996,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.6363577149895718,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.618891583988443,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.4135933030047454,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.004354965989478,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.788307899987558,
+            "stalled_network_gui_response_seconds": 0.04570778900233563,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.189699053997174,
+            "stalled_network_gui_response_seconds": 0.02963382299640216,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 33502)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 48230)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 34140)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 40778)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 46752)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 40348)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 56438)"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 56454)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 37034)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45936)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45958)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45952)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45962)"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('127.0.0.1', 45978)"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "d3e1b178b2edcb40fff47e2a2f10e8939d295a4c38ed0b1625f2594dc037e8dc",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "tls6-uefi",
+      "exit": 0,
+      "seconds": 51.05925283298711,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "profile": "native TLS1.3 ECDHE-ECDSA/RSA AES-GCM; isolated prerequisite, not integrated browser",
+        "application_sha256": "e3fcc736ae26f706929f7dbb262119af17e2cebd3f5099af34dfcdfe89e0a594",
+        "ipv6": true,
+        "tcp6_wire_frames": 363,
+        "missing_clock": false,
+        "missing_entropy": false,
+        "cold_free_pages": 500124,
+        "free_pages_before": 500124,
+        "free_pages_after": 500124,
+        "cases": [
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7490131350059528,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "chain",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7717103120085085,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "bad-chain",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.1988707339914981,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7538529900048161,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "rsa256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.8173987679911079,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "aes256",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9587501210044138,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 4,
+            "hostname": "wrong.chos.test",
+            "seconds": 0.6304690020042472,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 8,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7145549769920763,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "wrong-purpose",
+            "expected": 4096,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5103557410038775,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "expired",
+            "expected": 1,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.5727946130064083,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "future",
+            "expected": 512,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.75780842101085,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "malformed",
+            "expected": 998,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.7130360500013921,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "truncated",
+            "expected": 997,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.3354197750013554,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "stall",
+            "expected": 996,
+            "hostname": "fixture.chos.test",
+            "seconds": 15.42923244999838,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 993,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.42978972000128124,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 995,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.2856788180069998,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 994,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.445930068002781,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "valid",
+            "expected": 0,
+            "hostname": "fixture.chos.test",
+            "seconds": 0.9668977580004139,
+            "stalled_network_gui_response_seconds": null,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 989,
+            "hostname": "fixture.chos.test",
+            "seconds": 2.952875192000647,
+            "stalled_network_gui_response_seconds": 0.04866102698724717,
+            "result": "PASS"
+          },
+          {
+            "kind": "threaded",
+            "expected": 988,
+            "hostname": "fixture.chos.test",
+            "seconds": 1.9713270790089155,
+            "stalled_network_gui_response_seconds": 0.02309606499329675,
+            "result": "PASS"
+          }
+        ],
+        "server_events": [
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 45638, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "chain",
+            "accepted": true
+          },
+          {
+            "kind": "chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "chain",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 59538, 0, 0)"
+          },
+          {
+            "kind": "chain",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "bad-chain",
+            "accepted": true
+          },
+          {
+            "kind": "bad-chain",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "bad-chain",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "rsa",
+            "accepted": true
+          },
+          {
+            "kind": "rsa",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 42578, 0, 0)"
+          },
+          {
+            "kind": "rsa",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "rsa256",
+            "accepted": true
+          },
+          {
+            "kind": "rsa256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "rsa256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 57140, 0, 0)"
+          },
+          {
+            "kind": "rsa256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "aes256",
+            "accepted": true
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "aes256",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 57876, 0, 0)"
+          },
+          {
+            "kind": "aes256",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: SSLV3_ALERT_BAD_CERTIFICATE] ssl/tls alert bad certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: TLSV1_ALERT_UNKNOWN_CA] tlsv1 alert unknown ca (_ssl.c:1010)"
+          },
+          {
+            "kind": "wrong-purpose",
+            "accepted": true
+          },
+          {
+            "kind": "wrong-purpose",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "wrong-purpose",
+            "server_error": "[SSL: SSLV3_ALERT_UNSUPPORTED_CERTIFICATE] ssl/tls alert unsupported certificate (_ssl.c:1010)"
+          },
+          {
+            "kind": "expired",
+            "accepted": true
+          },
+          {
+            "kind": "expired",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "expired",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_EXPIRED] ssl/tls alert certificate expired (_ssl.c:1010)"
+          },
+          {
+            "kind": "future",
+            "accepted": true
+          },
+          {
+            "kind": "future",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "future",
+            "server_error": "[SSL: SSLV3_ALERT_CERTIFICATE_UNKNOWN] ssl/tls alert certificate unknown (_ssl.c:1010)"
+          },
+          {
+            "kind": "malformed",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "accepted": true
+          },
+          {
+            "kind": "truncated",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "truncated",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 58724, 0, 0)"
+          },
+          {
+            "kind": "truncated",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "stall",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 41666, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 56864, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "valid",
+            "accepted": true
+          },
+          {
+            "kind": "valid",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "valid",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 41676, 0, 0)"
+          },
+          {
+            "kind": "valid",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 46332, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 46344, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::ffff:127.0.0.1', 52134, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "accepted": true
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "sni": "fixture.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 46358, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "version": "TLSv1.3",
+            "cipher": "TLS_AES_256_GCM_SHA384",
+            "alpn": "http/1.1",
+            "peer": "('::1', 46370, 0, 0)"
+          },
+          {
+            "kind": "threaded",
+            "request": "GET /fixture"
+          },
+          {
+            "kind": "threaded",
+            "sni": "wrong.chos.test"
+          },
+          {
+            "kind": "threaded",
+            "server_error": "[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)"
+          }
+        ],
+        "limits": [
+          "ephemeral test root only; production trust store/update policy still open",
+          "firmware/RTC clock availability is not authenticated time",
+          "browser integration, full modern engine and live Wi-Fi remain open",
+          "QEMU evidence; Fusion/physical TLS NOT RUN"
+        ]
+      },
+      "result_sha256": "81360f845ae1a15a3130939228075cdc23ec1a0e3822b04c9715398ff085e2d2",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "typing-uefi",
+      "exit": 0,
+      "seconds": 48.42846159900364,
+      "archive_exit": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "ordinary_tap_down_ms": 50,
+        "console_lengths": [
+          26,
+          19
+        ],
+        "browser_lengths": [
+          36,
+          29
+        ],
+        "document_lengths": [
+          36,
+          29
+        ],
+        "editor_sha256": "6365ba83be50febaca48b539141901299596ee7a490d990c1cb28d857fde4528",
+        "checks": [
+          "trusted UEFI desktop Console retains its diagnostic path and held Backspace/blinking caret",
+          "plain I leaves Setup closed",
+          "native Console netstatus reads OS Ethernet/DHCP status without claiming Internet access",
+          "actual isolated Console held Backspace/letters and visible caret pixels",
+          "actual isolated HTTP recovery browser address repeat and visible caret (modern-engine gate remains open)",
+          "actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence",
+          "native editor auto-saves on Escape; USB keyboard removal releases held key",
+          "oversized text remains read-only; typing/Backspace/save cannot truncate original",
+          "embedded-NUL text remains read-only; exact-capacity edits are bounded and durable"
+        ]
+      },
+      "result_sha256": "e241504ad74093cea9772202c187b99bef4c32aa4ca37b5632c1409dfce2a866",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    {
+      "profile": "platform-uefi",
+      "exit": 0,
+      "seconds": 51.01922302599996,
+      "archive_exit": 0,
+      "result": {
+        "mode": "uefi",
+        "checks": [
+          "32 fast USB keypress/release pairs",
+          "PCI VirtIO CHFS write/flush/read",
+          "PCI VirtIO hardware RNG",
+          "82574L e1000e DHCP/ARP/ICMP",
+          "keyboard shortcut",
+          "relative pointer",
+          "wheel reports through hardware transport to shared input",
+          "window maximize/restore",
+          "title-bar drag",
+          "20 USB hot-unplug/reconnect cycles with ring wraps",
+          "3 mixed input/storage cycles",
+          "2-second idle observation",
+          "storage persistence after fresh guest boot"
+        ],
+        "kernel_ready_seconds": 7.953,
+        "desktop_ready_seconds": 10.96,
+        "keyboard_visible_ms": 55.26,
+        "pointer_visible_ms": 45.43,
+        "maximize_visible_ms": 202.85,
+        "drag_visible_ms": 279.34,
+        "stress_seconds": 6.285,
+        "idle_cpu_percent": 11.0,
+        "status": "PASS"
+      },
+      "result_sha256": "a455da39612400598c1f9cd7380e849f7d24db89c7d6e11c9036d7e6f47b42b0",
+      "artifacts": {
+        "kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "iso_sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+        "iso_embedded_kernel_sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+        "kernel_symbols_match_iso": true
+      }
+    }
+  ],
+  "coverage": {
+    "raw_profiles": [
+      "pause-direct",
+      "pause-uefi"
+    ],
+    "raw_secondary_workers_per_profile": 84,
+    "raw_processes_per_profile": 15,
+    "raw_expected_data_abort_children_per_profile": 3,
+    "WTF_profiles": [
+      "foreign-direct",
+      "foreign-uefi"
+    ],
+    "WTF_secondary_workers_per_profile": 42,
+    "WTF_processes_per_profile": 12,
+    "WTF_expected_abort134_children_per_profile": 9,
+    "blocked_SVC_proof": "exact post-SVC PC,x8=61,x0=word pointer,x1=0,x2=60000,and wake returns exactly1;stable state through nested hold/wake,actual register restoration"
+  },
+  "full_host_suites": {
+    "full-host2": {
+      "exit": 0,
+      "log_sha256": "fdb6db5756372fb66079789119776e4859ca18cff8b7e92b938ee8300f4f6686"
+    },
+    "full-sanitize2": {
+      "exit": 0,
+      "log_sha256": "dce16040c575afcf779f4042c26a67123da18c916c88acb850409bed10eff73d"
+    },
+    "final-build1": {
+      "exit": 0,
+      "log_sha256": "1d7af7a081a898421ebf23d8296deaa1dd06fd031d5642b7f4f40bed3ed6e871"
+    }
+  },
+  "final_applications": {
+    "pause-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/native_pause",
+          "-B",
+          "/workspace/chos-gc-qualified-pause/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-qualified-pause/cmake",
+          "-j4"
+        ]
+      ],
+      "language_probes": [
+        {
+          "standard": "c++17",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++17",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-qualified-pause/language-probe.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "standard": "c++20",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++20",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-qualified-pause/language-probe.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "standard": "c++23",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++23",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-qualified-pause/language-probe.cpp"
+          ],
+          "exit": 0
+        }
+      ],
+      "returncode": 0,
+      "application_sha256": "38569685c5c4a90ccc20c716d2f1b130991a5780bcac7e809bbd6a81331f2398",
+      "limits": [
+        "native foreign pause component;not full engine/browser or SMP qualification",
+        "native guest qualification required;no hardware target claim"
+      ]
+    },
+    "foreign-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "aa3f4b346a5bb19a27ad54ff794dce8a33239acd3a065c944b098b1e1aec690e",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "8c1a102921a3be7c555e1f5d5acc1d9e5102bc2642744c918068b6a3da2309d4"
+      },
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j2"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/wtf_foreign_gc",
+          "-B",
+          "/workspace/chos-gc-qualified-foreign/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-qualified-foreign/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 5.3996428360114805,
+      "application_sha256": "92fab1d970a02afaf44e4bca067239a0d3d2e3a6fcdb4a0b807047697adeeb13",
+      "deployment": "/workspace/chos-gc-qualified-foreign/cmake/wtf_foreign_gc.elf",
+      "debug_application_sha256": "ca56cec6cd8e33381b71e0d2aac2a9d3c3c8916c5ce7c79cad233bae47f1d631",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "real native WTF archive;actual foreign pause/register/resume and stable native identity execution;not JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "full conservative GC execution and engine-sized resources remain open;native foreign pause is tested separately",
+        "ordinary scheduling and owned anonymous stacks only;name/QOS are unapplied hints;no arbitrary custom stacks or full POSIX claim",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    },
+    "WTF-threads-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "aa3f4b346a5bb19a27ad54ff794dce8a33239acd3a065c944b098b1e1aec690e",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "8c1a102921a3be7c555e1f5d5acc1d9e5102bc2642744c918068b6a3da2309d4"
+      },
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j2"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/wtf_threads",
+          "-B",
+          "/workspace/chos-gc-final-wtf-threads/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-final-wtf-threads/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 5.970286476993351,
+      "application_sha256": "525e9c0eadffa176b11bf1f6c06ffcf781b90187a09d4d83f55717157fdea70b",
+      "deployment": "/workspace/chos-gc-final-wtf-threads/cmake/wtf_threads.elf",
+      "debug_application_sha256": "8979620ffd08868a5ab28852b92b290134d73e0e3ed958a4789b037fb8162217",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "real native WTF archive;worker create/join/detach,owned stack and TLS lifecycle execution;not JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "foreign GC suspension and engine-sized resources remain open;bounded native thread lifecycle tested separately",
+        "ordinary scheduling and owned anonymous stacks only;name/QOS are unapplied hints;no arbitrary custom stacks or full POSIX claim",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    },
+    "WTF-fs-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "aa3f4b346a5bb19a27ad54ff794dce8a33239acd3a065c944b098b1e1aec690e",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "8c1a102921a3be7c555e1f5d5acc1d9e5102bc2642744c918068b6a3da2309d4"
+      },
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j4"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/wtf_filesystem",
+          "-B",
+          "/workspace/chos-gc-final-wtf-fs/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-final-wtf-fs/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 7.179868727005669,
+      "application_sha256": "18ae639abc114593f37ce43f474f229c879adcb46bfbf729b23f9e81c202a88e",
+      "deployment": "/workspace/chos-gc-final-wtf-fs/cmake/wtf_filesystem.elf",
+      "debug_application_sha256": "bec78bbf0309538f25176e409ce0a489de7b6dcc4b51f3c3a1e5de4e45f203a7",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "real native WTF archive;String/Vector/path/file/directory component execution;not JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "full engine Thread lifecycle and foreign GC suspension remain open;current-thread stack/context services are separately qualified",
+        "native filesystem has explicit format/service limits,including no coherent shared maps/locks/timestamps/capacity service",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    },
+    "JSC-options-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "javascriptcore_archive_built": true,
+      "javascriptcore_archive_sha256": "150fce6ccf0aded3f6c722b642e83d67685c306ef0ac24e27016cbee44537b3f",
+      "javascriptcore_archive_members": 141,
+      "javascript_vm_executed": false,
+      "wasm_executed": false,
+      "browser_built": false,
+      "wtf_archive_sha256": "aa3f4b346a5bb19a27ad54ff794dce8a33239acd3a065c944b098b1e1aec690e",
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "8c1a102921a3be7c555e1f5d5acc1d9e5102bc2642744c918068b6a3da2309d4"
+      },
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "JavaScriptCore",
+          "-j2"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/jsc_options_wasm",
+          "-B",
+          "/workspace/chos-gc-final-jsc-options/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-final-jsc-options/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 19.136846426001284,
+      "application_sha256": "4d722b6ff9cf72e580dcc3f0371de48992fad8fb76bd4a4592f496219fbf2948",
+      "deployment": "/workspace/chos-gc-final-jsc-options/cmake/jsc_options_wasm.elf",
+      "debug_application_sha256": "1fa123b5526f465b8165a451b8cb1b4790af695b09a392123f3ca9d4716f6ddf",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "actual JSC option initialization/parsing and native checked-Wasm activation policy;not a running VM",
+      "limits": [
+        "full archive compilation does not establish complete VM link,JavaScript/WebAssembly execution or browser rendering",
+        "foreign Thread lifecycle/GC and engine-sized admitted resources remain open",
+        "bootstrap ICU library used only for the options/platform component;full data/Intl execution not claimed",
+        "native guest qualification required;new Fusion/Pi5/laptop qualification NOT RUN"
+      ]
+    },
+    "JSC-register-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "engine_built": false,
+      "wtf_archive_built": true,
+      "full_wtf_runtime_qualified": false,
+      "wtf_archive_sha256": "aa3f4b346a5bb19a27ad54ff794dce8a33239acd3a065c944b098b1e1aec690e",
+      "engine_executed": false,
+      "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+      "native_port_files_sha256": {
+        "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+        "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+        "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+        "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+        "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+        "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+        "ports/webkit/chos/CurrentThreadCHOS.cpp": "8c1a102921a3be7c555e1f5d5acc1d9e5102bc2642744c918068b6a3da2309d4"
+      },
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "upstream_configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-context-engine/cmake",
+          "--target",
+          "WTF",
+          "-j4"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/jsc_register_platform",
+          "-B",
+          "/workspace/chos-gc-final-jsc-register/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DWEBKIT_SOURCE=/workspace/chos-reference/webkit-2.54.2",
+          "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-final-jsc-register/cmake",
+          "-j4"
+        ]
+      ],
+      "returncode": 0,
+      "seconds": 6.722762413002783,
+      "application_sha256": "594fd65cf38c35a4462ed8c220485bcfb0386d58776ecdbb080b0561ea83b2f6",
+      "deployment": "/workspace/chos-gc-final-jsc-register/cmake/jsc_register_platform.elf",
+      "debug_application_sha256": "cdb01323bfff1ead7866f73cc071d04ed153d423d0e6fca0ba75352c79f79f67",
+      "strip_verification": "entry,loaded segment addresses/flags/bytes and ABI notes identical",
+      "scope": "actual ARM64 RegisterState capture,MachineContext SP and ProfilerSupport queries;not full GC/JavaScript/browser",
+      "limits": [
+        "WTF archive build/link does not establish full-library runtime,JavaScript or rendering",
+        "foreign Thread lifecycle and GC suspension remain open;own-current register visibility is only a component",
+        "native filesystem has explicit format/service limits,including no coherent shared maps/locks/timestamps/capacity service",
+        "native guest tests required;no new physical/Fusion qualification"
+      ]
+    },
+    "detach-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/native_detach",
+          "-B",
+          "/workspace/chos-gc-final-detach/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-final-detach/cmake",
+          "-j4"
+        ]
+      ],
+      "language_probes": [
+        {
+          "standard": "c++17",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++17",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-final-detach/language-probe.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "standard": "c++20",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++20",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-final-detach/language-probe.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "standard": "c++23",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++23",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-final-detach/language-probe.cpp"
+          ],
+          "exit": 0
+        }
+      ],
+      "returncode": 0,
+      "application_sha256": "e39c1b807680b0fd32da50259a5b25f46acb427a50ea14afd7cc0edb6c63e3c6",
+      "limits": [
+        "native managed detach/ownership component;not complete POSIX,foreign GC or browser completion",
+        "native guest qualification required;no hardware target claim"
+      ]
+    },
+    "math-app": {
+      "status": "BUILT_NOT_EXECUTED",
+      "stage3_complete": false,
+      "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/native_vm_math",
+          "-B",
+          "/workspace/chos-gc-final-math/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+          "-DCMAKE_BUILD_TYPE=Release"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-gc-final-math/cmake",
+          "-j4"
+        ]
+      ],
+      "language_probes": [
+        {
+          "standard": "c++17",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++17",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-final-math/language-probe.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "standard": "c++20",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++20",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-final-math/language-probe.cpp"
+          ],
+          "exit": 0
+        },
+        {
+          "standard": "c++23",
+          "command": [
+            "clang++",
+            "--target=aarch64-none-elf",
+            "--sysroot=/workspace/chos-stage3-build/native-sdk",
+            "-std=c++23",
+            "-D__CHOS__=1",
+            "-fno-exceptions",
+            "-fno-rtti",
+            "-femulated-tls",
+            "-nostdinc++",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include/c++/v1",
+            "-isystem",
+            "/workspace/chos-stage3-build/native-sdk/include",
+            "-fsyntax-only",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "/workspace/chos-gc-final-math/language-probe.cpp"
+          ],
+          "exit": 0
+        }
+      ],
+      "returncode": 0,
+      "application_sha256": "9568fc23da345c53e21df6f694363cb016af619ca23edc56b0a0fcd6678ff9dd",
+      "limits": [
+        "native signed128 overflow and binary128 RNE math component;not full long-double conformance or VM/browser completion",
+        "native guest qualification required;no hardware target claim"
+      ]
+    }
+  },
+  "full_VM_probe": {
+    "status": "LINK_FAILED",
+    "returncode": 1,
+    "stage3_complete": false,
+    "VM_executed": false,
+    "JavaScript_executed": false,
+    "Intl_executed": false,
+    "runtime_admitted": false,
+    "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+    "native_port_files_sha256": {
+      "ports/webkit/chos/ThreadingPrimitivesCHOS.cpp": "8ec9611747d38d435ae2dd155dd3dbe6ac7cb85c3fa65f11599a5ccb27c2ce8b",
+      "ports/webkit/chos/CPUTimeCHOS.cpp": "25d89991b9d66183ab7410a1827a66f07b245836e3217a912b610775f2576e3d",
+      "ports/webkit/chos/MemoryFootprintCHOS.cpp": "9a4ad2988bc09d4d763148daed0268c19aa909d089be9e24bac37325811e018a",
+      "ports/webkit/chos/FileHandleCHOS.cpp": "5ba4e51df7b258b962e7eb0f275f4f452532589cbb795e69e6bd007f7e5829c8",
+      "ports/webkit/chos/FileSystemCHOS.cpp": "888661f26a79cc16e07037551087fe5b6bc8689974a45353d450c72f89bca415",
+      "ports/webkit/chos/UniStdExtrasCHOS.cpp": "c75d30f3430fa948c1bcd5ca3e34a22d034378d22cebc4144b027e63e904b1ef",
+      "ports/webkit/chos/CurrentThreadCHOS.cpp": "8c1a102921a3be7c555e1f5d5acc1d9e5102bc2642744c918068b6a3da2309d4"
+    },
+    "sdk_manifest_sha256": "51fd40589fdeb44a246a299d4b89dd30bd16615d56ed03eb7939aba8b7c05dbf",
+    "configuration_sha256": "39af37994e1878cacf0055dc0a7fbc494af74d82685cd6bce0b86bd5f0750e24",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-context-engine/cmake",
+        "--target",
+        "JavaScriptCore",
+        "JavaScriptCoreJIT",
+        "-j2"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/jsc_vm_probe",
+        "-B",
+        "/workspace/chos-gc-final-vm-probe/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-stage3-build/native-sdk",
+        "-DENGINE_BUILD=/workspace/chos-context-engine/cmake",
+        "-DJSC_LINK_OBJECTS_FILE=/workspace/chos-gc-final-vm-probe/link-objects.cmake",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-gc-final-vm-probe/cmake",
+        "-j2"
+      ]
+    ],
+    "seconds": 1.294650719006313,
+    "object_subtarget": "JavaScriptCoreJIT (includes bytecode/interpreter;JIT stays OFF)",
+    "original_subtarget_objects": [
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-1.cpp.obj",
+        "bytes": 92664,
+        "sha256": "8af27da421be37019784921544a5c396840004fa9423b77bfaaaea36980a947e"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-10.cpp.obj",
+        "bytes": 68984,
+        "sha256": "404f05bb9a9a403460388deb5586436cc2baab0c00dbf5eb2ae34ee4f695a171"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-11.cpp.obj",
+        "bytes": 146104,
+        "sha256": "4c22b5afd27287d1632fdbbf21837a4f792562b8e6c833cb601c784f6a27ae90"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-12.cpp.obj",
+        "bytes": 107920,
+        "sha256": "cbc60af3dee39a2383c820f186ad0b90417fc54866879012f0fb326f931861b3"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-13.cpp.obj",
+        "bytes": 99384,
+        "sha256": "daf403beebd21761263e30104428a86f99cd302b5125bd8db701cb7958c1cf42"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-14.cpp.obj",
+        "bytes": 22680,
+        "sha256": "cc470d8c88a026a3c0c8659029d4376caabc7fdbd0cb415f0ffb0cfbc48bbf9a"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-2.cpp.obj",
+        "bytes": 385880,
+        "sha256": "3a2be571bcfd759b2b20dfaec4ac47ba51b582850073fa08ab84c0e8a2cfbc87"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-3.cpp.obj",
+        "bytes": 270632,
+        "sha256": "c67cbe758fde1da7ca1af364877c8ad382a524bb4b40082f804ea3869c5f0909"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-4.cpp.obj",
+        "bytes": 27992,
+        "sha256": "63cad5befc08ab4f72246a701332cbbc223061c541903ba853f7e9b72792d6a1"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-5.cpp.obj",
+        "bytes": 54752,
+        "sha256": "bb89066d30560386d4e100ed5f127c39274ec951908d70c17a8ced72be2e7210"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-6.cpp.obj",
+        "bytes": 105776,
+        "sha256": "2705412353cbbab0c7b19a8db4634e42eb70ce284a580602f2e64d17f882f78d"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-7.cpp.obj",
+        "bytes": 47424,
+        "sha256": "c8df5e92c6a3e2f7ba7ad8ed9f147487de364ec2667c6ee868ff71c9c37cbc09"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-8.cpp.obj",
+        "bytes": 50672,
+        "sha256": "3cf851cc024a243d233532419c8cb1555f7b896abd11220f4a8f215864ef5ec4"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecode-9.cpp.obj",
+        "bytes": 110824,
+        "sha256": "6d93bc9d834f56e0382b4c988f455fa5bd278c2cd1f2f2ca548db7a97f221527"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-bytecompiler-1.cpp.obj",
+        "bytes": 1881312,
+        "sha256": "ef787c50f2410ec9bc67079c8f833600378cd7edd02b98b2b837bf4317d70227"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-1.cpp.obj",
+        "bytes": 800,
+        "sha256": "7cc6952c68e9fa8ff591f73c9e7c0323c1d677878e2d6450caaceeb2e06317a9"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-10.cpp.obj",
+        "bytes": 800,
+        "sha256": "5242b7e5eacfe114196f0c3e1b6d9a2b198333304e69b17b515f12c8b2784c70"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-11.cpp.obj",
+        "bytes": 800,
+        "sha256": "7f734e136ad60012eb959ba0a857fe2f5a97831aca8485f79009dd59b6104f54"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-12.cpp.obj",
+        "bytes": 2024,
+        "sha256": "12e715f1164611d592691558c448cc5c50f1e7f4aff176a0984f944ce1ec5c9d"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-13.cpp.obj",
+        "bytes": 800,
+        "sha256": "294579b7ce6f7b8198af692eeec26c7e42d99aecbab2695c8a662a7993b45d93"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-14.cpp.obj",
+        "bytes": 800,
+        "sha256": "c8a12e03ab9701e5d5cc5225696e8af8ba2bd74cadad295a421c525a20f16e47"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-15.cpp.obj",
+        "bytes": 800,
+        "sha256": "4f1538da78965921da5d2df942c6479d95e003d698f00443983a4e1e2a73909c"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-16.cpp.obj",
+        "bytes": 800,
+        "sha256": "b2c77b1a234a76631ff66f2b65df8ec38a04fd5c29536cca7c5f4a0554ada691"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-17.cpp.obj",
+        "bytes": 800,
+        "sha256": "53a55cac122d1c15b245a25d7f89e62005e1905e909e204524675d11bb40b069"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-2.cpp.obj",
+        "bytes": 800,
+        "sha256": "617e6c3dd0cc81cca03184f2a6b7ca1c13b73ad41d6bf276a9f57fecfbefb148"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-3.cpp.obj",
+        "bytes": 800,
+        "sha256": "2d66f48dd49f0043925ca5e03fb754ea69a22fc42509b5995c9872b95b46cc5c"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-4.cpp.obj",
+        "bytes": 3016,
+        "sha256": "946a049da163a999b4f19710f3b1c4c8ea20148d07d0d5781b12e0e648c3848a"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-5.cpp.obj",
+        "bytes": 800,
+        "sha256": "fd5101d48140a1de2236ba184f661032c72f52677aa2872c59ebdb4bbefdeae8"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-6.cpp.obj",
+        "bytes": 1800,
+        "sha256": "e9df0ed1d671214ccedc85ad9c3f98ccfb916d5e0e4f3176298f887fbcbc6f8a"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-7.cpp.obj",
+        "bytes": 800,
+        "sha256": "b386aa45a9d09b963cbf4e02e5aec79d1fd6e7c22f93a57e99eb3cd47fdafd37"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-8.cpp.obj",
+        "bytes": 800,
+        "sha256": "9188f00668207e3c9f4acc4987d7d213fbd43bf5c94e931ebc6c8571c67f797b"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-dfg-9.cpp.obj",
+        "bytes": 800,
+        "sha256": "d694c9677c7466b6c6ace291331504a3a21964fab87b349444bc97e2ad3e9f63"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-ftl-1.cpp.obj",
+        "bytes": 800,
+        "sha256": "b4ef99ba0e5383084a7f94871ad1bfc1820d588e07558056daa2f4cf71cd444a"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-ftl-2.cpp.obj",
+        "bytes": 800,
+        "sha256": "e42077562df563fb1d82bfc99b5e97f534ace13e9b0daef176e5ba761dc1aabd"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-ftl-3.cpp.obj",
+        "bytes": 800,
+        "sha256": "658d661fbf193cb23d10db8ce2c3551e6d5c54041d7f8ac69a450942a7460dc7"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-ftl-4.cpp.obj",
+        "bytes": 800,
+        "sha256": "e85b8f2f6f4f89b436b2a077a506e47db6ce7dcf99e636eb1bf7fa53333312c6"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-1.cpp.obj",
+        "bytes": 800,
+        "sha256": "98187ab86ba3b76f7b543dc1877fa4f0b381b6b75acfc6ccc202f84a623f719d"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-2.cpp.obj",
+        "bytes": 12664,
+        "sha256": "9a72af9c9217c55f065176faaafe34cbaaaf5ba41c74321b6db0d3e42573b883"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-3.cpp.obj",
+        "bytes": 101768,
+        "sha256": "8745840e99fd36dc183ebfb9ff8812f1103519486dd2eaaf55d579ef42134c89"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-4.cpp.obj",
+        "bytes": 37048,
+        "sha256": "f2c68710f5f815711f4971b0c6583bdd3a37d269823fbfff0f4b71a3a13115e2"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-5.cpp.obj",
+        "bytes": 800,
+        "sha256": "1f250ddf71dcd32cfb5ce72d60f1a9905931908d816577f01395e2c6bdc4fb4b"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-6.cpp.obj",
+        "bytes": 5520,
+        "sha256": "88c6b23aa08ebb9ff0ad9a8aa6609f839a42c0d6f858600fee962d968ed3a207"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-7.cpp.obj",
+        "bytes": 24224,
+        "sha256": "6c1ab88678d9b36949755b40f2d738c6057ada1e4af6fc02e020d652ffe36fce"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-8.cpp.obj",
+        "bytes": 28144,
+        "sha256": "4c29581d5797f9b31a57d3f6ecc092d63b38982daeaa9bf994c42dc74cd62bce"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-jit-9.cpp.obj",
+        "bytes": 2984,
+        "sha256": "11061200dfe8a7e6b90d33cbb9345e9a421257aacfd3ccc5dfdf548f2949ed62"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-llint-1.cpp.obj",
+        "bytes": 659104,
+        "sha256": "525a57c3e02b5b3c97c34a9338b0188c04a1a402322baf966f29d1a1948d4fc9"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-lol-1.cpp.obj",
+        "bytes": 800,
+        "sha256": "c2aa2d3b8abb19d6ae00010cc35c3be002396171a667f930a8a0dd9a2d631f40"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-tools-1.cpp.obj",
+        "bytes": 670104,
+        "sha256": "8c14fd419ddcaeebbfebe4757e8cb09db09e9f740c313dc56c518234c320fb32"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-tools-2.cpp.obj",
+        "bytes": 47544,
+        "sha256": "bf4e0219cb9352086ecca603e19016a3cb82cd65677c489cfef9692b7251a5e1"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/dfg/DFGSpeculativeJIT.cpp.obj",
+        "bytes": 792,
+        "sha256": "9058e42e57012657569777392e07105a55f26f49a33c2ad735443df1b7139fa3"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/dfg/DFGSpeculativeJIT32_64.cpp.obj",
+        "bytes": 800,
+        "sha256": "6e0ea6ff34b0b2b7b65a324ff35f94385656ed5f65eb780798901c978fa70af6"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/dfg/DFGSpeculativeJIT64.cpp.obj",
+        "bytes": 800,
+        "sha256": "313f5892c0c51e7800a8a6d6df89b3bf9903eb9437222ab0fce8976941d01923"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/ftl/FTLLowerDFGToB3.cpp.obj",
+        "bytes": 792,
+        "sha256": "a39259ce35e80266bb280ffc73df7188b78893acde4f56ea4a2aa64a396cca34"
+      }
+    ],
+    "libraries": {
+      "libJavaScriptCore.a": {
+        "sha256": "150fce6ccf0aded3f6c722b642e83d67685c306ef0ac24e27016cbee44537b3f",
+        "bytes": 2393050
+      },
+      "libWTF.a": {
+        "sha256": "aa3f4b346a5bb19a27ad54ff794dce8a33239acd3a065c944b098b1e1aec690e",
+        "bytes": 234498
+      },
+      "libbmalloc.a": {
+        "sha256": "4d23708bd1fdad4a124d39f77c095e2cbcf438c05acc48414512f2effef6d499",
+        "bytes": 28622
+      },
+      "libicui18n.a": {
+        "sha256": "6316db0261e578b4d50b52c2632f5dbf2d1729f71a95f4182e9dc7d1b8fa1a79",
+        "bytes": 32952164
+      },
+      "libicuuc.a": {
+        "sha256": "78e8d7da5500585c4e7c605b61970c5f2a68ba5e0fa9703554f3c300b1319339",
+        "bytes": 18915428
+      },
+      "libicudata.a": {
+        "sha256": "d55b6fddb07d9ec364a40f36aaefdb2939f9b0f81e12c0e80d07e5fe96068a44",
+        "bytes": 33558892
+      }
+    },
+    "undefined_symbols": [],
+    "bounded_image_rejected": true,
+    "proposed_image_sections": [
+      {
+        "name": ".text",
+        "address": 536870912,
+        "bytes": 15029008
+      },
+      {
+        "name": "__lcxx_override",
+        "address": 551899920,
+        "bytes": 196
+      },
+      {
+        "name": ".rodata",
+        "address": 551903232,
+        "bytes": 35292636
+      },
+      {
+        "name": ".preinit_array",
+        "address": 587195872,
+        "bytes": 0
+      },
+      {
+        "name": ".init_array",
+        "address": 587195872,
+        "bytes": 0
+      },
+      {
+        "name": ".fini_array",
+        "address": 587195872,
+        "bytes": 0
+      },
+      {
+        "name": ".note.chos",
+        "address": 587195872,
+        "bytes": 24
+      },
+      {
+        "name": ".data",
+        "address": 587198464,
+        "bytes": 284032
+      },
+      {
+        "name": ".bss",
+        "address": 587482496,
+        "bytes": 17960
+      },
+      {
+        "name": "__DATA,__jsc_opcodes",
+        "address": 587501568,
+        "bytes": 16384
+      },
+      {
+        "name": "__DATA,__wtf_config",
+        "address": 587517952,
+        "bytes": 16384
+      }
+    ],
+    "proposed_image_span_bytes": 50663424,
+    "limits": [
+      "diagnostic link only;no engine output executed,published or admitted",
+      "original4MiB arena/linker assertion and native resource limits retained;no ignored symbols or bootstrap ICU substituted",
+      "full original CAPI VM creation,JavaScript/JSON,Intl and GC calls are linked;not evidence they execute",
+      "static framework consumers also require original separate object subtarget even with JIT/DFG/FTL OFF",
+      "foreign GC coordination,admitted resource profile,WebCore/browser,WiFi/security/platform gates remain open"
+    ]
+  },
+  "VM_executed": false,
+  "JavaScript_executed": false,
+  "full_GC_executed": false,
+  "upstream_patch_apply": {
+    "commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+    "clean_original_blob_apply_and_all39_postimage_hashes_match": true,
+    "scratch": "/tmp/chos-patch-final-4ajgp1ud"
+  },
+  "engine_libraries": {
+    "libJavaScriptCore.a": {
+      "sha256": "150fce6ccf0aded3f6c722b642e83d67685c306ef0ac24e27016cbee44537b3f",
+      "members": 141,
+      "complete_actual_thin_members_preserved": true
+    },
+    "libWTF.a": {
+      "sha256": "aa3f4b346a5bb19a27ad54ff794dce8a33239acd3a065c944b098b1e1aec690e",
+      "members": 173,
+      "complete_actual_thin_members_preserved": true
+    },
+    "libbmalloc.a": {
+      "sha256": "4d23708bd1fdad4a124d39f77c095e2cbcf438c05acc48414512f2effef6d499",
+      "members": 168,
+      "complete_actual_thin_members_preserved": true
+    }
+  },
+  "JSC_additional_object_target_members": 53,
+  "PCH_retention": {
+    "products": [
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/cmake_pch.hxx.pch",
+        "bytes": 95528416,
+        "sha256": "b6bc18e5df8163a1c157bac6b88501432ca0aa11ad2f4821bb5e7138870b436b"
+      },
+      {
+        "path": "Source/JavaScriptCore/CMakeFiles/JavaScriptCoreJIT.dir/cmake_pch.hxx.pch",
+        "bytes": 96177028,
+        "sha256": "ace2ea5eac536fb3eb014444b8603d1d3b9ea4883d0542cd74ee6910b783979c"
+      }
+    ],
+    "retention": "Current engine cache retained;complete actual compiled archive and53object members copied here. Rebuild PCH from frozen SDK/pinned originals/postimages/configuration;PCH cache not duplicated."
+  },
+  "retained_investigations": [
+    {
+      "log": "wtf-build1.log",
+      "sha256": "f9c859610f92106360188ef282140e97dba352c6144c39c0276af0b102c422b6",
+      "diagnosis": "native ThreadIdentifier typedef missing after adding actual ID field;corrected to real uint32 kernel TID before WTF build/runtime;no pthread-pointer or fake PID alias"
+    },
+    {
+      "log": "preserve-inputs.log",
+      "sha256": "c0add0a49d3b1b0e23c358a491fb27904c1df6c2b3127ca1aaf17f3ab92d4eb1",
+      "diagnosis": "evidence helper lacked prepared llvm-ar PATH;resumed with activation and exact comparison of every already-copied file;no changed runtime input overwritten"
+    },
+    {
+      "investigation": "initial git archive proof stopped during unnecessary promisor attribute fetch;individual original cached Git blobs then clean apply/all39postimage hashes verified"
+    }
+  ],
+  "prior_sync_investigation": "Earlier synchronization timeout cause remains unresolved;new passing checks do not establish its cause.",
+  "nested_guest_evidence": [
+    {
+      "profile": "direct1",
+      "exit": 0,
+      "archive": "completed-profiles/direct1.tar.gz",
+      "archive_sha256": "e3313e143da36dae15e7203a4b6fc61fbc7ec3b78816c1ed483005c47c9360ac",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "eb203bf65045aacfd752afdc1034cdf57b26c6f9cf3ca4e8b3e36a28af492c45",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "301f633e7dfb1d33db62accda026c6cc172829246ee76f9d2760ddc9f1cda3fa",
+          "bytes": 7049552,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "uefi1",
+      "exit": 0,
+      "archive": "completed-profiles/uefi1.tar.gz",
+      "archive_sha256": "69e3ca28c95814cdf04c09813b9171467f25fb173f107fdd65b8e0ade940615f",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "4c189a162bd13f7aa17a460acd8282e11d77c7e15d0429cbcb2aef040595437f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "eb203bf65045aacfd752afdc1034cdf57b26c6f9cf3ca4e8b3e36a28af492c45",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c0442b6ca0129cb490d4c20af3f92292ae17567e5b9ee10f61710415e7dfa777",
+          "bytes": 7058200,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "direct2",
+      "exit": 0,
+      "archive": "completed-profiles/direct2.tar.gz",
+      "archive_sha256": "c619b7899a89e5c625410f28e0cf0362991ec6315907849dfd5a75a4f35a561f",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "859203cb29fa29d6db2f4f9ee8215c4d152abeae85f5eeea2985f972ddbf9567",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "301f633e7dfb1d33db62accda026c6cc172829246ee76f9d2760ddc9f1cda3fa",
+          "bytes": 7049552,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "uefi2",
+      "exit": 0,
+      "archive": "completed-profiles/uefi2.tar.gz",
+      "archive_sha256": "52f8d62425d7b5208a6fd5a7aa25b3476b4b88f332ed6021113ca70e574c54d7",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "4c189a162bd13f7aa17a460acd8282e11d77c7e15d0429cbcb2aef040595437f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "859203cb29fa29d6db2f4f9ee8215c4d152abeae85f5eeea2985f972ddbf9567",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c0442b6ca0129cb490d4c20af3f92292ae17567e5b9ee10f61710415e7dfa777",
+          "bytes": 7058200,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "wtf-direct1",
+      "exit": 0,
+      "archive": "completed-profiles/wtf-direct1.tar.gz",
+      "archive_sha256": "b92a30d719deed30e152cfc12ea9555f7a7f9e10e5299dc0506292e9314d794c",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "35925e1284066bcb5d059c1376dff53ffca3117d238d9892747a2dd28dd9cc68",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "301f633e7dfb1d33db62accda026c6cc172829246ee76f9d2760ddc9f1cda3fa",
+          "bytes": 7049552,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "wtf-uefi1",
+      "exit": 0,
+      "archive": "completed-profiles/wtf-uefi1.tar.gz",
+      "archive_sha256": "e80a076835ca7faf9f42a3259120e52282abc580fc1c6bba9743817a3a006c86",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "4c189a162bd13f7aa17a460acd8282e11d77c7e15d0429cbcb2aef040595437f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "35925e1284066bcb5d059c1376dff53ffca3117d238d9892747a2dd28dd9cc68",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "c0442b6ca0129cb490d4c20af3f92292ae17567e5b9ee10f61710415e7dfa777",
+          "bytes": 7058200,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "pause-direct",
+      "exit": 0,
+      "archive": "completed-profiles/pause-direct.tar.gz",
+      "archive_sha256": "d8285c5b7e97b36b217d4e36813924b91ffd312a4dd2111f9f1e40110dea0a2c",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "55f86fc8c4cace7ddf00570058b5253d41cb4faff31c1ad6b59044e593e6f4b3",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "7f992d6a62999e26903b3e3df7931bbe2586efe0fcc92425fdeb985a94bba2be",
+          "bytes": 7048120,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "pause-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/pause-uefi.tar.gz",
+      "archive_sha256": "6f6689433a877480cf3625c8cbb89da67697fc9b2115c872058956edd5071de9",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "55f86fc8c4cace7ddf00570058b5253d41cb4faff31c1ad6b59044e593e6f4b3",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "foreign-direct",
+      "exit": 0,
+      "archive": "completed-profiles/foreign-direct.tar.gz",
+      "archive_sha256": "9721d32ed2b8e01f6fc344c44a0015c827f56a6d34f665130bb86dd25468bc1c",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "cd94f9fa2fe5b44c00925d6b5bf55338def0baf4c1603e01cb2659dbb86609c3",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "7f992d6a62999e26903b3e3df7931bbe2586efe0fcc92425fdeb985a94bba2be",
+          "bytes": 7048120,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "foreign-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/foreign-uefi.tar.gz",
+      "archive_sha256": "af33ba202099f5d5ae8145e1662c0bcd39d70580a412e57a61d13356e489bafe",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "cd94f9fa2fe5b44c00925d6b5bf55338def0baf4c1603e01cb2659dbb86609c3",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "raw-direct",
+      "exit": 0,
+      "archive": "completed-profiles/raw-direct.tar.gz",
+      "archive_sha256": "98b9c8f0ea27fe6f64aa3470f0419e81f2ce0ced3d1ae24c0a842c721fb09602",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "disposable.img",
+          "sha256": "2d4d7f54c33a11ac38181467845b48c3915dee2fa8325579c1efc3a6a6ebb508",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "7f992d6a62999e26903b3e3df7931bbe2586efe0fcc92425fdeb985a94bba2be",
+          "bytes": 7048120,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "raw-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/raw-uefi.tar.gz",
+      "archive_sha256": "00b7257e2e612983d1d587aa9d785e6f061d30c6e943faaea76a58e9c863a870",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "2d4d7f54c33a11ac38181467845b48c3915dee2fa8325579c1efc3a6a6ebb508",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "pthread-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/pthread-uefi.tar.gz",
+      "archive_sha256": "b8496f9f27f6f94e0cac04bbcaa7bf6b8906b7b26d8d379c5f5b023f9b560ef8",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "4a2d5c47b96eb546ee36489dfb474bab59866f9799fb60ecd0678dfb2ffed024",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "cxx20-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/cxx20-uefi.tar.gz",
+      "archive_sha256": "332135587cbbc5162afb53aad818c8c2276d13db937ef70a117ca1d89770b821",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "8b37ba5b1e94862b40cadde52427afd6739b67d2ea56501cdc79391bdec2fb5e",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "cxx23-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/cxx23-uefi.tar.gz",
+      "archive_sha256": "bc3452fadcdf75598295c1d5d1a083c1e76568eac15760cb79935eb1e6975d5e",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "20b19992a2a6106d681d724845795705dbf640199e7be1422c1895ea00efb72e",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "sync-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/sync-uefi.tar.gz",
+      "archive_sha256": "491e31393565c1ea52fa586eab7844a4c84d986f48b4b3faa905e3a797d45f2b",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "5f363162550c2e2e91d67ce5376c15a21d90679d5d52e0352f0f99b922cf800f",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "emutls-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/emutls-uefi.tar.gz",
+      "archive_sha256": "573b72a5d94fed00116cc8e74530e7a55d837c3ec45cb18871bce932823a7697",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "defbedfda898a2ab3d3ac9860374432ce08470b770a1308233d40757704568dc",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "startup-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/startup-uefi.tar.gz",
+      "archive_sha256": "854e7931e1548f3aee5f55307c6d092f1e55ed438a6e3081504fd029d3a6dddc",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "142dca4c5fdbf9eb5e648a652acd3705389ed3e651a1025ba7dcbeee918796b5",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "vm-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/vm-uefi.tar.gz",
+      "archive_sha256": "9e42d56c4cf7266434565a2c7df8b7ddd43980db302c2108f2c171541a3a7f94",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "994c39b1b742ddd80838fa29641c230b7194aa53da23bead2a9db1ca94574c28",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "detach-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/detach-uefi.tar.gz",
+      "archive_sha256": "80643980717a302c9e04c17d6350ca7e89ee7387cf7d05b496907d565d54f62f",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "0ed28922a899ad6fc6c1e070ae5687d03fde8c4586bd6a800e41266e2a8580b6",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "wtf-threads-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/wtf-threads-uefi.tar.gz",
+      "archive_sha256": "4317d4614a6dc4d0cdeb87aedf23ab6ccbf367c1b673ab03d2eed98ef27c0e5c",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "24e47af3ef759999d4fc9c48fd0e9104f03032840f6eaf4b5e71f6b6febc783c",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "wtf-fs-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/wtf-fs-uefi.tar.gz",
+      "archive_sha256": "c34e27975f45a1878cc7ce65c3d0cb3aa2878eb9e056b432c195f563f6d975b6",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "8f505f5243ae2c52a026a8d9ba30713e15c3b8979756fafe2c6d0dc606682cc0",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "jsc-options-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/jsc-options-uefi.tar.gz",
+      "archive_sha256": "0b8ad03fae1a20f498a5c5a2cd2133c8eff8ff389cf39b2a34306ad43369162c",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "e9a66b5398eced120f19c1de1db77288ec345541b5eb87d3172ddd15f5c4594d",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "jsc-register-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/jsc-register-uefi.tar.gz",
+      "archive_sha256": "54425c3977bd31c9231b6192a508a516d9cf3e783f4884d447c674338af65f17",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "a7fae4b47b574ae10b170a62e3cf0f2d03653af5517010768544002f828b6f2a",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "math-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/math-uefi.tar.gz",
+      "archive_sha256": "2c6fee4f7f81d4e16975828b59cb934303ec643c2a2ed901c275b23e83109d88",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "69e1d33341285d95d1c1904d4e471e6208c24631119e686f0d69ea4d9cd2873f",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "icu-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/icu-uefi.tar.gz",
+      "archive_sha256": "64f1c79e7acd0f5dfc8deaa582af7fe10557de4038dc2e758f9577adebfe4bd4",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "11c0c035f89a80fc352dbb5fc0858aea395a2006f04adde1a1d710f4f1ca2395",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "tls-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/tls-uefi.tar.gz",
+      "archive_sha256": "7cb70a0ea1ae73faf9546ed71eb5fa2b8fcf5138cd5079593dde294f6a25e46e",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "9b21cb9344ecd0e234608e5db547a8fa4c299d3323dde378e11ef64058223c12",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "tls6-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/tls6-uefi.tar.gz",
+      "archive_sha256": "39a4d20be91da71586f3cc8592af1b01c96df04f93a637025e5e1296b8dde281",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "5144352f755aa7b3fa5f36f37c763e88b60a95f966d92f303ea594fb57f25df3",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "typing-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/typing-uefi.tar.gz",
+      "archive_sha256": "e92c84428524ae09b403e8ff49f18ff070f1f158396765532b662a91733e316e",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "96af52d3d13a3aa7d268f215c1bb97cb4dff1a9c25331621418e46a75ff98b4b",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    },
+    {
+      "profile": "platform-uefi",
+      "exit": 0,
+      "archive": "completed-profiles/platform-uefi.tar.gz",
+      "archive_sha256": "30d3f46330d0558622687120c581e700e3a844c18ab92944c4c8df7df0f395f0",
+      "policy": "Closed guest copies only;complete exact member-verified archive retained,including failed fixtures for investigation. Current build/SDK/engine untouched.",
+      "removed_duplicate_files": [
+        {
+          "path": "boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "disposable.img",
+          "sha256": "6bdb400a03c62414d44eef19c74798fdb6762fc0f681a2e8ad6fe1357b6eafc7",
+          "bytes": 16777216,
+          "mode": 384
+        },
+        {
+          "path": "kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "reboot/boot.iso",
+          "sha256": "99e753d3dbc1e2db837b4cfa4da00942242c22634500894ced014c4efdd20b7f",
+          "bytes": 33603584,
+          "mode": 384
+        },
+        {
+          "path": "reboot/kernel.elf",
+          "sha256": "611457d39ecb730f2ea554f61227c96c0137efc3cf34fc1844339264beff1ece",
+          "bytes": 7056760,
+          "mode": 384
+        },
+        {
+          "path": "reboot/vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        },
+        {
+          "path": "vars.fd",
+          "sha256": "d6652bd9b175f4a362d3396ad3987d9064bbc15d6e9e057aa2ff3f800eaea3a1",
+          "bytes": 67108864,
+          "mode": 384
+        }
+      ]
+    }
+  ],
+  "raw_evidence": {
+    "archive": "/workspace/chos-evidence/native-foreign-gc-qualified.tar.gz",
+    "archive_sha256": "7a99074d3865cbb8543caa2c87b7c8957ea33cc9754412beba81b60fca5b1cbb",
+    "archive_bytes": 238638095,
+    "verification": "all restored members hash/length/mode verified; original tree retained"
+  },
+  "source_files_sha256": {
+    "Makefile": "2b2114800957caa69dd92b1a7301bc047abab6cae14206b203ffec172e09a84f",
+    "docs/BROWSER_ENGINE_PORT.md": "d68739c559aa3163d3006d0450a99540ab9988dc4d3864317ec64bd8797a38b8",
+    "docs/NATIVE_FOREIGN_GC.md": "a1b5f324149c6b9c362f014bb2b731dc842e17946a50850cc9592569eaad77e0",
+    "docs/NATIVE_JSC_FRAMEWORK_CLOSURE.md": "959926ff403a03a113e7b342462bd198c6cf0d7b54c18b244cd683bdc9e91608",
+    "docs/NATIVE_SDK.md": "cd3a36c0bcffd4c1f3f7a2958dba2d3ca85af1bed5bf851af37163d2a78021cb",
+    "docs/NATIVE_VM_MATH.md": "70cc87a9516e3d4faede951bc0733f520d886e28e5c4134f2b5cb7f6215c7e79",
+    "docs/NATIVE_WTF_THREADS.md": "6337c6528bbdd8600ef68c924b83e7d617c4a9b15542a230b809a72d95afd1bc",
+    "docs/STAGE3_CURRENT_RESULTS.md": "d7e675035f6a7c3090f01411b22a1979ac246c8e8628f586c85e96a42699b0e9",
+    "docs/dependencies/webkit-jsc-bringup.json": "176ca54edb31b197a0357487fa7adbacbde114212f53193dda2532730d6e9201",
+    "include/chos/process_caps.h": "d9801840f3170370c76867339e03c27a676efd68e7498197e8d8c021cbb84261",
+    "include/chos/scheduler.h": "d836ca856546e7fe374d7edd92109fe1aadf8760548383a1963b675673e55b42",
+    "include/chos/syscall.h": "3ee19d40a0c1f9c48c4433d550b99f8d5201245e7a9254beb4a41d0d401c62be",
+    "include/chos/thread_context_api.h": "2d1dec0119cac9c62ca2a0407ba22e828472d2e074241723b829f6df4e7656ce",
+    "include/chos/thread_pause.h": "4f556f619c1bf71ceb42a237323d98469b235a0b24d55518784c62b53e182c37",
+    "include/chos/threads.h": "8f1309c4e2a5df001011abc7ed1c7464c4764b936d8845f67a8d396553464c1d",
+    "kernel/core/scheduler.c": "31f31a3090c64feda8bdd4fd91fdb6062860c21e5b9248299d4e5263f794aa86",
+    "kernel/core/scheduler_core.c": "a279b62fd5d74ff26fb59d6c08447661d9cbededb0c81effd6e28d00b4e2318f",
+    "kernel/core/syscall.c": "49c0228831e8615c2e75ff39d5f037a8b5c655395301048764ba6e97e4bfbd82",
+    "kernel/core/threads.c": "b835edd7334e3e50e4da26adb4312f0163448b6b72182db709e4e0f4db09c43e",
+    "ports/webkit/chos/CurrentThreadCHOS.cpp": "8c1a102921a3be7c555e1f5d5acc1d9e5102bc2642744c918068b6a3da2309d4",
+    "ports/webkit/patches/0001-chos-platform-bringup.patch": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+    "tests/native_pause/CMakeLists.txt": "c0f083dbbb071e10e9562b997b357323b521d2425ee8e4c12740cc7371850f9c",
+    "tests/native_pause/main.cpp": "d61b28ed2a4d06e1408be7500c5899fb0ac0869e743025ab10d5b35c444d1b57",
+    "tests/native_pause/seed.S": "8f2969cf67a7e94625636500bb8c865e8e021894c0673f715600e0fffe4f3734",
+    "tests/native_pause/seed.h": "34c278f23887995c052d6dfe447e6215d5d79b538ef0ba8836440e8f9ef013d4",
+    "tests/qemu_native_pause.py": "2ea3f799f535d9b051844ec19b8791a4c0bfc32f02b53a8c441ab0c5a0dd38d2",
+    "tests/qemu_wtf_foreign_gc.py": "466a2ca5ff6dd80d8f8eea51f9afd506f8a7d84b1379e0106cae635df9c984fa",
+    "tests/test_process_caps.c": "e04080dbc5af1b0b1e8529dea4f7504dc5472b643e48a5d6312826050d666479",
+    "tests/test_scheduler.c": "a97ff37d24d34dbbd6664b69fd7b014d748a1bb40faccdda608ff8ce6171aa5e",
+    "tests/test_thread_api.c": "21b3afc3cb85cab5cd300dcfdf1403da3b955b4faeef3b2fd9641c7b9ecf5730",
+    "tests/test_user_abi.c": "3eb9862e97f5c42377b8c76eba2733fabebc585f122b01d50618abc95e7708a3",
+    "tests/wtf_foreign_gc/CMakeLists.txt": "310cd15f0328d1f2c09449ed7e457fa36e2d6ccab2b2a98effb018a17aa07d4f",
+    "tests/wtf_foreign_gc/main.cpp": "60aaaf678b2d2f07960d8a81872a87ed0ea9ab2ce60bc926344a33137351d11c",
+    "tools/build_native_pause.py": "aec199148d1b50685e900e5daf4af9ef62eaf58c38112a6108efb3114912afe2",
+    "tools/build_wtf_foreign_gc.py": "fdd3dcad4847765a9c5170be0fe2780225ea47951f653fb608dfa91d5275d946",
+    "userland/libchos/include/chos/user.h": "3a516f635644b17013f37b4f604ff0a48aff300a6b3629dc8e64c3354e9a920c"
+  },
+  "limits": [
+    "real pause/WTF coordination component,not complete conservative GC or running VM/browser",
+    "image still rejected at50,663,424 bytes under existing4MiB arena;address layout,loader/CHFS,frames/heap/global reserve/stacks/scheduler admission remain open",
+    "default32KiB stacks still below64KiB GC reserve;sampling profiler remains OFF;foreign signals/SMP/full POSIX not qualified",
+    "forced process exit reclaims resources without promising TLS/RAII destructors or robust user mutex recovery;storage IRQ-save latency remains separate",
+    "WebCore/browser,native Pi5 SDIO/firmware/auth/radio,production security and independent Fusion/Pi5/laptop acceptance remain open",
+    "development0.30.0;not Stage3/version0.50.0;no new binary completion claim"
+  ]
+}

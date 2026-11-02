@@ -128,4 +128,15 @@ scheduler_irq_action_t scheduler_preemption_plan(
     scheduler_task_state_t *states, uint64_t *wake_ticks, size_t count,
     size_t interrupted_slot, uint64_t now_tick, size_t *resume_slot);
 
+/* Same-process, single-CPU foreign user pause. A frozen task keeps its ordinary
+ * wait state; wake/deadline events are retained while dispatch is inhibited.
+ * Scheduler APIs never acquire process/thread/VM/allocator locks. */
+void scheduler_lower_context_enter(chos_irq_context_t *);
+/* Exception exit only: leaves local IRQs masked through ERET. */
+void scheduler_lower_context_leave(chos_irq_context_t *);
+int scheduler_pause_user_task(address_space_handle_t,uint32_t,chos_irq_context_t *);
+int scheduler_resume_user_task(address_space_handle_t,uint32_t);
+int scheduler_pick_next_unpaused(const scheduler_task_state_t *,const uint8_t *,size_t,size_t,size_t *);
+scheduler_irq_action_t scheduler_preemption_plan_unpaused(scheduler_task_state_t *,uint64_t *,const uint8_t *,size_t,size_t,uint64_t,size_t *);
+
 #endif

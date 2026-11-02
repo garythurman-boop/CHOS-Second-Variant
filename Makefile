@@ -1522,10 +1522,10 @@ $(BUILD)/userland/thread_test.o: userland/examples/thread_test.c include/chos/th
 $(BUILD)/userland/thread_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o $(BUILD)/userland/thread_test.o userland/native.ld
 	$(LD) -T userland/native.ld -nostdlib -static -z max-page-size=4096 -o $@ $(filter %.o,$^)
 test: $(BUILD)/userland/thread_test.elf
-$(BUILD)/test-thread-api: tests/test_thread_api.c include/chos/thread_api.h
+$(BUILD)/test-thread-api: tests/test_thread_api.c include/chos/thread_api.h include/chos/thread_pause.h
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude $< -o $@
-$(SAN_DIR)/test-thread-api: tests/test_thread_api.c include/chos/thread_api.h
+$(SAN_DIR)/test-thread-api: tests/test_thread_api.c include/chos/thread_api.h include/chos/thread_pause.h
 	@mkdir -p $(dir $@)
 	$(CC_HOST) $(SAN_FLAGS) $< -o $@
 test-thread-api: $(BUILD)/test-thread-api

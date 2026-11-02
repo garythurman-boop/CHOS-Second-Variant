@@ -1,0 +1,135 @@
+.text
+.align 4
+.global pause_seed_run
+.type pause_seed_run,%function
+pause_seed_run:
+ sub sp,sp,#624
+ stp x19,x20,[sp,#0]
+ stp x21,x22,[sp,#16]
+ stp x23,x24,[sp,#32]
+ stp x25,x26,[sp,#48]
+ stp x27,x28,[sp,#64]
+ stp x29,x30,[sp,#80]
+ stp q0,q1,[sp,#96]
+ stp q2,q3,[sp,#128]
+ stp q4,q5,[sp,#160]
+ stp q6,q7,[sp,#192]
+ stp q8,q9,[sp,#224]
+ stp q10,q11,[sp,#256]
+ stp q12,q13,[sp,#288]
+ stp q14,q15,[sp,#320]
+ stp q16,q17,[sp,#352]
+ stp q18,q19,[sp,#384]
+ stp q20,q21,[sp,#416]
+ stp q22,q23,[sp,#448]
+ stp q24,q25,[sp,#480]
+ stp q26,q27,[sp,#512]
+ stp q28,q29,[sp,#544]
+ stp q30,q31,[sp,#576]
+ mrs x9,fpcr
+ mrs x10,fpsr
+ str x9,[sp,#608]
+ str x10,[sp,#616]
+ mov x12,x0
+ ldp x19,x20,[x12,#48]
+ ldp x21,x22,[x12,#64]
+ ldp x23,x24,[x12,#80]
+ ldp x25,x26,[x12,#96]
+ ldp x27,x28,[x12,#112]
+ ldp q0,q1,[x12,#128]
+ ldp q2,q3,[x12,#160]
+ ldp q4,q5,[x12,#192]
+ ldp q6,q7,[x12,#224]
+ ldp q8,q9,[x12,#256]
+ ldp q10,q11,[x12,#288]
+ ldp q12,q13,[x12,#320]
+ ldp q14,q15,[x12,#352]
+ ldp q16,q17,[x12,#384]
+ ldp q18,q19,[x12,#416]
+ ldp q20,q21,[x12,#448]
+ ldp q22,q23,[x12,#480]
+ ldp q24,q25,[x12,#512]
+ ldp q26,q27,[x12,#544]
+ ldp q28,q29,[x12,#576]
+ ldp q30,q31,[x12,#608]
+.global pause_seed_active
+pause_seed_active:
+ mov w11,#1
+ stlr w11,[x12]
+1:
+ ldr x10,[x12,#16]
+ add x10,x10,#1
+ str x10,[x12,#16]
+ add x14,x12,#4
+ ldar w11,[x14]
+ cbnz w11,3f
+ ldr w11,[x12,#8]
+ cbz w11,1b
+ add x0,x12,#12
+ ldar w11,[x0]
+ cbnz w11,3f
+ mov x1,#0
+ mov x2,#60000
+ mov x8,#61
+ svc #0
+.global pause_seed_wait_return
+pause_seed_wait_return:
+ b 1b
+3:
+ add x14,x12,#640
+ stp x19,x20,[x14,#0]
+ stp x21,x22,[x14,#16]
+ stp x23,x24,[x14,#32]
+ stp x25,x26,[x14,#48]
+ stp x27,x28,[x14,#64]
+ add x14,x12,#720
+ stp q0,q1,[x14,#0]
+ stp q2,q3,[x14,#32]
+ stp q4,q5,[x14,#64]
+ stp q6,q7,[x14,#96]
+ stp q8,q9,[x14,#128]
+ stp q10,q11,[x14,#160]
+ stp q12,q13,[x14,#192]
+ stp q14,q15,[x14,#224]
+ stp q16,q17,[x14,#256]
+ stp q18,q19,[x14,#288]
+ stp q20,q21,[x14,#320]
+ stp q22,q23,[x14,#352]
+ stp q24,q25,[x14,#384]
+ stp q26,q27,[x14,#416]
+ stp q28,q29,[x14,#448]
+ stp q30,q31,[x14,#480]
+ mrs x9,fpcr
+ mrs x10,fpsr
+ add x14,x12,#1232
+ stp x9,x10,[x14]
+.global pause_seed_end
+pause_seed_end:
+ ldr x9,[sp,#608]
+ ldr x10,[sp,#616]
+ msr fpcr,x9
+ msr fpsr,x10
+ ldp q0,q1,[sp,#96]
+ ldp q2,q3,[sp,#128]
+ ldp q4,q5,[sp,#160]
+ ldp q6,q7,[sp,#192]
+ ldp q8,q9,[sp,#224]
+ ldp q10,q11,[sp,#256]
+ ldp q12,q13,[sp,#288]
+ ldp q14,q15,[sp,#320]
+ ldp q16,q17,[sp,#352]
+ ldp q18,q19,[sp,#384]
+ ldp q20,q21,[sp,#416]
+ ldp q22,q23,[sp,#448]
+ ldp q24,q25,[sp,#480]
+ ldp q26,q27,[sp,#512]
+ ldp q28,q29,[sp,#544]
+ ldp q30,q31,[sp,#576]
+ ldp x19,x20,[sp,#0]
+ ldp x21,x22,[sp,#16]
+ ldp x23,x24,[sp,#32]
+ ldp x25,x26,[sp,#48]
+ ldp x27,x28,[sp,#64]
+ ldp x29,x30,[sp,#80]
+ add sp,sp,#624
+ ret

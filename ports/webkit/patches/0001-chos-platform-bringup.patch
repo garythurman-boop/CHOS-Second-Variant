@@ -943,9 +943,18 @@ index d928bed8..e265b2e0 100644
 
  #if OS(OPENBSD)
 diff --git a/Source/WTF/wtf/Threading.cpp b/Source/WTF/wtf/Threading.cpp
-index 830f8b7f..d3618a7e 100644
+index 830f8b7f..2b4691f7 100644
 --- a/Source/WTF/wtf/Threading.cpp
 +++ b/Source/WTF/wtf/Threading.cpp
+@@ -224,7 +224,7 @@ void Thread::initializeInThread()
+     }
+ #endif
+
+-#if OS(LINUX)
++#if OS(LINUX) || OS(CHOS)
+     m_id = currentID();
+ #endif
+ }
 @@ -484,7 +484,11 @@ void initialize()
          Thread::initializeTLSKey();
  #endif
@@ -959,7 +968,7 @@ index 830f8b7f..d3618a7e 100644
          initializeLibraryPathDiagnostics();
  #endif
 diff --git a/Source/WTF/wtf/Threading.h b/Source/WTF/wtf/Threading.h
-index a376be92..7b8c7e67 100644
+index a376be92..8dc487b3 100644
 --- a/Source/WTF/wtf/Threading.h
 +++ b/Source/WTF/wtf/Threading.h
 @@ -57,7 +57,7 @@
@@ -971,6 +980,15 @@ index a376be92..7b8c7e67 100644
  #include <signal.h>
  #endif
 
+@@ -191,7 +191,7 @@ public:
+     WTF_EXPORT_PRIVATE size_t getRegisters(const ThreadSuspendLocker&, PlatformRegisters&);
+
+ #if USE(PTHREADS)
+-#if OS(LINUX)
++#if OS(LINUX) || OS(CHOS)
+     WTF_EXPORT_PRIVATE static ThreadIdentifier currentID();
+     ThreadIdentifier id() const { return m_id; }
+ #endif
 @@ -326,7 +326,7 @@ protected:
      void establishPlatformSpecificHandle(PlatformThreadHandle, ThreadIdentifier);
  #endif
@@ -980,11 +998,29 @@ index a376be92..7b8c7e67 100644
      static void signalHandlerSuspendResume(int, siginfo_t*, void* ucontext);
  #endif
 
+@@ -402,7 +402,7 @@ protected:
+ #elif OS(DARWIN)
+     mach_port_t m_platformThread { MACH_PORT_NULL };
+ #elif USE(PTHREADS)
+-#if OS(LINUX)
++#if OS(LINUX) || OS(CHOS)
+     ThreadIdentifier m_id { 0 };
+ #endif
+     PlatformRegisters* m_platformRegisters { nullptr };
 diff --git a/Source/WTF/wtf/ThreadingPrimitives.h b/Source/WTF/wtf/ThreadingPrimitives.h
-index 5b4c0629..5c98613e 100644
+index 5b4c0629..6e29c773 100644
 --- a/Source/WTF/wtf/ThreadingPrimitives.h
 +++ b/Source/WTF/wtf/ThreadingPrimitives.h
-@@ -134,7 +134,12 @@ inline void threadSpecificKeyDelete(ThreadSpecificKey key)
+@@ -59,6 +59,8 @@ using PlatformCondition = pthread_cond_t;
+ using ThreadSpecificKey = pthread_key_t;
+ #if OS(LINUX)
+ using ThreadIdentifier = pid_t;
++#elif OS(CHOS)
++using ThreadIdentifier = uint32_t; // Actual native kernel TID, never a pthread TCB pointer.
+ #endif
+ #elif OS(WINDOWS)
+ using ThreadIdentifier = uint32_t;
+@@ -134,7 +136,12 @@ inline void threadSpecificKeyDelete(ThreadSpecificKey key)
 
  inline void threadSpecificSet(ThreadSpecificKey key, void* value)
  {
