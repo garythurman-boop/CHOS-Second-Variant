@@ -710,3 +710,14 @@ its50,663,424-byte image is still rejected under unchanged admission limits. See
 [the exact scope and qualification](NATIVE_FOREIGN_GC.md). No VM/JavaScript,
 full conservative collection, WebCore/browser or Stage3/version0.50.0 completion
 is claimed.
+
+### Indexed frame ownership for larger engine resources
+
+The [native frame index](NATIVE_FRAME_OWNERSHIP.md) replaces per-page dense-list
+searches with bounded ownership lookup and collision-chain deletion. Host and
+sanitizer model checks cover 2.5 million operations, including a simulated
+49,152-frame table. The live full-quota diagnostic exercises allocation,
+zeroing, mapped/foreign/stale refusals, hole reuse and sparse destruction using
+the existing 2,048-frame limit. This is resource bookkeeping, not larger engine
+admission or full-VM execution. Current image/heap/stack limits, the full browser,
+native Wi-Fi and final security/platform gates remain open; version stays0.30.0.

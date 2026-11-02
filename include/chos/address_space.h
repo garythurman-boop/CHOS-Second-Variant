@@ -123,5 +123,8 @@ size_t address_space_count(void);
 int address_space_get_info_at(size_t index, address_space_info_t *out);
 const char *address_space_error_string(address_space_error_t error);
 int address_space_self_test(void);
+/* Explicit diagnostic: exercise the full existing frame quota without changing
+ * active roots; only runs from the canonical kernel root with no live spaces. */
+int address_space_frame_self_test(void);
 
 #endif

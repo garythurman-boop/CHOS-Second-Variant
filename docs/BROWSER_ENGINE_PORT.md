@@ -476,3 +476,10 @@ The [native foreign-pause/WTF coordination component](NATIVE_FOREIGN_GC.md) now
 supersedes earlier missing-foreign-method diagnoses: the full VM link has no
 undefined symbols. Its image remains unadmitted; full VM/GC/browser execution and
 the remaining revised Stage3 gates are still open.
+
+The [native frame index](NATIVE_FRAME_OWNERSHIP.md) now removes the old quadratic
+owned-page search from loader/memory operations. Large synthetic host tables
+qualify the bookkeeping algorithm, while live guests retain their existing
+8 MiB frame quota. Larger image/heap/stack admission, incremental memory
+operations, executable storage and actual full-VM/GC execution remain necessary;
+this does not lift the current linker arena or enable a modern browser.

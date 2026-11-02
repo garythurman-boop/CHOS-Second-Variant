@@ -1786,6 +1786,7 @@ static void print_help(void) {
     uart_puts("  vmminfo    Show MMU state and bootstrap mappings\n");
     uart_puts("  asinfo     Show prepared process address spaces and user VA policy\n");
     uart_puts("  as-test    Test private user roots, mappings, ownership and teardown\n");
+    uart_puts("  as-frames-test Test full frame quota, indexed ownership and page reuse\n");
     uart_puts("  as-switch-test  Switch TTBR0 between two EL1-only roots and verify same-VA isolation\n");
     uart_puts("  task-as-test Test timer-preempted tasks bound to private address spaces\n");
     uart_puts("  vmm-test   Test MMU permissions, dynamic map/unmap and targeted TLB invalidation\n");
@@ -2028,6 +2029,10 @@ static void execute_command(char *line, const fdt_info_t *tree) {
         print_address_space_info();
     } else if (strings_equal(line, "as-test")) {
         run_address_space_test();
+    } else if (strings_equal(line, "as-frames-test")) {
+        uart_puts(address_space_frame_self_test()
+            ? "[ OK ] full-quota indexed frame ownership, page reuse and cleanup passed\n"
+            : "[FAIL] full-quota frame test refused or ownership/PMM baseline failed\n");
     } else if (strings_equal(line, "as-switch-test")) {
         run_address_space_switch_test();
     } else if (strings_equal(line, "task-as-test")) {
