@@ -121,6 +121,11 @@ class Guest:
         raise AssertionError('No visible foreground window')
     def serial(self,c):
         self.process.stdin.write((c+'\n').encode());self.process.stdin.flush()
+    def ping_state(self):
+        # Clang may scalarize this private C aggregate. Its first scalar is the
+        # state (also the first uint32 returned by chos_net_ping_get_info).
+        name='ping_state' if 'ping_state' in self.symbols else 'ping_state.0'
+        return int.from_bytes(self.block(name,size=4),'little')
     def terminal(self):return self.block('terminal_lines',size=69*29).decode('ascii',errors='replace').replace('\x00','\n')
     def type(self,command,enter=True):
         keys={'.':'dot','/':'slash','-':'minus',' ':'spc'}
@@ -165,6 +170,7 @@ def main():
     ap.add_argument('--rtc-base')
     ap.add_argument('--pci-virtio',action='store_true')
     ap.add_argument('--net-model',choices=['virtio','vmxnet3','e1000e'],default='virtio')
+    ap.add_argument('--net-capture',action='store_true',help='capture actual Ethernet frames for network diagnosis')
     ap.add_argument('--trace',action='store_true')
     ap.add_argument('--nvme',action='store_true')
     ap.add_argument('--no-usb',action='store_true')
@@ -292,12 +298,18 @@ def main():
             expected='Entropy unavailable:' if args.no_rng else 'Received 32 hardware entropy bytes.'
             wait(lambda:expected in g.terminal(),3,'PCI entropy hardware receipt or explicit absence')
             g.type('ping 10.0.2.2')
+            (out/'ping-command-console.txt').write_text(g.terminal())
             next_status=[0.0]
+            ping_observations=[]
             def gui_ping_replied():
                 if time.monotonic()>next_status[0]:
                     g.type('netstatus');next_status[0]=time.monotonic()+.5
+                    ping_observations.append({'seconds_since_guest_start':time.monotonic()-g.started,'native_ping_state':g.ping_state()})
+                    (out/'ping-observations.json').write_text(json.dumps(ping_observations,indent=2)+'\n')
                 return 'Ping: reply received' in g.terminal()
             wait(gui_ping_replied,10,'PCI VirtIO ARP/ICMP reply')
+            result['native_ping_state']=g.ping_state()
+            assert result['native_ping_state']==2,'GUI reply must agree with native ICMP state'
             (out/'pci-console.txt').write_text(g.terminal());g.screen('pci-diagnostics')
             result['checks']+=[('NVMe injected write failure and responsive GUI' if args.storage_error else 'NVMe CHFS write/flush/read') if args.nvme else 'PCI VirtIO CHFS write/flush/read','PCI VirtIO hardware RNG' if not args.no_rng else 'PCI RNG absent fails explicitly',({'vmxnet3':'VMXNET3','e1000e':'82574L e1000e','virtio':'PCI VirtIO'}[args.net_model]+' DHCP/ARP/ICMP')]
         before=g.screen('pointer-before');t=time.monotonic()
@@ -426,6 +438,9 @@ def main():
             if args.pci_virtio:
                 result['virtio_devices']=g.qmp('x-query-virtio')
                 result['network_debug']={name:g.block(name,size=size).hex() for name,size in [('net_state',112),('net_info',112),('tx_used',24),('rx_used',32)]}
+                result['native_ping_state']=g.ping_state()
+                (out/'failure-console.txt').write_text(g.terminal())
+                g.screen('failure-screen',full=True)
     finally:
         if g:g.close()
         (out/'result.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))

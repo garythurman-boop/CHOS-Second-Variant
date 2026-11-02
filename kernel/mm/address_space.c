@@ -6,6 +6,7 @@
 #include "chos/spinlock.h"
 #include "chos/scheduler.h"
 #include "chos/frame_ownership.h"
+#include "chos/timer.h"
 
 #define DESC_VALID       (1ull << 0)
 #define DESC_TABLE_PAGE  3ull
@@ -25,6 +26,8 @@ _Static_assert((FRAME_BUCKETS & (FRAME_BUCKETS - 1u)) == 0u, "Frame buckets must
 
 typedef struct {
     int live;
+    int destroying;
+    uint32_t resource_profile;
     uint32_t id;
     uint32_t generation;
     uint32_t mapped_user_pages;
@@ -39,6 +42,10 @@ typedef struct {
 } address_space_slot_t;
 
 static address_space_slot_t spaces[CHOS_AS_MAX_SPACES];
+static chos_owned_frame_t engine_frames[CHOS_RESOURCE_ENGINE_BUCKETS];
+static int32_t engine_owner_slot = -1;
+static uint32_t committed_frame_limits;
+static volatile uint64_t last_engine_teardown_ticks;
 static uint32_t slot_generations[CHOS_AS_MAX_SPACES];
 static uint32_t next_address_space_id = 1u;
 static chos_spinlock_t address_space_lock = CHOS_SPINLOCK_INITIALIZER;
@@ -56,7 +63,7 @@ static int handle_slot(address_space_handle_t handle, address_space_slot_t **out
     address_space_slot_t *slot;
     if (out == NULL || handle.slot >= CHOS_AS_MAX_SPACES || handle.generation == 0u || handle.id == 0u) return 0;
     slot = &spaces[handle.slot];
-    if (!slot->live || slot->generation != handle.generation || slot->id != handle.id) return 0;
+    if (!slot->live || slot->destroying || slot->generation != handle.generation || slot->id != handle.id) return 0;
     *out = slot;
     return 1;
 }
@@ -181,6 +188,8 @@ static void fill_info(size_t index, const address_space_slot_t *slot, address_sp
     out->user_l3_tables = table_count;
     out->task_references = slot->task_references;
     out->root_table_physical = slot->root_pa;
+    out->resource_profile = slot->resource_profile;
+    out->destroying = slot->destroying;
 }
 
 static int query_root(const address_space_slot_t *slot, uint64_t virtual_address,
@@ -205,16 +214,32 @@ static int backing_page_is_suitable(address_space_slot_t *slot, uint64_t physica
 }
 
 address_space_error_t address_space_create(address_space_handle_t *out) {
+    return address_space_create_profile(CHOS_RESOURCE_LEGACY, out);
+}
+
+address_space_error_t address_space_create_profile(uint32_t profile_id, address_space_handle_t *out) {
     uint64_t irq_flags, root_pa = 0u, device_pa = 0u, ram_pa = 0u, low_pa = 0u;
     uint64_t *root, *device_l2, *ram_l2;
     size_t index;
     uint32_t generation, id;
 
+    chos_resource_profile_t profile;
+    pmm_stats_t available;
     if (out == NULL) return AS_ERR_ARGUMENT;
     out->slot = out->generation = out->id = 0u;
+    if (!chos_resource_profile_get(profile_id, &profile)) return AS_ERR_ARGUMENT;
     if (!vmm_is_enabled()) return AS_ERR_VMM_NOT_READY;
 
     irq_flags = chos_spin_lock_irqsave(&address_space_lock);
+    if (profile_id == CHOS_RESOURCE_ENGINE && engine_owner_slot >= 0) {
+        chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
+        return AS_ERR_CAPACITY;
+    }
+    pmm_get_stats(&available);
+    if (!chos_resource_admit(committed_frame_limits, available.free_pages, &profile)) {
+        chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
+        return AS_ERR_OUT_OF_MEMORY;
+    }
     for (index = 0u; index < CHOS_AS_MAX_SPACES; ++index) if (!spaces[index].live) break;
     if (index == CHOS_AS_MAX_SPACES) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
@@ -272,13 +297,17 @@ address_space_error_t address_space_create(address_space_handle_t *out) {
     id = next_address_space_id++;
     if (next_address_space_id == 0u) next_address_space_id = 1u;
     zero_bytes(&spaces[index], sizeof(spaces[index]));
-    if (!chos_frame_table_init(&spaces[index].frames, spaces[index].user_frames,
-                              FRAME_BUCKETS, CHOS_AS_MAX_USER_FRAMES)) {
+    if (!chos_frame_table_init(&spaces[index].frames,
+            profile_id == CHOS_RESOURCE_ENGINE ? engine_frames : spaces[index].user_frames,
+            profile.buckets, profile.frame_limit)) {
         if (low_pa) (void)pmm_free_page(low_pa);
         (void)pmm_free_page(ram_pa); (void)pmm_free_page(device_pa); (void)pmm_free_page(root_pa);
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_BAD_DESCRIPTOR;
     }
+    spaces[index].resource_profile = profile_id;
+    committed_frame_limits += profile.frame_limit;
+    if (profile_id == CHOS_RESOURCE_ENGINE) engine_owner_slot = (int32_t)index;
     spaces[index].live = 1;
     spaces[index].id = id;
     spaces[index].generation = generation;
@@ -307,11 +336,14 @@ address_space_error_t address_space_alloc_user_page(address_space_handle_t handl
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_BAD_HANDLE;
     }
-    if (slot->frames.count >= CHOS_AS_MAX_USER_FRAMES) {
+    if (slot->frames.count >= slot->frames.capacity) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_FRAME_CAPACITY;
     }
-    if (!pmm_alloc_page(&physical_address)) {
+    pmm_stats_t available;
+    pmm_get_stats(&available);
+    if (available.free_pages <= CHOS_RESOURCE_SYSTEM_RESERVE_FRAMES ||
+        !pmm_alloc_page(&physical_address)) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_OUT_OF_MEMORY;
     }
@@ -346,7 +378,7 @@ address_space_error_t address_space_free_user_page(address_space_handle_t handle
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_PAGE_NOT_OWNED;
     }
-    if (slot->user_frames[index].mapped_virtual_address != 0u) {
+    if (slot->frames.entries[index].mapped_virtual_address != 0u) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_PAGE_MAPPED;
     }
@@ -393,7 +425,7 @@ address_space_error_t address_space_map_user_page(address_space_handle_t handle,
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_PAGE_NOT_OWNED;
     }
-    if (slot->user_frames[owned_index].mapped_virtual_address != 0u) {
+    if (slot->frames.entries[owned_index].mapped_virtual_address != 0u) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_MAPPING_CONFLICT;
     }
@@ -408,7 +440,9 @@ address_space_error_t address_space_map_user_page(address_space_handle_t handle,
             chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
             return AS_ERR_MAPPING_CONFLICT;
         }
-        if (!pmm_alloc_page(&l3_pa)) {
+        pmm_stats_t available;
+        pmm_get_stats(&available);
+        if (available.free_pages <= CHOS_RESOURCE_SYSTEM_RESERVE_FRAMES || !pmm_alloc_page(&l3_pa)) {
             chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
             return AS_ERR_OUT_OF_MEMORY;
         }
@@ -448,7 +482,7 @@ address_space_error_t address_space_map_user_page(address_space_handle_t handle,
     if (vmm_current_root_table_address() == slot->root_pa)
         vmm_tlb_invalidate_page(virtual_address);
     ++slot->mapped_user_pages;
-    slot->user_frames[owned_index].mapped_virtual_address = virtual_address;
+    slot->frames.entries[owned_index].mapped_virtual_address = virtual_address;
     chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
     return AS_OK;
 }
@@ -483,7 +517,7 @@ address_space_error_t address_space_unmap_user_page(address_space_handle_t handl
         return AS_ERR_PAGE_NOT_MAPPED;
     }
     if (!find_owned_frame(slot, descriptor & DESC_ADDR_MASK, &owned_index) ||
-        slot->user_frames[owned_index].mapped_virtual_address != virtual_address) {
+        slot->frames.entries[owned_index].mapped_virtual_address != virtual_address) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_BAD_DESCRIPTOR;
     }
@@ -492,7 +526,7 @@ address_space_error_t address_space_unmap_user_page(address_space_handle_t handl
     vmm_clean_page_table_range(&l3[l3_index], sizeof(l3[l3_index]));
     if (vmm_current_root_table_address() == slot->root_pa)
         vmm_tlb_invalidate_page(virtual_address);
-    slot->user_frames[owned_index].mapped_virtual_address = 0u;
+    slot->frames.entries[owned_index].mapped_virtual_address = 0u;
     if (slot->mapped_user_pages > 0u) --slot->mapped_user_pages;
 
     /* With ASID 0, a VA invalidation is sufficient while this root is active; a later
@@ -523,7 +557,7 @@ static address_space_error_t collect_owned_data_range(address_space_handle_t han
         uint64_t *pte=&((uint64_t *)(uintptr_t)pa)[address_space_user_l3_index(va)];
         uint64_t physical=*pte&DESC_ADDR_MASK;uint32_t owned_index;
         if (!find_owned_frame(slot,physical,&owned_index) ||
-            slot->user_frames[owned_index].mapped_virtual_address!=va ||
+            slot->frames.entries[owned_index].mapped_virtual_address!=va ||
             !(address_space_user_descriptor_matches(*pte,physical,AS_PERM_USER_RW) ||
               address_space_user_descriptor_matches(*pte,physical,AS_PERM_USER_RO) ||
               address_space_user_descriptor_matches(*pte,physical,AS_PERM_USER_NONE)))
@@ -570,84 +604,84 @@ address_space_error_t address_space_discard_user_range(address_space_handle_t ha
 
 address_space_error_t address_space_destroy(address_space_handle_t handle) {
     address_space_slot_t *slot;
-    uint64_t irq_flags, root_pa, device_pa, ram_pa, low_pa;
-    size_t i;
-    irq_flags = chos_spin_lock_irqsave(&address_space_lock);
+    uint64_t irq_flags = chos_spin_lock_irqsave(&address_space_lock);
     if (!handle_slot(handle, &slot)) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_BAD_HANDLE;
     }
-    if (slot->task_references != 0u) {
+    address_space_error_t refusal = AS_OK;
+    if (slot->task_references) refusal = AS_ERR_REFERENCED;
+    else if (active_address_space_slot == (int32_t)handle.slot ||
+             vmm_current_root_table_address() == slot->root_pa) refusal = AS_ERR_ACTIVE;
+    else if (slot->mapped_user_pages) refusal = AS_ERR_HAS_MAPPINGS;
+    if (refusal != AS_OK) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
-        return AS_ERR_REFERENCED;
+        return refusal;
     }
-    if (active_address_space_slot == (int32_t)handle.slot ||
-        vmm_current_root_table_address() == slot->root_pa) {
-        chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
-        return AS_ERR_ACTIVE;
-    }
-    if (slot->mapped_user_pages != 0u) {
-        chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
-        return AS_ERR_HAS_MAPPINGS;
-    }
-    root_pa = slot->root_pa;
-    device_pa = slot->device_l2_pa;
-    ram_pa = slot->ram_l2_pa;
-    low_pa = slot->low_l1_pa;
-    for (i = 0u; i < CHOS_AS_USER_L2_SLOTS; ++i) {
-        if (slot->user_l3_pa[i] != 0u && !pmm_is_allocated_page(slot->user_l3_pa[i])) {
-            chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
+    /* Quiescent, unreferenced and inactive. Retain the slot, pool and logical
+     * commitment, but refuse every handle operation before dropping the lock.
+     * A failed preflight/release quarantines this owner until reboot. No task
+     * can acquire a new reference or activate the root while teardown yields. */
+    slot->destroying = 1;
+    chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
+    uint64_t teardown_start = timer_ticks();
+    chos_resource_profile_t profile;
+    if (!chos_resource_profile_get(slot->resource_profile, &profile) ||
+        slot->frames.capacity != profile.frame_limit || slot->frames.buckets != profile.buckets)
+        return AS_ERR_BAD_DESCRIPTOR;
+    uint64_t tables[] = {slot->root_pa, slot->device_l2_pa, slot->ram_l2_pa, slot->low_l1_pa};
+    for (size_t i = 0; i < 4; ++i)
+        if ((i < 3 || tables[i]) && !pmm_is_allocated_page(tables[i])) return AS_ERR_BAD_DESCRIPTOR;
+    for (size_t i = 0; i < CHOS_AS_USER_L2_SLOTS; ++i)
+        if (slot->user_l3_pa[i] && !pmm_is_allocated_page(slot->user_l3_pa[i]))
             return AS_ERR_BAD_DESCRIPTOR;
-        }
+    uint32_t observed = 0;
+    for (uint32_t i = 0; i < slot->frames.buckets; ++i) {
+        const chos_owned_frame_t *frame = &slot->frames.entries[i];
+        if (frame->mapped_virtual_address) return AS_ERR_BAD_DESCRIPTOR;
+        if (!frame->physical_address) continue;
+        uint32_t found;
+        if (!chos_frame_table_find(&slot->frames, frame->physical_address, &found) || found != i ||
+            !pmm_is_allocated_page(frame->physical_address)) return AS_ERR_BAD_DESCRIPTOR;
+        ++observed;
     }
-    uint32_t observed_frames = 0u;
-    for (i = 0u; i < FRAME_BUCKETS; ++i) {
-        if (!slot->user_frames[i].physical_address) {
-            if (slot->user_frames[i].mapped_virtual_address) {
-                chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
-                return AS_ERR_BAD_DESCRIPTOR;
-            }
-            continue;
-        }
-        ++observed_frames;
-        if (slot->user_frames[i].mapped_virtual_address != 0u ||
-            !pmm_is_allocated_page(slot->user_frames[i].physical_address)) {
-            chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
-            return AS_ERR_BAD_DESCRIPTOR;
-        }
+    if (observed != slot->frames.count) return AS_ERR_BAD_DESCRIPTOR;
+    /* Scrub and release one physical page at a time with the caller's IRQ
+     * state restored. Only short metadata updates use the address-space lock. */
+    for (uint32_t i = 0; i < slot->frames.buckets; ++i) {
+        uint64_t physical = slot->frames.entries[i].physical_address;
+        if (!physical) continue;
+        zero_bytes((void *)(uintptr_t)physical, VMM_PAGE_SIZE);
+        vmm_clean_page_table_range((const void *)(uintptr_t)physical, VMM_PAGE_SIZE);
+        if (!pmm_free_page(physical)) return AS_ERR_BAD_DESCRIPTOR;
+        irq_flags = chos_spin_lock_irqsave(&address_space_lock);
+        slot->frames.entries[i] = (chos_owned_frame_t){0u, 0u};
+        --slot->frames.count;
+        chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
     }
-    if (observed_frames != slot->frames.count ||
-        !pmm_is_allocated_page(root_pa) || !pmm_is_allocated_page(device_pa) ||
-        !pmm_is_allocated_page(ram_pa) || (low_pa && !pmm_is_allocated_page(low_pa))) {
+    for (size_t i = 0; i < CHOS_AS_USER_L2_SLOTS; ++i) {
+        uint64_t physical = slot->user_l3_pa[i];
+        if (physical && !pmm_free_page(physical)) return AS_ERR_BAD_DESCRIPTOR;
+        irq_flags = chos_spin_lock_irqsave(&address_space_lock);
+        slot->user_l3_pa[i] = 0;
+        chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
+    }
+    for (size_t i = 0; i < 4; ++i)
+        if (tables[i] && !pmm_free_page(tables[i])) return AS_ERR_BAD_DESCRIPTOR;
+    irq_flags = chos_spin_lock_irqsave(&address_space_lock);
+    if (committed_frame_limits < profile.frame_limit ||
+        (slot->resource_profile == CHOS_RESOURCE_ENGINE && engine_owner_slot != (int32_t)handle.slot)) {
         chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
         return AS_ERR_BAD_DESCRIPTOR;
     }
-
-    for (i = 0u; i < CHOS_AS_USER_L2_SLOTS; ++i) {
-        uint64_t l3_pa = slot->user_l3_pa[i];
-        if (l3_pa != 0u) (void)pmm_free_page(l3_pa);
+    committed_frame_limits -= profile.frame_limit;
+    if (slot->resource_profile == CHOS_RESOURCE_ENGINE) {
+        engine_owner_slot = -1;
+        last_engine_teardown_ticks = timer_ticks() - teardown_start;
     }
-    for (i = 0u; i < FRAME_BUCKETS; ++i) {
-        uint64_t user_pa = slot->user_frames[i].physical_address;
-        if (!user_pa) continue;
-        zero_bytes((void *)(uintptr_t)user_pa, VMM_PAGE_SIZE);
-        vmm_clean_page_table_range((const void *)(uintptr_t)user_pa, VMM_PAGE_SIZE);
-        (void)pmm_free_page(user_pa);
-    }
-    slot->live = 0;
-    slot->id = 0u;
-    slot->root_pa = 0u;
-    slot->device_l2_pa = 0u;
-    slot->ram_l2_pa = 0u;
-    slot->low_l1_pa = 0u;
-    slot->mapped_user_pages = 0u;
-    slot->frames.count = 0u;
-    zero_bytes(slot->user_l3_pa, sizeof(slot->user_l3_pa));
-    zero_bytes(slot->user_frames, sizeof(slot->user_frames));
-    if(low_pa)(void)pmm_free_page(low_pa);
-    (void)pmm_free_page(ram_pa);
-    (void)pmm_free_page(device_pa);
-    (void)pmm_free_page(root_pa);
+    slot->root_pa = slot->device_l2_pa = slot->ram_l2_pa = slot->low_l1_pa = 0;
+    slot->live = slot->destroying = 0;
+    slot->id = 0;
     chos_spin_unlock_irqrestore(&address_space_lock, irq_flags);
     return AS_OK;
 }
@@ -890,8 +924,11 @@ cleanup:
 
 /* No user-provided size or VA: this diagnostic exercises the declared legacy
  * quota through the same public ownership/mapping operations as the loader. */
-int address_space_frame_self_test(void) {
-    static uint64_t pages[CHOS_AS_MAX_USER_FRAMES];
+static int frame_profile_self_test(uint32_t profile_id) {
+    static uint64_t pages[CHOS_RESOURCE_ENGINE_FRAMES];
+    chos_resource_profile_t profile;
+    if (!chos_resource_profile_get(profile_id, &profile)) return 0;
+    uint32_t frame_limit = profile.frame_limit;
     static int running;
     address_space_handle_t first = {0}, peer = {0};
     address_space_info_t info;
@@ -911,19 +948,27 @@ int address_space_frame_self_test(void) {
     running = 1;
     chos_spin_unlock_irqrestore(&address_space_lock, flags);
     pmm_get_stats(&before);
-    for (uint32_t round = 0; round < 3; ++round) {
+    for (uint32_t round = 0; round < (profile_id == CHOS_RESOURCE_ENGINE ? 1u : 3u); ++round) {
         zero_bytes(pages, sizeof(pages));
-        if (address_space_create(&first) != AS_OK) goto cleanup;
+        if (address_space_create_profile(profile_id, &first) != AS_OK) goto cleanup;
         first_live = 1;
+        address_space_handle_t refused = {UINT32_MAX, UINT32_MAX, UINT32_MAX};
+        if (address_space_create_profile(UINT32_MAX, &refused) != AS_ERR_ARGUMENT ||
+            refused.slot || refused.generation || refused.id) goto cleanup;
+        if (profile_id == CHOS_RESOURCE_ENGINE &&
+            (address_space_create_profile(profile_id, &refused) != AS_ERR_CAPACITY ||
+             refused.slot || refused.generation || refused.id)) goto cleanup;
+        if (!address_space_get_info(first, &info) || info.resource_profile != profile_id ||
+            info.destroying) goto cleanup;
         if (address_space_create(&peer) != AS_OK) goto cleanup;
         peer_live = 1;
-        for (uint32_t i = 0; i < CHOS_AS_MAX_USER_FRAMES; ++i) {
+        for (uint32_t i = 0; i < frame_limit; ++i) {
             uint64_t va = CHOS_AS_USER_VA_BASE + (uint64_t)i * VMM_PAGE_SIZE;
             if (address_space_alloc_user_page(first, &pages[i]) != AS_OK) goto cleanup;
             volatile uint64_t *p = (volatile uint64_t *)(uintptr_t)pages[i];
             for (uint32_t word = 0; word < VMM_PAGE_SIZE / sizeof(uint64_t); ++word)
                 if (p[word]) goto cleanup;
-            uint64_t value = UINT64_C(0x43484f5300000000) | ((uint64_t)round << 24) | i;
+            uint64_t value = UINT64_C(0x43484f5300000000) | ((uint64_t)round << 32) | i;
             p[0] = value; p[VMM_PAGE_SIZE / sizeof(uint64_t) - 1u] = ~value;
             if (address_space_map_user_page(first, va, pages[i], AS_PERM_USER_RW) != AS_OK)
                 goto cleanup;
@@ -937,32 +982,32 @@ int address_space_frame_self_test(void) {
             address_space_map_user_page(first, CHOS_AS_USER_VA_BASE, pages[0], AS_PERM_USER_RW)
                 != AS_ERR_MAPPING_CONFLICT ||
             address_space_destroy(first) != AS_ERR_HAS_MAPPINGS ||
-            !address_space_get_info(first, &info) || info.owned_user_frames != CHOS_AS_MAX_USER_FRAMES ||
-            info.mapped_user_pages != CHOS_AS_MAX_USER_FRAMES) goto cleanup;
+            !address_space_get_info(first, &info) || info.owned_user_frames != frame_limit ||
+            info.mapped_user_pages != frame_limit) goto cleanup;
         /* Make holes throughout the hash table while half the frames stay mapped,
          * then refill them. Deletion must retain every other entry's VA metadata. */
-        for (uint32_t i = 1; i < CHOS_AS_MAX_USER_FRAMES; i += 2) {
+        for (uint32_t i = 1; i < frame_limit; i += 2) {
             uint64_t va = CHOS_AS_USER_VA_BASE + (uint64_t)i * VMM_PAGE_SIZE, returned;
             if (address_space_unmap_user_page(first, va, &returned) != AS_OK || returned != pages[i] ||
                 address_space_free_user_page(first, pages[i]) != AS_OK) goto cleanup;
             pages[i] = 0;
         }
-        for (uint32_t i = 1; i < CHOS_AS_MAX_USER_FRAMES; i += 2) {
+        for (uint32_t i = 1; i < frame_limit; i += 2) {
             uint64_t va = CHOS_AS_USER_VA_BASE + (uint64_t)i * VMM_PAGE_SIZE;
             if (address_space_alloc_user_page(first, &pages[i]) != AS_OK) goto cleanup;
             volatile uint64_t *p = (volatile uint64_t *)(uintptr_t)pages[i];
             for (uint32_t word = 0; word < VMM_PAGE_SIZE / sizeof(uint64_t); ++word)
                 if (p[word]) goto cleanup;
-            uint64_t value = UINT64_C(0x43484f5300010000) | ((uint64_t)round << 24) | i;
+            uint64_t value = UINT64_C(0x43484f5301000000) | ((uint64_t)round << 32) | i;
             p[0] = value; p[VMM_PAGE_SIZE / sizeof(uint64_t) - 1u] = ~value;
             if (address_space_map_user_page(first, va, pages[i], AS_PERM_USER_RW) != AS_OK)
                 goto cleanup;
         }
-        for (uint32_t k = 0; k < CHOS_AS_MAX_USER_FRAMES; ++k) {
-            uint32_t i = (k * 5u) & (CHOS_AS_MAX_USER_FRAMES - 1u);
+        for (uint32_t k = 0; k < frame_limit; ++k) {
+            uint32_t i = (k * 5u) % frame_limit;
             uint64_t va = CHOS_AS_USER_VA_BASE + (uint64_t)i * VMM_PAGE_SIZE, returned;
-            uint64_t value = UINT64_C(0x43484f5300000000) | ((uint64_t)round << 24) |
-                ((i & 1u) ? UINT64_C(0x10000) : 0u) | i;
+            uint64_t value = UINT64_C(0x43484f5300000000) | ((uint64_t)round << 32) |
+                ((i & 1u) ? UINT64_C(0x1000000) : 0u) | i;
             volatile uint64_t *p = (volatile uint64_t *)(uintptr_t)pages[i];
             uint64_t copied = 0;
             if (!address_space_query(first, va, &map) || map.physical_address != pages[i] ||
@@ -983,9 +1028,11 @@ int address_space_frame_self_test(void) {
             }
         }
         if (!address_space_get_info(first, &info) || info.mapped_user_pages ||
-            info.owned_user_frames != (round ? 0u : CHOS_AS_MAX_USER_FRAMES / 2u) ||
+            info.owned_user_frames != (round ? 0u : frame_limit / 2u) ||
             address_space_destroy(first) != AS_OK) goto cleanup;
         first_live = 0;
+        if (profile_id == CHOS_RESOURCE_ENGINE && timer_is_ready() && !last_engine_teardown_ticks)
+            goto cleanup;
         if (address_space_alloc_user_page(first, &extra) != AS_ERR_BAD_HANDLE || extra ||
             address_space_destroy(peer) != AS_OK) goto cleanup;
         peer_live = 0;
@@ -996,7 +1043,7 @@ int address_space_frame_self_test(void) {
     ok = 1;
 cleanup:
     if (first_live) {
-        for (uint32_t i = 0; i < CHOS_AS_MAX_USER_FRAMES; ++i) {
+        for (uint32_t i = 0; i < frame_limit; ++i) {
             uint64_t va = CHOS_AS_USER_VA_BASE + (uint64_t)i * VMM_PAGE_SIZE;
             if (address_space_query(first, va, &map))
                 (void)address_space_unmap_user_page(first, va, NULL);
@@ -1009,6 +1056,9 @@ cleanup:
     chos_spin_unlock_irqrestore(&address_space_lock, flags);
     return ok;
 }
+
+int address_space_frame_self_test(void) { return frame_profile_self_test(CHOS_RESOURCE_LEGACY); }
+int address_space_engine_frame_self_test(void) { return frame_profile_self_test(CHOS_RESOURCE_ENGINE); }
 
 int address_space_activation_self_test(void) {
     const uint64_t first_value = 0x43484f5355413031ull;

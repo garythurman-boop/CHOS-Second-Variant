@@ -1705,3 +1705,17 @@ test-sanitize: test-frame-ownership-sanitize
 test-frame-ownership-sanitize: $(SAN_DIR)/test-frame-ownership
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-frame-ownership
 .PHONY: test-frame-ownership test-frame-ownership-sanitize
+
+$(BUILD)/test-resource-profile: tests/test_resource_profile.c include/chos/resource_profile.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-resource-profile: tests/test_resource_profile.c include/chos/resource_profile.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+test: test-resource-profile
+test-resource-profile: $(BUILD)/test-resource-profile
+	./$(BUILD)/test-resource-profile
+test-sanitize: test-resource-profile-sanitize
+test-resource-profile-sanitize: $(SAN_DIR)/test-resource-profile
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-resource-profile
+.PHONY: test-resource-profile test-resource-profile-sanitize

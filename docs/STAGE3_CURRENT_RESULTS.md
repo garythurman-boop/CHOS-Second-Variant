@@ -721,3 +721,13 @@ zeroing, mapped/foreign/stale refusals, hole reuse and sparse destruction using
 the existing 2,048-frame limit. This is resource bookkeeping, not larger engine
 admission or full-VM execution. Current image/heap/stack limits, the full browser,
 native Wi-Fi and final security/platform gates remain open; version stays0.30.0.
+
+### Kernel engine frame admission and incremental teardown
+
+A [separate kernel engine-frame profile](NATIVE_ENGINE_FRAMES.md) now provides
+192 MiB of real owned/mapped frames with bounded logical commitment, physical
+headroom checks and one exclusive ownership pool. Teardown closes handle access
+before releasing pages with the caller's IRQ state restored between operations.
+This is the kernel service only: the executable loader still selects legacy,
+and larger image/heap/stack integration, actual VM/GC/JavaScript, modern rendering,
+wireless and final security/platform gates remain open. Version remains0.30.0.

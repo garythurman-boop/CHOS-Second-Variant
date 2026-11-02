@@ -483,3 +483,9 @@ qualify the bookkeeping algorithm, while live guests retain their existing
 8 MiB frame quota. Larger image/heap/stack admission, incremental memory
 operations, executable storage and actual full-VM/GC execution remain necessary;
 this does not lift the current linker arena or enable a modern browser.
+
+The [kernel engine-frame service](NATIVE_ENGINE_FRAMES.md) now supports a separate
+192 MiB owned-page profile and incremental inactive-space destruction. This is
+not yet selected by executable ABI or the process loader; application image,
+anonymous heap and stack limits remain unchanged. Those integration steps and
+actual engine execution remain open, alongside the full modern browser gates.

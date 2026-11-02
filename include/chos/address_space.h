@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/vmm.h"
+#include "chos/resource_profile.h"
 
 #define CHOS_AS_MAX_SPACES 4u
 #define CHOS_AS_USER_VA_BASE  0x20000000ull
@@ -12,7 +13,7 @@
 #define CHOS_AS_USER_L2_LIMIT ((uint32_t)(CHOS_AS_USER_VA_LIMIT >> 21))
 #define CHOS_AS_USER_L2_SLOTS (CHOS_AS_USER_L2_LIMIT - CHOS_AS_USER_L2_FIRST)
 #define CHOS_AS_USER_PAGE_LIMIT ((CHOS_AS_USER_VA_LIMIT - CHOS_AS_USER_VA_BASE) / VMM_PAGE_SIZE)
-#define CHOS_AS_MAX_USER_FRAMES 2048u /* 8 MiB of zero-filled frames per address space. */
+#define CHOS_AS_MAX_USER_FRAMES CHOS_RESOURCE_LEGACY_FRAMES /* 8 MiB of zero-filled frames per address space. */
 
 typedef struct {
     uint32_t slot;
@@ -60,6 +61,8 @@ typedef struct {
     uint32_t user_l3_tables;
     uint32_t task_references;
     uint64_t root_table_physical;
+    uint32_t resource_profile;
+    int destroying;
 } address_space_info_t;
 
 /* Pure policy/layout helpers, host-tested independently of the EL1 table walker. */
@@ -77,6 +80,8 @@ int address_space_user_descriptor_matches(uint64_t descriptor,
  * The scheduler can activate task roots and return into isolated EL0 application contexts.
  * Because ASID support is not enabled, every switch performs a full stage-1 TLB flush. */
 address_space_error_t address_space_create(address_space_handle_t *out);
+/* Kernel admission only; the executable loader currently selects legacy. */
+address_space_error_t address_space_create_profile(uint32_t, address_space_handle_t *out);
 address_space_error_t address_space_activate(address_space_handle_t handle);
 address_space_error_t address_space_deactivate(void);
 /* Scheduler-only address-space transitions. These are valid only while the scheduler
@@ -126,5 +131,6 @@ int address_space_self_test(void);
 /* Explicit diagnostic: exercise the full existing frame quota without changing
  * active roots; only runs from the canonical kernel root with no live spaces. */
 int address_space_frame_self_test(void);
+int address_space_engine_frame_self_test(void);
 
 #endif
