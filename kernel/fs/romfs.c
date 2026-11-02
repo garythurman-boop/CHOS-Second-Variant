@@ -31,6 +31,8 @@ extern const uint8_t chos_romfs_browser_end[];
 
 extern const uint8_t chos_romfs_stdio_start[];
 extern const uint8_t chos_romfs_stdio_end[];
+extern const uint8_t chos_romfs_engine_start[];
+extern const uint8_t chos_romfs_engine_end[];
 
 static const embedded_file_t embedded_files[] = {
     { "/BIN/HELLO.CHX", chos_romfs_hello_start, chos_romfs_hello_end },
@@ -43,11 +45,15 @@ static const embedded_file_t embedded_files[] = {
     { "/BIN/CONSOLE.CHX", chos_romfs_console_start, chos_romfs_console_end },
     { "/BIN/FILEMAN.CHX", chos_romfs_fileman_start, chos_romfs_fileman_end },
     { "/BIN/BROWSER.CHX", chos_romfs_browser_start, chos_romfs_browser_end },
-    { "/BIN/STDIO.ELF", chos_romfs_stdio_start, chos_romfs_stdio_end }
+    { "/BIN/STDIO.ELF", chos_romfs_stdio_start, chos_romfs_stdio_end },
+    { "/BIN/JSCVM.ELF", chos_romfs_engine_start, chos_romfs_engine_end }
 };
 
 size_t romfs_file_count(void) {
-    return sizeof(embedded_files) / sizeof(embedded_files[0]);
+    /* Normal kernels link the empty object; diagnostic kernels replace it with
+     * a validated native ELF. No undefined weak symbols or mode flags in PIE. */
+    return sizeof(embedded_files) / sizeof(embedded_files[0]) -
+        ((uintptr_t)chos_romfs_engine_end == (uintptr_t)chos_romfs_engine_start);
 }
 
 int romfs_get_at(size_t index, chos_romfs_file_t *out) {

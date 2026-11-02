@@ -1,5 +1,10 @@
 # Explicit native engine execution profile
 
+This records the resource/link checkpoint. The subsequent
+[VM boot fixture](NATIVE_JSC_VM_BOOT.md) reaches executable entry, but creation
+aborts at the missing aligned virtual-reservation service. JavaScript does not
+yet run; later attempts do not turn this earlier link into VM qualification.
+
 The executable loader now admits an explicitly marked engine application into
 the separately accounted 192 MiB frame profile. A normal native executable keeps
 its 4 MiB image, 32 KiB main/default worker stacks, 2 MiB anonymous window and

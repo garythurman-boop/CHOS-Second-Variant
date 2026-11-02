@@ -1,5 +1,9 @@
 # Modern browser engine port decision
 
+The [separate native VM boot fixture](NATIVE_JSC_VM_BOOT.md) boots and enters the
+real C API executable. Creation aborts at aligned Structure heap reservation;
+the precise abort trace is retained. A working VM/browser is not claimed.
+
 Current checkpoint: the [explicit engine execution profile](NATIVE_ENGINE_EXECUTION_PROFILE.md)
 passes large-image resource tests. The full original-ICU JavaScriptCore VM links
 without unresolved symbols and passes actual kernel loader policy, but has not

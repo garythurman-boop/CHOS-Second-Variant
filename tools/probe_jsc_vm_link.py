@@ -92,6 +92,9 @@ report={'status':'LINKED_NOT_EXECUTED' if not code else phase.upper()+'_FAILED',
 report['application_profile']=o.application_profile
 report['engine_archive_members']=archive_members
 report['loader_policy']=loader_policy
+if not code:
+ executable=out/'cmake/jsc_vm_probe'
+ report['executable']={'sha256':sha(executable),'bytes':executable.stat().st_size}
 if o.application_profile=='engine':
  report['limits']=['Explicit64MiB engine ELF link;actual kernel file/span/profile policy checked;physical runtime admission and packaging not attempted','No VM/JavaScript/Intl/GC/WebAssembly or WebCore/browser execution is claimed','JIT/DFG/FTL/sampling remainOFF;checked Wasm remainsON;full original ICU and actual53object subtarget retained','Anonymous map size,threads,real engine runtime,modern browser,WiFi/security/platform gates remain open']
 (out/'result.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({k:report[k] for k in ['status','returncode','undefined_symbols','bounded_image_rejected','proposed_image_span_bytes']},indent=2));raise SystemExit(code)

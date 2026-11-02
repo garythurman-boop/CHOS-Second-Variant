@@ -1,5 +1,10 @@
 # Revised Stage 3: internet platform architecture
 
+The latest [VM boot attempt](NATIVE_JSC_VM_BOOT.md) reaches real executable entry
+in direct and UEFI QEMU, then aborts before JavaScript at the missing aligned
+reservation service. Separate normal and diagnostic images preserve installer
+and file bounds; actual VM and browser qualification remain open.
+
 The latest [engine execution profile](NATIVE_ENGINE_EXECUTION_PROFILE.md) adds
 explicit image/heap/stack admission and large-application QEMU evidence. The full
 original-ICU JavaScriptCore VM links and passes loader policy; execution and modern

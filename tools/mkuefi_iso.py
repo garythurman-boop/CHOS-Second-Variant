@@ -382,6 +382,8 @@ def main() -> int:
     parser.add_argument('--efi', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--readme', type=Path)
+    parser.add_argument('--esp-mib', type=int, choices=[32, 64, 128], default=32,
+                        help='Explicit FAT16 ESP capacity; normal distribution remains32MiB')
     args = parser.parse_args()
     if not args.kernel.is_file() or not args.efi.is_file():
         parser.error('kernel and EFI loader inputs must exist')
@@ -409,7 +411,7 @@ def main() -> int:
     if reloc_rva == 0 or reloc_size < 8:
         parser.error('EFI loader needs base relocations so firmware can load it outside its preferred image base')
 
-    fat = Fat16Builder()
+    fat = Fat16Builder(sectors=args.esp_mib * 1024 * 1024 // FAT_SECTOR)
     fat.add_file('EFI/BOOT/BOOTAA64.EFI', efi)
     fat.add_file('EFI/CHOS/CHOS.ELF', kernel)
     if args.install_payload: fat.add_file('INSTALL.BIN',args.install_payload.read_bytes())

@@ -37,7 +37,7 @@ $(patsubst %.c,$(BUILD)/uefi-kernel/%.o,$(CRYPTO_SOURCES)): UEFI_KERNEL_CFLAGS +
 OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(SOURCES_C)) $(BUILD)/kernel/arch/aarch64/vectors.o \
            $(BUILD)/kernel/arch/aarch64/context_switch.o $(BUILD)/kernel/arch/aarch64/register_stress.o $(BUILD)/kernel/arch/aarch64/user_entry.o \
            $(BUILD)/kernel/arch/aarch64/user_demo.o $(BUILD)/kernel/arch/aarch64/user_exit.o $(BUILD)/kernel/arch/aarch64/user_preempt_good.o \
-           $(BUILD)/kernel/arch/aarch64/user_preempt_fault.o $(BUILD)/kernel/arch/aarch64/power.o $(BUILD)/kernel/arch/aarch64/romfs_apps.o $(BUILD)/kernel/arch/aarch64/romfs_userland.o $(BUILD)/boot/aarch64/start.o
+           $(BUILD)/kernel/arch/aarch64/user_preempt_fault.o $(BUILD)/kernel/arch/aarch64/power.o $(BUILD)/kernel/arch/aarch64/romfs_apps.o $(BUILD)/kernel/arch/aarch64/romfs_userland.o $(BUILD)/kernel/arch/aarch64/romfs_engine_empty.o $(BUILD)/boot/aarch64/start.o
 
 # QEMU's generic loader expects the ordinary kernel to be ET_EXEC. Only the
 # UEFI path uses a separately compiled relocatable PIE kernel.
@@ -46,7 +46,7 @@ KERNEL_ASM_SOURCES := kernel/arch/aarch64/vectors.S kernel/arch/aarch64/context_
                       kernel/arch/aarch64/user_demo.S kernel/arch/aarch64/user_exit.S \
                       kernel/arch/aarch64/user_preempt_good.S kernel/arch/aarch64/user_preempt_fault.S \
                       kernel/arch/aarch64/power.S kernel/arch/aarch64/romfs_apps.S \
-                      kernel/arch/aarch64/romfs_userland.S boot/aarch64/start.S
+                      kernel/arch/aarch64/romfs_userland.S kernel/arch/aarch64/romfs_engine_empty.S boot/aarch64/start.S
 UEFI_KERNEL_BUILD := $(BUILD)/uefi-kernel
 UEFI_KERNEL_ELF := $(UEFI_KERNEL_BUILD)/chos.elf
 UEFI_KERNEL_CFLAGS := $(filter-out -fno-pic -fno-pie -fpie -fPIC -fPIE,$(CFLAGS)) -fpie
@@ -1727,3 +1727,25 @@ $(BUILD)/userland/native_engine_abi.o: userland/native_engine_abi.S
 	$(CC) $(ASFLAGS) -c $< -o $@
 
 $(BUILD)/test-user-allocator $(SAN_DIR)/test-user-allocator: include/chos/resource_profile.h
+
+# Separate diagnostic kernels; normal media never acquire the engine fixture.
+$(BUILD)/kernel/arch/aarch64/romfs_engine_empty.o: kernel/arch/aarch64/romfs_engine_empty.S
+	@mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+ENGINE_TEST_OBJECTS := $(filter-out $(BUILD)/kernel/arch/aarch64/romfs_engine_empty.o,$(OBJECTS))
+ENGINE_TEST_UEFI_OBJECTS := $(filter-out $(UEFI_KERNEL_BUILD)/kernel/arch/aarch64/romfs_engine_empty.o,$(UEFI_KERNEL_OBJECTS))
+$(BUILD)/engine-test/native-engine.elf:
+	@echo 'Stage the real engine with tools/prepare_native_engine.py --application FILE' >&2
+	@false
+$(BUILD)/engine-test/romfs_engine.o: kernel/arch/aarch64/romfs_engine.S $(BUILD)/engine-test/native-engine.elf
+	@mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+$(BUILD)/engine-test/chos.elf: $(ENGINE_TEST_OBJECTS) $(BUILD)/engine-test/romfs_engine.o linker.ld
+	$(LD) $(LDFLAGS) -o $@ $(ENGINE_TEST_OBJECTS) $(BUILD)/engine-test/romfs_engine.o
+$(BUILD)/engine-test/uefi-kernel.elf: $(ENGINE_TEST_UEFI_OBJECTS) $(BUILD)/engine-test/romfs_engine.o linker.ld
+	$(LD) $(UEFI_KERNEL_LDFLAGS) -o $@ $(ENGINE_TEST_UEFI_OBJECTS) $(BUILD)/engine-test/romfs_engine.o
+$(BUILD)/engine-test/chos.iso: $(BUILD)/engine-test/uefi-kernel.elf $(BUILD)/uefi/BOOTAA64.EFI tools/mkuefi_iso.py
+	python3 tests/test_uefi_kernel.py $(BUILD)/engine-test/uefi-kernel.elf
+	python3 tools/mkuefi_iso.py --kernel $(BUILD)/engine-test/uefi-kernel.elf --efi $(BUILD)/uefi/BOOTAA64.EFI --esp-mib 64 --output $@
+.PHONY: engine-test-images
+engine-test-images: $(BUILD)/engine-test/chos.elf $(BUILD)/engine-test/chos.iso

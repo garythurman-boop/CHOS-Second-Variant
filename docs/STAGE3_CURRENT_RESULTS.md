@@ -3,7 +3,9 @@
 Stage3 remains incomplete. The latest runtime work admits an explicit native
 engine resource profile and executes a real 48 MiB application fixture. The
 full JavaScriptCore VM now links with original ICU data and passes the kernel
-loader policy; it has not yet executed. Selected JSC/WTF components execute,
+loader policy. A separate diagnostic image boots and enters it in both QEMU
+profiles, but VM creation aborts at the missing aligned-reservation service;
+JavaScript has not executed. Selected JSC/WTF components execute,
 including actual workers and foreign-thread GC coordination. A modern browser
 does not yet run. Earlier milestone descriptions below retain their historical scope;
 later results supersede earlier dependency diagnoses.
@@ -13,7 +15,7 @@ later results supersede earlier dependency diagnoses.
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
 | Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads and foreign pause; explicit engine image/heap/stack profile runs in QEMU; full VM/GC execution remains open |
-| Modern browser | WPE/WebKit selected; full original-ICU JSC VM links and passes loader policy; VM execution, JavaScript, WebCore rendering and browser features remain open |
+| Modern browser | Full original-ICU JSC VM links and enters from diagnostic ROMFS; creation aborts at aligned memory reservation; JavaScript, WebCore rendering and browser features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
 | Release | Development0.30.0;0.50.0 requires all revised gates |
@@ -26,6 +28,8 @@ See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 See [native engine execution profile](NATIVE_ENGINE_EXECUTION_PROFILE.md) for
 the current resource contract, actual large-image qualification and full VM
 link boundary. No new browser or hardware support is inferred from that link.
+The subsequent [separate VM boot fixture](NATIVE_JSC_VM_BOOT.md) records actual
+boot attempts, retained initialization failures and their precise software cause.
 
 The complete linked WTF filesystem source checkpoint is `e438245`. Native writable working-copy
 handles, shared buffer quotas and conditional commits are qualified in

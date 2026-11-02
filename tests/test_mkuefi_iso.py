@@ -97,6 +97,16 @@ def fake_efi() -> bytes:
 
 
 def main() -> None:
+    # Explicit larger ESPs must remain FAT16 and preserve multi-cluster payloads.
+    # The default capacity is separately retained below and in live boot tests.
+    for mib in [32,64,128]:
+        geometry = iso.Fat16Builder(sectors=mib*1024*1024//512)
+        payload = bytes(range(256))*257
+        geometry.add_file('PROBE.BIN',payload)
+        volume = geometry.build()
+        cluster,size,_ = fat_find(volume,'PROBE.BIN')
+        assert len(volume)==mib*1024*1024 and 4085<=geometry.cluster_count<65525
+        assert read_fat_file(volume,cluster,size)==payload
     loader = fake_efi()
     kernel = fake_elf()
     iso.validate_kernel_elf(kernel)

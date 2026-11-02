@@ -28,6 +28,8 @@
 #define KERNEL_MIN_PHYSICAL_ADDRESS ((uint64_t)0x01000000u)
 #define KERNEL_MAX_PHYSICAL_ADDRESS ((uint64_t)0x0000fffffffff000u)
 #define KERNEL_MAX_IMAGE_SIZE ((uint64_t)256u * 1024u * 1024u)
+#define KERNEL_MAX_FILE_SIZE ((uint64_t)64u * 1024u * 1024u)
+#define BOOT_AUX_MAX_FILE_SIZE ((uint64_t)16u * 1024u * 1024u)
 #define ELF_PT_LOAD 1u
 #define ELF_PT_DYNAMIC 2u
 #define ELF_ET_DYN 3u
@@ -481,7 +483,8 @@ static uintptr_t find_fdt(void) {
     return 0u;
 }
 
-static int read_boot_file(EFI_HANDLE image, CHAR16 *path, uint8_t **file_bytes, size_t *file_size) {
+static int read_boot_file(EFI_HANDLE image, CHAR16 *path, uint64_t maximum,
+                          uint8_t **file_bytes, size_t *file_size) {
     EFI_LOADED_IMAGE_PROTOCOL *loaded = NULL;
     EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs = NULL;
     EFI_FILE_PROTOCOL *root = NULL, *file = NULL;
@@ -509,7 +512,7 @@ static int read_boot_file(EFI_HANDLE image, CHAR16 *path, uint8_t **file_bytes, 
     if (status != EFI_SUCCESS) { (void)g_st->BootServices->FreePool(info); (void)file->Close(file); return 0; }
     declared_size = le64(info + 8u);
     (void)g_st->BootServices->FreePool(info);
-    if (declared_size < 64u || declared_size > 16u * 1024u * 1024u) { (void)file->Close(file); return 0; }
+    if (declared_size < 64u || declared_size > maximum || maximum > KERNEL_MAX_FILE_SIZE) { (void)file->Close(file); return 0; }
     status = g_st->BootServices->AllocatePool(EFI_LOADER_DATA, (EFI_UINTN)declared_size, (void **)&buffer);
     if (status != EFI_SUCCESS || buffer == NULL) { (void)file->Close(file); return 0; }
     {
@@ -872,7 +875,7 @@ static uint32_t display_crc(const uint8_t *p,size_t n){uint32_t c=~0u;for(size_t
 static void read_display_request(EFI_HANDLE image){
     CHAR16 path[]={'\\','E','F','I','\\','C','H','O','S','\\','D','I','S','P','L','A','Y','.','C','F','G',0};
     uint8_t *bytes=NULL;size_t n=0;
-    if(!read_boot_file(image,path,&bytes,&n))return;
+    if(!read_boot_file(image,path,BOOT_AUX_MAX_FILE_SIZE,&bytes,&n))return;
     const char *magic="CHOSDSP1";int valid=n==64;
     for(unsigned i=0;valid&&i<8;i++)if(bytes[i]!=(uint8_t)magic[i])valid=0;
     if(valid&&display_crc(bytes,16)==le32(bytes+16)&&chos_display_mode_index(le32(bytes+8),le32(bytes+12))>=0){requested_width=le32(bytes+8);requested_height=le32(bytes+12);}
@@ -980,7 +983,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
     out(relocation_anchor);
     out(msg_open);
     CHAR16 kernel_path[]={'\\','E','F','I','\\','C','H','O','S','\\','C','H','O','S','.','E','L','F',0};
-    if (!read_boot_file(image_handle, kernel_path, &kernel_file, &kernel_size)) {
+    if (!read_boot_file(image_handle, kernel_path, KERNEL_MAX_FILE_SIZE, &kernel_file, &kernel_size)) {
         out(msg_kernel_read); return EFI_ERROR_BIT | (uintptr_t)1u;
     }
     if (!load_elf_kernel(kernel_file, kernel_size, &kernel_entry)) {
@@ -1001,7 +1004,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE image_handle, EFI_SYSTEM_TABLE *system_tab
     boot_info->kernel_entry = kernel_entry;
     uint8_t *payload=NULL;size_t payload_size=0;
     CHAR16 payload_path[]={'\\','I','N','S','T','A','L','L','.','B','I','N',0};
-    if(read_boot_file(image_handle,payload_path,&payload,&payload_size)) {
+    if(read_boot_file(image_handle,payload_path,BOOT_AUX_MAX_FILE_SIZE,&payload,&payload_size)) {
         boot_info->installer_payload_address=(uintptr_t)payload;
         boot_info->installer_payload_size=payload_size;
     }

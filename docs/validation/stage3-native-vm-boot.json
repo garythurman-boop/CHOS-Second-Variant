@@ -1,0 +1,209 @@
+{
+  "status": "PACKAGING_BOOT_REGRESSIONS_PASS_VM_INITIALIZATION_FAILS",
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "VM_qualified": false,
+  "JavaScript_executed": false,
+  "Intl_executed": false,
+  "full_GC_qualified": false,
+  "positive_regression_profiles": [
+    {
+      "profile": "platform-normal-uefi",
+      "exit": 0,
+      "seconds": 51.520232737995684
+    },
+    {
+      "profile": "platform-large-uefi",
+      "exit": 0,
+      "seconds": 54.00075605799793
+    },
+    {
+      "profile": "resource-direct",
+      "exit": 0,
+      "seconds": 10.507714849998592
+    },
+    {
+      "profile": "resource-uefi",
+      "exit": 0,
+      "seconds": 22.83832954800164
+    },
+    {
+      "profile": "typing-uefi",
+      "exit": 0,
+      "seconds": 48.208799785992596
+    },
+    {
+      "profile": "tls-uefi",
+      "exit": 0,
+      "seconds": 58.973158066000906
+    },
+    {
+      "profile": "tls6-uefi",
+      "exit": 0,
+      "seconds": 57.0420201139932
+    },
+    {
+      "profile": "installer-uefi",
+      "exit": 0,
+      "seconds": 137.3908695190039
+    }
+  ],
+  "complete_host_exit": 0,
+  "complete_sanitizer_exit": 0,
+  "initial_host_failure": "Explicit direct empty-object build rule missing;corrected and retained before full passing rerun",
+  "actual_VM_attempts": [
+    {
+      "profile": "first-vm-direct",
+      "exit": 1
+    },
+    {
+      "profile": "first-vm-uefi",
+      "exit": 1
+    }
+  ],
+  "observed_contained_abort": {
+    "status": "OBSERVED_CONTAINED_ABORT_NOT_VM_PASS",
+    "VM_qualified": false,
+    "mode": "uefi",
+    "application_sha256": "defdec4c7d95d88357dd54bcb24bb1ddb0d7b80db949380bbc6666cb46f9aead",
+    "cold_free_pages": 488827,
+    "final_free_pages": 488827,
+    "runs": [
+      {
+        "pid": 1,
+        "observed_exit": 134,
+        "free_pages_after": 488827
+      },
+      {
+        "pid": 2,
+        "observed_exit": 134,
+        "free_pages_after": 488827
+      },
+      {
+        "pid": 3,
+        "observed_exit": 134,
+        "free_pages_after": 488827
+      }
+    ],
+    "diagnosis": "Original StructureMemoryManager aligned reservation assertion117;not a VM success",
+    "checks": [
+      "three actual VM creation attempts abort134",
+      "exact cold physical pages,commit,pool and futex baseline aftereach",
+      "actual emulated keyboard/desktop responds afterward"
+    ]
+  },
+  "causal_diagnosis": {
+    "upstream_function": "JSC::StructureMemoryManager::StructureMemoryManager",
+    "pinned_source": "Source/JavaScriptCore/heap/StructureAlignedMemoryAllocator.cpp",
+    "assertion_line": 117,
+    "failure": "No aligned Structure heap reservation succeeded",
+    "preferred_bytes": 4294967296,
+    "last_attempted_bytes": 33554432,
+    "last_POSIX_request_with_alignment_slack": 67108864,
+    "captured_after_final_halving_bytes": 16777216,
+    "native_mmap_limit": 1048576,
+    "evidence": "Actual hardware breakpoint at native abort;unaltered CPU/register snapshot and original frame chain;not a diagnosed network/hardware fault"
+  },
+  "images": {
+    "chos.elf": {
+      "sha256": "7b3e43c37f25699b9e301bb0b4fea404dbbbf9af98ba08d0d4f46a69376c8be6",
+      "bytes": 7081864
+    },
+    "uefi-kernel/chos.elf": {
+      "sha256": "1ff63b717200eba7513ac5c87402f27b89c1fd6d71012b66d8ec0d6036922b3a",
+      "bytes": 7090496
+    },
+    "chos-0.30.0.iso": {
+      "sha256": "7774b3e0fc2cc55b005b21d1684ee0df7e7ff49759de4c71c7c01d3539cf42f8",
+      "bytes": 33603584
+    },
+    "engine-test/chos.elf": {
+      "sha256": "6d01eccdc415ac7e5f2a7f5dc7b97cb63774f6790f958872ba6c1fdc3e8e166c",
+      "bytes": 57761688
+    },
+    "engine-test/uefi-kernel.elf": {
+      "sha256": "c1d75c0fdd27e52366928cb1ea701e049271c90fcb25f11be62915a87516247b",
+      "bytes": 57770320
+    },
+    "engine-test/chos.iso": {
+      "sha256": "553ca15bd2028f984514331d803757529edc71c96f7f5e53c71240211ec4cd3d",
+      "bytes": 67158016
+    },
+    "engine-test/native-engine.elf": {
+      "sha256": "defdec4c7d95d88357dd54bcb24bb1ddb0d7b80db949380bbc6666cb46f9aead",
+      "bytes": 50680784
+    }
+  },
+  "firmware_file_limits": {
+    "kernel": 67108864,
+    "auxiliary_payload_and_preferences": 16777216,
+    "relocated_kernel_span": 268435456
+  },
+  "stage_tests": "Real policy before/after strip;all PT_LOAD/PT_NOTE bytes/geometry identical;managed-stage invalid/unowned/modified refusal and idempotent binary timestamp passed",
+  "packet_analysis": [
+    {
+      "profile": "platform-normal-uefi",
+      "guest_result": "PASS",
+      "native_ping_state": 2,
+      "pcap_sha256": "b264559ebac9eddb5ddcc4d68d81b7fe9294d71bb5a50e2ac722fd2ea5b34957",
+      "checks": "Exact one matching ICMP request/reply;valid IPv4/ICMP checksums,reverse endpoints,id,sequence,payload match",
+      "packets": [
+        {
+          "type": 8,
+          "src": "10.0.2.15",
+          "dst": "10.0.2.2",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        },
+        {
+          "type": 0,
+          "src": "10.0.2.2",
+          "dst": "10.0.2.15",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        }
+      ]
+    },
+    {
+      "profile": "platform-large-uefi",
+      "guest_result": "PASS",
+      "native_ping_state": 2,
+      "pcap_sha256": "8f489f4bd7ed74afa0204c4a8efa8d81bf007e2ae76c1e34a997296fd35cf7cf",
+      "checks": "Exact one matching ICMP request/reply;valid IPv4/ICMP checksums,reverse endpoints,id,sequence,payload match",
+      "packets": [
+        {
+          "type": 8,
+          "src": "10.0.2.15",
+          "dst": "10.0.2.2",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        },
+        {
+          "type": 0,
+          "src": "10.0.2.2",
+          "dst": "10.0.2.15",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        }
+      ]
+    }
+  ],
+  "archive": {
+    "name": "native-vm-boot-qualified.tar.gz",
+    "bytes": 386205926,
+    "sha256": "b370f559baa20671694e0e49890fe83f5e7181f76aaa9f1ae1af5e910533ef72",
+    "verification": "Every member hash/length/mode verified;complete exact current inputs plus reverified unchanged engine/SDK archive reference"
+  },
+  "limits": [
+    "No working VM,JavaScript/Intl/GC/Wasm or modern browser claim",
+    "Diagnostic ISO has no installer payload;normal installer/32MiBESP/CHFS file limits retained",
+    "Aligned virtual reservation and real native commit/decommit are the next software dependency;no larger IRQ-masked eager mapping loop",
+    "Original iteration20 GUI-ping timeout remains causally unproven;current passing captures do not establish its repair",
+    "New Fusion/Pi5/laptop qualification,native WiFi,full browser/security remain open",
+    "No new user binary;latest shipped ISO cc29ea8;0.50.0 reserved for all revised gates"
+  ]
+}
