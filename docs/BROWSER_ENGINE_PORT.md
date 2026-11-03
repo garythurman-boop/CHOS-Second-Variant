@@ -1,5 +1,7 @@
 # Modern browser engine port decision
 
+Current checkpoint: [native engine reservations and first VM execution](NATIVE_ENGINE_RESERVATIONS.md). The real original-ICU VM now executes initial JavaScript/Intl and collection/release in direct and UEFI QEMU. The earlier boot/link failures and limits below are historical evidence. Full browser, Wasm/conformance, wireless, security and new hardware acceptance remain open. Engine main stacks are now 1 MiB; default/maximum secondary workers remain 128 KiB.
+
 The [separate native VM boot fixture](NATIVE_JSC_VM_BOOT.md) boots and enters the
 real C API executable. Creation aborts at aligned Structure heap reservation;
 the precise abort trace is retained. A working VM/browser is not claimed.

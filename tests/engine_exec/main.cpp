@@ -12,24 +12,24 @@ alignas(4096) static volatile unsigned char large_bss[48u*1024u*1024u];
 extern "C" char __chos_image_end[];
 static bool failure(unsigned line){std::printf("[FAIL] engine executable line %u\n",line);return false;}
 #define CHECK(v) do{if(!(v))return failure(__LINE__);}while(0)
-static bool stack_probe(){
+static bool stack_probe(size_t expected){
     alignas(16) volatile unsigned char bytes[65536];
     for(unsigned i=0;i<sizeof(bytes);i++)bytes[i]=(unsigned char)(i*7u);
     chos_thread_context_t context{};
     CHECK(!chos_thread_context(&context));
-    CHECK(context.stack_bytes==128u*1024u && context.flags==7);
+    CHECK(context.stack_bytes==expected && context.flags==7);
     CHECK((uintptr_t)bytes>=context.stack_base &&
           (uintptr_t)bytes+sizeof(bytes)<=context.stack_base+context.stack_bytes);
     for(unsigned i=0;i<sizeof(bytes);i++)CHECK(bytes[i]==(unsigned char)(i*7u));
     return true;
 }
-static void *worker(void*){return (void*)(uintptr_t)(stack_probe()?0x43484f53u:1u);}
+static void *worker(void*){return (void*)(uintptr_t)(stack_probe(chos_native_worker_stack_bytes())?0x43484f53u:1u);}
 static bool normal(){
     CHECK(chos_native_resource_profile()==CHOS_RESOURCE_ENGINE);
     for(unsigned i=0;i<sizeof(large_bss);i++)CHECK(!large_bss[i]);
     for(unsigned i=0;i<sizeof(large_bss);i+=4096)for(unsigned k=0;k<4;k++)
         large_bss[i+k]=(unsigned char)((1u+i/4096u)>>(k*8u));
-    CHECK(stack_probe());
+    CHECK(stack_probe(CHOS_RESOURCE_ENGINE_STACK_PAGES*4096u));
     pthread_attr_t attr;size_t stack_bytes=0;
     CHECK(!pthread_attr_init(&attr)&&!pthread_attr_getstacksize(&attr,&stack_bytes));
     CHECK(stack_bytes==128u*1024u&&!pthread_attr_destroy(&attr));
@@ -72,13 +72,13 @@ static bool normal(){
     for(unsigned i=0;i<sizeof(large_bss);i+=4096)for(unsigned k=0;k<4;k++)
         CHECK(large_bss[i+k]==(unsigned char)((1u+i/4096u)>>(k*8u)));
     // Three full mappings intentionally remain for terminal process cleanup.
-    std::puts("[ OK ] native engine48MiB image,128KiB stacks,expanded heap and isolated mappings passed");
+    std::puts("[ OK ] native engine48MiB image,1MiB main and128KiB worker stacks,expanded heap and isolated mappings passed");
     return true;
 }
 int main(int argc,char **argv){
     if(argc==1)return normal()?0:1;
     chos_thread_context_t context{};
-    if(chos_thread_context(&context)||context.stack_bytes!=128u*1024u)return 2;
+    if(chos_thread_context(&context)||context.stack_bytes!=CHOS_RESOURCE_ENGINE_STACK_PAGES*4096u)return 2;
     if(!std::strcmp(argv[1],"image-guard"))*(volatile char*) __chos_image_end=1;
     else if(!std::strcmp(argv[1],"stack-guard"))*(volatile char*)(uintptr_t)(context.stack_base-1u)=1;
     else if(!std::strcmp(argv[1],"profile-write")){

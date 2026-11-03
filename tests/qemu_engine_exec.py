@@ -14,7 +14,7 @@ app=o.application.resolve();variants={'/UNKNOWN.ELF':'unknown-profile.elf','/AMB
 for path,source in [('/ENGINE.ELF',app)]+[(n,o.variants/f) for n,f in variants.items()]:
  subprocess.run(['python3','tools/mkchfs.py','put',str(disk),path,str(source)],check=True)
 a=argparse.Namespace(mode=o.mode,kernel=pathlib.Path('build/chos.elf'),uefi_kernel=pathlib.Path('build/uefi-kernel/chos.elf'),iso=pathlib.Path('build/chos-0.30.0.iso'),memory='256M' if o.pressure else ('2G' if o.mode=='uefi' else '512M'),qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model='e1000e',storage_error=False,nvme=False,no_rng=False,hub_depth=0,empty_usb=False,tablet=True)
-g=Guest(a,out,disk);marker='[ OK ] native engine48MiB image,128KiB stacks,expanded heap and isolated mappings passed'
+g=Guest(a,out,disk);marker='[ OK ] native engine48MiB image,1MiB main and128KiB worker stacks,expanded heap and isolated mappings passed'
 
 def free_pages():
  end=time.monotonic()+12
@@ -66,9 +66,9 @@ try:
  assert '[FATAL]' not in g.text() and g.symbol('futex_queued_waiters')==0
  after_preemptions=int.from_bytes(g.block('preemption_switches',size=8),'little')
  if not o.pressure:assert after_preemptions>before_preemptions
- (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'pressure_refusal':o.pressure,'application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'file_bytes':app.stat().st_size,'cold_free_pages':cold,'final_free_pages':free_pages(),'normal_runs':runs,'contained_faults':faults,'invalid_profiles':list(variants),'preemption_switches_before':before_preemptions,'preemption_switches_after':after_preemptions,'checks':(['three engine executable reservations refused without page/commit/pool leak'] if o.pressure else ['actual48MiB BSS image and unique page markers','actual64KiB stack scratch and context bounds on128KiB main/defaultworker stacks','malloc registry beyond16regions and8MiB anonymous data with protection/discard/split release','contained image/stack guard,readonlyCRTprofile and heap-XN faults','abandoned mappings and large image return to exact cold physical baseline'])+['unknown/ambiguous ABI profile and legacy-large image refused independently of CRT hint'],'limits':['native executable resource fixture only;no actual VM/JavaScript/GC/WebAssembly/WebCore/browser qualification','QEMU evidence does not establish Fusion or physical hardware qualification']},indent=2)+'\n')
+ (out/'result.json').write_text(json.dumps({'status':'PASS','mode':o.mode,'pressure_refusal':o.pressure,'application_sha256':hashlib.sha256(app.read_bytes()).hexdigest(),'file_bytes':app.stat().st_size,'cold_free_pages':cold,'final_free_pages':free_pages(),'normal_runs':runs,'contained_faults':faults,'invalid_profiles':list(variants),'preemption_switches_before':before_preemptions,'preemption_switches_after':after_preemptions,'checks':(['three engine executable reservations refused without page/commit/pool leak'] if o.pressure else ['actual48MiB BSS image and unique page markers','actual64KiB stack scratch and context bounds on1MiB main/128KiB defaultworker stacks','malloc registry beyond16regions and8MiB anonymous data with protection/discard/split release','contained image/stack guard,readonlyCRTprofile and heap-XN faults','abandoned mappings and large image return to exact cold physical baseline'])+['unknown/ambiguous ABI profile and legacy-large image refused independently of CRT hint'],'limits':['native executable resource fixture only;no actual VM/JavaScript/GC/WebAssembly/WebCore/browser qualification','QEMU evidence does not establish Fusion or physical hardware qualification']},indent=2)+'\n')
 except Exception:
- try:g.serial('procinfo');time.sleep(.3);g.serial('threads');time.sleep(.3)
+ try:g.serial('procinfo');time.sleep(.3);g.serial('taskinfo');time.sleep(.3)
  except Exception:pass
  (out/'failure.txt').write_text(g.text());raise
 finally:g.close()

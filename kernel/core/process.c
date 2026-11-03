@@ -30,7 +30,8 @@
 #define PROCESS_NAME_DEFAULT "process"
 _Static_assert((CHOS_ELF_MAX_SPAN % PROCESS_PAGE_SIZE)==0u,"Native span must be page aligned");
 _Static_assert(PROCESS_CODE_VA+CHOS_ELF_MAX_SPAN<CHOS_USER_MAP_BASE,"Native images must not overlap anonymous memory");
-_Static_assert(CHOS_RESOURCE_ENGINE_STACK_PAGES<=32u,"Root stack must fit the32-bit page mask");
+_Static_assert(CHOS_RESOURCE_ENGINE_STACK_PAGES>=CHOS_EXEC_MAX_STACK_PAGES,"Root ledger must cover CHCX stacks");
+_Static_assert(CHOS_RESOURCE_STACK_MASK_WORDS*64u>=CHOS_RESOURCE_ENGINE_STACK_PAGES,"Root stack ledger capacity");
 _Static_assert(PROCESS_CODE_VA+CHOS_RESOURCE_ENGINE_IMAGE_SPAN<CHOS_RESOURCE_ENGINE_MAP_BASE,"Engine image and anonymous window must not overlap");
 _Static_assert(CHOS_PROCESS_IMAGE_PAGES>=CHOS_EXEC_MAX_IMAGE_PAGES,"CHCX images must fit the mapping ledger");
 
@@ -54,7 +55,7 @@ typedef struct {
     uint64_t code_mapped_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
     uint64_t image_inaccessible_mask[(CHOS_PROCESS_IMAGE_PAGES+63u)/64u];
     uint32_t resource_profile;
-    uint32_t stack_mapped_mask;
+    uint64_t stack_mapped_mask[CHOS_RESOURCE_STACK_MASK_WORDS];
     uint32_t sequence;
     uint64_t stack_base_va;
     uint64_t initial_stack_pointer;
@@ -213,16 +214,18 @@ static int reap_slot_owned(size_t index) {
         }
     }
     for (i = 0u; i < slot->info.stack_pages; ++i) {
-        uint32_t bit = UINT32_C(1) << i;
-        if ((slot->stack_mapped_mask & bit) != 0u) {
+        uint64_t bit = UINT64_C(1) << (i%64u);
+        if ((slot->stack_mapped_mask[i/64u] & bit) != 0u) {
             uint64_t va = slot->stack_base_va + (uint64_t)i * PROCESS_PAGE_SIZE;
             if (address_space_unmap_user_page(slot->space, va, NULL) == AS_OK)
-                slot->stack_mapped_mask &= ~bit;
+                slot->stack_mapped_mask[i/64u] &= ~bit;
         }
     }
     uint64_t image_mapped=0;
     for(i=0;i<(CHOS_PROCESS_IMAGE_PAGES+63u)/64u;i++)image_mapped|=slot->code_mapped_mask[i];
-    if (image_mapped == 0u && slot->stack_mapped_mask == 0u) {
+    uint64_t stack_mapped=0;
+    for(i=0;i<CHOS_RESOURCE_STACK_MASK_WORDS;i++)stack_mapped|=slot->stack_mapped_mask[i];
+    if (image_mapped == 0u && stack_mapped == 0u) {
         if (address_space_destroy(slot->space) == AS_OK) {
             slot->address_space_live = 0;
             slot->space = (address_space_handle_t){0u, 0u, 0u};
@@ -385,7 +388,7 @@ static chos_process_error_t process_load_image(const char *name, const void *fil
             return fail_and_cleanup(index, PROCESS_ERR_OUT_OF_MEMORY);
         if (address_space_map_user_page(slot->space, va, physical, AS_PERM_USER_RW) != AS_OK)
             return fail_and_cleanup(index, PROCESS_ERR_MAPPING);
-        slot->stack_mapped_mask |= UINT32_C(1) << i;
+        slot->stack_mapped_mask[i/64u] |= UINT64_C(1) << (i%64u);
     }
 
     {
@@ -732,9 +735,12 @@ int process_main_stack_bounds(address_space_handle_t space,uint64_t *base,uint64
  if(index<CHOS_PROCESS_MAX){
   process_slot_t *slot=&process_slots[index];uint32_t pages=slot->info.stack_pages;
   chos_execution_profile_t profile;
+  int complete=1;
+  for(unsigned word=0;word<CHOS_RESOURCE_STACK_MASK_WORDS;word++)
+   if(slot->stack_mapped_mask[word]!=chos_execution_stack_word_mask(pages,word))complete=0;
   if(chos_execution_profile_get(slot->resource_profile,&profile)&&
-     slot->info.state==CHOS_PROCESS_RUNNING&&pages&&pages<=profile.root_stack_pages&&pages<=32u&&
-     slot->stack_mapped_mask==chos_execution_stack_mask(pages)){
+     slot->info.state==CHOS_PROCESS_RUNNING&&pages&&pages<=profile.root_stack_pages&&
+     pages<=CHOS_RESOURCE_ENGINE_STACK_PAGES&&complete){
    *base=slot->stack_base_va;*bytes=(uint64_t)pages*PROCESS_PAGE_SIZE;rc=0;
   }
  }

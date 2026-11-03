@@ -80,7 +80,7 @@ int address_space_user_descriptor_matches(uint64_t descriptor,
  * The scheduler can activate task roots and return into isolated EL0 application contexts.
  * Because ASID support is not enabled, every switch performs a full stage-1 TLB flush. */
 address_space_error_t address_space_create(address_space_handle_t *out);
-/* Kernel admission only; the executable loader currently selects legacy. */
+/* The executable loader selects only a validated ABI-note profile. */
 address_space_error_t address_space_create_profile(uint32_t, address_space_handle_t *out);
 address_space_error_t address_space_activate(address_space_handle_t handle);
 address_space_error_t address_space_deactivate(void);
@@ -114,6 +114,9 @@ address_space_error_t address_space_protect_user_range(address_space_handle_t,
                                                        address_space_user_permissions_t);
 address_space_error_t address_space_discard_user_range(address_space_handle_t,
                                                        uint64_t, size_t);
+/* Read-only ownership/descriptor validation, with the same256-page bound. */
+address_space_error_t address_space_validate_user_data_range(address_space_handle_t,
+                                                            uint64_t,size_t);
 int address_space_query(address_space_handle_t handle, uint64_t virtual_address,
                         vmm_mapping_info_t *out);
 /* Copies only from currently mapped EL0-accessible normal pages owned by handle. */

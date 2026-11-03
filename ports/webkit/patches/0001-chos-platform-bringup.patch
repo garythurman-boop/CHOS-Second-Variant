@@ -1090,6 +1090,266 @@ index 7d01fe9c..a2386032 100644
  #include <unistd.h>
  #endif
 
+diff --git a/Source/WTF/wtf/posix/OSAllocatorPOSIX.cpp b/Source/WTF/wtf/posix/OSAllocatorPOSIX.cpp
+index ca44751e..49cd3b87 100644
+--- a/Source/WTF/wtf/posix/OSAllocatorPOSIX.cpp
++++ b/Source/WTF/wtf/posix/OSAllocatorPOSIX.cpp
+@@ -36,6 +36,12 @@
+ #include <wtf/PageBlock.h>
+ #include <wtf/SafeStrerror.h>
+ #include <wtf/text/CString.h>
++#if OS(CHOS)
++#include <algorithm>
++#include <chos/user.h>
++#include <chos/resource_profile_user.h>
++#include <chos/user_memory_limits.h>
++#endif
+
+ #if ENABLE(JIT_CAGE)
+ #include <WebKitAdditions/JITCageAdditions.h>
+@@ -67,6 +73,120 @@
+
+ namespace WTF {
+
++#if OS(CHOS)
++// Explicit engine profile only. Each SVC performs at most1MiB of physical
++// work; userland iteration can be preempted or terminated between operations.
++static bool chosUsesVirtualReservations()
++{
++    return chos_native_resource_profile() == CHOS_RESOURCE_ENGINE;
++}
++static bool chosAllocationRange(void* address, size_t bytes)
++{
++    uintptr_t first = reinterpret_cast<uintptr_t>(address);
++    if ((first & (pageSize() - 1)) || (bytes & (pageSize() - 1))
++        || bytes > CHOS_RESOURCE_ENGINE_RESERVE_MAX || first > UINTPTR_MAX - bytes) {
++        errno = EINVAL;
++        return false;
++    }
++    return true;
++}
++static bool chosAllocationControl(void* address, size_t bytes, unsigned operation)
++{
++    if (!chosAllocationRange(address, bytes))
++        return false;
++    uintptr_t at = reinterpret_cast<uintptr_t>(address);
++    while (bytes) {
++        size_t step = std::min(bytes, static_cast<size_t>(CHOS_USER_MAP_MAX_BYTES));
++        long result = chos_memory_control(reinterpret_cast<void*>(at), step, operation);
++        if (result < 0) {
++            errno = static_cast<int>(-result);
++            return false;
++        }
++        at += step;
++        bytes -= step;
++    }
++    return true;
++}
++static bool chosAllocationRelease(void* address, size_t bytes, unsigned guards)
++{
++    if (guards > CHOS_RESOURCE_ENGINE_RESERVE_MAX / (2 * pageSize())) {
++        errno = EINVAL;
++        return false;
++    }
++    size_t guardBytes = static_cast<size_t>(guards) * pageSize();
++    uintptr_t first = reinterpret_cast<uintptr_t>(address);
++    if (first < guardBytes || bytes > CHOS_RESOURCE_ENGINE_RESERVE_MAX - 2 * guardBytes) {
++        errno = EINVAL;
++        return false;
++    }
++    first -= guardBytes;
++    bytes += 2 * guardBytes;
++    if (!chosAllocationRange(reinterpret_cast<void*>(first), bytes))
++        return false;
++    while (bytes) {
++        size_t step = std::min(bytes, static_cast<size_t>(CHOS_USER_MAP_MAX_BYTES));
++        long result = chos_unmap_range(reinterpret_cast<void*>(first), step);
++        if (result < 0) {
++            errno = static_cast<int>(-result);
++            return false;
++        }
++        first += step;
++        bytes -= step;
++    }
++    return true;
++}
++static void* chosAllocationReserve(size_t bytes, size_t alignment, void* address,
++    bool executable, bool jitCageEnabled, unsigned guards)
++{
++    if (executable || jitCageEnabled) {
++        errno = EACCES;
++        return nullptr;
++    }
++    if (address || alignment < pageSize() || alignment > CHOS_RESOURCE_ENGINE_RESERVE_MAX
++        || !hasOneBitSet(alignment) || guards > CHOS_RESOURCE_ENGINE_RESERVE_MAX / (2 * pageSize())) {
++        errno = ENOTSUP;
++        return nullptr;
++    }
++    size_t guardBytes = static_cast<size_t>(guards) * pageSize();
++    if (!bytes || (bytes & (pageSize() - 1))
++        || bytes > CHOS_RESOURCE_ENGINE_RESERVE_MAX - 2 * guardBytes) {
++        errno = ENOMEM;
++        return nullptr;
++    }
++    if (guardBytes % alignment) {
++        // Align the usable data, retaining both requested guard ranges. The
++        // extra virtual space is never physically committed and is trimmed
++        // before publication; cancellation leaves kernel-owned metadata.
++        if (alignment > CHOS_RESOURCE_ENGINE_RESERVE_MAX - 2 * guardBytes
++            || bytes > CHOS_RESOURCE_ENGINE_RESERVE_MAX - 2 * guardBytes - alignment) {
++            errno = ENOMEM;
++            return nullptr;
++        }
++        size_t total = bytes + 2 * guardBytes + alignment;
++        long raw = chos_reserve_memory(total, pageSize());
++        if (raw <= 0) {
++            errno = raw < 0 ? static_cast<int>(-raw) : ENOMEM;
++            return nullptr;
++        }
++        uintptr_t first = static_cast<uintptr_t>(raw);
++        uintptr_t aligned = (first + guardBytes + alignment - 1) & ~(alignment - 1);
++        size_t prefix = aligned - guardBytes - first;
++        size_t suffix = total - prefix - bytes - 2 * guardBytes;
++        if (prefix)
++            RELEASE_ASSERT(chosAllocationRelease(reinterpret_cast<void*>(first), prefix, 0));
++        if (suffix)
++            RELEASE_ASSERT(chosAllocationRelease(reinterpret_cast<void*>(aligned + bytes + guardBytes), suffix, 0));
++        return reinterpret_cast<void*>(aligned);
++    }
++    long result = chos_reserve_memory(bytes + 2 * guardBytes, alignment);
++    if (result <= 0) {
++        errno = result < 0 ? static_cast<int>(-result) : ENOMEM;
++        return nullptr;
++    }
++    return reinterpret_cast<void*>(static_cast<uintptr_t>(result) + guardBytes);
++}
++#endif
++
+ void* OSAllocator::tryReserveAndCommit(size_t bytes, Usage usage, void* address, bool writable, bool executable, bool jitCageEnabled, unsigned numGuardPagesToAddOnEachEnd)
+ {
+     return tryReserveAndCommitImpl(bytes, usage, address, writable, executable, jitCageEnabled, numGuardPagesToAddOnEachEnd, /* uncommitted */ false);
+@@ -74,6 +194,18 @@ void* OSAllocator::tryReserveAndCommit(size_t bytes, Usage usage, void* address,
+
+ void* OSAllocator::tryReserveAndCommitImpl(size_t bytes, Usage usage, void* address, bool writable, bool executable, bool jitCageEnabled, unsigned numGuardPagesToAddOnEachEnd, bool uncommitted)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations()) {
++        void* result = chosAllocationReserve(bytes, pageSize(), address, executable, jitCageEnabled, numGuardPagesToAddOnEachEnd);
++        if (result && !uncommitted && !chosAllocationControl(result, bytes, writable ? CHOS_MEMORY_PROTECT_RW : CHOS_MEMORY_PROTECT_READ)) {
++            int error = errno;
++            RELEASE_ASSERT(chosAllocationRelease(result, bytes, numGuardPagesToAddOnEachEnd));
++            errno = error;
++            return nullptr;
++        }
++        return result;
++    }
++#endif
+     // All POSIX reservations start out logically committed.
+     int protection = PROT_READ;
+     if (writable)
+@@ -134,6 +266,10 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+
+ void* OSAllocator::tryReserveUncommitted(size_t bytes, Usage usage, void* address, bool writable, bool executable, bool jitCageEnabled, unsigned numGuardPagesToAddOnEachEnd)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations())
++        return chosAllocationReserve(bytes, pageSize(), address, executable, jitCageEnabled, numGuardPagesToAddOnEachEnd);
++#endif
+ #if OS(LINUX) || OS(HAIKU)
+     UNUSED_PARAM(usage);
+     void* result = tryReserveAndCommitImpl(bytes, usage, address, writable, executable, jitCageEnabled, numGuardPagesToAddOnEachEnd, /* uncommitted */ true);
+@@ -161,6 +297,10 @@ void* OSAllocator::reserveUncommitted(size_t bytes, Usage usage, void* address,
+
+ void* OSAllocator::tryReserveUncommittedAligned(size_t bytes, size_t alignment, Usage usage, void* address, bool writable, bool executable, bool jitCageEnabled, unsigned numGuardPagesToAddOnEachEnd)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations())
++        return chosAllocationReserve(bytes, alignment, address, executable, jitCageEnabled, numGuardPagesToAddOnEachEnd);
++#endif
+     ASSERT(hasOneBitSet(alignment) && alignment >= pageSize());
+
+ #if PLATFORM(MAC) || USE(APPLE_INTERNAL_SDK)
+@@ -241,6 +381,12 @@ void* OSAllocator::reserveAndCommit(size_t bytes, Usage usage, void* address, bo
+
+ void OSAllocator::commit(void* address, size_t bytes, bool writable, bool executable)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations()) {
++        RELEASE_ASSERT(!executable && chosAllocationControl(address, bytes, writable ? CHOS_MEMORY_PROTECT_RW : CHOS_MEMORY_PROTECT_READ));
++        return;
++    }
++#endif
+ #if OS(LINUX) || OS(HAIKU) || OS(QNX)
+     UNUSED_PARAM(writable);
+     UNUSED_PARAM(executable);
+@@ -260,6 +406,12 @@ void OSAllocator::commit(void* address, size_t bytes, bool writable, bool execut
+
+ void OSAllocator::decommit(void* address, size_t bytes)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations()) {
++        RELEASE_ASSERT(chosAllocationControl(address, bytes, CHOS_MEMORY_DECOMMIT));
++        return;
++    }
++#endif
+ #if OS(LINUX) || OS(HAIKU)
+     while (madvise(address, bytes, MADV_DONTNEED) == -1 && errno == EAGAIN) { }
+ #elif HAVE(MADV_FREE_REUSE)
+@@ -276,6 +428,12 @@ void OSAllocator::decommit(void* address, size_t bytes)
+
+ void OSAllocator::hintMemoryNotNeededSoon(void* address, size_t bytes)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations()) {
++        RELEASE_ASSERT(chosAllocationControl(address, bytes, CHOS_MEMORY_DISCARD));
++        return;
++    }
++#endif
+ #if HAVE(MADV_DONTNEED)
+     while (madvise(address, bytes, MADV_DONTNEED) == -1 && errno == EAGAIN) { }
+ #else
+@@ -286,6 +444,12 @@ void OSAllocator::hintMemoryNotNeededSoon(void* address, size_t bytes)
+
+ void OSAllocator::releaseDecommitted(void* address, size_t bytes, unsigned numberOfGuardPagesOnEachEnd = 0)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations()) {
++        RELEASE_ASSERT(chosAllocationRelease(address, bytes, numberOfGuardPagesOnEachEnd));
++        return;
++    }
++#endif
+     void* base = address;
+     size_t size = bytes;
+     if (numberOfGuardPagesOnEachEnd) {
+@@ -301,6 +465,15 @@ WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+
+ bool OSAllocator::tryProtect(void* address, size_t bytes, bool readable, bool writable)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations()) {
++        if (writable && !readable) {
++            errno = EINVAL;
++            return false;
++        }
++        return chosAllocationControl(address, bytes, readable ? (writable ? CHOS_MEMORY_PROTECT_RW : CHOS_MEMORY_PROTECT_READ) : CHOS_MEMORY_PROTECT_NONE);
++    }
++#endif
+     int protection = 0;
+     if (readable) {
+         if (writable)
+@@ -324,6 +497,12 @@ void OSAllocator::protect(void* address, size_t bytes, bool readable, bool writa
+
+ void OSAllocator::zeroFill(void* base, size_t size)
+ {
++#if OS(CHOS)
++    if (chosUsesVirtualReservations()) {
++        RELEASE_ASSERT(chosAllocationControl(base, size, CHOS_MEMORY_DISCARD));
++        return;
++    }
++#endif
+     ASSERT(isPageAligned(base));
+     ASSERT(isPageAligned(size));
+
 diff --git a/Source/WTF/wtf/simdutf/simdutf_impl.h b/Source/WTF/wtf/simdutf/simdutf_impl.h
 index 10110d1a..6fe230fe 100644
 --- a/Source/WTF/wtf/simdutf/simdutf_impl.h

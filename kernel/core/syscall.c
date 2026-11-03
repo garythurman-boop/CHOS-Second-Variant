@@ -1121,6 +1121,9 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
             }
             case CHOS_SYS_MAP_MEMORY: {
                 if(process_pid_for_address_space(fault_space)==0u){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[1]==CHOS_MEMORY_MAP_RESERVE){
+                    frame->x[0]=(uint64_t)chos_user_memory_reserve(fault_space,(size_t)frame->x[0],frame->x[2]);return frame;
+                }
                 if(frame->x[1]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
                 frame->x[0]=(uint64_t)chos_user_memory_map(fault_space,(size_t)frame->x[0],0);return frame;
             }

@@ -12,7 +12,9 @@
 #define CHOS_RESOURCE_ENGINE_MAP_BASE UINT64_C(0x28000000)
 #define CHOS_RESOURCE_ENGINE_MAP_BYTES (UINT64_C(96)*1024u*1024u)
 #define CHOS_RESOURCE_ENGINE_REGIONS 512u
-#define CHOS_RESOURCE_ENGINE_STACK_PAGES 32u
+#define CHOS_RESOURCE_ENGINE_RESERVE_MAX (32u*1024u*1024u)
+#define CHOS_RESOURCE_ENGINE_STACK_PAGES 256u /* 1MiB main stack; worker policy is separate. */
+#define CHOS_RESOURCE_STACK_MASK_WORDS ((CHOS_RESOURCE_ENGINE_STACK_PAGES+63u)/64u)
 #define CHOS_RESOURCE_SYSTEM_RESERVE_FRAMES 16384u /* 64 MiB */
 typedef struct {
     uint32_t id, frame_limit, buckets;
@@ -47,6 +49,12 @@ static inline int chos_execution_profile_get(uint32_t id, chos_execution_profile
 static inline uint32_t chos_execution_stack_mask(uint32_t pages) {
     if(!pages || pages>32u)return 0u;
     return pages==32u?UINT32_MAX:((UINT32_C(1)<<pages)-1u);
+}
+static inline uint64_t chos_execution_stack_word_mask(uint32_t pages,uint32_t word) {
+    if(!pages||pages>CHOS_RESOURCE_ENGINE_STACK_PAGES||word>=CHOS_RESOURCE_STACK_MASK_WORDS||
+       word*64u>=pages)return 0;
+    uint32_t remaining=pages-word*64u;
+    return remaining>=64u?UINT64_MAX:((UINT64_C(1)<<remaining)-1u);
 }
 /* Logical commitment is independent of actual physical allocation. Arithmetic
  * is subtraction-based so an overflowing or inconsistent reservation refuses. */

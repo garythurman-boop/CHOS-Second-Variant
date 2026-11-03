@@ -57,6 +57,27 @@ def click(x,y):
 def main_action():
  if options.keyboard:key('ret')
  else:click(560,469)
+def wait_for_install():
+ # TCG speed varies with host load. Bound both total time and actual device-job
+ # progress rather than mistaking a slow but advancing ESP write for a hang.
+ import subprocess,tempfile
+ with tempfile.TemporaryDirectory() as temporary:
+  source=pathlib.Path(temporary)/'progress.c';binary=pathlib.Path(temporary)/'progress'
+  source.write_text('#include <stddef.h>\n#include <stdio.h>\n#include "chos/installer_io.h"\nint main(void){printf("%zu %zu %zu",sizeof(chos_install_job_t),offsetof(chos_install_job_t,state),offsetof(chos_install_job_t,next_sector));}\n')
+  subprocess.run(['cc','-Iinclude',str(source),'-o',str(binary)],check=True)
+  size,state_offset,sector_offset=map(int,subprocess.check_output([str(binary)],text=True).split())
+ begin=last_progress=time.monotonic();previous=None;observations=[]
+ while g.symbol('installer_page')!=5:
+  raw=g.block('installation',size=size)
+  position=(int.from_bytes(raw[state_offset:state_offset+4],'little'),int.from_bytes(raw[sector_offset:sector_offset+8],'little'))
+  now=time.monotonic()
+  if position!=previous:
+   previous=position;last_progress=now
+   observations.append({'seconds':round(now-begin,3),'state':position[0],'next_sector':position[1]})
+   (out/'install-progress.json').write_text(json.dumps(observations,indent=2)+'\n')
+  assert now-begin<180,'Installer exceeded180-second total watchdog'
+  assert now-last_progress<15,'Installer made no job/sector progress for15seconds'
+  time.sleep(.25)
 try:
  wait(lambda:'Initial CHOS GUI frame rendered' in g.text(),45,'desktop')
  wait(lambda:g.symbol('splash_active')==0,10,'splash')
@@ -82,7 +103,7 @@ try:
  key('tab');key('tab')
  responsiveness_ms=round((time.monotonic()-input_start)*1000,2)
  g.screen('interactive-progress')
- wait(lambda:g.symbol('installer_page')==5,90,'actual install and verification')
+ wait_for_install()
  g.screen('finished')
  # Stable state field follows the planner; read its position from a tiny host layout probe.
  import subprocess,struct,tempfile

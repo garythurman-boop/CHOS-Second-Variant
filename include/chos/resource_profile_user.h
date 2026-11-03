@@ -15,7 +15,7 @@ static inline uint32_t chos_native_resource_profile(void) {
         ? CHOS_RESOURCE_ENGINE : CHOS_RESOURCE_LEGACY;
 }
 static inline uint32_t chos_native_worker_stack_bytes(void) {
-    chos_execution_profile_t profile = {0};
+    chos_execution_profile_t profile;
     if(!chos_execution_profile_get(chos_native_resource_profile(), &profile))return 32768u;
     return profile.default_worker_stack_bytes;
 }

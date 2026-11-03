@@ -16,8 +16,16 @@ int main(void){
  assert(output.version==1&&output.size_bytes==832&&output.tid==7&&output.flags==7&&!output.reserved);
  assert(output.stack_base==base&&output.stack_bytes==bytes&&output.pc==f.elr&&output.sp==f.sp_el0&&output.fpcr==f.fpcr&&output.fpsr==f.fpsr);
  assert(!memcmp(output.x,f.x,sizeof(f.x))&&!memcmp(output.q,f.q,sizeof(f.q)));
+ const uint64_t capture_sizes[]={CHOS_THREAD_STACK_MAX,CHOS_RESOURCE_ENGINE_STACK_PAGES*4096u};
+ for(unsigned i=0;i<sizeof(capture_sizes)/sizeof(capture_sizes[0]);i++){
+  f.sp_el0=base+capture_sizes[i];
+  assert(chos_thread_context_capture(&f,7,base,capture_sizes[i],&output));
+  assert(output.stack_bytes==capture_sizes[i]&&output.stack_base==base&&output.sp==f.sp_el0);
+  assert(!memcmp(output.x,f.x,sizeof(f.x))&&!memcmp(output.q,f.q,sizeof(f.q)));
+ }
+ f.sp_el0=base+bytes;
  reject(0,7,base,bytes);reject(&f,0,base,bytes);reject(&f,7,base+1,bytes);reject(&f,7,base,bytes+1);
- reject(&f,7,base,0);reject(&f,7,0,bytes);reject(&f,7,UINT64_MAX-4095,bytes);reject(&f,7,base,CHOS_THREAD_STACK_MAX+4096);
+ reject(&f,7,base,0);reject(&f,7,0,bytes);reject(&f,7,UINT64_MAX-4095,bytes);reject(&f,7,base,CHOS_RESOURCE_ENGINE_STACK_PAGES*4096u+4096u);
  reject(&f,7,CHOS_AS_USER_VA_LIMIT-4096,8192);
  f.spsr=5;reject(&f,7,base,bytes);f.spsr=0;
  f.sp_el0=base-16;reject(&f,7,base,bytes);f.sp_el0=base+bytes+16;reject(&f,7,base,bytes);f.sp_el0=base+1;reject(&f,7,base,bytes);f.sp_el0=base;

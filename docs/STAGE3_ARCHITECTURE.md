@@ -1,5 +1,7 @@
 # Revised Stage 3: internet platform architecture
 
+Current checkpoint: [native engine reservations and first VM execution](NATIVE_ENGINE_RESERVATIONS.md). The real original-ICU VM now executes initial JavaScript/Intl and collection/release in direct and UEFI QEMU. The earlier boot/link failures and limits below are historical evidence. Full browser, Wasm/conformance, wireless, security and new hardware acceptance remain open. Engine main stacks are now 1 MiB; default/maximum secondary workers remain 128 KiB.
+
 The latest [VM boot attempt](NATIVE_JSC_VM_BOOT.md) reaches real executable entry
 in direct and UEFI QEMU, then aborts before JavaScript at the missing aligned
 reservation service. Separate normal and diagnostic images preserve installer

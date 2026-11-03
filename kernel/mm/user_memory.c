@@ -25,6 +25,40 @@ static int length_pages(size_t n,uint32_t *pages){
  if(!n||n>CHOS_USER_MAP_MAX_BYTES)return 0;
  *pages=(uint32_t)((n+VMM_PAGE_SIZE-1u)/VMM_PAGE_SIZE);return 1;
 }
+/* State3 is a virtual reservation: holes are intentional and carry no frames.
+ * Every operation that allocates,zeros or releases data is still at most1MiB. */
+int64_t chos_user_memory_reserve(address_space_handle_t h,size_t n,uint64_t alignment){
+ if(!n||n>CHOS_RESOURCE_ENGINE_RESERVE_MAX||alignment<VMM_PAGE_SIZE||
+    alignment>CHOS_RESOURCE_ENGINE_RESERVE_MAX||(alignment&(alignment-1u)))return -CHOS_ERRNO_EINVAL;
+ uint32_t pages=(uint32_t)((n+VMM_PAGE_SIZE-1u)/VMM_PAGE_SIZE);
+ uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);address_space_info_t info;
+ if(!o||!address_space_get_info(h,&info)){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
+ if(info.resource_profile!=CHOS_RESOURCE_ENGINE){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOTSUP;}
+ unsigned slot;for(slot=0;slot<o->region_limit&&o->regions[slot].state;slot++){}
+ if(slot==o->region_limit){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOMEM;}
+ uint64_t candidate=(o->map_base+VMM_PAGE_SIZE+alignment-1u)&~(alignment-1u);
+ for(;;){
+  if(candidate+(uint64_t)(pages+1u)*VMM_PAGE_SIZE>o->map_end){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ENOMEM;}
+  int overlap=0;
+  for(unsigned i=0;i<o->region_limit;i++){
+   const region_t *r=&o->regions[i];if(!r->state)continue;
+   uint64_t high=r->first+(uint64_t)(r->pages+1u)*VMM_PAGE_SIZE;
+   if(candidate-VMM_PAGE_SIZE<high&&candidate+(uint64_t)(pages+1u)*VMM_PAGE_SIZE>r->first-VMM_PAGE_SIZE){
+    candidate=(high+VMM_PAGE_SIZE+alignment-1u)&~(alignment-1u);overlap=1;break;
+   }
+  }
+  if(!overlap)break;
+ }
+ /* Descriptor observations only; no physical allocation or clearing here. */
+ for(uint32_t p=0;p<pages;p++){
+  vmm_mapping_info_t m;
+  if(address_space_query(h,candidate+(uint64_t)p*VMM_PAGE_SIZE,&m)){
+   chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EBUSY;
+  }
+ }
+ o->regions[slot]=(region_t){.first=candidate,.pages=pages,.state=3};
+ chos_spin_unlock_irqrestore(&memory_lock,irq);return (int64_t)candidate;
+}
 static int remove_pages(address_space_handle_t h,region_t *r,int free_frames){
  int ok=1;
  for(uint32_t p=0;p<r->pages;p++){
@@ -71,9 +105,9 @@ int chos_user_memory_unmap(address_space_handle_t h,uint64_t address,size_t n){
  if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
  for(unsigned i=0;i<o->region_limit;i++){
   region_t *r=&o->regions[i];
-  if(r->state==1 && r->first==address && r->pages==pages){
+  if((r->state==1||r->state==3) && r->first==address && r->pages==pages){
    if(r->pins){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EBUSY;}
-   for(uint32_t p=0;p<pages;p++){vmm_mapping_info_t m;if(!address_space_query(h,address+(uint64_t)p*VMM_PAGE_SIZE,&m)){r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;}}
+   if(r->state==1)for(uint32_t p=0;p<pages;p++){vmm_mapping_info_t m;if(!address_space_query(h,address+(uint64_t)p*VMM_PAGE_SIZE,&m)){r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;}}
    int ok=remove_pages(h,r,1);chos_spin_unlock_irqrestore(&memory_lock,irq);return ok?0:-CHOS_ERRNO_EIO;
   }
  }
@@ -148,20 +182,72 @@ static region_t *containing_region(map_owner_t *o,uint64_t address,uint32_t page
  uint64_t end=address+(uint64_t)pages*VMM_PAGE_SIZE;
  for(unsigned i=0;i<o->region_limit;i++){
   region_t *r=&o->regions[i];
-  if(r->state==1 && address>=r->first && end<=r->first+(uint64_t)r->pages*VMM_PAGE_SIZE)return r;
+  if((r->state==1||r->state==3) && address>=r->first && end<=r->first+(uint64_t)r->pages*VMM_PAGE_SIZE)return r;
  }
  return NULL;
+}
+static int reservation_control(address_space_handle_t h,region_t *r,uint64_t address,
+        uint32_t pages,unsigned operation){
+ uint64_t present[4]={0},created[4]={0};
+ _Static_assert(CHOS_USER_MAP_MAX_BYTES/VMM_PAGE_SIZE<=256u,"reservation transactions fit bounded ledgers");
+ for(uint32_t p=0;p<pages;p++){
+  vmm_mapping_info_t m;uint64_t va=address+(uint64_t)p*VMM_PAGE_SIZE;
+  if(address_space_query(h,va,&m)){
+   if(m.memory_type!=VMM_MEMORY_NORMAL||m.executable_at_el0||m.executable_at_el1||
+      address_space_validate_user_data_range(h,va,VMM_PAGE_SIZE)!=AS_OK){r->state=2;return -CHOS_ERRNO_EIO;}
+   present[p/64u]|=UINT64_C(1)<<(p%64u);
+  }
+ }
+ if(operation==CHOS_MEMORY_VALIDATE)return 0;
+ if(operation==CHOS_MEMORY_PROTECT_READ||operation==CHOS_MEMORY_PROTECT_RW){
+  int error=-CHOS_ERRNO_ENOMEM;
+  for(uint32_t p=0;p<pages;p++)if(!(present[p/64u]&(UINT64_C(1)<<(p%64u)))){
+   uint64_t physical;address_space_error_t e=address_space_alloc_user_page(h,&physical);
+   if(e!=AS_OK){if(e!=AS_ERR_OUT_OF_MEMORY&&e!=AS_ERR_FRAME_CAPACITY)error=-CHOS_ERRNO_EIO;goto rollback;}
+   e=address_space_map_user_page(h,address+(uint64_t)p*VMM_PAGE_SIZE,physical,AS_PERM_USER_RW);
+   if(e!=AS_OK){
+    if(address_space_free_user_page(h,physical)!=AS_OK)r->state=2;
+    if(e!=AS_ERR_OUT_OF_MEMORY)error=-CHOS_ERRNO_EIO;
+    goto rollback;
+   }
+   created[p/64u]|=UINT64_C(1)<<(p%64u);
+  }
+  if(address_space_protect_user_range(h,address,(size_t)pages*VMM_PAGE_SIZE,
+       operation==CHOS_MEMORY_PROTECT_READ?AS_PERM_USER_RO:AS_PERM_USER_RW)==AS_OK)return 0;
+  error=-CHOS_ERRNO_EIO;
+rollback:
+  if(error==-CHOS_ERRNO_EIO)r->state=2;
+  for(uint32_t p=0;p<pages;p++)if(created[p/64u]&(UINT64_C(1)<<(p%64u))){
+   uint64_t physical;
+   if(address_space_unmap_user_page(h,address+(uint64_t)p*VMM_PAGE_SIZE,&physical)!=AS_OK)r->state=2;
+   else if(address_space_free_user_page(h,physical)!=AS_OK)r->state=2;
+  }
+  return r->state==2?-CHOS_ERRNO_EIO:error;
+ }
+ for(uint32_t p=0;p<pages;p++)if(present[p/64u]&(UINT64_C(1)<<(p%64u))){
+  uint64_t va=address+(uint64_t)p*VMM_PAGE_SIZE;address_space_error_t e;
+  if(operation==CHOS_MEMORY_DECOMMIT){
+   uint64_t physical;e=address_space_unmap_user_page(h,va,&physical);
+   if(e==AS_OK)e=address_space_free_user_page(h,physical);
+  }else if(operation==CHOS_MEMORY_DISCARD)e=address_space_discard_user_range(h,va,VMM_PAGE_SIZE);
+  else e=address_space_protect_user_range(h,va,VMM_PAGE_SIZE,AS_PERM_USER_NONE);
+  if(e!=AS_OK){r->state=2;return -CHOS_ERRNO_EIO;}
+ }
+ return 0;
 }
 int chos_user_memory_control(address_space_handle_t h,uint64_t address,size_t bytes,unsigned operation){
  uint32_t pages;
  if((address&(VMM_PAGE_SIZE-1u))||!length_pages(bytes,&pages))return -CHOS_ERRNO_EINVAL;
  if(operation!=CHOS_MEMORY_PROTECT_NONE && operation!=CHOS_MEMORY_PROTECT_READ &&
-    operation!=CHOS_MEMORY_PROTECT_RW && operation!=CHOS_MEMORY_DISCARD && operation!=CHOS_MEMORY_VALIDATE)return -CHOS_ERRNO_EINVAL;
+    operation!=CHOS_MEMORY_PROTECT_RW && operation!=CHOS_MEMORY_DISCARD && operation!=CHOS_MEMORY_VALIDATE&&
+    operation!=CHOS_MEMORY_DECOMMIT)return -CHOS_ERRNO_EINVAL;
  uint64_t irq=chos_spin_lock_irqsave(&memory_lock);map_owner_t *o=owner(h);
  if(!o){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_ESRCH;}
  region_t *r=containing_region(o,address,pages);
  if(!r){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EINVAL;}
  if(r->pins){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EBUSY;}
+ if(r->state==3){int result=reservation_control(h,r,address,pages,operation);chos_spin_unlock_irqrestore(&memory_lock,irq);return result;}
+ if(operation==CHOS_MEMORY_DECOMMIT){chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EINVAL;}
  address_space_error_t error=AS_OK;
  if(operation==CHOS_MEMORY_VALIDATE){
   for(uint32_t p=0;p<pages;p++){
@@ -193,14 +279,16 @@ int chos_user_memory_unmap_range(address_space_handle_t h,uint64_t address,size_
   * table/free failure quarantine the entire original region until process reap. */
  for(uint32_t p=0;p<pages;p++){
   vmm_mapping_info_t m;
-  if(!address_space_query(h,address+(uint64_t)p*VMM_PAGE_SIZE,&m)){
+  int found=address_space_query(h,address+(uint64_t)p*VMM_PAGE_SIZE,&m);
+  if((r->state==1&&!found)||(found&&r->state==3&&
+      address_space_validate_user_data_range(h,address+(uint64_t)p*VMM_PAGE_SIZE,VMM_PAGE_SIZE)!=AS_OK)){
    r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;
   }
  }
  region_t part={.first=address,.pages=pages,.state=1};
  if(!remove_pages(h,&part,1)){r->state=2;chos_spin_unlock_irqrestore(&memory_lock,irq);return -CHOS_ERRNO_EIO;}
  uint64_t after=address+(uint64_t)pages*VMM_PAGE_SIZE;
- if(left){r->pages=left;if(right)*tail=(region_t){.first=after,.pages=right,.state=1};}
+ if(left){r->pages=left;if(right)*tail=(region_t){.first=after,.pages=right,.state=r->state};}
  else if(right){r->first=after;r->pages=right;}
  else *r=(region_t){0};
  chos_spin_unlock_irqrestore(&memory_lock,irq);return 0;

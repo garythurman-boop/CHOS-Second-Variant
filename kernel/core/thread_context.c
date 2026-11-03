@@ -1,8 +1,11 @@
 #include "chos/thread_context.h"
 #include "chos/thread_api.h"
 #include "chos/address_space.h"
+/* The caller supplies registered stack bounds. Main stacks may exceed the
+ * separate secondary-thread creation limit; capture never grants mappings. */
+_Static_assert(CHOS_RESOURCE_ENGINE_STACK_PAGES*4096u>=CHOS_THREAD_STACK_MAX,"Snapshot covers supported stacks");
 int chos_thread_context_capture(const chos_irq_context_t *frame,uint32_t tid,uint64_t base,uint64_t bytes,chos_thread_context_t *out){
- if(!frame||!out||!tid||(frame->spsr&15u)||!bytes||(base&4095u)||(bytes&4095u)||bytes>CHOS_THREAD_STACK_MAX||
+ if(!frame||!out||!tid||(frame->spsr&15u)||!bytes||(base&4095u)||(bytes&4095u)||bytes>CHOS_RESOURCE_ENGINE_STACK_PAGES*4096u||
     base<CHOS_AS_USER_VA_BASE||base>=CHOS_AS_USER_VA_LIMIT||bytes>CHOS_AS_USER_VA_LIMIT-base||
     (frame->sp_el0&15u)||frame->sp_el0<base||frame->sp_el0>base+bytes||
     (frame->elr&3u)||frame->elr<CHOS_AS_USER_VA_BASE||frame->elr>CHOS_AS_USER_VA_LIMIT-4u)return 0;

@@ -1,21 +1,24 @@
 # Revised Stage 3 current evidence
 
-Stage3 remains incomplete. The latest runtime work admits an explicit native
-engine resource profile and executes a real 48 MiB application fixture. The
-full JavaScriptCore VM now links with original ICU data and passes the kernel
-loader policy. A separate diagnostic image boots and enters it in both QEMU
-profiles, but VM creation aborts at the missing aligned-reservation service;
-JavaScript has not executed. Selected JSC/WTF components execute,
-including actual workers and foreign-thread GC coordination. A modern browser
-does not yet run. Earlier milestone descriptions below retain their historical scope;
-later results supersede earlier dependency diagnoses.
+Stage 3 remains incomplete. The native engine now has aligned virtual reservations
+with real bounded commit/decommit and a 1 MiB main stack. The full original-ICU
+JavaScriptCore VM creates a context, executes JavaScript iteration/JSON and Intl,
+collects garbage and releases its context in both direct and UEFI QEMU. These are
+initial execution fixtures, not ECMAScript/Wasm/GC conformance or WebCore rendering.
+A modern browser does not yet run. Earlier milestone descriptions below retain
+their historical scope; later results supersede earlier dependency diagnoses.
+
+The current [reservation/VM checkpoint](NATIVE_ENGINE_RESERVATIONS.md) has 41
+passing guest profiles and complete host/sanitizer suites. It includes retained
+stack failures, a measured page-scrub repair, a progress-bounded installation
+retry, actual shutdown and exact memory cleanup; it does not certify full Stage 3.
 
 | Requirement | Current boundary |
 |---|---|
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
-| Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads and foreign pause; explicit engine image/heap/stack profile runs in QEMU; full VM/GC execution remains open |
-| Modern browser | Full original-ICU JSC VM links and enters from diagnostic ROMFS; creation aborts at aligned memory reservation; JavaScript, WebCore rendering and browser features remain open |
+| Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads and foreign pause; explicit engine image/heap/stack profile runs in QEMU; initial VM/GC lifecycle executes; full conformance remains open |
+| Modern browser | Full original-ICU JSC VM executes initial JavaScript/Intl and collection/release from diagnostic ROMFS; conformance, WebCore rendering and browser features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
 | Release | Development0.30.0;0.50.0 requires all revised gates |
@@ -28,8 +31,9 @@ See [native read streams and Fusion checklist](NATIVE_READ_STREAMS.md).
 See [native engine execution profile](NATIVE_ENGINE_EXECUTION_PROFILE.md) for
 the current resource contract, actual large-image qualification and full VM
 link boundary. No new browser or hardware support is inferred from that link.
-The subsequent [separate VM boot fixture](NATIVE_JSC_VM_BOOT.md) records actual
-boot attempts, retained initialization failures and their precise software cause.
+The [separate VM boot fixture](NATIVE_JSC_VM_BOOT.md) retains earlier boot failures.
+The current [reservation and VM execution checkpoint](NATIVE_ENGINE_RESERVATIONS.md)
+records their concrete memory/stack fixes and the actual positive execution boundary.
 
 The complete linked WTF filesystem source checkpoint is `e438245`. Native writable working-copy
 handles, shared buffer quotas and conditional commits are qualified in

@@ -7,7 +7,8 @@
 /* Calling process/current thread only. CPU ticks are architectural counter
  * intervals while dispatched; blocked/idle time is excluded. Process totals
  * retain exited threads. Kernel-root service tasks are not charged to a client.
- * Resident bytes charge owned user frames, including inaccessible reservations;
+ * Resident bytes charge owned user frames, including committed inaccessible pages;
+ * unbacked virtual reservations have no resident or mapped page charge.
  * mapped bytes count user mappings. Page tables/kernel buffers are excluded. */
 typedef struct {
  uint32_t version,size_bytes,flags,reserved0;

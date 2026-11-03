@@ -10,6 +10,7 @@
 #define CHOS_USER_MAP_REGIONS 16u
 /* Anonymous zeroed RW/XN pages only. Nonzero flags are rejected. */
 int64_t chos_user_memory_map(address_space_handle_t,size_t,unsigned flags);
+int64_t chos_user_memory_reserve(address_space_handle_t,size_t,uint64_t alignment);
 int chos_user_memory_unmap(address_space_handle_t,uint64_t,size_t);
 int chos_user_memory_unmap_range(address_space_handle_t,uint64_t,size_t);
 int chos_user_memory_control(address_space_handle_t,uint64_t,size_t,unsigned);

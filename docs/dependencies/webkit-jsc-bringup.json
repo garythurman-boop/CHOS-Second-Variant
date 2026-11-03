@@ -59,10 +59,11 @@
     "Source/JavaScriptCore/runtime/MachineContext.h": "c3fa16a556e16715a4666b874512a32979b5ae8bc789e6e1d11d1890939a8b00",
     "Source/JavaScriptCore/runtime/ProfilerSupport.cpp": "724bce2c7ad1ac936a928db8f8e72c334fa2beb34640a6ae1c4c081f1c632aa3",
     "Source/JavaScriptCore/runtime/Options.cpp": "50f3383317ae6e015f0c8b63d8aab5910fe59a86fd2cc4de00a4459b59d5159a",
-    "Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp": "bcf2dd98ffb70d7a7c8e4a5885c5c7d5385e34c0aa99bc3af7fde0e741785e5d"
+    "Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp": "bcf2dd98ffb70d7a7c8e4a5885c5c7d5385e34c0aa99bc3af7fde0e741785e5d",
+    "Source/WTF/wtf/posix/OSAllocatorPOSIX.cpp": "fa30c4780ed2e69c6969abffcb863325dbd6d415869507831813d110b33aa027"
   },
   "patch": "ports/webkit/patches/0001-chos-platform-bringup.patch",
-  "patch_sha256": "3be84fe9ac5d08dd5351231d813fed2fff96d201aade9a50038b58f05ed280c3",
+  "patch_sha256": "21b548b8a667aaa666354cf6fa99b44843cdb77efb56e7f61c914a0ac806f57e",
   "patched_files_sha256": {
     "Source/JavaScriptCore/assembler/ARM64Assembler.h": "eea05e4d8e986937a2e8d39166f565526d42f8c13a0e0480a95e9258457b6570",
     "Source/JavaScriptCore/assembler/PerfLog.cpp": "4430edb3133a141d7767937f629b74c956a1afce3b6b677e110ec19c92970bd2",
@@ -102,7 +103,8 @@
     "Source/bmalloc/bmalloc/SpinBackoff.h": "24670fa44672030e4127389fb87456bf8c92f5dbcf6e93ae46b639bd10e37880",
     "Source/bmalloc/bmalloc/VMAllocate.h": "3d9584bd0f2508171c4adfa1095ad08891e572aa8cc8de594db506f437862b80",
     "Source/cmake/OptionsJSCOnly.cmake": "a4b9b0b3dd2c3deecd43d0a5c24494ee2d9f15e255c960bbeb55948c3ae25805",
-    "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c"
+    "Source/cmake/WebKitCommon.cmake": "565c9a2922f7ffe25f932bfc28e1bf5bb047aa6114eec5b23a15a12cd9df2d9c",
+    "Source/WTF/wtf/posix/OSAllocatorPOSIX.cpp": "9a74179ab8566a6f0e6298415d37153c08fc96931561dd545b6eb2dde2f0bf10"
   },
   "signature_verification": "Not claimed; HTTPS Git object identity and exact inspected file/patch hashes recorded. Full license/dependency/release qualification remains open.",
   "required_source_roots": [

@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSEngineReserve LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_executable(engine_reserve main.cpp)
+target_compile_options(engine_reserve PRIVATE -Wall -Wextra -Werror)
+target_link_options(engine_reserve PRIVATE "-Wl,--strip-debug")

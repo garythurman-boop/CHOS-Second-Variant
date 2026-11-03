@@ -6,6 +6,7 @@ static struct {uint64_t pa;int used,mapped;} frames[4][32768];
 static uint64_t mappings[4][24576];
 static address_space_user_permissions_t permissions[4][24576];
 static unsigned protect_calls,discard_calls,control_fail;
+static unsigned validation_fail;
 static unsigned profiles[4],references[4],retain_fail,release_fail,release_probe,release_observed;
 static unsigned generations[4]={1,1,1,1},allocations,allocation_fail,map_calls,map_fail,unmap_fail,free_fail;
 static unsigned index_of(uint64_t va){
@@ -45,6 +46,16 @@ address_space_error_t address_space_discard_user_range(address_space_handle_t h,
  discard_calls++;if(control_fail)return AS_ERR_BAD_DESCRIPTOR;
  assert(n&&!(n%4096));for(size_t at=0;at<n;at+=4096)assert(mappings[h.slot][index_of(va+at)]);return AS_OK;
 }
+address_space_error_t address_space_validate_user_data_range(address_space_handle_t h,uint64_t va,size_t n){
+ if(validation_fail)return AS_ERR_BAD_DESCRIPTOR;
+ assert(n&&n<=CHOS_USER_MAP_MAX_BYTES&&!(n%4096));
+ for(size_t at=0;at<n;at+=4096){
+  uint64_t pa=mappings[h.slot][index_of(va+at)];if(!pa)return AS_ERR_PAGE_NOT_MAPPED;
+  unsigned frame=(unsigned)((pa-0x50000000u-h.slot*0x10000000u)/4096);
+  if(frame>=32768||!frames[h.slot][frame].used||!frames[h.slot][frame].mapped)return AS_ERR_BAD_DESCRIPTOR;
+ }
+ return AS_OK;
+}
 static unsigned used(unsigned slot){unsigned n=0;for(unsigned i=0;i<32768;i++)n+=frames[slot][i].used;return n;}
 static void reset(void){memset(owners,0,sizeof(owners));memset(profiles,0,sizeof(profiles));memset(references,0,sizeof(references));retain_fail=release_fail=release_probe=release_observed=0;memset(frames,0,sizeof(frames));memset(mappings,0,sizeof(mappings));allocations=allocation_fail=map_calls=map_fail=unmap_fail=free_fail=protect_calls=discard_calls=control_fail=0;}
 static void engine_profiles(void){
@@ -74,6 +85,78 @@ static void engine_profiles(void){
  reset();assert(chos_user_memory_map(a,4096,0)>0);release_fail=1;
  assert(!chos_user_memory_release(a)&&references[0]==1&&owners[0].releasing);
  reset();profiles[0]=2;assert(chos_user_memory_map(a,4096,0)==-CHOS_ERRNO_ESRCH&&!allocations);
+}
+static void reservations(void){
+ address_space_handle_t a={.slot=0,.id=1,.generation=1},b={.slot=1,.id=2,.generation=1};
+ reset();validation_fail=0;
+ assert(chos_user_memory_reserve(a,4096,4096)==-CHOS_ERRNO_ENOTSUP&&!allocations);
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE; /* A live AS never changes profile. */
+ for(unsigned align=0;align<4096;align+=127)assert(chos_user_memory_reserve(a,4096,align)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_reserve(a,4096,12288)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_reserve(a,0,4096)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_reserve(a,(size_t)-1,4096)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_reserve(a,4096,UINT64_MAX)==-CHOS_ERRNO_EINVAL);
+ assert(chos_user_memory_reserve(a,CHOS_RESOURCE_ENGINE_RESERVE_MAX+1u,4096)==-CHOS_ERRNO_EINVAL);
+ const size_t span=CHOS_RESOURCE_ENGINE_RESERVE_MAX;
+ int64_t va=chos_user_memory_reserve(a,span,span);
+ assert(va>0&&!(va%(int64_t)span)&&!used(0)&&!allocations&&owners[0].regions[0].state==3);
+ assert(!chos_user_memory_pin(a,va,span));
+ assert(chos_user_memory_control(a,va,CHOS_USER_MAP_MAX_BYTES+1u,3)==-CHOS_ERRNO_EINVAL);
+ assert(!chos_user_memory_control(a,va,4096,CHOS_MEMORY_PROTECT_NONE)&&!used(0));
+ assert(!chos_user_memory_control(a,va,4096,CHOS_MEMORY_DISCARD)&&!used(0));
+ assert(!chos_user_memory_control(a,va,4096,CHOS_MEMORY_DECOMMIT)&&!used(0));
+ assert(!chos_user_memory_control(a,va,4*4096,CHOS_MEMORY_PROTECT_READ)&&used(0)==4);
+ assert(permissions[0][index_of(va)]==AS_PERM_USER_RO);
+ assert(chos_user_memory_control(b,va,4096,3)==-CHOS_ERRNO_EINVAL);
+ assert(!chos_user_memory_control(a,va+span-4096,4096,3)&&used(0)==5);
+ assert(!chos_user_memory_control(a,va,4*4096,0)&&used(0)==5);
+ assert(!chos_user_memory_control(a,va,4*4096,CHOS_MEMORY_DECOMMIT)&&used(0)==1);
+ assert(!chos_user_memory_control(a,va,4*4096,CHOS_MEMORY_DECOMMIT)&&used(0)==1);
+ assert(!chos_user_memory_control(a,va,4*4096,3)&&used(0)==5);
+ assert(!chos_user_memory_unmap_range(a,va+2*4096,4096)&&used(0)==4);
+ assert(owners[0].regions[0].state==3&&owners[0].regions[1].state==3);
+ assert(chos_user_memory_control(a,va+2*4096,4096,3)==-CHOS_ERRNO_EINVAL);
+ assert(!chos_user_memory_unmap_range(a,va,2*4096)&&used(0)==2);
+ assert(chos_user_memory_release(a)&&used(0)==2); /* AS destruction owns terminal frames. */
+ /* Failed commits preserve all preexisting RO pages and release only new frames. */
+ for(unsigned boundary=1;boundary<=4;boundary++){
+  reset();profiles[0]=CHOS_RESOURCE_ENGINE;va=chos_user_memory_reserve(a,8*4096,4096);
+  assert(!chos_user_memory_control(a,va,4096,CHOS_MEMORY_PROTECT_READ));uint64_t kept=mappings[0][index_of(va)];
+  allocation_fail=allocations+boundary;
+  assert(chos_user_memory_control(a,va,5*4096,3)==-CHOS_ERRNO_ENOMEM&&used(0)==1);
+  assert(permissions[0][index_of(va)]==AS_PERM_USER_RO&&mappings[0][index_of(va)]==kept);
+  assert(owners[0].regions[0].state==3);
+ }
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;va=chos_user_memory_reserve(a,8*4096,4096);map_fail=3;
+ assert(chos_user_memory_control(a,va,8*4096,3)==-CHOS_ERRNO_ENOMEM&&!used(0));
+ map_fail=0;assert(!chos_user_memory_control(a,va,8*4096,3)&&used(0)==8);
+ validation_fail=1;assert(chos_user_memory_control(a,va,4096,CHOS_MEMORY_DECOMMIT)==-CHOS_ERRNO_EIO&&used(0)==8);
+ validation_fail=0;assert(owners[0].regions[0].state==2&&chos_user_memory_release(a));
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;va=chos_user_memory_reserve(a,8*4096,4096);control_fail=1;
+ assert(chos_user_memory_control(a,va,8*4096,3)==-CHOS_ERRNO_EIO&&!used(0)&&owners[0].regions[0].state==2);
+ /* Unexpected rollback/disposal failures retain uncertain ownership for reap. */
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;va=chos_user_memory_reserve(a,8*4096,4096);
+ allocation_fail=3;unmap_fail=1;
+ assert(chos_user_memory_control(a,va,8*4096,3)==-CHOS_ERRNO_EIO&&used(0)==2&&owners[0].regions[0].state==2);
+ unmap_fail=0;assert(chos_user_memory_release(a)&&used(0)==2);
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;va=chos_user_memory_reserve(a,8*4096,4096);
+ allocation_fail=3;free_fail=1;
+ assert(chos_user_memory_control(a,va,8*4096,3)==-CHOS_ERRNO_EIO&&used(0)==2&&owners[0].regions[0].state==2);
+ free_fail=0;assert(chos_user_memory_release(a)&&used(0)==2);
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;va=chos_user_memory_reserve(a,8*4096,4096);
+ assert(!chos_user_memory_control(a,va,8*4096,3));unmap_fail=1;
+ assert(chos_user_memory_control(a,va,8*4096,CHOS_MEMORY_DECOMMIT)==-CHOS_ERRNO_EIO&&used(0)==8);
+ unmap_fail=0;assert(chos_user_memory_release(a)&&used(0)==8);
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;va=chos_user_memory_reserve(a,8*4096,4096);
+ mappings[0][index_of(va)]=0x50000000; /* An injected descriptor not owned by this AS. */
+ assert(chos_user_memory_control(a,va,4096,0)==-CHOS_ERRNO_EIO&&!allocations&&owners[0].regions[0].state==2);
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;
+ for(unsigned i=0;i<512;i++)assert(chos_user_memory_reserve(a,4096,4096)>0);
+ assert(chos_user_memory_reserve(a,4096,4096)==-CHOS_ERRNO_ENOMEM&&!used(0)&&!allocations);
+ assert(chos_user_memory_release(a));
+ reset();profiles[0]=CHOS_RESOURCE_ENGINE;mappings[0][1]=0x50000000;
+ assert(chos_user_memory_reserve(a,4096,4096)==-CHOS_ERRNO_EBUSY&&!allocations);
+ puts("engine reservations: aligned logical ranges,sparse commits,decommit,split ownership,rollback and quarantine passed");
 }
 int main(void){
  address_space_handle_t a={.slot=0,.id=1,.generation=1},b={.slot=1,.id=2,.generation=1};reset();
@@ -175,5 +258,6 @@ int main(void){
  assert(chos_user_memory_retire_stack(a,va,8192)==-CHOS_ERRNO_EIO&&used(0)==2);
  assert(chos_user_memory_release(a));
  engine_profiles();
+ reservations();
  puts("anonymous user mappings: bounds, owner separation, rollback, quota, non-executable pages, managed stack disposal and quarantine passed");
 }

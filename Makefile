@@ -1727,6 +1727,7 @@ $(BUILD)/userland/native_engine_abi.o: userland/native_engine_abi.S
 	$(CC) $(ASFLAGS) -c $< -o $@
 
 $(BUILD)/test-user-allocator $(SAN_DIR)/test-user-allocator: include/chos/resource_profile.h
+$(BUILD)/test-thread-context $(SAN_DIR)/test-thread-context: include/chos/resource_profile.h
 
 # Separate diagnostic kernels; normal media never acquire the engine fixture.
 $(BUILD)/kernel/arch/aarch64/romfs_engine_empty.o: kernel/arch/aarch64/romfs_engine_empty.S
@@ -1749,3 +1750,18 @@ $(BUILD)/engine-test/chos.iso: $(BUILD)/engine-test/uefi-kernel.elf $(BUILD)/uef
 	python3 tools/mkuefi_iso.py --kernel $(BUILD)/engine-test/uefi-kernel.elf --efi $(BUILD)/uefi/BOOTAA64.EFI --esp-mib 64 --output $@
 .PHONY: engine-test-images
 engine-test-images: $(BUILD)/engine-test/chos.elf $(BUILD)/engine-test/chos.iso
+
+$(BUILD)/kernel/mm/address_space.o $(UEFI_KERNEL_BUILD)/kernel/mm/address_space.o: kernel/mm/page_clear.h
+$(BUILD)/test-page-clear: tests/test_page_clear.c kernel/mm/page_clear.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Ikernel/mm $< -o $@
+$(SAN_DIR)/test-page-clear: tests/test_page_clear.c kernel/mm/page_clear.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -Ikernel/mm $< -o $@
+.PHONY: test-page-clear test-page-clear-sanitize
+test-page-clear: $(BUILD)/test-page-clear
+	./$(BUILD)/test-page-clear
+test-page-clear-sanitize: $(SAN_DIR)/test-page-clear
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-page-clear
+test: test-page-clear
+test-sanitize: test-page-clear-sanitize

@@ -1,0 +1,757 @@
+{
+  "status": "PASS_NATIVE_ALIGNED_RESERVATIONS_INITIAL_JSC_VM_AND_REGRESSIONS",
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "profiles": [
+    {
+      "profile": "vm-final-direct2",
+      "exit": 0,
+      "seconds": 29.49092536000171
+    },
+    {
+      "profile": "wtf-allocator-direct2",
+      "exit": 0,
+      "seconds": 5.297065070000826
+    },
+    {
+      "profile": "reserve-final-direct2",
+      "exit": 0,
+      "seconds": 17.55637584299984
+    },
+    {
+      "profile": "exec-final-direct2",
+      "exit": 0,
+      "seconds": 8.038121963996673
+    },
+    {
+      "profile": "pressure-final-direct2",
+      "exit": 0,
+      "seconds": 4.290611127999
+    },
+    {
+      "profile": "vm-final-uefi2",
+      "exit": 0,
+      "seconds": 39.19714049899994
+    },
+    {
+      "profile": "wtf-allocator-uefi2",
+      "exit": 0,
+      "seconds": 12.792209070001263
+    },
+    {
+      "profile": "reserve-final-uefi2",
+      "exit": 0,
+      "seconds": 23.57929526299995
+    },
+    {
+      "profile": "exec-final-uefi2",
+      "exit": 0,
+      "seconds": 15.845993760998681
+    },
+    {
+      "profile": "pressure-final-uefi2",
+      "exit": 0,
+      "seconds": 11.778128440000728
+    },
+    {
+      "profile": "memory-regression-direct2",
+      "exit": 0,
+      "seconds": 5.335083082998608
+    },
+    {
+      "profile": "memory-regression-uefi2",
+      "exit": 0,
+      "seconds": 16.102531363998423
+    },
+    {
+      "profile": "vm-regression-direct2",
+      "exit": 0,
+      "seconds": 8.97827114899701
+    },
+    {
+      "profile": "vm-regression-uefi2",
+      "exit": 0,
+      "seconds": 18.292803303000255
+    },
+    {
+      "profile": "allocator-regression-direct2",
+      "exit": 0,
+      "seconds": 7.539763808003045
+    },
+    {
+      "profile": "allocator-regression-uefi2",
+      "exit": 0,
+      "seconds": 15.456687886999134
+    },
+    {
+      "profile": "raw-regression-direct2",
+      "exit": 0,
+      "seconds": 19.195947334002994
+    },
+    {
+      "profile": "raw-regression-uefi2",
+      "exit": 0,
+      "seconds": 25.832833160999144
+    },
+    {
+      "profile": "pthread-regression-uefi2",
+      "exit": 0,
+      "seconds": 36.85918309400222
+    },
+    {
+      "profile": "sync-regression-uefi2",
+      "exit": 0,
+      "seconds": 54.755990707999445
+    },
+    {
+      "profile": "emutls-regression-uefi2",
+      "exit": 0,
+      "seconds": 17.957165641997562
+    },
+    {
+      "profile": "startup-regression-uefi2",
+      "exit": 0,
+      "seconds": 27.606790244000877
+    },
+    {
+      "profile": "icu-regression-uefi2",
+      "exit": 0,
+      "seconds": 16.49498360600046
+    },
+    {
+      "profile": "cxx20-regression-uefi2",
+      "exit": 0,
+      "seconds": 19.112666609998996
+    },
+    {
+      "profile": "cxx23-regression-uefi2",
+      "exit": 0,
+      "seconds": 19.41324521700153
+    },
+    {
+      "profile": "pause-regression-direct2",
+      "exit": 0,
+      "seconds": 26.16774748500029
+    },
+    {
+      "profile": "pause-regression-uefi2",
+      "exit": 0,
+      "seconds": 36.2582287610021
+    },
+    {
+      "profile": "foreign-regression-direct2",
+      "exit": 0,
+      "seconds": 15.082738795001205
+    },
+    {
+      "profile": "foreign-regression-uefi2",
+      "exit": 0,
+      "seconds": 17.50782485599848
+    },
+    {
+      "profile": "detach-regression-uefi2",
+      "exit": 0,
+      "seconds": 40.04354400099692
+    },
+    {
+      "profile": "wtf-threads-regression-uefi2",
+      "exit": 0,
+      "seconds": 34.488335701000324
+    },
+    {
+      "profile": "wtf-fs-regression-uefi2",
+      "exit": 0,
+      "seconds": 22.555262138997932
+    },
+    {
+      "profile": "jsc-options-regression-uefi2",
+      "exit": 0,
+      "seconds": 31.132752001998597
+    },
+    {
+      "profile": "jsc-register-regression-uefi2",
+      "exit": 0,
+      "seconds": 13.73217463200126
+    },
+    {
+      "profile": "math-regression-uefi2",
+      "exit": 0,
+      "seconds": 13.11899319299846
+    },
+    {
+      "profile": "tls-final-uefi2",
+      "exit": 0,
+      "seconds": 52.39539632699962
+    },
+    {
+      "profile": "tls6-final-uefi2",
+      "exit": 0,
+      "seconds": 47.1997774219999
+    },
+    {
+      "profile": "typing-final-uefi2",
+      "exit": 0,
+      "seconds": 48.68737399699967
+    },
+    {
+      "profile": "platform-final-uefi2",
+      "exit": 0,
+      "seconds": 54.075037586997496
+    },
+    {
+      "profile": "installer-progress-uefi",
+      "exit": 0,
+      "seconds": 196.74446255500152
+    },
+    {
+      "profile": "installer-write-fault-uefi",
+      "exit": 0,
+      "seconds": 21.026369680999778
+    }
+  ],
+  "host_suites": {
+    "complete_host": 0,
+    "complete_sanitizers": 0,
+    "page_clear_independent_canaries_and_misaligned_refusals": 0
+  },
+  "kernel_sha256": {
+    "chos.elf": "8bc0dd7763bf926af058d4a6bfd8799895e093d71de2a71e3f69caf3e62a7edf",
+    "uefi-kernel/chos.elf": "43f71055418fb69dafc20d6f8c390d682780301e6af449c9f05d6bc95cfb290c",
+    "chos-0.30.0.iso": "b81048e9c14e187850d6adbcc6697938f5e6ce8a7a0a8fc1cf95f7bcd302bb61",
+    "engine-test/chos.elf": "9dede339ecaf5b3939654c7df1786c565c1a62d0e9f074a175750d313c67f6e8",
+    "engine-test/uefi-kernel.elf": "5d73e82711da57dc3fbc63a150d32adac673d34ca4ee10eb5b51d1827c7e44cc",
+    "engine-test/chos.iso": "7d35269e2529ddebaeec24243b7272674cd3c12b15162a75e3361a95a78beff5",
+    "engine-test/native-engine.elf": "d1036ce77de966d664288dc0fa2af20a379624b9da9021a734ca17eefec87fcb"
+  },
+  "sdk_manifest_sha256": "b21966090479c02d8347ba5f02e264c16034db067ff88dfc769c3c9154545a9f",
+  "engine_source": {
+    "commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "21b548b8a667aaa666354cf6fa99b44843cdb77efb56e7f61c914a0ac806f57e",
+    "patched_postimages": 40,
+    "native_port_files": 7,
+    "all_postimages_forward_replayed": true
+  },
+  "actual_VM_link": {
+    "full_original_ICU": true,
+    "undefined_symbols": [],
+    "original_archive_members": 482,
+    "original_separate_interpreter_objects": 53,
+    "loader_policy": {
+      "accepted": true,
+      "resource_profile": 1,
+      "file_bytes": 54819200,
+      "virtual_bytes": 50679808,
+      "root_stack_pages": 256,
+      "segments": 3,
+      "executed": false
+    },
+    "executable": {
+      "sha256": "5fe66fb7b22cbd72401dcfbdbdddae7bf5489ad39de26aec49b829dc3f556151",
+      "bytes": 54819200
+    }
+  },
+  "actual_VM_execution": {
+    "direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "d1036ce77de966d664288dc0fa2af20a379624b9da9021a734ca17eefec87fcb",
+      "cold_free_pages": 104461,
+      "final_free_pages": 104461,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 8.584658753999975,
+          "free_pages_after": 104461,
+          "desktop_response_seconds_during_VM_exit": 0.02320979000069201,
+          "engine_teardown_ticks": 43
+        },
+        {
+          "pid": 2,
+          "seconds": 8.56680932800009,
+          "free_pages_after": 104461,
+          "desktop_response_seconds_during_VM_exit": 0.02298526199956541,
+          "engine_teardown_ticks": 46
+        },
+        {
+          "pid": 3,
+          "seconds": 8.377217558001576,
+          "free_pages_after": 104461,
+          "desktop_response_seconds_during_VM_exit": 0.0020869459985988215,
+          "engine_teardown_ticks": 44
+        }
+      ],
+      "checks": [
+        "Actual native original JSC CAPI VM creation",
+        "Actual JavaScript iteration and JSON round trip",
+        "Original full ICU Intl UTC date formatting",
+        "JSGarbageCollect and context release;exact physical/commit/pool/futex baseline"
+      ],
+      "limits": [
+        "Initial VM execution fixture only;not ECMAScript/Wasm/full GC conformance or modern WebCore/browser qualification",
+        "Diagnostic ISO contains no installer payload;normal distribution media unchanged",
+        "QEMU only;new Fusion/Pi5/laptop execution NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "d1036ce77de966d664288dc0fa2af20a379624b9da9021a734ca17eefec87fcb",
+      "cold_free_pages": 488827,
+      "final_free_pages": 488827,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 8.067683500001294,
+          "free_pages_after": 488827,
+          "desktop_response_seconds_during_VM_exit": 0.023854948998632608,
+          "engine_teardown_ticks": 43
+        },
+        {
+          "pid": 2,
+          "seconds": 8.22296728499714,
+          "free_pages_after": 488827,
+          "desktop_response_seconds_during_VM_exit": 0.022614555000473047,
+          "engine_teardown_ticks": 43
+        },
+        {
+          "pid": 3,
+          "seconds": 10.732577061000484,
+          "free_pages_after": 488827,
+          "desktop_response_seconds_during_VM_exit": 0.03153224700145074,
+          "engine_teardown_ticks": 58
+        }
+      ],
+      "checks": [
+        "Actual native original JSC CAPI VM creation",
+        "Actual JavaScript iteration and JSON round trip",
+        "Original full ICU Intl UTC date formatting",
+        "JSGarbageCollect and context release;exact physical/commit/pool/futex baseline"
+      ],
+      "limits": [
+        "Initial VM execution fixture only;not ECMAScript/Wasm/full GC conformance or modern WebCore/browser qualification",
+        "Diagnostic ISO contains no installer payload;normal distribution media unchanged",
+        "QEMU only;new Fusion/Pi5/laptop execution NOT RUN;Stage3 incomplete"
+      ]
+    }
+  },
+  "actual_WTF_allocator": {
+    "direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "3fc4f3721db381d9b3caa49f32e70d6e3be8cb2e9f439a335036e3d72ed0e7b9",
+      "cold_free_pages": 116833,
+      "final_free_pages": 116833,
+      "normal_run_pids": [
+        1,
+        2,
+        3
+      ],
+      "contained_faults": [
+        "leftguard",
+        "rightguard",
+        "readonly",
+        "decommitted",
+        "execute"
+      ],
+      "checks": [
+        "Actual pinned WTF OSAllocator public methods;32MiB aligned reservation without physical backing",
+        "Guarded64KiB data alignment,virtual slack trimming and2MiB bounded commit/release",
+        "Real zero-filled commit,permission changes,preserved data,decommit,recommit,zeroFill and hints",
+        "Executable,address-hint,invalid-alignment and over-budget refusals",
+        "Exact cold physical,commit,engine-pool and futex baseline after every lifecycle"
+      ],
+      "limits": [
+        "Selected actual allocator APIs,not full WTF/JSC/Wasm/WebCore/browser conformance",
+        "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "3fc4f3721db381d9b3caa49f32e70d6e3be8cb2e9f439a335036e3d72ed0e7b9",
+      "cold_free_pages": 499458,
+      "final_free_pages": 499458,
+      "normal_run_pids": [
+        1,
+        2,
+        3
+      ],
+      "contained_faults": [
+        "leftguard",
+        "rightguard",
+        "readonly",
+        "decommitted",
+        "execute"
+      ],
+      "checks": [
+        "Actual pinned WTF OSAllocator public methods;32MiB aligned reservation without physical backing",
+        "Guarded64KiB data alignment,virtual slack trimming and2MiB bounded commit/release",
+        "Real zero-filled commit,permission changes,preserved data,decommit,recommit,zeroFill and hints",
+        "Executable,address-hint,invalid-alignment and over-budget refusals",
+        "Exact cold physical,commit,engine-pool and futex baseline after every lifecycle"
+      ],
+      "limits": [
+        "Selected actual allocator APIs,not full WTF/JSC/Wasm/WebCore/browser conformance",
+        "QEMU only;new Fusion/Pi5/laptop qualification NOT RUN;Stage3 incomplete"
+      ]
+    }
+  },
+  "bounded_reservations": {
+    "direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "applications_sha256": {
+        "engine": "e5e1d345011545205d0d17c8275be8eb3953f398bf23b9bd5064ee934a07d5a6",
+        "legacy": "ccb34457d4470680cf80393383d2f485a2c77da576cf6783fcfe81a030f85499"
+      },
+      "cold_free_pages": 116833,
+      "final_free_pages": 116833,
+      "normal_and_live_worker_runs": [
+        {
+          "argument": "",
+          "pid": 1,
+          "desktop_response_seconds_during_live_worker": null
+        },
+        {
+          "argument": "",
+          "pid": 2,
+          "desktop_response_seconds_during_live_worker": null
+        },
+        {
+          "argument": "",
+          "pid": 3,
+          "desktop_response_seconds_during_live_worker": null
+        },
+        {
+          "argument": "live-worker",
+          "pid": 4,
+          "desktop_response_seconds_during_live_worker": 0.024241404000349576
+        },
+        {
+          "argument": "live-worker",
+          "pid": 5,
+          "desktop_response_seconds_during_live_worker": 0.07107765799810295
+        },
+        {
+          "argument": "live-worker",
+          "pid": 6,
+          "desktop_response_seconds_during_live_worker": 0.02311605400245753
+        }
+      ],
+      "contained_faults": [
+        "uncommitted",
+        "guard",
+        "readonly",
+        "decommitted",
+        "execute"
+      ],
+      "legacy_refusals": 3,
+      "preemption_switches_before": 0,
+      "preemption_switches_after": 918,
+      "checks": [
+        "real32MiB aligned logical reservation adds no resident or mapped pages",
+        "32MiB bounded zero-filled commits,16MiB real decommit and zero recommit;exact per-process frame charges",
+        "guard,NONE,RO,decommitted and XN access faults contained",
+        "512-record logical metadata cap without physical backing;split release preserves reservation ownership",
+        "process termination with live commit/decommit worker;actual HID desktop response while worker remains active",
+        "every process returns to exact cold pages,commit,pool and futex baseline;legacy profile refuses new reservation"
+      ],
+      "limits": [
+        "QEMU resource service only;not actual VM/JavaScript/Intl/GC/Wasm or modern browser qualification",
+        "Single CPU;no SMP or maximum IRQ latency claim;physical operation limit1MiB remains",
+        "New Fusion/Pi5/laptop qualification NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "applications_sha256": {
+        "engine": "e5e1d345011545205d0d17c8275be8eb3953f398bf23b9bd5064ee934a07d5a6",
+        "legacy": "ccb34457d4470680cf80393383d2f485a2c77da576cf6783fcfe81a030f85499"
+      },
+      "cold_free_pages": 499458,
+      "final_free_pages": 499458,
+      "normal_and_live_worker_runs": [
+        {
+          "argument": "",
+          "pid": 1,
+          "desktop_response_seconds_during_live_worker": null
+        },
+        {
+          "argument": "",
+          "pid": 2,
+          "desktop_response_seconds_during_live_worker": null
+        },
+        {
+          "argument": "",
+          "pid": 3,
+          "desktop_response_seconds_during_live_worker": null
+        },
+        {
+          "argument": "live-worker",
+          "pid": 4,
+          "desktop_response_seconds_during_live_worker": 0.023278507000213722
+        },
+        {
+          "argument": "live-worker",
+          "pid": 5,
+          "desktop_response_seconds_during_live_worker": 0.02469293700050912
+        },
+        {
+          "argument": "live-worker",
+          "pid": 6,
+          "desktop_response_seconds_during_live_worker": 0.023913425000500865
+        }
+      ],
+      "contained_faults": [
+        "uncommitted",
+        "guard",
+        "readonly",
+        "decommitted",
+        "execute"
+      ],
+      "legacy_refusals": 3,
+      "preemption_switches_before": 0,
+      "preemption_switches_after": 864,
+      "checks": [
+        "real32MiB aligned logical reservation adds no resident or mapped pages",
+        "32MiB bounded zero-filled commits,16MiB real decommit and zero recommit;exact per-process frame charges",
+        "guard,NONE,RO,decommitted and XN access faults contained",
+        "512-record logical metadata cap without physical backing;split release preserves reservation ownership",
+        "process termination with live commit/decommit worker;actual HID desktop response while worker remains active",
+        "every process returns to exact cold pages,commit,pool and futex baseline;legacy profile refuses new reservation"
+      ],
+      "limits": [
+        "QEMU resource service only;not actual VM/JavaScript/Intl/GC/Wasm or modern browser qualification",
+        "Single CPU;no SMP or maximum IRQ latency claim;physical operation limit1MiB remains",
+        "New Fusion/Pi5/laptop qualification NOT RUN;Stage3 incomplete"
+      ]
+    }
+  },
+  "large_image_and_pressure": {
+    "exec-final-direct2": {
+      "status": "PASS",
+      "mode": "direct",
+      "pressure_refusal": false,
+      "application_sha256": "2f73493d013f9606f3bc1a10ff46f339e88182eb7eef6bf9b3604c337f161c40",
+      "file_bytes": 87952,
+      "cold_free_pages": 116833,
+      "final_free_pages": 116833,
+      "normal_runs": [
+        {
+          "pid": 1,
+          "engine_teardown_timer_ticks": 7
+        },
+        {
+          "pid": 2,
+          "engine_teardown_timer_ticks": 10
+        },
+        {
+          "pid": 3,
+          "engine_teardown_timer_ticks": 6
+        }
+      ],
+      "contained_faults": [
+        "image-guard",
+        "stack-guard",
+        "profile-write",
+        "execute-heap"
+      ],
+      "invalid_profiles": [
+        "/UNKNOWN.ELF",
+        "/AMBIG.ELF",
+        "/LEGACY.ELF"
+      ],
+      "preemption_switches_before": 0,
+      "preemption_switches_after": 189,
+      "checks": [
+        "actual48MiB BSS image and unique page markers",
+        "actual64KiB stack scratch and context bounds on1MiB main/128KiB defaultworker stacks",
+        "malloc registry beyond16regions and8MiB anonymous data with protection/discard/split release",
+        "contained image/stack guard,readonlyCRTprofile and heap-XN faults",
+        "abandoned mappings and large image return to exact cold physical baseline",
+        "unknown/ambiguous ABI profile and legacy-large image refused independently of CRT hint"
+      ],
+      "limits": [
+        "native executable resource fixture only;no actual VM/JavaScript/GC/WebAssembly/WebCore/browser qualification",
+        "QEMU evidence does not establish Fusion or physical hardware qualification"
+      ]
+    },
+    "exec-final-uefi2": {
+      "status": "PASS",
+      "mode": "uefi",
+      "pressure_refusal": false,
+      "application_sha256": "2f73493d013f9606f3bc1a10ff46f339e88182eb7eef6bf9b3604c337f161c40",
+      "file_bytes": 87952,
+      "cold_free_pages": 499458,
+      "final_free_pages": 499458,
+      "normal_runs": [
+        {
+          "pid": 1,
+          "engine_teardown_timer_ticks": 8
+        },
+        {
+          "pid": 2,
+          "engine_teardown_timer_ticks": 9
+        },
+        {
+          "pid": 3,
+          "engine_teardown_timer_ticks": 8
+        }
+      ],
+      "contained_faults": [
+        "image-guard",
+        "stack-guard",
+        "profile-write",
+        "execute-heap"
+      ],
+      "invalid_profiles": [
+        "/UNKNOWN.ELF",
+        "/AMBIG.ELF",
+        "/LEGACY.ELF"
+      ],
+      "preemption_switches_before": 0,
+      "preemption_switches_after": 209,
+      "checks": [
+        "actual48MiB BSS image and unique page markers",
+        "actual64KiB stack scratch and context bounds on1MiB main/128KiB defaultworker stacks",
+        "malloc registry beyond16regions and8MiB anonymous data with protection/discard/split release",
+        "contained image/stack guard,readonlyCRTprofile and heap-XN faults",
+        "abandoned mappings and large image return to exact cold physical baseline",
+        "unknown/ambiguous ABI profile and legacy-large image refused independently of CRT hint"
+      ],
+      "limits": [
+        "native executable resource fixture only;no actual VM/JavaScript/GC/WebAssembly/WebCore/browser qualification",
+        "QEMU evidence does not establish Fusion or physical hardware qualification"
+      ]
+    },
+    "pressure-final-direct2": {
+      "status": "PASS",
+      "mode": "direct",
+      "pressure_refusal": true,
+      "application_sha256": "2f73493d013f9606f3bc1a10ff46f339e88182eb7eef6bf9b3604c337f161c40",
+      "file_bytes": 87952,
+      "cold_free_pages": 51297,
+      "final_free_pages": 51297,
+      "normal_runs": [],
+      "contained_faults": [],
+      "invalid_profiles": [
+        "/UNKNOWN.ELF",
+        "/AMBIG.ELF",
+        "/LEGACY.ELF"
+      ],
+      "preemption_switches_before": 0,
+      "preemption_switches_after": 0,
+      "checks": [
+        "three engine executable reservations refused without page/commit/pool leak",
+        "unknown/ambiguous ABI profile and legacy-large image refused independently of CRT hint"
+      ],
+      "limits": [
+        "native executable resource fixture only;no actual VM/JavaScript/GC/WebAssembly/WebCore/browser qualification",
+        "QEMU evidence does not establish Fusion or physical hardware qualification"
+      ]
+    },
+    "pressure-final-uefi2": {
+      "status": "PASS",
+      "mode": "uefi",
+      "pressure_refusal": true,
+      "application_sha256": "2f73493d013f9606f3bc1a10ff46f339e88182eb7eef6bf9b3604c337f161c40",
+      "file_bytes": 87952,
+      "cold_free_pages": 40707,
+      "final_free_pages": 40707,
+      "normal_runs": [],
+      "contained_faults": [],
+      "invalid_profiles": [
+        "/UNKNOWN.ELF",
+        "/AMBIG.ELF",
+        "/LEGACY.ELF"
+      ],
+      "preemption_switches_before": 0,
+      "preemption_switches_after": 0,
+      "checks": [
+        "three engine executable reservations refused without page/commit/pool leak",
+        "unknown/ambiguous ABI profile and legacy-large image refused independently of CRT hint"
+      ],
+      "limits": [
+        "native executable resource fixture only;no actual VM/JavaScript/GC/WebAssembly/WebCore/browser qualification",
+        "QEMU evidence does not establish Fusion or physical hardware qualification"
+      ]
+    }
+  },
+  "root_stack_contract": {
+    "engine_main_bytes": 1048576,
+    "engine_default_worker_bytes": 131072,
+    "all_maximum_secondary_worker_bytes": 131072,
+    "legacy_main_and_default_worker_bytes": 32768
+  },
+  "scrub_diagnosis": {
+    "prior_same_binary_unchanged_three_run_diagnostic": "PASS with exact cold physical baselines;delay was not deadlock",
+    "prior_teardown_ticks_at_100Hz": [
+      216,
+      445,
+      474
+    ],
+    "fixed_page_clear": "Aligned alias-safe volatile64-bit stores;no SIMD or cache-zero instructions;whole physical page still cleared",
+    "fixed_guest_metrics": "See each actual_VM_execution run for100Hz teardown ticks and actual HID response during exit",
+    "limits": "Measured QEMU configuration only;no SMP or maximum latency guarantee"
+  },
+  "packet_analysis": [
+    {
+      "profile": "platform-final-uefi2",
+      "guest_result": "PASS",
+      "native_ping_state": 2,
+      "pcap_sha256": "9ae7cb19a136f5088fbbdedbd7689fe36a5d00cb8104e0a7ccd786a5851b91e9",
+      "checks": "Exact one matching ICMP request/reply;valid IPv4/ICMP checksums,reverse endpoints,id,sequence,payload match",
+      "packets": [
+        {
+          "type": 8,
+          "src": "10.0.2.15",
+          "dst": "10.0.2.2",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        },
+        {
+          "type": 0,
+          "src": "10.0.2.2",
+          "dst": "10.0.2.15",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        }
+      ]
+    }
+  ],
+  "archives": [
+    {
+      "name": "engine-reservations-qualified.tar.gz",
+      "bytes": 764353798,
+      "sha256": "0b444f55017c1e80ba08a5197173970fc583ab26762f8204a30d2b23fe552ddf",
+      "verification": "Every archived member hash/length/mode verified;final kernel/media/source,profiles,failed and interrupted evidence retained"
+    },
+    {
+      "name": "engine-reservations-inputs.tar.gz",
+      "bytes": 256769936,
+      "sha256": "b53415aecb113bd9eadc0f9e875e641497d9ed50f02f0bdc565443a409790b32",
+      "verification": "Complete SDK,all535 actual compiled engine objects,applications and prior debug input bytes retained;every current referenced member reverified;exact removed duplicate copies have retention ledgers"
+    }
+  ],
+  "retained_failures": [
+    "First host reservation model incorrectly changed profile on a live generation;corrected test isolation",
+    "Original C++ profile hint aggregate warning;validated safe declaration fix",
+    "Full VM prior Structure reservation abort and initial stack-overflow exceptions",
+    "Widened main stack exposed snapshot validator still enforcing worker cap;host reproducer retained",
+    "Repeated VM third exit4s diagnostic timeout;unchanged3-run diagnostic proved slow byte scrub,not deadlock;volatile word scrub measured and requalified",
+    "Environment restart interrupted pthread firmware boot;retained as INTERRUPTED,rerun passed",
+    "Original90second installer deadline expired at sector120704 with active ESP write and NVMe statusOK;progress-aware180second total/15second stall watchdog retry and injected-write-failure checks separately recorded"
+  ],
+  "prior_concern": "Iteration20 original uninstrumented GUI ping timeout cause remains unproven;passing current PCAP/native-state tests do not establish a causal fix.",
+  "limits": [
+    "Initial actual JavaScript iteration/JSON,full ICU Intl and GC/context release only;not ECMAScript/Wasm/full GC conformance",
+    "No WebCore rendering,modern browser,native Pi5 radio/authentication or production browser security qualification",
+    "Checked Wasm configuredON but actual modules not executed;JIT/DFG/FTL/sampling remainOFF",
+    "Engine-only32MiB virtual reservations;each physical operation stays at most1MiB,one exclusive engine lease,192MiB frame quota,64MiB system floor",
+    "New Fusion/Pi5/laptop qualification NOT RUN;prior user-confirmed Fusion Ethernet evidence remains distinct",
+    "No new user binary;latest shipped cc29ea8;0.50.0 requires all revised Stage3 gates"
+  ]
+}

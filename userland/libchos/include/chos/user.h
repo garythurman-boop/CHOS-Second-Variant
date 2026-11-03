@@ -153,6 +153,7 @@ static inline long chos_rmdir(const char *path) {
 /* Nonblocking, process-owned outbound TCP client. IPv4 addresses use network
  * presentation order in a uint32_t (e.g. 10.0.2.2 == 0x0a000202). */
 static inline long chos_map_memory(size_t bytes){return chos_syscall2(CHOS_SYS_MAP_MEMORY,(long)bytes,0);}
+static inline long chos_reserve_memory(size_t bytes,size_t alignment){return chos_syscall3(CHOS_SYS_MAP_MEMORY,(long)bytes,CHOS_MEMORY_MAP_RESERVE,(long)alignment);}
 static inline long chos_unmap_memory(void *base,size_t bytes){return chos_syscall2(CHOS_SYS_UNMAP_MEMORY,(long)(uintptr_t)base,(long)bytes);}
 static inline long chos_network_status(chos_net_status_t *out){return chos_syscall2(CHOS_SYS_NET_INFO,(long)(uintptr_t)out,sizeof(*out));}
 static inline long chos_capabilities(void){return chos_syscall0(CHOS_SYS_CAPABILITIES);}

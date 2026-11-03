@@ -1,5 +1,7 @@
 # Separate native VM boot fixture
 
+Current checkpoint: [native engine reservations and first VM execution](NATIVE_ENGINE_RESERVATIONS.md). The real original-ICU VM now executes initial JavaScript/Intl and collection/release in direct and UEFI QEMU. The earlier boot/link failures and limits below are historical evidence. Full browser, Wasm/conformance, wireless, security and new hardware acceptance remain open. Engine main stacks are now 1 MiB; default/maximum secondary workers remain 128 KiB.
+
 CHOS now packages the real original-ICU JavaScriptCore executable in a separate
 diagnostic kernel and boots that larger kernel through AAVMF. This closes a
 packaging dependency. It does **not** establish a working VM: the first direct

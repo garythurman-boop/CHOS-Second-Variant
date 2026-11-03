@@ -7,6 +7,8 @@
 #include "chos/scheduler.h"
 #include "chos/frame_ownership.h"
 #include "chos/timer.h"
+#include "page_clear.h"
+_Static_assert(VMM_PAGE_SIZE==CHOS_PAGE_CLEAR_BYTES,"Page scrub matches translation granule");
 
 #define DESC_VALID       (1ull << 0)
 #define DESC_TABLE_PAGE  3ull
@@ -54,6 +56,7 @@ static int32_t active_address_space_slot = -1;
 extern uint8_t __text_start;
 
 static void zero_bytes(void *memory, size_t length) {
+    if (length==VMM_PAGE_SIZE && chos_clear_page(memory)) return;
     uint8_t *bytes = (uint8_t *)memory;
     size_t i;
     for (i = 0u; i < length; ++i) bytes[i] = 0u;
@@ -565,6 +568,13 @@ static address_space_error_t collect_owned_data_range(address_space_handle_t han
         pages[i]=(user_range_page_t){.pte=pte,.physical=physical};
     }
     *owner_out=slot;*count_out=count;return AS_OK;
+}
+address_space_error_t address_space_validate_user_data_range(address_space_handle_t handle,
+        uint64_t start,size_t bytes) {
+    user_range_page_t pages[USER_RANGE_MAX_PAGES];address_space_slot_t *slot;uint32_t count;
+    uint64_t irq=chos_spin_lock_irqsave(&address_space_lock);
+    address_space_error_t error=collect_owned_data_range(handle,start,bytes,&slot,pages,&count);
+    chos_spin_unlock_irqrestore(&address_space_lock,irq);return error;
 }
 address_space_error_t address_space_protect_user_range(address_space_handle_t handle,
         uint64_t start,size_t bytes,address_space_user_permissions_t permissions) {
