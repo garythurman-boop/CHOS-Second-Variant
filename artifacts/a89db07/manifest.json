@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "source_commit": "a89db07f60345bae56676eacfbefc7cf08f5973e",
+  "tag": "build-a89db07",
+  "inputs": {
+    "iso_sha256": "085c39aa5d9b5ca34f21a0e4266a13523c5a0f62c74f8a2527608c918dcb97fc"
+  },
+  "assets": [
+    {
+      "name": "CHOS-Fusion-a89db07.iso",
+      "sha256": "085c39aa5d9b5ca34f21a0e4266a13523c5a0f62c74f8a2527608c918dcb97fc",
+      "bytes": 33603584
+    },
+    {
+      "name": "CHOS-a89db07-prepared.img.gz",
+      "sha256": "d6dc96a5aeff24cab1cc5d5fa782044315bee00493f22605585f4b70f2d52470",
+      "bytes": 2151760,
+      "uncompressed_sha256": "9c045950122b50913c0d984b4253dd9b013013cc837290a241eafc63e2199635",
+      "uncompressed_bytes": 268435456
+    },
+    {
+      "name": "CHOS-a89db07-kernel-direct.elf.gz",
+      "sha256": "4ed5081b423ee4c8046b64eb7138a24a7529421fd6056ccb391b573c869cbc26",
+      "bytes": 1786281,
+      "uncompressed_sha256": "0fa41431e48e4cc8cce9d4e714aac065bcc20f3ab9489c361ac74f2ef42175e0",
+      "uncompressed_bytes": 7090176
+    },
+    {
+      "name": "CHOS-a89db07-kernel-uefi.elf.gz",
+      "sha256": "f94cb53ef36e5ebfb030a45a52e49112ff1f20c7eb405f2f33e9a165d1f0520e",
+      "bytes": 1788303,
+      "uncompressed_sha256": "2bda1fd58a0809ae67a0918d3a89c2b5f41c7889257dfa6491fc8955f890a3a1",
+      "uncompressed_bytes": 7098808
+    },
+    {
+      "name": "BOOTAA64.EFI",
+      "sha256": "8b6267923bc23edaddaed7f707542a71c674022b1f5f62639a8ed6fd6989b8e5",
+      "bytes": 16896
+    },
+    {
+      "name": "CHOS-a89db07-source.zip",
+      "sha256": "47ecbbaa9a588da6972958523ada6b3851379356d0a634e0c471fd591530cb9d",
+      "bytes": 40916943
+    },
+    {
+      "name": "CHOS-Fusion-a89db07-Handoff.zip",
+      "sha256": "d80683ec9b98b6784611b45930603f600c04ea2220cedc438bc7c29cb59ce97f",
+      "bytes": 96096953
+    },
+    {
+      "name": "CHOS-Native-Engine-a89db07.iso",
+      "bytes": 67158016,
+      "sha256": "d1ad9e06ba4737bc0c73213bf97ddfd80ad2a9e8cc2a75dd8923839253d840d4"
+    },
+    {
+      "name": "ENGINE-REBUILD.json",
+      "bytes": 228883,
+      "sha256": "4a68ec44f3c49e69ac8687342a73d134de25c6f6361b6187f1547019aba6e815"
+    },
+    {
+      "name": "VALIDATION.json",
+      "bytes": 14155,
+      "sha256": "e1ef9b722e913a3804ceaddac93dee489dfbe723cd3c8265565d26c9345bae68"
+    },
+    {
+      "name": "TESTING.md",
+      "bytes": 2866,
+      "sha256": "2b2c184c85b4a5c3ce5ec7f7f6cdb7b459bb0fbf328368a70e9a2b8ae6203e04"
+    }
+  ],
+  "diagnostic": {
+    "iso": "CHOS-Native-Engine-a89db07.iso",
+    "installer_payload": false,
+    "engine_app": "/BIN/JSCVM.ELF",
+    "stage3_complete": false,
+    "source_archive": "CHOS-a89db07-source.zip",
+    "handoff": "CHOS-Fusion-a89db07-Handoff.zip",
+    "rebuild_record": "ENGINE-REBUILD.json"
+  }
+}

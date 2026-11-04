@@ -1,0 +1,354 @@
+{
+  "status": "PASS_EXACT_PUBLISHED_SOURCE_BINARIES_QEMU",
+  "source_commit": "a89db07f60345bae56676eacfbefc7cf08f5973e",
+  "version": "0.30.0",
+  "stage3_complete": false,
+  "source_qualification_report": "../../docs/validation/stage3-native-jsc-suite.json",
+  "source_qualification": {
+    "host": "PASS full suite",
+    "ASan_UBSan": "PASS full suite",
+    "guest_profiles": 21,
+    "native_engine_lifecycles": 30,
+    "selected_Test262_variant_executions": 1032
+  },
+  "exact_binary_smoke_profiles": [
+    {
+      "profile": "native-postcommit-test262-uefi",
+      "exit": 0,
+      "seconds": 167.63803929599817
+    },
+    {
+      "profile": "native-postcommit-mixed-direct",
+      "exit": 0,
+      "seconds": 18.286860078005702
+    },
+    {
+      "profile": "native-postcommit-mixed-uefi",
+      "exit": 0,
+      "seconds": 28.323850878005032
+    },
+    {
+      "profile": "console-postcommit-direct",
+      "exit": 0,
+      "seconds": 11.284135752008297
+    },
+    {
+      "profile": "console-postcommit-uefi",
+      "exit": 0,
+      "seconds": 17.100397992006037
+    },
+    {
+      "profile": "platform-postcommit-uefi",
+      "exit": 0,
+      "seconds": 51.671360008011106
+    },
+    {
+      "profile": "platform-engine-postcommit-uefi",
+      "exit": 0,
+      "seconds": 55.73001527400629
+    },
+    {
+      "profile": "installer-postcommit-uefi",
+      "exit": 0,
+      "seconds": 136.47568944799423
+    },
+    {
+      "profile": "installer-fault-postcommit-uefi",
+      "exit": 0,
+      "seconds": 18.015849863993935
+    }
+  ],
+  "exact_binary_results": {
+    "native-postcommit-test262-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "suite": "test262",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 155.3624597570015,
+          "desktop_response_seconds_during_long_script": null
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-postcommit-mixed-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "suite": "mixed",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 14.504223290001391,
+          "desktop_response_seconds_during_long_script": 0.05159969000669662
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-postcommit-mixed-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "suite": "mixed",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 13.668056762006017,
+          "desktop_response_seconds_during_long_script": 0.024114898988045752
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "console-postcommit-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "console_frontend": "isolated EL0",
+      "physical_command": "run /bin/jscvm.elf wasm",
+      "console_parent_pid": 1,
+      "launch_to_visible_output_seconds": 4.2098887440079125,
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "checks": [
+        "Actual emulated keyboard input;no GUI/API injection",
+        "Path and argv reach the real native Wasm executable;its positive stdout is visible in Console",
+        "Child normal exit,Console close and exact cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Diagnostic engine fixture only;not browser integration or new Fusion qualification"
+      ]
+    },
+    "console-postcommit-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "console_frontend": "trusted UEFI",
+      "physical_command": "run /bin/jscvm.elf wasm",
+      "console_parent_pid": null,
+      "launch_to_visible_output_seconds": 2.838628550991416,
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "checks": [
+        "Actual emulated keyboard input;no GUI/API injection",
+        "Path and argv reach the real native Wasm executable;its positive stdout is visible in Console",
+        "Child normal exit,Console close and exact cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Diagnostic engine fixture only;not browser integration or new Fusion qualification"
+      ]
+    },
+    "platform-postcommit-uefi": {
+      "mode": "uefi",
+      "checks": [
+        "32 fast USB keypress/release pairs",
+        "PCI VirtIO CHFS write/flush/read",
+        "PCI VirtIO hardware RNG",
+        "82574L e1000e DHCP/ARP/ICMP",
+        "keyboard shortcut",
+        "relative pointer",
+        "wheel reports through hardware transport to shared input",
+        "window maximize/restore",
+        "title-bar drag",
+        "20 USB hot-unplug/reconnect cycles with ring wraps",
+        "3 mixed input/storage cycles",
+        "2-second idle observation",
+        "storage persistence after fresh guest boot"
+      ],
+      "kernel_ready_seconds": 8.085,
+      "desktop_ready_seconds": 11.067,
+      "keyboard_visible_ms": 54.35,
+      "native_ping_state": 2,
+      "pointer_visible_ms": 45.34,
+      "maximize_visible_ms": 227.12,
+      "drag_visible_ms": 236.69,
+      "stress_seconds": 5.782,
+      "idle_cpu_percent": 13.0,
+      "status": "PASS"
+    },
+    "platform-engine-postcommit-uefi": {
+      "mode": "uefi",
+      "checks": [
+        "32 fast USB keypress/release pairs",
+        "PCI VirtIO CHFS write/flush/read",
+        "PCI VirtIO hardware RNG",
+        "82574L e1000e DHCP/ARP/ICMP",
+        "keyboard shortcut",
+        "relative pointer",
+        "wheel reports through hardware transport to shared input",
+        "window maximize/restore",
+        "title-bar drag",
+        "20 USB hot-unplug/reconnect cycles with ring wraps",
+        "3 mixed input/storage cycles",
+        "2-second idle observation",
+        "storage persistence after fresh guest boot"
+      ],
+      "kernel_ready_seconds": 11.187,
+      "desktop_ready_seconds": 14.173,
+      "keyboard_visible_ms": 29.5,
+      "native_ping_state": 2,
+      "pointer_visible_ms": 48.58,
+      "maximize_visible_ms": 239.56,
+      "drag_visible_ms": 233.76,
+      "stress_seconds": 5.633,
+      "idle_cpu_percent": 19.49,
+      "status": "PASS"
+    },
+    "installer-postcommit-uefi": {
+      "status": "PASS",
+      "install_seconds": 77.224,
+      "three_key_focus_ms": 458.65,
+      "max_install_step_ms": 629.217,
+      "keyboard_wizard": false,
+      "physical_mode_change": true,
+      "shutdown_seconds": 5.104,
+      "checks": [
+        "no writes before target selection and final confirmation",
+        "guest GPT/FAT32/EFI/CHFS creation and verification",
+        "ISO detached: disk-only desktop and native input",
+        "scheduled shell file write survives a fresh reboot; native editor checked separately",
+        "ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback",
+        "keyboard focus remains responsive during installation",
+        "installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits"
+      ]
+    },
+    "installer-fault-postcommit-uefi": {
+      "status": "PASS",
+      "checks": [
+        "real guest NVMe write error",
+        "no false success",
+        "no disk mutation on first failed write",
+        "GUI and timer remain responsive"
+      ]
+    }
+  },
+  "frozen_build_inputs": {
+    "source_commit": "a89db07f60345bae56676eacfbefc7cf08f5973e",
+    "publication_metadata_preserved": true,
+    "files": {
+      "build/chos.elf": {
+        "bytes": 7090176,
+        "sha256": "0fa41431e48e4cc8cce9d4e714aac065bcc20f3ab9489c361ac74f2ef42175e0"
+      },
+      "build/uefi-kernel/chos.elf": {
+        "bytes": 7098808,
+        "sha256": "2bda1fd58a0809ae67a0918d3a89c2b5f41c7889257dfa6491fc8955f890a3a1"
+      },
+      "build/chos-0.30.0.iso": {
+        "bytes": 33603584,
+        "sha256": "085c39aa5d9b5ca34f21a0e4266a13523c5a0f62c74f8a2527608c918dcb97fc"
+      },
+      "build/chos-0.30.0-installed.img": {
+        "bytes": 268435456,
+        "sha256": "9c045950122b50913c0d984b4253dd9b013013cc837290a241eafc63e2199635"
+      },
+      "build/engine-test/chos.elf": {
+        "bytes": 58019856,
+        "sha256": "9c7a220d06d9c36513f4c0ec3253b2f3ab31c72b1e8392baef926f6310c17fba"
+      },
+      "build/engine-test/uefi-kernel.elf": {
+        "bytes": 58028496,
+        "sha256": "d4ccbcfc491a3e0a4cd158fdb17fcc0c5820874848d51a95a3ba09f6ff559b5d"
+      },
+      "build/engine-test/chos.iso": {
+        "bytes": 67158016,
+        "sha256": "d1ad9e06ba4737bc0c73213bf97ddfd80ad2a9e8cc2a75dd8923839253d840d4"
+      },
+      "build/engine-test/native-engine.elf": {
+        "bytes": 50930640,
+        "sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6"
+      },
+      "build/native-sdk/chos-sdk.json": {
+        "bytes": 135599,
+        "sha256": "b21966090479c02d8347ba5f02e264c16034db067ff88dfc769c3c9154545a9f"
+      },
+      "build/userland/console.elf": {
+        "bytes": 101640,
+        "sha256": "a211666bf9da2060a6a87310d19a3bae2080db3287d91c744fa7015d41b2d9c6"
+      },
+      "build/userland/console.chcx": {
+        "bytes": 28744,
+        "sha256": "751159e913c47ffd64ff690b14f64b5d464ba9596897b4185a921a2107e50863"
+      },
+      "build/qemu-smoke-disk.img": {
+        "bytes": 16777216,
+        "sha256": "0ed2eb76918805f986086cbf109449ce5cd0892c5e55e28910f1a87f8f891770"
+      }
+    }
+  },
+  "handoff": {
+    "archive": "/workspace/chos-evidence/CHOS-Native-Engine-a89db07-Verified2-Handoff.zip",
+    "bytes": 96096953,
+    "sha256": "d80683ec9b98b6784611b45930603f600c04ea2220cedc438bc7c29cb59ce97f",
+    "source_commit": "a89db07f60345bae56676eacfbefc7cf08f5973e",
+    "file_count": 10650,
+    "original_file_modes_preserved": true,
+    "all_member_hashes_lengths_and_crc_verified": true,
+    "relocated_relink_stripped_executable_identical": true,
+    "companion_CHOS_source_archive": {
+      "name": "CHOS-a89db07-source.zip",
+      "bytes": 40916943,
+      "sha256": "47ecbbaa9a588da6972958523ada6b3851379356d0a634e0c471fd591530cb9d",
+      "url": "https://github.com/garythurman-boop/CHOS-Second-Variant/raw/refs/heads/main/artifacts/a89db07/CHOS-a89db07-source.zip"
+    },
+    "omitted_uncompiled_test_media": {
+      "prefix": "Tools/TestWebKitAPI/Resources/",
+      "files": 673,
+      "reason": "Only upstream API-test resource assets omitted;API tests are disabled in qualified JSCOnly configuration. All corresponding compiled engine source,build tools and API-test code are retained."
+    },
+    "original_oversize_attempt_retained": {
+      "archive": "/workspace/chos-evidence/CHOS-Native-Engine-a89db07-Handoff.zip",
+      "bytes": 167009554,
+      "sha256": "64ca39b66c2c129cc29963969f43c10c92c76700e7c56a93de958a450ebc0278",
+      "file_count": 11323,
+      "all_member_hashes_lengths_and_crc_verified": true,
+      "relocated_relink_stripped_executable_identical": true,
+      "source_commit": "a89db07f60345bae56676eacfbefc7cf08f5973e"
+    }
+  },
+  "actual_Fusion_acceptance": "NOT RUN for this new engine;user confirmed earlier Ethernet build separately",
+  "Pi5_laptop_acceptance": "NOT RUN",
+  "limits": [
+    "88selected original Test262 scripts/172variants;not full ECMAScript/Wasm/security conformance",
+    "No WebCore rendering or full modern browser;HTTP preview remains recovery only",
+    "Native Pi5 SDIO/firmware/radio/authentication,production browser security/trust/time/entropy/update and remaining platform gates remain open",
+    "Diagnostic ISO has no installer;normal ISO is separate and does not embed JSCVM.ELF",
+    "Development0.30.0;0.50.0 requires all revised Stage3 gates"
+  ],
+  "retained_packaging_attempts": [
+    "Initial complete handoff167009554bytes exceeded repository per-file budget;retained locally,not published",
+    "Final handoff omits only uncompiled upstream API-test resource media and uses the exact companion CHOS source ZIP already published alongside it",
+    "Initial compact repack did not retain source executable modes;final compact package preserves and verifies all original payload file modes"
+  ]
+}
