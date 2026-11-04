@@ -134,6 +134,23 @@ index d1388620..5a5c1256 100644
      return static_cast<uint32_t>(syscall(__NR_gettid));
  #elif OS(DARWIN)
      // Ideally we would like to use pthread_threadid_np. But this is 64bit, while required one is 32bit.
+diff --git a/Source/JavaScriptCore/runtime/Watchdog.cpp b/Source/JavaScriptCore/runtime/Watchdog.cpp
+index 85134796..4459ebc3 100644
+--- a/Source/JavaScriptCore/runtime/Watchdog.cpp
++++ b/Source/JavaScriptCore/runtime/Watchdog.cpp
+@@ -84,6 +84,12 @@ bool Watchdog::shouldTerminate(JSGlobalObject* globalObject)
+
+     // If m_callback is not set, then we terminate by default.
+     // Else, we let m_callback decide if we should terminate or not.
++#if OS(CHOS)
++    // This deadline was consumed. Only a callback that explicitly changes the
++    // limit may leave a new finite deadline; an unchanged false callback must
++    // rearm below rather than mistake the expired deadline for a new timer.
++    m_cpuDeadline = noTimeLimit;
++#endif
+     bool needsTermination = !m_callback
+         || m_callback(globalObject, m_callbackData1, m_callbackData2);
+     if (needsTermination)
 diff --git a/Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp b/Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp
 index 516fbdc0..e40fb8f9 100644
 --- a/Source/JavaScriptCore/wasm/WasmFaultSignalHandler.cpp

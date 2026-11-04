@@ -1,7 +1,17 @@
 # CHOS ARM64 Operating System — 0.30.0
 
 Current downloadable ISO and related files: **[GitHub build downloads](artifacts/README.md)**.
-Source is pushed each iteration; binary downloads are updated every other iteration.
+Source is pushed each completed iteration. During Stage 3, binary downloads are
+published at selected verified milestones useful for user testing.
+
+Current Stage 3 work: the actual original-ICU JavaScriptCore engine runs selected
+Test262, checked WebAssembly, native asynchronous compilation and script watchdog
+tests in CHOS. See the [engine checkpoint and Fusion checklist](docs/NATIVE_JSC_STANDARDS.md)
+and [current requirements/evidence](docs/STAGE3_CURRENT_RESULTS.md). Modern WebCore
+rendering, the complete browser, native Pi5 Wi-Fi and final security/platform
+qualification remain open. Stage 3 is incomplete; version 0.50.0 is reserved for
+its full acceptance. The diagnostic engine ISO and normal installation ISO are
+separate. Historical baseline descriptions below do not supersede current reports.
 
 Current [Fusion follow-up](docs/STAGE1_FUSION_FOLLOWUP.md) tracks the reported boot/input failure and subsequent fixes.
 

@@ -1,27 +1,27 @@
 # Revised Stage 3 current evidence
 
-Stage 3 remains incomplete. The native engine now has aligned virtual reservations
-with real bounded commit/decommit and a 1 MiB main stack. The full original-ICU
-JavaScriptCore VM creates a context, executes JavaScript iteration/JSON and Intl,
-collects garbage and releases its context in both direct and UEFI QEMU. These are
-initial execution fixtures, not ECMAScript/Wasm/GC conformance or WebCore rendering.
-A modern browser does not yet run. Earlier milestone descriptions below retain
-their historical scope; later results supersede earlier dependency diagnoses.
+Stage 3 remains incomplete. The current
+[native JavaScript checkpoint](NATIVE_JSC_STANDARDS.md) runs 172 selected original
+Test262 variants, checked WebAssembly operations, native asynchronous compilation
+and five CPU-watchdog cases in actual CHOS guests. Both desktop Console frontends
+can launch the native fixture with arguments. These are selected engine tests;
+WebCore does not yet render pages and a modern browser does not yet run. Earlier
+milestone descriptions retain their historical scope and failures.
 
-The current [reservation/VM checkpoint](NATIVE_ENGINE_RESERVATIONS.md) has 41
-passing guest profiles and complete host/sanitizer suites. It includes retained
-stack failures, a measured page-scrub repair, a progress-bounded installation
-retry, actual shutdown and exact memory cleanup; it does not certify full Stage 3.
+The preceding [reservation/VM checkpoint](NATIVE_ENGINE_RESERVATIONS.md) retains
+its 41 passing guest profiles and complete host/sanitizer suites. Current native
+suite qualification and regression evidence are recorded separately in
+[the JavaScript suite validation](validation/stage3-native-jsc-suite.json).
 
 | Requirement | Current boundary |
 |---|---|
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
-| Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads and foreign pause; explicit engine image/heap/stack profile runs in QEMU; initial VM/GC lifecycle executes; full conformance remains open |
-| Modern browser | Full original-ICU JSC VM executes initial JavaScript/Intl and collection/release from diagnostic ROMFS; conformance, WebCore rendering and browser features remain open |
+| Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads, foreign pause and explicit engine reservation/image/stack profile; real native RunLoop and selected async engine execution |
+| Modern browser | Actual original-ICU JSC selected Test262/checked Wasm/watchdog/async execution; full conformance, WebCore rendering and browser application features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
-| Release | Development0.30.0;0.50.0 requires all revised gates |
+| Release | Development 0.30.0; 0.50.0 requires all revised gates |
 
 Current publication policy: the user now authorizes interim binaries for critical
 verified milestones suitable for Fusion testing. This supersedes historical hold

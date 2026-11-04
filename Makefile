@@ -1765,3 +1765,23 @@ test-page-clear-sanitize: $(SAN_DIR)/test-page-clear
 	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-page-clear
 test: test-page-clear
 test-sanitize: test-page-clear-sanitize
+
+.PHONY: test-test262-inputs
+test-test262-inputs:
+	python3 tests/test_test262_inputs.py
+test: test-test262-inputs
+
+$(BUILD)/userland/console.o $(BUILD)/kernel/gfx/gui.o $(UEFI_KERNEL_BUILD)/kernel/gfx/gui.o $(BUILD)/test-gui $(SAN_DIR)/test-gui: include/chos/command_program.h
+$(BUILD)/test-command-program: tests/test_command_program.c include/chos/command_program.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Iinclude $< -o $@
+$(SAN_DIR)/test-command-program: tests/test_command_program.c include/chos/command_program.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) $< -o $@
+.PHONY: test-command-program test-command-program-sanitize
+test-command-program: $(BUILD)/test-command-program
+	./$(BUILD)/test-command-program
+test-command-program-sanitize: $(SAN_DIR)/test-command-program
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-command-program
+test: test-command-program
+test-sanitize: test-command-program-sanitize

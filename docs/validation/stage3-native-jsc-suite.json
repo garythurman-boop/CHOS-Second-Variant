@@ -1,0 +1,738 @@
+{
+  "status": "PASS_SELECTED_NATIVE_JAVASCRIPT_WASM_ASYNC_WATCHDOG_AND_REGRESSIONS",
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "profiles": [
+    {
+      "profile": "native-final-test262-direct",
+      "exit": 0,
+      "seconds": 381.9803685310035
+    },
+    {
+      "profile": "native-final-test262-uefi",
+      "exit": 0,
+      "seconds": 374.4110279699962
+    },
+    {
+      "profile": "native-final-wasm-direct",
+      "exit": 0,
+      "seconds": 10.441166724005598
+    },
+    {
+      "profile": "native-final-wasm-uefi",
+      "exit": 0,
+      "seconds": 18.470584448004956
+    },
+    {
+      "profile": "native-final-watchdog-direct",
+      "exit": 0,
+      "seconds": 35.13213870099571
+    },
+    {
+      "profile": "native-final-watchdog-uefi",
+      "exit": 0,
+      "seconds": 40.25014495800133
+    },
+    {
+      "profile": "native-final-async-wasm-direct",
+      "exit": 0,
+      "seconds": 11.068958425006713
+    },
+    {
+      "profile": "native-final-async-wasm-uefi",
+      "exit": 0,
+      "seconds": 18.959098127001198
+    },
+    {
+      "profile": "native-final-mixed-direct",
+      "exit": 0,
+      "seconds": 41.9977945000137
+    },
+    {
+      "profile": "native-final-mixed-uefi",
+      "exit": 0,
+      "seconds": 45.086205351995886
+    },
+    {
+      "profile": "console-final-direct",
+      "exit": 0,
+      "seconds": 10.934159171010833
+    },
+    {
+      "profile": "typing-final-direct",
+      "exit": 0,
+      "seconds": 24.232118517989875
+    },
+    {
+      "profile": "console-final-uefi",
+      "exit": 0,
+      "seconds": 16.80426643800456
+    },
+    {
+      "profile": "typing-final-uefi",
+      "exit": 0,
+      "seconds": 42.222886604999076
+    },
+    {
+      "profile": "typing-engine-final-uefi",
+      "exit": 0,
+      "seconds": 45.07436781900469
+    },
+    {
+      "profile": "platform-final-uefi",
+      "exit": 0,
+      "seconds": 47.996113120010705
+    },
+    {
+      "profile": "platform-engine-final-uefi",
+      "exit": 0,
+      "seconds": 49.709419917999185
+    },
+    {
+      "profile": "tls-final-uefi",
+      "exit": 0,
+      "seconds": 45.71114853899053
+    },
+    {
+      "profile": "tls6-final-uefi",
+      "exit": 0,
+      "seconds": 48.409986286002095
+    },
+    {
+      "profile": "installer-final-uefi",
+      "exit": 0,
+      "seconds": 140.49901688798855
+    },
+    {
+      "profile": "installer-fault-final-uefi",
+      "exit": 0,
+      "seconds": 17.74728066699754
+    }
+  ],
+  "guest_profiles_passed": 21,
+  "native_engine_lifecycles": 30,
+  "test262_variant_executions": 1032,
+  "host_suites": {
+    "complete_host": 0,
+    "complete_ASan_UBSan": 0,
+    "new_program_path_argv_boundary_tests": "PASS including exact capacity,canaries and unchanged failure outputs"
+  },
+  "selection": {
+    "status": "EXECUTED_SELECTED_VARIANTS",
+    "commit": "c990733f8d234dd333bd8a71c0c2eb871249b0e0",
+    "tests": 88,
+    "variants": 172,
+    "manifest_sha256": "8a38eee6067c4b244f272f24cdafe4541a8b68cde753a3844fb173aef9f69634",
+    "generated_header_sha256": "8275730e057183c9888ffe6fec1eda1e4cf26442f46b3961deb3b95816b62af2",
+    "selection_policy": "Selected before execution:first8 lexicographically sorted JavaScript paths under each of11 fixed category prefixes;no selection by test outcome. Unsupported host hooks/features must remain explicit not-run/fail records."
+  },
+  "fixture_sources_sha256": {
+    "tests/jsc_native_suite/CMakeLists.txt": "207096faf3b4cd857dbb1907d816d558cc6e57bf436a57accbe9f25ccc48e613",
+    "tests/jsc_native_suite/async.inc": "11340908ac0f8f4b7099b3fa1cd700443f6928a321b145341fabb8a043d1c1f6",
+    "tests/jsc_native_suite/main.cpp": "db688489efba0f2515f399ce96e88806ec0d807b25083ec83988d805cead3963",
+    "tests/jsc_native_suite/wasm.inc": "646e24d05ba8623d16314613455acef8a7750fa8116b89f81115c53e06ebc886",
+    "tests/jsc_native_suite/watchdog.inc": "dd6835cb8f5cc950247808b0dde6815ed9bf83b596327945f7fd40770dff973e"
+  },
+  "compiled_input_sha256": {
+    "build/chos.elf": "b6abcd41b4a7e77b637cdadd68e68ec11d9c361971fea3448bb77d6c65ab65ea",
+    "build/uefi-kernel/chos.elf": "b777343ae514d76e69e0c677e28865ba60187fc016355f56bd2b95df02a0b327",
+    "build/chos-0.30.0.iso": "a8b18112f15587ee3e28377aec2f1dae069ea12d31025ae4363d88e12f23615c",
+    "build/engine-test/chos.elf": "fc3c847933637e31eddf9323b5c33c23e632b1adebc10944ff9ab1a56d23d071",
+    "build/engine-test/uefi-kernel.elf": "e1729dc0d4cabdccf115b85b9491869f2da17222db67f2b8124b72e1ec422024",
+    "build/engine-test/chos.iso": "cb0fa0a3cf0dcaa334336650add0c34e03cec824a51b92a00685c50329ffa83d",
+    "build/engine-test/native-engine.elf": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+    "build/native-sdk/chos-sdk.json": "b21966090479c02d8347ba5f02e264c16034db067ff88dfc769c3c9154545a9f",
+    "build/qemu-smoke-disk.img": "0ed2eb76918805f986086cbf109449ce5cd0892c5e55e28910f1a87f8f891770",
+    "build/userland/console.elf": "a211666bf9da2060a6a87310d19a3bae2080db3287d91c744fa7015d41b2d9c6",
+    "build/userland/console.chcx": "751159e913c47ffd64ff690b14f64b5d464ba9596897b4185a921a2107e50863",
+    "/workspace/chos-native-jsc-suite4/cmake/jsc_native_suite": "c5c8bfaec7b1b91fb1426dfb36a560cc2498f4ad992a09e4fd7a38c675785d26",
+    "/workspace/chos-native-jsc-suite4/generated/cases.h": "8275730e057183c9888ffe6fec1eda1e4cf26442f46b3961deb3b95816b62af2",
+    "docs/dependencies/test262-selected.json": "8a38eee6067c4b244f272f24cdafe4541a8b68cde753a3844fb173aef9f69634",
+    "docs/dependencies/webkit-jsc-bringup.json": "b318b257e98a6a201163f37a818ef9924eb9accc1125a52e5572ca64d490d054"
+  },
+  "sdk_staged_files": 1210,
+  "sdk_manifest_sha256": "b21966090479c02d8347ba5f02e264c16034db067ff88dfc769c3c9154545a9f",
+  "engine_source": {
+    "commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+    "patch_sha256": "42bc399b4cf2084499043c24f0678025ca28a328e7936405e62f973278de331d",
+    "patched_postimages": 41,
+    "native_port_files": 7,
+    "patch_replay": {
+      "status": "PASS",
+      "commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+      "patch_sha256": "42bc399b4cf2084499043c24f0678025ca28a328e7936405e62f973278de331d",
+      "forward_postimages": 41,
+      "reverse_check": true,
+      "native_port_files": 7
+    },
+    "JIT_DFG_FTL_sampling": "OFF",
+    "checked_Wasm": "ON,actual selected binary module execution"
+  },
+  "engine_link": {
+    "full_original_ICU": true,
+    "undefined_symbols": [],
+    "archive_members": 482,
+    "separate_interpreter_objects": 53,
+    "loader_policy": {
+      "accepted": true,
+      "resource_profile": 1,
+      "file_bytes": 55069232,
+      "virtual_bytes": 50925568,
+      "root_stack_pages": 256,
+      "segments": 3,
+      "executed": false
+    },
+    "application": {
+      "bytes": 55069232,
+      "sha256": "c5c8bfaec7b1b91fb1426dfb36a560cc2498f4ad992a09e4fd7a38c675785d26"
+    }
+  },
+  "native_execution": {
+    "native-final-test262-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "suite": "test262",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 136.05481537000742,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 2,
+          "seconds": 115.26562551400275,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 3,
+          "seconds": 126.892994016991,
+          "desktop_response_seconds_during_long_script": null
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-test262-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "suite": "test262",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 123.76635108499613,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 2,
+          "seconds": 124.5021318079962,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 3,
+          "seconds": 113.24282400499214,
+          "desktop_response_seconds_during_long_script": null
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-wasm-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "suite": "wasm",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 2.160140274994774,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 2,
+          "seconds": 2.1039850730012404,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 3,
+          "seconds": 2.3317309849953745,
+          "desktop_response_seconds_during_long_script": null
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-wasm-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "suite": "wasm",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 2.3143412560020806,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 2,
+          "seconds": 2.2739336720114807,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 3,
+          "seconds": 2.2848816059995443,
+          "desktop_response_seconds_during_long_script": null
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-watchdog-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "suite": "watchdog",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 10.51800055099011,
+          "desktop_response_seconds_during_long_script": 0.023995164010557346
+        },
+        {
+          "pid": 2,
+          "seconds": 11.202452764002373,
+          "desktop_response_seconds_during_long_script": 0.031000021001091227
+        },
+        {
+          "pid": 3,
+          "seconds": 9.762698849997832,
+          "desktop_response_seconds_during_long_script": 0.02421909100667108
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-watchdog-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "suite": "watchdog",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 9.787893627013545,
+          "desktop_response_seconds_during_long_script": 0.02494807400216814
+        },
+        {
+          "pid": 2,
+          "seconds": 9.748324376996607,
+          "desktop_response_seconds_during_long_script": 0.001591488005942665
+        },
+        {
+          "pid": 3,
+          "seconds": 9.254285040995455,
+          "desktop_response_seconds_during_long_script": 0.04480361900641583
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-async-wasm-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "suite": "async-wasm",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 2.4506623600027524,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 2,
+          "seconds": 2.407665821010596,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 3,
+          "seconds": 2.4619602089951513,
+          "desktop_response_seconds_during_long_script": null
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-async-wasm-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "suite": "async-wasm",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 2.3249766460066894,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 2,
+          "seconds": 2.473750598001061,
+          "desktop_response_seconds_during_long_script": null
+        },
+        {
+          "pid": 3,
+          "seconds": 2.316607828004635,
+          "desktop_response_seconds_during_long_script": null
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-mixed-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "suite": "mixed",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 12.956064144993434,
+          "desktop_response_seconds_during_long_script": 0.04612913199525792
+        },
+        {
+          "pid": 2,
+          "seconds": 12.002165768994018,
+          "desktop_response_seconds_during_long_script": 0.03230902799987234
+        },
+        {
+          "pid": 3,
+          "seconds": 12.73344210399955,
+          "desktop_response_seconds_during_long_script": 0.04335625300882384
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    },
+    "native-final-mixed-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "suite": "mixed",
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "runs": [
+        {
+          "pid": 1,
+          "seconds": 11.05668611600413,
+          "desktop_response_seconds_during_long_script": 0.02414281699748244
+        },
+        {
+          "pid": 2,
+          "seconds": 10.96831987600308,
+          "desktop_response_seconds_during_long_script": 0.04644778699730523
+        },
+        {
+          "pid": 3,
+          "seconds": 11.39739861000271,
+          "desktop_response_seconds_during_long_script": 0.024622465993161313
+        }
+      ],
+      "checks": [
+        "Actual native original JSC execution,not host JavaScript",
+        "Exact positive suite marker,normal process exit and cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Selected Test262 cases/checked Wasm/watchdog probes only;not complete standards or security conformance",
+        "Diagnostic ISO has no installer;modern WebCore/browser,native WiFi and production browser policy remain open",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete"
+      ]
+    }
+  },
+  "GUI_argument_launch": {
+    "console-final-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "console_frontend": "isolated EL0",
+      "physical_command": "run /bin/jscvm.elf wasm",
+      "console_parent_pid": 1,
+      "launch_to_visible_output_seconds": 4.252381213998888,
+      "cold_free_pages": 104401,
+      "final_free_pages": 104401,
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "checks": [
+        "Actual emulated keyboard input;no GUI/API injection",
+        "Path and argv reach the real native Wasm executable;its positive stdout is visible in Console",
+        "Child normal exit,Console close and exact cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Diagnostic engine fixture only;not browser integration or new Fusion qualification"
+      ]
+    },
+    "console-final-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "console_frontend": "trusted UEFI",
+      "physical_command": "run /bin/jscvm.elf wasm",
+      "console_parent_pid": null,
+      "launch_to_visible_output_seconds": 2.7901600470067933,
+      "cold_free_pages": 488767,
+      "final_free_pages": 488767,
+      "application_sha256": "ff85fe0934478e50dc4c1fef5e2ab13a87168ba2d2daffde8960f47ac5d616b6",
+      "checks": [
+        "Actual emulated keyboard input;no GUI/API injection",
+        "Path and argv reach the real native Wasm executable;its positive stdout is visible in Console",
+        "Child normal exit,Console close and exact cold physical/commit/engine-pool/futex baseline"
+      ],
+      "limits": [
+        "Diagnostic engine fixture only;not browser integration or new Fusion qualification"
+      ]
+    }
+  },
+  "watchdog_causal_proof": {
+    "status": "DIAGNOSED_CALLBACK_FALSE_WITHOUT_TIMER_REARM",
+    "qualified_watchdog": false,
+    "stop": "T05thread:01;",
+    "watchdog": "0x28083df0",
+    "time_limit_seconds": 0.5,
+    "cpu_deadline": 1.784464656,
+    "wall_deadline": "infinity",
+    "callback_calls": 1,
+    "terminate_at": 2,
+    "instructions": [
+      {
+        "pc": "0x20a7506c",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a75070",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a75074",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a75078",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a7507c",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a75080",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a74fe4",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a74fe8",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a74fec",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a74ff0",
+        "x0": "0x0"
+      },
+      {
+        "pc": "0x20a74d64",
+        "x0": "0x0"
+      }
+    ],
+    "finding": "Consumed finite CPU deadline remains set after callback returns false;original callbackAlreadyStartedTimer treats it as a new timer and skips rearming. No native code/register modifications."
+  },
+  "watchdog_minimal_input_comparison": {
+    "fixture_source_unchanged": true,
+    "sdk_unchanged": true,
+    "actual_engine_objects": 535,
+    "changed_members": [
+      "Source/JavaScriptCore/CMakeFiles/JavaScriptCore.dir/__/__/JavaScriptCore/DerivedSources/unified-sources/UnifiedSource-runtime-49.cpp.obj"
+    ],
+    "policy": "Same failing fixture;only the diagnosed original JSC watchdog object changed. Checked Wasm/JIT flags unchanged."
+  },
+  "packet_analysis": [
+    {
+      "profile": "platform-final-uefi",
+      "guest_result": "PASS",
+      "native_ping_state": 2,
+      "pcap_sha256": "da0365096dca7275befd5f6206f99b5c44425e81443ff2118c7a797feef8c0c3",
+      "checks": "Exact one matching ICMP request/reply;valid IPv4/ICMP checksums,reverse endpoints,id,sequence,payload match",
+      "packets": [
+        {
+          "type": 8,
+          "src": "10.0.2.15",
+          "dst": "10.0.2.2",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        },
+        {
+          "type": 0,
+          "src": "10.0.2.2",
+          "dst": "10.0.2.15",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        }
+      ]
+    },
+    {
+      "profile": "platform-engine-final-uefi",
+      "guest_result": "PASS",
+      "native_ping_state": 2,
+      "pcap_sha256": "fe22aaf80f33ee343982be8448f57be0ca9aaac56e96297fc1f4cb08005b1754",
+      "checks": "Exact one matching ICMP request/reply;valid IPv4/ICMP checksums,reverse endpoints,id,sequence,payload match",
+      "packets": [
+        {
+          "type": 8,
+          "src": "10.0.2.15",
+          "dst": "10.0.2.2",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        },
+        {
+          "type": 0,
+          "src": "10.0.2.2",
+          "dst": "10.0.2.15",
+          "id": 17225,
+          "sequence": 1,
+          "payload_sha256": "4e23a0b437707cd8cd459c6bb8e606b67fb5ffb2362dd41a5ec45e8ddd72fb4f"
+        }
+      ]
+    }
+  ],
+  "archives": [
+    {
+      "name": "native-jsc-suite-qualified.tar.gz",
+      "bytes": 1304099638,
+      "sha256": "87224bcc125fa6809ad2a593960911be9631dbd02e15bb85de112c3cf048c01a",
+      "verification": "Every member SHA,size,mode verified;final inputs,source index,all attempts/failures and diagnostics retained"
+    },
+    {
+      "name": "engine-reservations-inputs.tar.gz",
+      "bytes": 256769936,
+      "sha256": "b53415aecb113bd9eadc0f9e875e641497d9ed50f02f0bdc565443a409790b32",
+      "verification": "Complete prior535engineobjects/SDK archive;current534unchangedobjects and completeSDK rehashed against its member index. Changed watchdog object and current535member link manifest retained in current archive."
+    }
+  ],
+  "retained_failures": [
+    {
+      "attempt": "watchdog-first-direct and watchdog-first-uefi",
+      "result": "FAIL",
+      "reason": "Callbackfalse continuation never rearms;120s fixture timeout",
+      "proof": "Hardware breakpoint traces the consumed finite CPU deadline skipping startTimer;original fixture passes after the single-object fix",
+      "retained": true
+    },
+    {
+      "attempt": "console-arguments-direct",
+      "result": "FAIL",
+      "reason": "Old CHFS Console shadows rebuilt ROMFS;entire command sent as path with empty argv,queue slots free",
+      "proof": "Read-only breakpoint and current loaded text verification;fresh disposable Console corrects test inputs;no admission-policy workaround",
+      "retained": true
+    },
+    {
+      "attempt": "console-focused1 and console-focused2",
+      "result": "FAIL",
+      "reason": "Host fixture omitted J/F/W scan codes and retained old launch count after adding a command",
+      "proof": "Exact key mapping,argv and launch count assertions corrected,full host/sanitizer suites pass",
+      "retained": true
+    }
+  ],
+  "prior_unresolved_diagnosis": "Iteration20 original GUI ping timeout remains unproven",
+  "qualification_phase": "Pre-commit source tests;published clean source stamp/ISO hashes and exact-binary smoke results are recorded separately with artifacts",
+  "limits": [
+    "88selectedTest262scripts/172variants,not full ECMAScript/GC/WebAssembly or security conformance",
+    "Actual Wasm bounds traps/compile errors/growth/tables,async RunLoop and five watchdog cases;not complete web APIs",
+    "No WebCore rendering or modern browser application integration;old HTTP preview remains recovery only",
+    "Native Pi5SDIO/firmware/authentication/radio,production browser TLS/entropy/time/trust/update and complete isolation/permission gates remain open",
+    "New Fusion/Pi5/laptop qualification NOT RUN;prior user-confirmed Fusion Ethernet remains separate",
+    "Development0.30.0;0.50.0 reserved all revisedStage3 acceptance gates"
+  ]
+}

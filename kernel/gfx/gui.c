@@ -6,6 +6,7 @@
 #include "chos/atomic.h"
 #include "chos/gui.h"
 #include "chos/scrollback.h"
+#include "chos/command_program.h"
 #include "../platform/uefi_console.h"
 #include "chos/taskbar_text.h"
 #include "chos/syscall.h"
@@ -2211,13 +2212,14 @@ static int terminal_parse_pid(const char *argument, uint32_t *pid_out) {
     *pid_out = (uint32_t)value; return 1;
 }
 static void terminal_run_path(const char *argument) {
-    char path[CHOS_CHFS_PATH_MAX]; uint32_t pid = 0u; chos_process_error_t error;
-    if (argument == NULL || argument[0] == '\0' || !terminal_resolve_path(argument, path)) { terminal_puts("Usage: run <program.chx>\n"); return; }
+    char path[CHOS_CHFS_PATH_MAX],program[CHOS_CHFS_PATH_MAX];const char *arguments;
+    uint32_t pid = 0u; chos_process_error_t error;
+    if (chos_command_program(argument,program,sizeof(program),&arguments)!=1 || !terminal_resolve_path(program, path)) { terminal_puts("Usage: run <program.elf> [arguments...]\n"); return; }
     terminal_puts("Launching "); terminal_puts(path); terminal_puts("\n");
-    if ((string_ends_with_fold(path,"/BIN/BROWSER.CHX") && path[16]==0) && chos_kernel_browser_start && (!scheduler_is_running || !scheduler_is_running())) {
+    if (!*arguments && (string_ends_with_fold(path,"/BIN/BROWSER.CHX") && path[16]==0) && chos_kernel_browser_start && (!scheduler_is_running || !scheduler_is_running())) {
         terminal_puts(chos_kernel_browser_start()?"Browser opened.\n":"Browser could not open.\n"); return;
     }
-    error = process_spawn_path(path, &pid);
+    error = *arguments?process_spawn_path_args(path,arguments,&pid):process_spawn_path(path,&pid);
     if (error != PROCESS_OK) {
         terminal_puts("Launch failed: "); terminal_puts(process_error_string(error)); terminal_putc('\n');
         if (error == PROCESS_ERR_CONTEXT) terminal_puts("The scheduled runtime is required for asynchronous applications.\n");
@@ -2276,7 +2278,7 @@ static void terminal_execute(char *input) {
     argument = split;
     while (*argument == ' ' || *argument == '\t') ++argument;
     if (gui_strings_equal(command, "help")) {
-        terminal_puts("Commands:\n  help       Show this help\n  drivers    Driver admission report\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci [net]  PCI inventory (net: adapters only)\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  dnsserver IP  Set session DNS resolver\n  netstatus  DHCP and ping status\n  net6status IPv6 addresses and echo status\n  ping6 IP   Send an ICMPv6 echo\n  ping IP    Send an ICMP echo\n  run PATH   Launch a CHCX program asynchronously\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
+        terminal_puts("Commands:\n  help       Show this help\n  drivers    Driver admission report\n  clock      Wall clock source and seconds\n  bootlog    Retained firmware/USB diagnostics\n  pci [net]  PCI inventory (net: adapters only)\n  clear      Clear the terminal\n  pwd        Show current directory\n  dir / ls   List CHFS files\n  cd PATH    Change directory prefix\n  type PATH  Display a text file\n  write PATH TEXT  Write a CHFS file\n  sync       Flush storage\n  rng-test   Receive 32 hardware entropy bytes\n  dnsserver IP  Set session DNS resolver\n  netstatus  DHCP and ping status\n  net6status IPv6 addresses and echo status\n  ping6 IP   Send an ICMPv6 echo\n  ping IP    Send an ICMP echo\n  run PATH [ARGS]  Launch ELF/CHCX with arguments\n  tasklist   List process states\n  status PID Show a process status\n  sysinfo    Show system status\n  version    Show CHOS version\n  echo TEXT  Print text\n  exit       Close this Console window\n");
     } else if(gui_strings_equal(command,"drivers")) {
         chos_gui_show_driver_report();
     } else if(gui_strings_equal(command,"clock")) {

@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSNativeJSCSuite LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include("${JSC_LINK_OBJECTS_FILE}")
+add_executable(jsc_native_suite main.cpp ${JSC_LINK_OBJECTS})
+target_include_directories(jsc_native_suite PRIVATE "${ENGINE_BUILD}" "${ENGINE_BUILD}/JavaScriptCore/Headers" "${WEBKIT_SOURCE}/Source/JavaScriptCore/API" "${WEBKIT_SOURCE}/Source/WTF" "${WEBKIT_SOURCE}/Source/bmalloc" "${NATIVE_TEST_INPUTS}")
+target_compile_definitions(jsc_native_suite PRIVATE BUILDING_JSCONLY__ BUILDING_WITH_CMAKE=1 HAVE_CONFIG_H=1 NDEBUG=1)
+# Full original ICU data and i18n are deliberate. The bootstrap stub is not a VM/Intl qualification.
+target_link_libraries(jsc_native_suite PRIVATE "-Wl,--start-group" "${ENGINE_BUILD}/lib/libJavaScriptCore.a" "${ENGINE_BUILD}/lib/libWTF.a" "${ENGINE_BUILD}/lib/libbmalloc.a" "${CHOS_SDK_ROOT}/lib/libicui18n.a" "${CHOS_SDK_ROOT}/lib/libicuuc.a" "${CHOS_SDK_ROOT}/lib/libicudata.a" "-Wl,--end-group")
+target_link_options(jsc_native_suite PRIVATE "-Wl,--error-limit=0" "-Wl,-Map,${CMAKE_BINARY_DIR}/jsc_native_suite.map" "-Wl,--strip-debug")

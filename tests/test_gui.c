@@ -34,6 +34,7 @@ static int gpu_present_success = 1;
 static unsigned program_launches;
 static int allow_user_console_spawn;
 static char last_program_path[CHOS_CHFS_PATH_MAX];
+static char last_program_arguments[128];
 static uint64_t mock_ticks;
 static int mock_timer_ready = 1;
 static size_t mock_display_mode_index;
@@ -247,7 +248,7 @@ chos_process_error_t process_run_path(const char *path, chos_process_result_t *r
     return PROCESS_OK;
 }
 chos_process_error_t process_spawn_path(const char *path, uint32_t *pid_out) {
-    size_t i = 0u;
+    size_t i = 0u;last_program_arguments[0]='\0';
     /* This host GUI test has no embedded userland ROMFS table, so exercise the
        documented fallback to kernel-resident views when demo apps are unavailable. */
     if (path != NULL && strcmp(path, "/BIN/CONSOLE.CHX") == 0 && allow_user_console_spawn) {
@@ -267,8 +268,9 @@ chos_process_error_t process_spawn_path(const char *path, uint32_t *pid_out) {
     return PROCESS_OK;
 }
 chos_process_error_t process_spawn_path_args(const char *path, const char *arguments, uint32_t *pid_out) {
-    (void)arguments;
-    return process_spawn_path(path, pid_out);
+    chos_process_error_t result=process_spawn_path(path,pid_out);
+    assert(arguments&&strlen(arguments)<sizeof(last_program_arguments));
+    strcpy(last_program_arguments,arguments);return result;
 }
 int process_get_info_at(size_t index, chos_process_info_t *out) { (void)index; (void)out; return 0; }
 int process_query_pid(uint32_t pid, chos_process_state_t *state_out, int64_t *status_out) {
@@ -318,7 +320,8 @@ static uint16_t code_for_char(char ch) {
         case 'h': return 35u; case 'l': return 38u; case 'p': return 25u;
         case 's': return 31u; case 'y': return 21u; case 't': return 20u;
         case 'x': return 45u; case 'v': return 47u; case 'a': return 30u;
-        case 'b': return 48u; default: return 0u;
+        case 'b': return 48u; case 'j': return 36u; case 'f': return 33u;
+        case 'w': return 17u; default: return 0u;
     }
 }
 static void type_text(const char *value) {
@@ -663,6 +666,10 @@ int main(void) {
     assert(program_launches == 1u);
     assert(strcmp(last_program_path, "/BIN/CDEMO.CHX") == 0);
     assert(strcmp(chos_gui_view_name(), "Console") == 0);
+    chos_gui_input_key(28u,0);
+    type_text("run /BIN/JSCVM.ELF wasm");chos_gui_input_key(28u,1);chos_gui_input_key(28u,0);chos_gui_pump();
+    assert(program_launches==2u&&strcmp(last_program_path,"/BIN/JSCVM.ELF")==0);
+    assert(strcmp(last_program_arguments,"wasm")==0);
     chos_gui_input_key(1u, 1); /* Esc returns focus to the desktop */
     chos_gui_input_key(33u, 1); /* F opens File Manager */
     assert(chos_gui_console_output_enabled()); /* background app output retains its Console */
@@ -705,7 +712,8 @@ int main(void) {
     click_at(220, 190); /* select the second row: the C demo */
     click_at(250, 420); /* Run opens and activates a real Console window */
     assert(strcmp(chos_gui_view_name(), "Console") == 0);
-    assert(program_launches == 2u);
+    assert(program_launches == 3u); /* Two Console commands,then File Manager Run. */
+    assert(last_program_arguments[0]==0);
     assert(strcmp(last_program_path, "/BIN/CDEMO.CHX") == 0);
     assert(chos_gui_console_output_enabled());
     click_at(768, 71); /* close Console; File Manager should regain focus */

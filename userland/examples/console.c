@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include "chos/user.h"
 #include "chos/scrollback.h"
+#include "chos/command_program.h"
 
 #define CONSOLE_LINES 11u
 #define CONSOLE_LINE_WIDTH 72u
@@ -163,7 +164,7 @@ static void command_help(void) {
     write_text("  net6status         show IPv6 addresses and echo status"); newline();
     write_text("  ping6 IPv6         request an OS-owned IPv6 echo"); newline();
     write_text("  type /PATH         display a text file"); newline();
-    write_text("  run /BIN/APP.ELF   launch a CHOS ELF or CHCX application"); newline();
+    write_text("  run PATH [ARGS]    launch an ELF or CHCX application"); newline();
     write_text("  mkdir PATH         create a directory"); newline();
     write_text("  touch PATH         create an empty file"); newline();
     write_text("  write PATH TEXT    create/replace a text file"); newline();
@@ -324,10 +325,10 @@ static int execute_command(void) {
     } else if (strings_equal(command, "type")) command_type(input_line + arg_start);
     else if (strings_equal(command, "run")) {
         long pid;
-        const char *path = input_line + arg_start;
-        if (*path == '\0') { write_text("usage: run /BIN/APP.CHX"); newline(); }
+        char path[CONSOLE_PATH_CAPACITY];const char *arguments;
+        if (chos_command_program(input_line+arg_start,path,sizeof(path),&arguments)!=1) { write_text("usage: run /BIN/APP.ELF [arguments...]"); newline(); }
         else {
-            pid = chos_spawn(path);
+            pid = *arguments?chos_spawn_args(path,arguments):chos_spawn(path);
             if (pid < 0) { write_text("run: launch failed (error "); write_unsigned((uint64_t)(-pid)); put_char(')'); newline(); }
             else { write_text("Started "); write_text(path); write_text(" (PID "); write_unsigned((uint64_t)pid); write_text(")"); newline(); }
         }
