@@ -1,0 +1,260 @@
+{
+  "status": "PASS_SELECTED_RENDERING_MILESTONE_AND_CLEAN_BINARY_ACCEPTANCE",
+  "source_commit": "32b31abeb8bc3aa727705f5720ecda26edb0e1b4",
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "earlier_frozen_guest_profiles": 20,
+  "clean_exact_publication_guest_profiles": 4,
+  "clean_runs": [
+    {
+      "name": "clean-pixels-direct",
+      "command": [
+        "python3",
+        "tests/qemu_pixel_surfaces.py",
+        "--mode",
+        "direct",
+        "--javascript",
+        "/workspace/chos-evidence/browser-surface-20261107/jsc-pixel-build-final/jsc_pixel_surface.elf",
+        "--legacy",
+        "/workspace/chos-evidence/browser-surface-20261107/published-baseline/gui_demo.chcx",
+        "--runs",
+        "3",
+        "--out",
+        "/workspace/chos-evidence/browser-surface-20261107/clean-pixels-direct"
+      ],
+      "returncode": 0,
+      "seconds": 15.920808373004547
+    },
+    {
+      "name": "clean-pixels-uefi",
+      "command": [
+        "python3",
+        "tests/qemu_pixel_surfaces.py",
+        "--mode",
+        "uefi",
+        "--javascript",
+        "/workspace/chos-evidence/browser-surface-20261107/jsc-pixel-build-final/jsc_pixel_surface.elf",
+        "--legacy",
+        "/workspace/chos-evidence/browser-surface-20261107/published-baseline/gui_demo.chcx",
+        "--runs",
+        "3",
+        "--out",
+        "/workspace/chos-evidence/browser-surface-20261107/clean-pixels-uefi"
+      ],
+      "returncode": 0,
+      "seconds": 23.18057666500681
+    },
+    {
+      "name": "clean-e1000e",
+      "command": [
+        "python3",
+        "tests/qemu_network.py",
+        "--net-model",
+        "e1000e",
+        "--network-loss",
+        "--out",
+        "/workspace/chos-evidence/browser-surface-20261107/clean-e1000e"
+      ],
+      "returncode": 0,
+      "seconds": 31.202803630003473
+    },
+    {
+      "name": "clean-installer",
+      "command": [
+        "python3",
+        "tests/qemu_installer.py",
+        "--keyboard",
+        "--supported-mode",
+        "--out",
+        "/workspace/chos-evidence/browser-surface-20261107/clean-installer"
+      ],
+      "returncode": 0,
+      "seconds": 95.44237330800388
+    }
+  ],
+  "clean_results": {
+    "clean-pixels-direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "engine_image": true,
+      "JavaScript_pixel_client": true,
+      "runs": [
+        {
+          "cycle": 0,
+          "physical_image_submission_seconds": 1.253354586995556,
+          "submission_during_JSC_seconds": null,
+          "cold_pages_restored": 98312
+        },
+        {
+          "cycle": 1,
+          "physical_image_submission_seconds": 1.1442417340003885,
+          "submission_during_JSC_seconds": null,
+          "cold_pages_restored": 98312
+        },
+        {
+          "cycle": 2,
+          "physical_image_submission_seconds": 1.2178653379960451,
+          "submission_during_JSC_seconds": null,
+          "cold_pages_restored": 98312
+        }
+      ],
+      "legacy_chcx_sha256": "2feae4321604c0ab6e9f2b3ef1082a5b41dcf4c136be47b28824a0bd08dd0133",
+      "pixel_application_sha256": "425a784b930f9bae80dc0f02a4363aab20c2279a22380907e637d390f69474dd",
+      "cold_free_pages": 98312,
+      "checks": [
+        "Exact original a89db07 CHCX survives keyboard/pointer polling,changes its real retained text and closes normally with unchanged184-byte event ABI",
+        "Actual original JavaScriptCore computes every RGB value into its real Uint32Array;no native pixel-generation fallback",
+        "Typed-array backing remains protected through bounded copied uploads;original engine GC occurs after every image",
+        "Physical Space triggers another real JS evaluation,image upload and framebuffer sample;close restores exact ownership/pin/commit/engine/futex baseline"
+      ],
+      "limits": [
+        "Pixel service and real engine coexistence only;not WebCore/browser rendering",
+        "Fixed24MiB static image store,1024x768 XRGB ceiling,logical desktop scaling;no shared mappings/GPU acceleration",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete,version0.30.0"
+      ]
+    },
+    "clean-pixels-uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "engine_image": true,
+      "JavaScript_pixel_client": true,
+      "runs": [
+        {
+          "cycle": 0,
+          "physical_image_submission_seconds": 1.246052692993544,
+          "submission_during_JSC_seconds": null,
+          "cold_pages_restored": 482682
+        },
+        {
+          "cycle": 1,
+          "physical_image_submission_seconds": 1.1501587389939232,
+          "submission_during_JSC_seconds": null,
+          "cold_pages_restored": 482682
+        },
+        {
+          "cycle": 2,
+          "physical_image_submission_seconds": 1.219848663007724,
+          "submission_during_JSC_seconds": null,
+          "cold_pages_restored": 482682
+        }
+      ],
+      "legacy_chcx_sha256": "2feae4321604c0ab6e9f2b3ef1082a5b41dcf4c136be47b28824a0bd08dd0133",
+      "pixel_application_sha256": "425a784b930f9bae80dc0f02a4363aab20c2279a22380907e637d390f69474dd",
+      "cold_free_pages": 482682,
+      "checks": [
+        "Exact original a89db07 CHCX survives keyboard/pointer polling,changes its real retained text and closes normally with unchanged184-byte event ABI",
+        "Actual original JavaScriptCore computes every RGB value into its real Uint32Array;no native pixel-generation fallback",
+        "Typed-array backing remains protected through bounded copied uploads;original engine GC occurs after every image",
+        "Physical Space triggers another real JS evaluation,image upload and framebuffer sample;close restores exact ownership/pin/commit/engine/futex baseline"
+      ],
+      "limits": [
+        "Pixel service and real engine coexistence only;not WebCore/browser rendering",
+        "Fixed24MiB static image store,1024x768 XRGB ceiling,logical desktop scaling;no shared mappings/GPU acceleration",
+        "QEMU only;new Fusion/Pi5/laptop acceptance NOT RUN;Stage3 incomplete,version0.30.0"
+      ]
+    },
+    "clean-e1000e": {
+      "status": "PASS",
+      "backend": "e1000e",
+      "browser_elf_sha256": "989c45f6c06aded8932919ed1865c67e1af73024f361f946799c19a39f726d12",
+      "browser_pid": 1,
+      "requests": [
+        "/redirect",
+        "/page",
+        "/page",
+        "/slow",
+        "/page"
+      ],
+      "dns_queries": [
+        "0463686f7304746573740000010001"
+      ],
+      "checks": [
+        "native Ethernet queues and DHCP",
+        "isolated EL0 browser window bound to its actual process owner",
+        "browser TCP HTTP body and relative redirect",
+        "HTTPS blocked without TLS and no plaintext downgrade",
+        "DNS A query and reply over actual adapter",
+        "actual in-flight HTTP failure on link loss releases its process-owned socket",
+        "DHCP reconnect and new HTTP request in the same isolated browser process"
+      ]
+    },
+    "clean-installer": {
+      "status": "PASS",
+      "install_seconds": 43.122,
+      "three_key_focus_ms": 453.14,
+      "max_install_step_ms": 13.844,
+      "keyboard_wizard": true,
+      "physical_mode_change": true,
+      "shutdown_seconds": 5.103,
+      "checks": [
+        "no writes before target selection and final confirmation",
+        "guest GPT/FAT32/EFI/CHFS creation and verification",
+        "ISO detached: disk-only desktop and native input",
+        "scheduled shell file write survives a fresh reboot; native editor checked separately",
+        "ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback",
+        "keyboard focus remains responsive during installation",
+        "installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits"
+      ]
+    }
+  },
+  "frozen_publication_inputs": {
+    "build/chos.elf": {
+      "sha256": "d026b91177eda52e544f5a2fbad745233c5324fbd240e6e9cbfc16890fee2567",
+      "bytes": 7102664
+    },
+    "build/uefi-kernel/chos.elf": {
+      "sha256": "882e9b1a2681da3f30030a0200b696b06e9665988000ca99561253caecdee303",
+      "bytes": 7111312
+    },
+    "build/chos-0.30.0.iso": {
+      "sha256": "8534b3f47f0419953719cad0399afd657dc789b0ca2f5bd9e7700899522b7eac",
+      "bytes": 33603584
+    },
+    "build/chos-0.30.0-installed.img": {
+      "sha256": "87f7c1dbd24e3cd4fb5c03368cb7df19035fea95c6c5757b73fe71596c4dcbab",
+      "bytes": 268435456
+    },
+    "build/engine-test/chos.elf": {
+      "sha256": "e6902cec9ff5f0bbc47f5684bb7d2426c0b18e15fe048dd56f69c188573b1f68",
+      "bytes": 57790696
+    },
+    "build/engine-test/uefi-kernel.elf": {
+      "sha256": "a6252ec22fbc95f661f1061c48b642d8600f99c71ff3afe96ece109e2e13aad0",
+      "bytes": 57799336
+    },
+    "build/engine-test/chos.iso": {
+      "sha256": "c5ea280d74f9d02843a8e5e5d7647fc17c56a20d785d276ca281cee03830e9ff",
+      "bytes": 67158016
+    },
+    "build/engine-test/native-engine.elf": {
+      "sha256": "fa1a005de07c306d89eba22effdbe64acfe2837f5e447869df9fcafe4fa1aaa3",
+      "bytes": 50688976
+    }
+  },
+  "handoff_roundtrip": {
+    "status": "PASS",
+    "source_commit": "32b31abeb8bc3aa727705f5720ecda26edb0e1b4",
+    "archive_sha256": "dfa465b2203377a046470409a486d3baf53b856e7c21a4e53c2e9964dfcb3925",
+    "payload_files_verified": 10719,
+    "original_SDK_files_verified": 1210,
+    "relocated_client_compile_object_identical": true,
+    "relocated_full_ELF_identical": true,
+    "relocated_stripped_ELF_identical": true,
+    "qualified_staged_elf_sha256": "fa1a005de07c306d89eba22effdbe64acfe2837f5e447869df9fcafe4fa1aaa3",
+    "source_zip_sha256": "16467b0860c95e4d6924ee80d0461456689bcd378eaaacbcd833139f3a87e322",
+    "limits": [
+      "Static engine relinking and selected pixel client only;not full WebCore/browser or Stage3 completion"
+    ]
+  },
+  "host_and_sanitizers": "PASS;see SOURCE-VALIDATION.json",
+  "hardware": {
+    "QEMU": "PASS for recorded profiles",
+    "Fusion": "NOT RUN for this new build;prior Ethernet remains user-confirmed",
+    "Pi5_laptop": "NOT RUN"
+  },
+  "limits": [
+    "Owned software images and real JSC typed-array pixels;not WebCore/HTML/CSS/DOM/Canvas or the modern browser",
+    "Fixed24MiB kernel image arena and bounded copied tiles;not browser FPS or navigation benchmarks",
+    "Full browser,native Wi-Fi,production browser security and remaining revised Stage3 gates stay open;version0.50.0 reserved"
+  ]
+}
