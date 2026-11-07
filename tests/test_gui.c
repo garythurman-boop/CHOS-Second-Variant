@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "chos/gui.h"
+#include "chos/gui_surface.h"
 #include "chos/syscall.h"
 #include "chos/audio.h"
 #include "chos/virtio_gpu.h"
@@ -508,6 +509,64 @@ static void test_el0_gui_service(void) {
     (void)window_id;
 }
 
+static void surface_message(chos_gui_surface_message_t *m,unsigned type,size_t payload) {
+    memset(m,0,sizeof(*m));m->header.version=CHOS_GUI_ABI_VERSION;m->header.type=(uint16_t)type;
+    m->header.size_bytes=(uint32_t)(offsetof(chos_gui_surface_message_t,payload)+payload);
+}
+static long surface_begin_test(uint32_t owner,uint32_t window,int x) {
+    chos_gui_surface_message_t m;surface_message(&m,CHOS_GUI_MSG_SURFACE_BEGIN,sizeof(m.payload.begin));
+    m.payload.begin.window_id=window;m.payload.begin.x=x;m.payload.begin.y=1;m.payload.begin.width=129;m.payload.begin.height=2;
+    return chos_gui_submit_message(owner,&m,m.header.size_bytes);
+}
+static void surface_fill_test(uint32_t window,uint64_t id,uint32_t color,unsigned tiles) {
+    chos_gui_surface_message_t m;surface_message(&m,CHOS_GUI_MSG_SURFACE_TILE,sizeof(m.payload.tile));
+    m.header.request_id=id;m.payload.tile.window_id=window;
+    for(unsigned i=0;i<128;++i)m.payload.tile.pixels[i]=color;
+    for(unsigned i=0;i<tiles;++i){m.payload.tile.tile_index=i;m.payload.tile.pixel_count=i%2?1:128;
+        assert(chos_gui_submit_message(52,&m,m.header.size_bytes)==0);}
+}
+static long surface_present_test(uint32_t owner,uint32_t window,uint64_t id) {
+    chos_gui_surface_message_t m;surface_message(&m,CHOS_GUI_MSG_SURFACE_PRESENT,sizeof(m.payload.window));
+    m.payload.window.window_id=window;m.header.request_id=id;return chos_gui_submit_message(owner,&m,m.header.size_bytes);
+}
+static void surface_force_repaint(uint32_t window) {
+    chos_gui_message_t m;gui_message_begin(&m,CHOS_GUI_MSG_SET_TITLE,sizeof(m.payload.set_title));
+    m.payload.set_title.window_id=window;m.payload.set_title.title_length=7;memcpy(m.payload.set_title.title,"Surface",7);
+    assert(chos_gui_submit_message(52,&m,m.header.size_bytes)==0);chos_gui_pump();
+}
+static void test_pixel_surface_service(void) {
+    uint32_t window=test_create_gui_client(52,"Surface");chos_gui_pump();
+    const size_t sample=165u*800u+157u;uint32_t background=pixels[sample];
+    long id=surface_begin_test(52,window,1);assert(id>0);
+    uint32_t foreign=test_create_gui_client(53,"Foreign");
+    assert(surface_begin_test(53,window,1)==-CHOS_ERRNO_EPERM);
+    assert(surface_begin_test(52,foreign,1)==-CHOS_ERRNO_EPERM);chos_gui_process_exited(53);chos_gui_pump();
+    unsigned unchanged=presentations;
+    assert(surface_begin_test(52,window,INT32_MAX)==-CHOS_ERRNO_EINVAL);
+    chos_gui_message_header_t short_header={CHOS_GUI_ABI_VERSION,CHOS_GUI_MSG_SURFACE_TILE,sizeof(short_header),0,0,0};
+    assert(chos_gui_submit_message(52,&short_header,sizeof(short_header))==-CHOS_ERRNO_EINVAL);
+    surface_fill_test(window,(uint64_t)id,0x112233,1);
+    assert(surface_present_test(52,window,(uint64_t)id)==-CHOS_ERRNO_EAGAIN);
+    chos_gui_pump();assert(presentations==unchanged); /* BEGIN/TILE/incomplete PRESENT do not repaint. */
+    surface_force_repaint(window);assert(pixels[sample]==background);
+    surface_fill_test(window,(uint64_t)id,0x112233,4);assert(surface_present_test(52,window,(uint64_t)id)==0);chos_gui_pump();
+    assert(pixels[sample]==0xff112233&&pixels[165u*800u+285u]==0xff112233);
+    long second=surface_begin_test(52,window,1);assert(second>id);surface_fill_test(window,(uint64_t)second,0x998877,1);
+    surface_force_repaint(window);assert(pixels[sample]==0xff112233);
+    uint32_t border=pixels[165u*800u+564u];
+    long clipped=surface_begin_test(52,window,400);assert(clipped>second);
+    assert(surface_present_test(52,window,(uint64_t)second)==-CHOS_ERRNO_EINVAL);
+    surface_fill_test(window,(uint64_t)clipped,0x445566,4);assert(surface_present_test(52,window,(uint64_t)clipped)==0);chos_gui_pump();
+    assert(pixels[165u*800u+556u]==0xff445566&&pixels[165u*800u+563u]==0xff445566);
+    assert(pixels[165u*800u+564u]==border);assert(pixels[sample]==background);
+    chos_gui_message_t clear;gui_message_begin(&clear,CHOS_GUI_MSG_CLEAR,sizeof(clear.payload.clear));
+    clear.payload.clear.window_id=window;clear.payload.clear.background_argb=0xffaa8866;
+    assert(chos_gui_submit_message(52,&clear,clear.header.size_bytes)==0);chos_gui_pump();assert(pixels[sample]==0xffaa8866);
+    chos_gui_process_exited(52);uint32_t reused=test_create_gui_client(54,"Reused");chos_gui_pump();
+    assert(reused==window&&pixels[sample]!=0xff445566);assert(surface_present_test(54,reused,(uint64_t)clipped)==-CHOS_ERRNO_EINVAL);
+    chos_gui_process_exited(54);
+}
+
 static unsigned report_pages_seen;
 static int report_missing=1;
 static int mock_needs_recovery(void){return report_missing;}
@@ -629,6 +688,7 @@ int main(void) {
 
     /* 0.10.2 GUI service enforces PID window ownership and routes focus/input events. */
     test_el0_gui_service();
+    test_pixel_surface_service();
 
     /* 0.9.1 terminal launches asynchronously and window state survives taskbar switches. */
     chos_gui_input_key(46u, 1); /* C opens Console */

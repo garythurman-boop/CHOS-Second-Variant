@@ -37,7 +37,7 @@ int chos_gui_ready(void);
 const char *chos_gui_view_name(void);
 /* EL0 GUI service. Messages have already been copied from the caller's address
  * space and are validated again here; each process may own one GUI window. */
-int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *message, size_t supplied_bytes);
+int64_t chos_gui_submit_message(uint32_t owner_pid, const void *message, size_t supplied_bytes);
 int chos_gui_pop_event(uint32_t owner_pid, chos_gui_message_t *event_out);
 void chos_gui_process_exited(uint32_t owner_pid);
 

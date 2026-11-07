@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "chos/gui_protocol.h"
+#include "chos/gui_surface.h"
 
 int main(void) {
     chos_gui_message_header_t h;
@@ -37,6 +38,11 @@ int main(void) {
     h.type = CHOS_GUI_MSG_REPLY;
     h.size_bytes = (uint32_t)sizeof(h);
     assert(chos_gui_message_header_valid(&h, sizeof(chos_gui_message_t))); /* framing only; submit rejects replies */
+    h.type=CHOS_GUI_MSG_SURFACE_TILE;
+    h.size_bytes=(uint32_t)sizeof(chos_gui_surface_message_t);
+    assert(chos_gui_message_header_valid(&h,sizeof(chos_gui_surface_message_t)));
+    assert(!chos_gui_message_header_valid(&h,sizeof(chos_gui_message_t)));
+    assert(sizeof(chos_gui_message_t)==184u);
     puts("gui protocol: command/event framing and fixed ABI layouts passed");
     return 0;
 }

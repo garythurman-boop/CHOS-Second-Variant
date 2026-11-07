@@ -38,6 +38,11 @@ typedef enum {
     CHOS_GUI_MSG_REPLY = 7,
     CHOS_GUI_MSG_CLEAR = 8,
     CHOS_GUI_MSG_SET_CARET = 9,
+    /* Optional larger submit envelopes; legacy messages/events stay 184 bytes. */
+    CHOS_GUI_MSG_SURFACE_BEGIN = 10,
+    CHOS_GUI_MSG_SURFACE_TILE = 11,
+    CHOS_GUI_MSG_SURFACE_PRESENT = 12,
+    CHOS_GUI_MSG_SURFACE_DROP = 13,
     CHOS_GUI_MSG_KEY_EVENT = 16,
     CHOS_GUI_MSG_POINTER_EVENT = 17,
     CHOS_GUI_MSG_CLOSE_REQUEST = 18,
@@ -142,7 +147,7 @@ static inline int chos_gui_message_header_valid(const chos_gui_message_header_t 
                                                  size_t supplied_bytes) {
     if (header == NULL || supplied_bytes < sizeof(*header)) return 0;
     if (header->version != CHOS_GUI_ABI_VERSION) return 0;
-    if (!((header->type >= CHOS_GUI_MSG_CREATE_WINDOW && header->type <= CHOS_GUI_MSG_SET_CARET) ||
+    if (!((header->type >= CHOS_GUI_MSG_CREATE_WINDOW && header->type <= CHOS_GUI_MSG_SURFACE_DROP) ||
           (header->type >= CHOS_GUI_MSG_KEY_EVENT && header->type <= CHOS_GUI_MSG_FOCUS_EVENT))) return 0;
     if (header->size_bytes < sizeof(*header) ||
         header->size_bytes > CHOS_GUI_MAX_MESSAGE_BYTES ||

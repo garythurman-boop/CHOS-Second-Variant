@@ -1,6 +1,9 @@
 # Revised Stage 3 current evidence
 
-Stage 3 remains incomplete. The current
+Stage 3 remains incomplete. The new [owned-pixel checkpoint](NATIVE_PIXEL_SURFACES.md)
+adds complete copied images in isolated GUI windows and actual JavaScript-generated
+typed-array pixels, with native input and exact cleanup checks. This is rendering
+infrastructure; WebCore and the modern browser remain unfinished. The preceding
 [native JavaScript checkpoint](NATIVE_JSC_STANDARDS.md) runs 172 selected original
 Test262 variants, checked WebAssembly operations, native asynchronous compilation
 and five CPU-watchdog cases in actual CHOS guests. Both desktop Console frontends
@@ -18,7 +21,7 @@ suite qualification and regression evidence are recorded separately in
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
 | Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads, foreign pause and explicit engine reservation/image/stack profile; real native RunLoop and selected async engine execution |
-| Modern browser | Actual original-ICU JSC selected Test262/checked Wasm/watchdog/async execution; full conformance, WebCore rendering and browser application features remain open |
+| Modern browser | Owned pixel presentation and actual JavaScript image data; original-ICU JSC selected Test262/checked Wasm/watchdog/async execution; full conformance, WebCore rendering and browser application features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
 | Release | Development 0.30.0; 0.50.0 requires all revised gates |

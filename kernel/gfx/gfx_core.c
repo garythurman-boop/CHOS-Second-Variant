@@ -48,6 +48,30 @@ static int clip_matches(const chos_surface_t *surface) {
     return clip_enabled && clip_surface == surface;
 }
 
+int chos_gfx_blit_xrgb_scaled(chos_surface_t *dst,int32_t x,int32_t y,
+                              const chos_surface_t *src,unsigned scale) {
+    if(!chos_surface_valid(dst)||!chos_surface_valid(src)||!scale||scale>4u||
+       src->width>INT32_MAX||src->height>INT32_MAX)return 0;
+    int64_t x0=x,y0=y,x1=(int64_t)x+(int64_t)src->width*scale,y1=(int64_t)y+(int64_t)src->height*scale;
+    if(x0<0)x0=0;
+    if(y0<0)y0=0;
+    if(x1>(int64_t)dst->width)x1=(int64_t)dst->width;
+    if(y1>(int64_t)dst->height)y1=(int64_t)dst->height;
+    if(clip_matches(dst)){
+        if(x0<clip_x0)x0=clip_x0;
+        if(y0<clip_y0)y0=clip_y0;
+        if(x1>clip_x1)x1=clip_x1;
+        if(y1>clip_y1)y1=clip_y1;
+    }
+    for(int64_t yy=y0;yy<y1;++yy){
+        const uint32_t *row=src->pixels+(size_t)((yy-y)/(int64_t)scale)*src->stride_pixels;
+        uint32_t *out=dst->pixels+(size_t)yy*dst->stride_pixels;
+        if(scale==1u)for(int64_t xx=x0;xx<x1;++xx)out[xx]=row[xx-x]|0xff000000u;
+        else for(int64_t xx=x0;xx<x1;++xx)out[xx]=row[(xx-x)/(int64_t)scale]|0xff000000u;
+    }
+    return 1;
+}
+
 void chos_gfx_clear(chos_surface_t *surface, uint32_t color) {
     size_t y, x;
     if (!chos_surface_valid(surface)) return;

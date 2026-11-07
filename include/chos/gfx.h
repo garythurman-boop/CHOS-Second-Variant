@@ -15,6 +15,10 @@ typedef struct {
 #define CHOS_COLOR_RGBA(r, g, b, a) ((((uint32_t)(a) & 0xffu) << 24) | (((uint32_t)(r) & 0xffu) << 16) | (((uint32_t)(g) & 0xffu) << 8) | ((uint32_t)(b) & 0xffu))
 
 int chos_surface_valid(const chos_surface_t *surface);
+/* Nonoverlapping owned software buffers; nearest-neighbor scaling 1..4,
+ * opaque XRGB input, destination/screen/active-clip intersection. */
+int chos_gfx_blit_xrgb_scaled(chos_surface_t *destination,int32_t x,int32_t y,
+                              const chos_surface_t *source,unsigned scale);
 /* A single active clip rectangle for the immediate-mode renderer. Clip is reset explicitly. */
 void chos_gfx_set_clip(chos_surface_t *surface, int32_t x, int32_t y, int32_t width, int32_t height);
 void chos_gfx_reset_clip(chos_surface_t *surface);

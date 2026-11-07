@@ -17,6 +17,7 @@
 #include "chos/net_tcp6_api.h"
 #include "chos/net_dns6_api.h"
 #include "chos/gui_protocol.h"
+#include "chos/gui_surface.h"
 #include "chos/file_api.h"
 #include "chos/file_write_api.h"
 #include "chos/file_metadata_api.h"
@@ -246,6 +247,9 @@ static inline long chos_console_read(void *buffer, size_t capacity) {
  * poll is nonblocking; -EAGAIN means the application should yield/sleep. */
 static inline long chos_gui_submit(const chos_gui_message_t *message, size_t bytes) {
     return chos_syscall2((long)CHOS_SYS_GUI_SUBMIT, (long)(uintptr_t)message, (long)bytes);
+}
+static inline long chos_gui_surface_submit(const chos_gui_surface_message_t *message,size_t bytes) {
+    return chos_syscall2((long)CHOS_SYS_GUI_SUBMIT,(long)(uintptr_t)message,(long)bytes);
 }
 static inline long chos_gui_poll_event(chos_gui_message_t *event, size_t capacity) {
     return chos_syscall2((long)CHOS_SYS_GUI_POLL_EVENT, (long)(uintptr_t)event, (long)capacity);

@@ -6,10 +6,11 @@ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--out',type=pathl
 p.add_argument('--mode',choices=['direct','uefi'],default='direct')
 p.add_argument('--suite',choices=['test262','wasm','watchdog','async-wasm','mixed'],required=True)
 p.add_argument('--runs',type=int,choices=[1,3],default=1)
+p.add_argument('--image-root',type=pathlib.Path,default=pathlib.Path('build/engine-test'),help='Frozen diagnostic kernel/ISO directory')
 p.add_argument('--application',type=pathlib.Path,default=pathlib.Path('build/engine-test/native-engine.elf'))
 o=p.parse_args();out=o.out.resolve();out.mkdir(parents=True,exist_ok=False)
 disk=out/'disposable.img';shutil.copyfile('build/qemu-smoke-disk.img',disk)
-a=argparse.Namespace(mode=o.mode,kernel=pathlib.Path('build/engine-test/chos.elf'),uefi_kernel=pathlib.Path('build/engine-test/uefi-kernel.elf'),iso=pathlib.Path('build/engine-test/chos.iso'),memory='2G' if o.mode=='uefi' else '512M',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model='e1000e',storage_error=False,nvme=False,no_rng=False,hub_depth=0,empty_usb=False,tablet=True)
+a=argparse.Namespace(mode=o.mode,kernel=o.image_root/'chos.elf',uefi_kernel=o.image_root/'uefi-kernel.elf',iso=o.image_root/'chos.iso',memory='2G' if o.mode=='uefi' else '512M',qemu_data=pathlib.Path('/workspace/chos-tools/root/usr/share/qemu'),rtc_base=None,trace=False,firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),no_usb=False,usb_pci_bus=0,xhci_model='qemu-xhci',pci_virtio=True,net_model='e1000e',storage_error=False,nvme=False,no_rng=False,hub_depth=0,empty_usb=False,tablet=True)
 g=Guest(a,out,disk)
 markers={'test262':'[ OK ] actual pinned Test262 selected native suite executed','wasm':'[ OK ] actual checked native Wasm arithmetic,memory growth,tables and bounds traps executed','watchdog':'[ OK ] actual native JSC CPU watchdog terminates long scripts and respects callback continuation','async-wasm':'[ OK ] actual native RunLoop,async Wasm compile/instantiate and Promise completion executed','mixed':'[ OK ] actual native Wasm,async main loop and CPU watchdog coexist'}
 def free_pages():

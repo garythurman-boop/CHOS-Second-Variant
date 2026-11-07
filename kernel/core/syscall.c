@@ -20,6 +20,7 @@
 #include "chos/scheduler.h"
 #include "chos/gui.h"
 #include "chos/gui_protocol.h"
+#include "chos/gui_surface.h"
 #include "chos/file_api.h"
 #include "chos/file_write_api.h"
 #include "chos/file_metadata_api.h"
@@ -790,7 +791,7 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
             }
             case CHOS_SYS_GUI_SUBMIT: {
                 chos_gui_message_header_t header;
-                chos_gui_message_t message;
+                union {chos_gui_message_t legacy;chos_gui_surface_message_t surface;} message;
                 uint64_t user_pointer = frame->x[0];
                 uint64_t size64 = frame->x[1];
                 size_t i, size;

@@ -933,11 +933,11 @@ $(SAN_DIR)/test-window-manager: tests/test_window_manager.c kernel/gfx/window_ma
 
 $(BUILD)/test-gui: $(ASSET_HEADER) tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c kernel/gfx/font8x12.h kernel/gfx/font_ui_dejavu.h include/chos/gui.h include/chos/window_manager.h include/chos/virtio_gpu.h include/chos/virtio_input.h include/chos/storage.h include/chos/chfs.h include/chos/process.h include/chos/romfs.h include/chos/taskbar_text.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude -Ikernel/gfx tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c kernel/net/net_profile.c -o $@
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -Iinclude -Ikernel/gfx -DCHOS_HOST_TEST tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c kernel/net/net_profile.c kernel/core/spinlock.c -o $@
 
 $(SAN_DIR)/test-gui: $(ASSET_HEADER) tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/taskbar_text.c kernel/gfx/font8x12.h kernel/gfx/font_ui_dejavu.h include/chos/gui.h include/chos/window_manager.h include/chos/virtio_gpu.h include/chos/virtio_input.h include/chos/storage.h include/chos/chfs.h include/chos/process.h include/chos/romfs.h include/chos/taskbar_text.h
 	@mkdir -p $(dir $@)
-	$(CC_HOST) $(SAN_FLAGS) -Iinclude -Ikernel/gfx tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c kernel/net/net_profile.c -o $@
+	$(CC_HOST) $(SAN_FLAGS) -Iinclude -Ikernel/gfx -DCHOS_HOST_TEST tests/test_gui.c kernel/gfx/gui.c kernel/gfx/gfx_core.c kernel/gfx/window_manager.c kernel/gfx/display_modes.c kernel/gfx/taskbar_text.c kernel/net/net_profile.c kernel/core/spinlock.c -o $@
 
 $(BUILD)/kernel/net/net_tcp.o: include/chos/net_tcp.h include/chos/net_tcp_api.h include/chos/net_packet.h
 $(BUILD)/kernel/net/net_stack.o: include/chos/net_tcp.h include/chos/net_packet.h
@@ -1785,3 +1785,42 @@ test-command-program-sanitize: $(SAN_DIR)/test-command-program
 	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-command-program
 test: test-command-program
 test-sanitize: test-command-program-sanitize
+
+# Optional pixel transport keeps the original GUI event envelope unchanged.
+$(BUILD)/kernel/gfx/gui.o $(UEFI_KERNEL_BUILD)/kernel/gfx/gui.o $(BUILD)/kernel/core/syscall.o $(UEFI_KERNEL_BUILD)/kernel/core/syscall.o $(BUILD)/test-gui $(SAN_DIR)/test-gui: include/chos/gui_surface.h include/chos/gui_protocol.h kernel/gfx/gui_surface_store.h include/chos/spinlock.h kernel/core/spinlock.c
+$(BUILD)/test-surface-store: tests/test_gui_surface_store.c kernel/gfx/gui_surface_store.h include/chos/gui_surface.h kernel/core/spinlock.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -DCHOS_HOST_TEST -Iinclude -Ikernel/gfx -pthread tests/test_gui_surface_store.c kernel/core/spinlock.c -o $@
+$(SAN_DIR)/test-surface-store: tests/test_gui_surface_store.c kernel/gfx/gui_surface_store.h include/chos/gui_surface.h kernel/core/spinlock.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -DCHOS_HOST_TEST -Ikernel/gfx -pthread tests/test_gui_surface_store.c kernel/core/spinlock.c -o $@
+$(BUILD)/test-gfx-blit: tests/test_gfx_blit.c kernel/gfx/gfx_core.c include/chos/gfx.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -O2 -Wall -Wextra -Werror -Iinclude tests/test_gfx_blit.c kernel/gfx/gfx_core.c -o $@
+$(SAN_DIR)/test-gfx-blit: tests/test_gfx_blit.c kernel/gfx/gfx_core.c include/chos/gfx.h
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) tests/test_gfx_blit.c kernel/gfx/gfx_core.c -o $@
+.PHONY: test-pixel-surfaces test-pixel-surfaces-sanitize
+test-pixel-surfaces: $(BUILD)/test-surface-store $(BUILD)/test-gfx-blit
+	./$(BUILD)/test-surface-store
+	./$(BUILD)/test-gfx-blit
+test-pixel-surfaces-sanitize: $(SAN_DIR)/test-surface-store $(SAN_DIR)/test-gfx-blit
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-surface-store
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-gfx-blit
+test: test-pixel-surfaces
+test-sanitize: test-pixel-surfaces-sanitize
+
+$(BUILD)/userland/pixel_demo.o: userland/examples/pixel_demo.c userland/libchos/include/chos/user.h include/chos/gui_surface.h include/chos/gui_protocol.h
+	@mkdir -p $(dir $@)
+	$(CC) $(USER_CFLAGS) -c $< -o $@
+$(BUILD)/userland/pixel_demo.elf: $(BUILD)/userland/start.o $(BUILD)/userland/pixel_demo.o userland/user.ld
+	$(LD) -T userland/user.ld -nostdlib -static -z max-page-size=4096 -o $@ $(BUILD)/userland/start.o $(BUILD)/userland/pixel_demo.o
+$(BUILD)/userland/pixel_demo.bin: $(BUILD)/userland/pixel_demo.elf
+	$(OBJCOPY) -O binary $< $@
+$(BUILD)/userland/pixel_demo.sym: $(BUILD)/userland/pixel_demo.elf
+	$(NM) --defined-only --numeric-sort $< > $@
+$(BUILD)/userland/pixel_demo.chcx: $(BUILD)/userland/pixel_demo.bin $(BUILD)/userland/pixel_demo.sym tools/mkchcx.py
+	python3 tools/mkchcx.py --stack-pages 4 --v2-symbols $(BUILD)/userland/pixel_demo.sym $(BUILD)/userland/pixel_demo.bin $@
+	python3 tools/mkchcx.py --verify $@
+$(BUILD)/test-gui-protocol $(SAN_DIR)/test-gui-protocol: include/chos/gui_surface.h
+$(BUILD)/userland/cdemo.o $(BUILD)/userland/gui_demo.o $(BUILD)/userland/text_viewer.o $(BUILD)/userland/console.o $(BUILD)/userland/file_manager.o $(BUILD)/userland/browser.o: include/chos/gui_surface.h include/chos/gui_protocol.h

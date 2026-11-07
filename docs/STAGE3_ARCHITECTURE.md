@@ -1,5 +1,7 @@
 # Revised Stage 3: internet platform architecture
 
+Current rendering checkpoint: [owned native pixel surfaces and actual JavaScript image data](NATIVE_PIXEL_SURFACES.md). Isolated clients can display complete owned images, and the real JSC engine computes typed-array pixels with keyboard-driven redraw. The original184-byte GUI event ABI remains intact. This is not WebCore/HTML/CSS or the modern browser; remaining revised Stage3 gates stay open at0.30.0.
+
 Current checkpoint: [native JavaScript standards and asynchronous execution](NATIVE_JSC_STANDARDS.md).
 The actual original-ICU engine executes 172 selected Test262 variants, checked
 Wasm, native asynchronous RunLoop/Promise work and five CPU-watchdog cases.

@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "chos/atomic.h"
+#include "chos/spinlock.h"
+#include "gui_surface_store.h"
 #include "chos/gui.h"
 #include "chos/scrollback.h"
 #include "chos/command_program.h"
@@ -156,6 +158,15 @@ typedef struct {
     chos_gui_caret_t caret;
 } gui_app_client_t;
 static gui_app_client_t gui_app_clients[GUI_APP_MAX_CLIENTS];
+/* Fixed 24 MiB pixel arena. No user mappings, allocations or device pointers. */
+static gui_surface_store_t gui_app_surfaces[GUI_APP_MAX_CLIENTS];
+static chos_spinlock_t gui_surface_lock=CHOS_SPINLOCK_INITIALIZER;
+static uint64_t gui_surface_next_id;
+static void gui_app_surface_drop(gui_app_client_t *client) {
+    uint64_t irq=chos_spin_lock_irqsave(&gui_surface_lock);
+    gui_surface_drop(&gui_app_surfaces[(size_t)(client-gui_app_clients)]);
+    chos_spin_unlock_irqrestore(&gui_surface_lock,irq);
+}
 
 static chos_surface_t screen;
 /* The image background is prepared once per display-mode/wallpaper change.
@@ -4236,12 +4247,57 @@ static size_t gui_expected_message_size(uint16_t type) {
     return offsetof(chos_gui_message_t, payload) + payload_size;
 }
 
-int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *message, size_t supplied_bytes) {
+static int64_t gui_submit_surface(uint32_t owner_pid,const chos_gui_surface_message_t *m,size_t bytes) {
+    size_t expected=offsetof(chos_gui_surface_message_t,payload);
+    uint32_t window_id;
+    switch(m->header.type){
+        case CHOS_GUI_MSG_SURFACE_BEGIN:expected+=sizeof(m->payload.begin);break;
+        case CHOS_GUI_MSG_SURFACE_TILE:expected+=sizeof(m->payload.tile);break;
+        default:expected+=sizeof(m->payload.window);break;
+    }
+    if(bytes!=expected||m->header.size_bytes!=expected)return -CHOS_ERRNO_EINVAL;
+    window_id=m->header.type==CHOS_GUI_MSG_SURFACE_BEGIN?m->payload.begin.window_id:
+        m->header.type==CHOS_GUI_MSG_SURFACE_TILE?m->payload.tile.window_id:m->payload.window.window_id;
+    uint64_t irq=chos_spin_lock_irqsave(&gui_surface_lock);
+    gui_app_client_t *client=gui_app_find_owner(owner_pid);
+    int64_t result=-CHOS_ERRNO_EPERM;
+    if(client&&window_id==(uint32_t)client->window_id){
+        const chos_wm_window_t *w=chos_wm_get_const(&window_manager,client->window_id);
+        gui_surface_store_t *s=&gui_app_surfaces[(size_t)(client-gui_app_clients)];
+        result=-CHOS_ERRNO_EINVAL;
+        if(!w)result=-CHOS_ERRNO_ENOENT;
+        else if(m->header.type==CHOS_GUI_MSG_SURFACE_BEGIN){
+            unsigned scale=gui_scale_factor();if(!scale)scale=1;
+            int64_t cw=w->width/(int32_t)scale-12,ch=w->height/(int32_t)scale-40;
+            if(!m->header.request_id&&gui_surface_next_id<INT64_MAX&&
+               m->payload.begin.x<cw&&m->payload.begin.y<ch){
+                uint64_t id=gui_surface_next_id+1;
+                result=gui_surface_begin(s,id,&m->payload.begin);
+                if(!result){gui_surface_next_id=id;result=(int64_t)id;}
+            }
+        }else if(m->header.type==CHOS_GUI_MSG_SURFACE_TILE)
+            result=gui_surface_tile(s,m->header.request_id,&m->payload.tile);
+        else if(!m->payload.window.reserved){
+            if(m->header.type==CHOS_GUI_MSG_SURFACE_PRESENT)result=gui_surface_present(s,m->header.request_id);
+            else if(!m->header.request_id){gui_surface_drop(s);result=0;}
+        }
+    }
+    chos_spin_unlock_irqrestore(&gui_surface_lock,irq);
+    if(result==0&&(m->header.type==CHOS_GUI_MSG_SURFACE_PRESENT||m->header.type==CHOS_GUI_MSG_SURFACE_DROP))gui_mark_dirty();
+    return result;
+}
+
+int64_t chos_gui_submit_message(uint32_t owner_pid, const void *raw, size_t supplied_bytes) {
     size_t expected, i;
     gui_app_client_t *client;
     const chos_wm_window_t *window;
     unsigned scale;
-    if (!gui_active || message == NULL || owner_pid == 0u) return -(int64_t)CHOS_ERRNO_EINVAL;
+    if (!gui_active || raw == NULL || owner_pid == 0u || supplied_bytes<sizeof(chos_gui_message_header_t)) return -(int64_t)CHOS_ERRNO_EINVAL;
+    const chos_gui_message_header_t *header=raw;
+    if(!chos_gui_message_header_valid(header,supplied_bytes)||header->flags)return -CHOS_ERRNO_EINVAL;
+    if(header->type>=CHOS_GUI_MSG_SURFACE_BEGIN&&header->type<=CHOS_GUI_MSG_SURFACE_DROP)
+        return gui_submit_surface(owner_pid,raw,supplied_bytes);
+    const chos_gui_message_t *message=raw;
     if (!chos_gui_message_header_valid(&message->header, supplied_bytes) || message->header.flags != 0u)
         return -(int64_t)CHOS_ERRNO_EINVAL;
     expected = gui_expected_message_size(message->header.type);
@@ -4318,6 +4374,7 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
         int id = client->window_id;
         if (view == id) gui_app_queue_focus(id, CHOS_GUI_EVENT_FOCUS_LOST);
         (void)chos_wm_close(&window_manager, id);
+        gui_app_surface_drop(client);
         for (i = 0u; i < sizeof(*client); ++i) ((uint8_t *)client)[i] = 0u;
         gui_sync_active_view();
         return 0;
@@ -4365,6 +4422,7 @@ int64_t chos_gui_submit_message(uint32_t owner_pid, const chos_gui_message_t *me
         return 0;
     }
     if (message->header.type == CHOS_GUI_MSG_CLEAR) {
+        gui_app_surface_drop(client);
         client->background_argb = message->payload.clear.background_argb != 0u
             ? message->payload.clear.background_argb : C_PANEL;
         client->op_count = 0u;
@@ -4440,6 +4498,7 @@ void chos_gui_process_exited(uint32_t owner_pid) {
             if (view == client->window_id)
                 gui_app_queue_focus(client->window_id, CHOS_GUI_EVENT_FOCUS_LOST);
             (void)chos_wm_close(&window_manager, client->window_id);
+            gui_app_surface_drop(client);
             for (size_t byte_index = 0u; byte_index < sizeof(*client); ++byte_index)
                 ((uint8_t *)client)[byte_index] = 0u;
             changed = 1;
@@ -4466,6 +4525,24 @@ static void gui_draw_app_window(int id, const chos_wm_window_t *window) {
     draw_window_shell(client->title, GUI_WINDOW_BASE_X, GUI_WINDOW_BASE_Y, logical_w, logical_h);
     rect(GUI_WINDOW_BASE_X + 4, GUI_WINDOW_BASE_Y + 30, logical_w - 8, logical_h - 34,
          client->background_argb);
+    gui_surface_store_t *store=&gui_app_surfaces[(size_t)(client-gui_app_clients)];
+    gui_surface_frame_t frame;
+    uint64_t irq=chos_spin_lock_irqsave(&gui_surface_lock);
+    int has_surface=gui_surface_acquire(store,&frame);
+    chos_spin_unlock_irqrestore(&gui_surface_lock,irq);
+    if(has_surface){
+        int32_t cy=window->y+34*(int32_t)scale;
+        int32_t ch=window->height-40*(int32_t)scale;
+        if(ch>TASKBAR_Y-cy)ch=TASKBAR_Y-cy;
+        chos_gfx_set_clip(&screen,window->x+6*(int32_t)scale,cy,window->width-12*(int32_t)scale,ch);
+        chos_surface_t source={store->pixels[frame.buffer],frame.width,frame.height,frame.width};
+        (void)chos_gfx_blit_xrgb_scaled(&screen,window->x+(6+frame.x)*(int32_t)scale,
+            window->y+(34+frame.y)*(int32_t)scale,&source,scale);
+        irq=chos_spin_lock_irqsave(&gui_surface_lock);
+        (void)gui_surface_release(store,&frame);
+        chos_spin_unlock_irqrestore(&gui_surface_lock,irq);
+        chos_gfx_set_clip(&screen,window->x,window->y,window->width,window->y<TASKBAR_Y?TASKBAR_Y-window->y:0);
+    }
     for (i = 0u; i < client->op_count; ++i) {
         const gui_app_draw_op_t *op = &client->ops[i];
         if (op->type == CHOS_GUI_MSG_FILL_RECT) {
@@ -4849,6 +4926,7 @@ int chos_gui_init(const chos_surface_t *surface) {
                                 chos_asset_cursor.height, 0u, 0u);
     view = VIEW_WELCOME;
     for (size_t client_index = 0u; client_index < GUI_APP_MAX_CLIENTS; ++client_index) {
+        gui_app_surface_drop(&gui_app_clients[client_index]);
         for (size_t byte_index = 0u; byte_index < sizeof(gui_app_clients[client_index]); ++byte_index)
             ((uint8_t *)&gui_app_clients[client_index])[byte_index] = 0u;
     }
