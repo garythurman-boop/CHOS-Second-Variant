@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "project": "musl AArch64 nonlocal jumps",
+  "version": "1.2.5",
+  "commit": "0784374d561435f7c787a555aeab8ede699ed298",
+  "source": "https://git.musl-libc.org/cgit/musl",
+  "files": {
+    "src/setjmp/aarch64/setjmp.s": "0c06b1b8653aa93217c00b6cd13f987b3eb8630fad1a72bd1554c2641c799389",
+    "src/setjmp/aarch64/longjmp.s": "2333947c6aae6df011b6f1d6d92e29c0a38c5f4982cd67cfc929c160dcdda63f",
+    "arch/aarch64/bits/setjmp.h": "78213ff8a529db45cb1baf5310546e5c297e556e1c2a8e959627a32d80c973ba"
+  },
+  "license": "MIT;third_party/musl/COPYRIGHT",
+  "provenance": "Imported bytes match the pinned local Git objects",
+  "scope": "Original AAPCS64 GPR/SP/return-PC and lower64-bit d8..d15 capture/restore;no signal-mask or cross-thread restoration"
+}

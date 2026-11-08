@@ -28,6 +28,11 @@ calendar=json.loads((root/'docs/dependencies/musl-calendar.json').read_text())
 for name,wanted in calendar['files'].items():
     if name in manifest['files']:assert manifest['files'][name]==wanted
     manifest['files'][name]=wanted
+nonlocal_jumps=json.loads((root/'docs/dependencies/musl-setjmp.json').read_text())
+assert nonlocal_jumps['commit']==manifest['commit'] and nonlocal_jumps['version']==manifest['version']
+for name,wanted in nonlocal_jumps['files'].items():
+    if name in manifest['files']:assert manifest['files'][name]==wanted
+    manifest['files'][name]=wanted
 actual={str(p.relative_to(base)) for p in base.rglob('*') if p.is_file()}
 assert actual==set(manifest['files']),'musl math closure changed'
 for name,wanted in manifest['files'].items():

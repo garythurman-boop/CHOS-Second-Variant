@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "fonts": [
+    {
+      "index": 0,
+      "path": "fonts/NotoSans-Regular.ttf",
+      "sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
+      "bytes": 512672,
+      "source": "Debian fonts-noto-core20201225-2,unmodified upstream Noto font,embedded OFL1.1 notice",
+      "name_records": {
+        "0": [
+          "Copyright 2015 Google LLC. All Rights Reserved."
+        ],
+        "1": [
+          "Noto Sans"
+        ],
+        "13": [
+          "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software."
+        ],
+        "14": [
+          "http://scripts.sil.org/OFL"
+        ]
+      },
+      "guest_path": "/FONTS/F0.TTF"
+    },
+    {
+      "index": 1,
+      "path": "fonts/NotoNaskhArabic-Regular.ttf",
+      "sha256": "8c67eaa2f0086872628fc3f7f760386f83c8be5c5e9a1ba3a38891237b2ac7cb",
+      "bytes": 175792,
+      "source": "Debian fonts-noto-core20201225-2,unmodified upstream Noto font,embedded OFL1.1 notice",
+      "name_records": {
+        "0": [
+          "Copyright 2019-2020 Google LLC. All Rights Reserved."
+        ],
+        "1": [
+          "Noto Naskh Arabic"
+        ],
+        "13": [
+          "This Font Software is licensed under the SIL Open Font License, Version 1.1. This license is available with a FAQ at: http://scripts.sil.org/OFL"
+        ],
+        "14": [
+          "http://scripts.sil.org/OFL"
+        ]
+      },
+      "guest_path": "/FONTS/F1.TTF"
+    },
+    {
+      "index": 2,
+      "path": "fonts/NotoSansDevanagari-Regular.ttf",
+      "sha256": "79a470365ccb210fa3c7d8d8ff2e005ef9d983cfd067f735a0caf7e15070ca9f",
+      "bytes": 229336,
+      "source": "Debian fonts-noto-core20201225-2,unmodified upstream Noto font,embedded OFL1.1 notice",
+      "name_records": {
+        "0": [
+          "Copyright 2015 Google Inc. All Rights Reserved."
+        ],
+        "1": [
+          "Noto Sans Devanagari"
+        ],
+        "13": [
+          "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software."
+        ],
+        "14": [
+          "http://scripts.sil.org/OFL"
+        ]
+      },
+      "guest_path": "/FONTS/F2.TTF"
+    },
+    {
+      "index": 3,
+      "path": "fonts/3e46c3b84c1370a06594736c7f8acebf810bbb3b.ttf",
+      "sha256": "a410c89bb5a934f847c14269dc230b6fc864fbcfc6c6bbcab104b4127add3e2c",
+      "bytes": 44884,
+      "source": "HarfBuzz15.1.0 official shaping corpus;Amiri/Noto Nastaliq Urdu,OFL1.1;original family/copyright metadata preserved",
+      "name_records": {
+        "0": [
+          "Copyright 2017 Google Inc. All Rights Reserved."
+        ],
+        "1": [
+          "Noto Nastaliq Urdu"
+        ],
+        "13": [],
+        "14": []
+      },
+      "guest_path": "/FONTS/F3.TTF"
+    },
+    {
+      "index": 4,
+      "path": "fonts/872d2955d326bd6676a06f66b8238ebbaabc212f.ttf",
+      "sha256": "a700535240f0cb38f1e523aada75fe19e3fd90d44d25bfda6e4a287d0f1afa8e",
+      "bytes": 17556,
+      "source": "HarfBuzz15.1.0 official shaping corpus;Amiri/Noto Nastaliq Urdu,OFL1.1;original family/copyright metadata preserved",
+      "name_records": {
+        "0": [
+          "Copyright 2010-2021 The Amiri Project Authors (https://github.com/aliftype/amiri)."
+        ],
+        "1": [
+          "Amiri"
+        ],
+        "13": [],
+        "14": []
+      },
+      "guest_path": "/FONTS/F4.TTF"
+    }
+  ],
+  "files": {
+    "NOTO-COPYRIGHT": "075f91382875da1c4b491f1facf2586f55448705133264d98ce15cab6211b125",
+    "OFL.txt": "9b35b8485f69cd298fccbb3c40a827dc06cf1185553bef827903497d2944a8d7",
+    "fonts/3e46c3b84c1370a06594736c7f8acebf810bbb3b.ttf": "a410c89bb5a934f847c14269dc230b6fc864fbcfc6c6bbcab104b4127add3e2c",
+    "fonts/872d2955d326bd6676a06f66b8238ebbaabc212f.ttf": "a700535240f0cb38f1e523aada75fe19e3fd90d44d25bfda6e4a287d0f1afa8e",
+    "fonts/NotoNaskhArabic-Regular.ttf": "8c67eaa2f0086872628fc3f7f760386f83c8be5c5e9a1ba3a38891237b2ac7cb",
+    "fonts/NotoSans-Regular.ttf": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
+    "fonts/NotoSansDevanagari-Regular.ttf": "79a470365ccb210fa3c7d8d8ff2e005ef9d983cfd067f735a0caf7e15070ca9f",
+    "tests/arabic-normalization.tests": "b592a00dfcd0112a78cf35ade4f9cbbd9ca3bfedbfacaa64c3f55749e1cbd615"
+  },
+  "original_harfbuzz_tests": {
+    "path": "tests/arabic-normalization.tests",
+    "sha256": "b592a00dfcd0112a78cf35ade4f9cbbd9ca3bfedbfacaa64c3f55749e1cbd615",
+    "cases": 64,
+    "selection": "Complete unmodified named upstream corpus file,OpenType font funcs,default flags",
+    "font_functions": "OpenType;not a full upstream shaper-suite run"
+  },
+  "license": "OFL1.1,original font copyright metadata and package notices retained;tests retain upstream HarfBuzz licensing",
+  "scope": "Reproducible font fixtures,not a production webfont catalogue"
+}

@@ -208,8 +208,23 @@ try:
   (out/'unplug-drain.json').write_text(json.dumps({'seconds_until_drained':time.monotonic()-unplug_start,'document_length':len(stopped),'repeat_key':0,'queued_events':probe.queued_events(editor_pid),'dispatches_after_empty_queue':g.symbol('preemption_switches')-switches},indent=2))
   time.sleep(.6);assert int.from_bytes(g.block('repeat_key',size=2),'little')==0 and probe.queued_events(editor_pid)==0 and app_text(editor_pid,editor,'document',8192)==stopped,'USB removal must release repeat after queued input drains'
   g.qmp('device_add',driver='usb-kbd',bus='xhci.0',id='kbd2');time.sleep(.7)
- else:state('backspace',False)
+ else:
+  # Releasing the QEMU key only queues a device report. Wait for CHOS to consume
+  # the physical release and finish legitimate earlier editor events before
+  # capturing the bytes that auto-save must preserve.
+  released_before=int.from_bytes(g.block('chos_input_diagnostics',size=8),'little')
+  state('backspace',False)
+  wait(lambda:int.from_bytes(g.block('chos_input_diagnostics',size=8),'little')>released_before and
+       int.from_bytes(g.block('repeat_key',size=2),'little')==0,
+       3,'direct physical Backspace release consumed')
+  wait(lambda:probe.queued_events(editor_pid)==0,4,'editor drains pre-release key events')
+  switches=g.symbol('preemption_switches')
+  wait(lambda:g.symbol('preemption_switches')>=switches+8,4,'editor completes consumed key events')
+  wait(lambda:probe.queued_events(editor_pid)==0 and
+       (c:=foreground('CHOS Text Editor')) and c['caret']['text_length']==len(app_text(editor_pid,editor,'document',8192).rsplit(b'\n',1)[-1]),
+       4,'direct editor presents the drained document caret')
  expected=app_text(editor_pid,editor,'document',8192)
+ (out/'expected-autosave.bin').write_bytes(expected)
  key('esc');wait(lambda:foreground('CHOS Console'),6,'auto-save close')
  checks+=['actual native editor append/backspace, focus cancellation, newline caret, Ctrl+S and reopen persistence','native editor auto-saves on Escape; USB keyboard removal releases held key' if o.mode=='uefi' else 'native editor auto-saves on Escape']
  large_pid=spawn('/BIN/TEXTVIEW.CHX','/DOCUMENTS/LARGE.TXT','CHOS Text Viewer')

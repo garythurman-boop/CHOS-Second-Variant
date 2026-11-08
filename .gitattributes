@@ -10,3 +10,8 @@ third_party/mbedtls/** -whitespace
 /third_party/icu-data-source/** -whitespace
 # Keep the selected Test262 scripts and original harness byte-identical.
 /third_party/test262-subset/** -whitespace
+
+# Preserve exact pinned upstream font implementation and fixture bytes.
+/third_party/freetype/** -whitespace
+/third_party/harfbuzz/** -whitespace
+/third_party/text-fixtures/** -whitespace

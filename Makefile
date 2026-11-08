@@ -1824,3 +1824,13 @@ $(BUILD)/userland/pixel_demo.chcx: $(BUILD)/userland/pixel_demo.bin $(BUILD)/use
 	python3 tools/mkchcx.py --verify $@
 $(BUILD)/test-gui-protocol $(SAN_DIR)/test-gui-protocol: include/chos/gui_surface.h
 $(BUILD)/userland/cdemo.o $(BUILD)/userland/gui_demo.o $(BUILD)/userland/text_viewer.o $(BUILD)/userland/console.o $(BUILD)/userland/file_manager.o $(BUILD)/userland/browser.o: include/chos/gui_surface.h include/chos/gui_protocol.h
+
+# Font libraries are opt-in native engine dependencies. Their original sources
+# and test inputs are always verified without using a host renderer as evidence.
+.PHONY: test-native-text-sources native-text
+NATIVE_TEXT_OUT ?= $(BUILD)/native-text
+native-text: native-sdk
+	python3 tools/build_native_text.py --native-sdk $(NATIVE_SDK_ROOT) --out $(NATIVE_TEXT_OUT)
+test-native-text-sources:
+	python3 tools/verify_native_text_sources.py
+test: test-native-text-sources

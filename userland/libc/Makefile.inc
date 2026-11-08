@@ -5,7 +5,7 @@ LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/
 CALENDAR_SOURCE_FILES := $(addprefix third_party/musl/src/time/,__tm_to_secs.c __secs_to_tm.c __year_to_secs.c __month_to_secs.c)
 CALENDAR_NATIVE_OBJECTS := $(patsubst third_party/musl/src/time/%.c,$(BUILD)/userland/libc/calendar/%.o,$(CALENDAR_SOURCE_FILES))
 CALENDAR_INCLUDES := -Iuserland/libc/calendar/include
-LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o $(BUILD)/userland/libc/musl_memmem.o $(CALENDAR_NATIVE_OBJECTS)
+LIBC_OBJECTS := $(patsubst %.c,$(BUILD)/%.o,$(LIBC_SOURCES)) $(BUILD)/userland/libc/compiler_rt_emutls.o $(BUILD)/userland/libc/fp_environment.o $(BUILD)/userland/libc/musl_memmem.o $(CALENDAR_NATIVE_OBJECTS) $(BUILD)/userland/libc/setjmp.o $(BUILD)/userland/libc/longjmp.o
 $(BUILD)/userland/libc/fp_environment.o: userland/libc/fp_environment.S
 	@mkdir -p $(dir $@)
 	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) -c $< -o $@
@@ -261,3 +261,22 @@ test-pread-sanitize: $(SAN_DIR)/test-pread
 test: test-pread
 test-sanitize: test-pread-sanitize
 .PHONY: test-pread test-pread-sanitize
+
+# Original AArch64 nonlocal-jump implementation, including callee-saved FP regs.
+$(BUILD)/userland/libc/setjmp.o: third_party/musl/src/setjmp/aarch64/setjmp.s
+	@mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+$(BUILD)/userland/libc/longjmp.o: third_party/musl/src/setjmp/aarch64/longjmp.s
+	@mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+$(BUILD)/userland/setjmp_probe.o: userland/examples/setjmp_probe.S
+	@mkdir -p $(dir $@)
+	$(CC) $(ASFLAGS) -c $< -o $@
+$(BUILD)/userland/setjmp_test.o: userland/examples/setjmp_test.c $(LIBC_HEADERS) userland/libchos/include/chos/user.h
+	@mkdir -p $(dir $@)
+	$(CC) $(filter-out -mgeneral-regs-only,$(USER_CFLAGS)) $(LIBC_INCLUDES) -c $< -o $@
+$(BUILD)/userland/setjmp_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/native_abi.o $(BUILD)/userland/setjmp_test.o $(BUILD)/userland/setjmp_probe.o $(LIBC_OBJECTS) userland/app.ld
+	$(LD) -T userland/app.ld -nostdlib -static --gc-sections -z max-page-size=4096 -o $@ $(filter %.o,$^)
+.PHONY: setjmp-test
+setjmp-test: $(BUILD)/userland/setjmp_test.elf
+test: setjmp-test
