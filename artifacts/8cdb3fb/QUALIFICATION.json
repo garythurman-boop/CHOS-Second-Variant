@@ -1,0 +1,337 @@
+{
+  "status": "PASS",
+  "source_commit": "8cdb3fb2fb8217bbda8d9d3104be1ff11efe2694",
+  "stage3_complete": false,
+  "version": "0.30.0",
+  "clean_guest_profiles": [
+    {
+      "name": "clean-cairo-direct",
+      "returncode": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "2e12fe7115d02c5692adf9c3f9339f193c94421bfe872369ac9e3506488aefbd",
+        "stdlib_sha256": "b8adbad6fb6ae48171751713abc01a8f6fdf77ee80d1e6513437bc30ce270681",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "stdlib_pid": 1,
+            "cairo_pid": 2,
+            "physical_redraw_seconds": [
+              0.8041512950148899,
+              0.7748013979871757
+            ],
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "stdlib_pid": 3,
+            "cairo_pid": 4,
+            "physical_redraw_seconds": [
+              0.773389652982587,
+              0.7723181379842572
+            ],
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "stdlib_pid": 5,
+            "cairo_pid": 6,
+            "physical_redraw_seconds": [
+              0.7888707320089452,
+              0.7713214130199049
+            ],
+            "cold_pages_restored": 110116
+          }
+        ],
+        "checks": [
+          "Actual Cairo1.18.4 with explicit port patches,pixman0.44 and FreeType dependencies in EL0",
+          "Analytic clip/alpha/stride/recording/matrix/error cases and three concurrent native rendering workers",
+          "All131072 pixels for three frames compared with independently built host reference",
+          "Actual physical key redraw,normal exit and exact physical/commit/engine/futex cleanup",
+          "Real native guard-page bounded string copies,recursive static mutex and deterministic atomic rand under three threads"
+        ],
+        "limits": [
+          "Selected software rendering prerequisite;not WebCore/HTML/CSS/DOM or a modern browser",
+          "Cairo low-level glyph API does not supply text shaping;HarfBuzz shaping is separately qualified",
+          "rand is deterministic/noncryptographic;security uses existing real OS entropy",
+          "QEMU only;new Fusion/Pi5/laptop execution NOT RUN;Stage3 incomplete"
+        ]
+      }
+    },
+    {
+      "name": "clean-cairo-uefi",
+      "returncode": 0,
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "2e12fe7115d02c5692adf9c3f9339f193c94421bfe872369ac9e3506488aefbd",
+        "stdlib_sha256": "b8adbad6fb6ae48171751713abc01a8f6fdf77ee80d1e6513437bc30ce270681",
+        "cold_free_pages": 494486,
+        "runs": [
+          {
+            "cycle": 0,
+            "stdlib_pid": 1,
+            "cairo_pid": 2,
+            "physical_redraw_seconds": [
+              0.754377946985187,
+              0.7735558839922305
+            ],
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 1,
+            "stdlib_pid": 3,
+            "cairo_pid": 4,
+            "physical_redraw_seconds": [
+              0.7738072859938256,
+              0.7753030519816093
+            ],
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 2,
+            "stdlib_pid": 5,
+            "cairo_pid": 6,
+            "physical_redraw_seconds": [
+              0.7571582670207135,
+              0.7934525790042244
+            ],
+            "cold_pages_restored": 494486
+          }
+        ],
+        "checks": [
+          "Actual Cairo1.18.4 with explicit port patches,pixman0.44 and FreeType dependencies in EL0",
+          "Analytic clip/alpha/stride/recording/matrix/error cases and three concurrent native rendering workers",
+          "All131072 pixels for three frames compared with independently built host reference",
+          "Actual physical key redraw,normal exit and exact physical/commit/engine/futex cleanup",
+          "Real native guard-page bounded string copies,recursive static mutex and deterministic atomic rand under three threads"
+        ],
+        "limits": [
+          "Selected software rendering prerequisite;not WebCore/HTML/CSS/DOM or a modern browser",
+          "Cairo low-level glyph API does not supply text shaping;HarfBuzz shaping is separately qualified",
+          "rand is deterministic/noncryptographic;security uses existing real OS entropy",
+          "QEMU only;new Fusion/Pi5/laptop execution NOT RUN;Stage3 incomplete"
+        ]
+      }
+    },
+    {
+      "name": "clean-e1000e",
+      "returncode": 0,
+      "result": {
+        "status": "PASS",
+        "backend": "e1000e",
+        "browser_elf_sha256": "989c45f6c06aded8932919ed1865c67e1af73024f361f946799c19a39f726d12",
+        "browser_pid": 1,
+        "requests": [
+          "/redirect",
+          "/page",
+          "/page",
+          "/slow",
+          "/page"
+        ],
+        "dns_queries": [
+          "0463686f7304746573740000010001"
+        ],
+        "checks": [
+          "native Ethernet queues and DHCP",
+          "isolated EL0 browser window bound to its actual process owner",
+          "browser TCP HTTP body and relative redirect",
+          "HTTPS blocked without TLS and no plaintext downgrade",
+          "DNS A query and reply over actual adapter",
+          "actual in-flight HTTP failure on link loss releases its process-owned socket",
+          "DHCP reconnect and new HTTP request in the same isolated browser process"
+        ]
+      }
+    },
+    {
+      "name": "clean-installer",
+      "returncode": 0,
+      "result": {
+        "status": "PASS",
+        "install_seconds": 42.761,
+        "three_key_focus_ms": 452.72,
+        "max_install_step_ms": 10.119,
+        "keyboard_wizard": false,
+        "physical_mode_change": false,
+        "shutdown_seconds": 5.075,
+        "checks": [
+          "no writes before target selection and final confirmation",
+          "guest GPT/FAT32/EFI/CHFS creation and verification",
+          "ISO detached: disk-only desktop and native input",
+          "scheduled shell file write survives a fresh reboot; native editor checked separately",
+          "ESP display request consumed before EBS; physical mode changes or retains safe unsupported-mode fallback",
+          "keyboard focus remains responsive during installation",
+          "installed Setup hidden; actual firmware reset preserves automatically writable storage; shutdown status held >=5 seconds then guest exits"
+        ]
+      }
+    }
+  ],
+  "graphics_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "stage3_complete": false,
+    "host_reference": false,
+    "host_sanitizers": false,
+    "source_manifest_sha256": "20de9bce46de64ce66f21cf81383f0212f61bc34d1546f9481b459683462b413",
+    "font_build_report_sha256": "f90582f03e3ecf503c2033115c42175ed65526d4b5b554319c860e78c5488b30",
+    "font_compilation_SDK_manifest_sha256": "ab7fb0126639c3a783154efa98dcba4c59e46f938d6cab2425783eee0902626a",
+    "SDK_manifest_sha256": "b808906f7af0ad0529584775f253f8596a9dc5d824472b34ceab229cb34f1190",
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/bin/meson",
+        "setup",
+        "--buildtype",
+        "release",
+        "--wrap-mode",
+        "nofallback",
+        "--prefix",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/prefix",
+        "--default-library",
+        "static",
+        "--libdir",
+        "lib",
+        "-Dauto_features=disabled",
+        "--cross-file",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/chos-cross.ini",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/pixman",
+        "/workspace/CHOS-Second-Variant/third_party/pixman",
+        "-Dtls=enabled",
+        "-Da64-neon=enabled",
+        "-Dgnu-inline-asm=enabled"
+      ],
+      [
+        "/workspace/chos-tools/build-python/bin/ninja",
+        "-C",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/pixman",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/bin/meson",
+        "install",
+        "-C",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/pixman"
+      ],
+      [
+        "/workspace/chos-tools/build-python/bin/meson",
+        "setup",
+        "--buildtype",
+        "release",
+        "--wrap-mode",
+        "nofallback",
+        "--prefix",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/prefix",
+        "--default-library",
+        "static",
+        "--libdir",
+        "lib",
+        "-Dauto_features=disabled",
+        "--cross-file",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/chos-cross.ini",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/cairo",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/cairo-source",
+        "-Dfreetype=enabled"
+      ],
+      [
+        "/workspace/chos-tools/build-python/bin/ninja",
+        "-C",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/cairo",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/bin/meson",
+        "install",
+        "-C",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/cairo"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_cairo",
+        "-B",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/application",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DGRAPHICS_PREFIX=/workspace/chos-evidence/native-cairo-20261108/release-graphics/prefix",
+        "-DFONT_PREFIX=/workspace/chos-evidence/native-fonts-20261107/release-text/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/native-cairo-20261108/native-sdk4",
+        "-DCHOS_APPLICATION_PROFILE=engine"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-cairo-20261108/release-graphics/application",
+        "-j4"
+      ]
+    ],
+    "limits": [
+      "Software Cairo/pixman dependency,not WebCore/DOM/HTML/CSS or a modern browser",
+      "Image/recording/observer and explicit FreeType face backend;Fontconfig,PNG,PDF/PS/SVG output,display servers and GPU not supplied by this profile",
+      "Full upstream rendering corpus and production graphics/font isolation remain separate gates"
+    ],
+    "port_patches_sha256": {
+      "cairo-postscript-spool.patch": "912543cd4153159757b2687fc62f6a6ab2ad2d3e486e450e68b2491c08c88835",
+      "cairo-bounded-debug.patch": "bafed8f9d192e1bc249c9789e16f61854761724404eeb4e25da59d1de9432dec"
+    },
+    "returncode": 0,
+    "seconds": 19.02626129600685,
+    "archives": {
+      "libcairo.a": {
+        "bytes": 1576200,
+        "sha256": "cf240fea6533af614ffa844cd885e63ddf00f4484dadb31f7749e97bb7c87f02",
+        "members": 120
+      },
+      "libpixman-1.a": {
+        "bytes": 1023194,
+        "sha256": "d6a43703833555c88177bdf7ea2c63177ee756a0b53c130eebf661fe6f735547",
+        "members": 34
+      }
+    },
+    "fixture_sources": {
+      "tests/native_cairo/main.c": "08579b0e5e865cba846d3a2e52f1460cd91d91812660b7da36bdaea366677f09",
+      "tests/native_cairo/CMakeLists.txt": "bac48330b4c8143ecd32e3d3bd585c73116a59c9598817e2892015b5819e3288"
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-cairo-20261108/release-graphics/application/native_cairo",
+      "sha256": "2e12fe7115d02c5692adf9c3f9339f193c94421bfe872369ac9e3506488aefbd",
+      "bytes": 2673096
+    },
+    "installed_files_sha256": {
+      "include/cairo/cairo-deprecated.h": "873654913917ec9623c0d6f4a940f8ea638c0954cd2c01471df570046bea2bbf",
+      "include/cairo/cairo-features.h": "dbfeea41b326e10e0adad500793fd8a7334d3799649f9080e49ee6ff1a4d9f43",
+      "include/cairo/cairo-ft.h": "12052b31eb03c101bbc05681d9a360b6f314ecb435281edddada02b7a209f48a",
+      "include/cairo/cairo-version.h": "1fd834f4dda391dfc52e485df2126e8f48be70b4ca858bedca03fc2f359cf3c1",
+      "include/cairo/cairo.h": "2648b182afef057343b789551ccb4a0d44398278a7e0a63aaf65246cc7d13e80",
+      "include/pixman-1/pixman-version.h": "08415adaab2069752232c191f09f6f1fca759a8e163d9a98afb74de5ddb27fac",
+      "include/pixman-1/pixman.h": "ef77f6ef29bfde4b4465c4567d32c9b60acb5e3924ec6350fa87bfe847be9527",
+      "lib/libcairo.a": "cf240fea6533af614ffa844cd885e63ddf00f4484dadb31f7749e97bb7c87f02",
+      "lib/libpixman-1.a": "d6a43703833555c88177bdf7ea2c63177ee756a0b53c130eebf661fe6f735547",
+      "lib/pkgconfig/cairo-ft.pc": "e4604e519ef1a6161f07ede594f7bc258535c5617dd80946acfa26d7b2bcc382",
+      "lib/pkgconfig/cairo.pc": "b7624181e4737725ab79fef9e98ee9fc921e17a7dc473f68f31ecffa6d0ebb9a",
+      "lib/pkgconfig/pixman-1.pc": "f9ffaa7892c77bf546f6f1bcb624bb65a74ccb6e3e4ac94753b755721bfbd05c"
+    }
+  },
+  "unpacked_handoff_relink": {
+    "status": "PASS",
+    "archive_sha256": "0d63ebf2685ae8d98b782d8c86a83bf4adeec07aae340b29c78c29fbc73d8c87",
+    "payload_files": 1353,
+    "actual_unpacked_relink_matches_qualified_elf": true,
+    "source_commit": "8cdb3fb2fb8217bbda8d9d3104be1ff11efe2694"
+  },
+  "input_hashes": {
+    "build/chos.elf": "9b43792903e168ac594cc796a14509b2af39cf9bd67f79af1fca061ad2c8bd2c",
+    "build/uefi-kernel/chos.elf": "39424b0f8cab64b3598494d410e3282ea3693be38878bf22e981eaf6328362f9",
+    "build/chos-0.30.0.iso": "ca1c770f5451a6b4bdfd14f5038800bbda84284d2e783300bd2b11a2f1894ea3",
+    "build/chos-0.30.0-installed.img": "528fd2f0ad5107cc8831f88bc6f6315ed685adf8908c293e534cde6b8aeb79f1"
+  },
+  "diagnostic_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+  "limits": [
+    "Software graphics prerequisite;not WebCore/HTML/CSS/DOM or the modern browser",
+    "NativePi5WiFi,production browser policy,full standards/performance and independent new hardware qualification remain open",
+    "Diagnostic has no installer;normal installation media separate;version0.50.0reserved for all gates"
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "source_commit": "8cdb3fb2fb8217bbda8d9d3104be1ff11efe2694",
+  "tag": "build-8cdb3fb",
+  "inputs": {
+    "iso_sha256": "ca1c770f5451a6b4bdfd14f5038800bbda84284d2e783300bd2b11a2f1894ea3"
+  },
+  "assets": [
+    {
+      "name": "CHOS-Fusion-8cdb3fb.iso",
+      "sha256": "ca1c770f5451a6b4bdfd14f5038800bbda84284d2e783300bd2b11a2f1894ea3",
+      "bytes": 33603584
+    },
+    {
+      "name": "CHOS-8cdb3fb-prepared.img.gz",
+      "sha256": "48aa448b6cd53f9b04504c7e9643194cce7f6703b20620c2dbab50a32288de84",
+      "bytes": 2165010,
+      "uncompressed_sha256": "528fd2f0ad5107cc8831f88bc6f6315ed685adf8908c293e534cde6b8aeb79f1",
+      "uncompressed_bytes": 268435456
+    },
+    {
+      "name": "CHOS-8cdb3fb-kernel-direct.elf.gz",
+      "sha256": "b82076a1ccf7b6f7cd3fe5f7de3b785ee6d2721069f2ba71d267a81f00a81d60",
+      "bytes": 1795690,
+      "uncompressed_sha256": "9b43792903e168ac594cc796a14509b2af39cf9bd67f79af1fca061ad2c8bd2c",
+      "uncompressed_bytes": 7106760
+    },
+    {
+      "name": "CHOS-8cdb3fb-kernel-uefi.elf.gz",
+      "sha256": "6531fb9fa0f96fc5a67f92d38c9600a26ca9d17bff49995dc78c0aeaefb7adf8",
+      "bytes": 1798373,
+      "uncompressed_sha256": "39424b0f8cab64b3598494d410e3282ea3693be38878bf22e981eaf6328362f9",
+      "uncompressed_bytes": 7115408
+    },
+    {
+      "name": "BOOTAA64.EFI",
+      "sha256": "fd66929b9bfecdd584443d72cde9d3edfbec22771db058b5a0db53ad3f458a8c",
+      "bytes": 16896
+    },
+    {
+      "name": "CHOS-8cdb3fb-source.zip",
+      "sha256": "d9ab763f9a7dc812ce21a135a6865237b57e8572f2239fb61c3d2e3d318ac635",
+      "bytes": 50096633
+    },
+    {
+      "name": "CHOS-Fusion-8cdb3fb-Handoff.zip",
+      "sha256": "0d63ebf2685ae8d98b782d8c86a83bf4adeec07aae340b29c78c29fbc73d8c87",
+      "bytes": 91693683
+    },
+    {
+      "name": "CHOS-Native-Cairo-8cdb3fb.iso",
+      "bytes": 67158016,
+      "sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7"
+    },
+    {
+      "name": "TESTING.md",
+      "bytes": 2770,
+      "sha256": "7b5b78b7178badddf32022baa855d66ebcacb27fc55a7f1233d0349744a5816a"
+    },
+    {
+      "name": "CAIRO-PREVIEW.png",
+      "bytes": 47238,
+      "sha256": "c180f3297843f7fafc6b20d7a5751c6e1bba76604b3a179c023e36a9fb01ffec"
+    },
+    {
+      "name": "QUALIFICATION.json",
+      "bytes": 14305,
+      "sha256": "211206911343aae530d84e9c6207141f21f884f015dcb66494c2ccaa79b7379b"
+    }
+  ]
+}
