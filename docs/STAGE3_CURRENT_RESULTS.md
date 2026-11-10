@@ -1,6 +1,8 @@
 # Revised Stage 3 current evidence
 
-Stage 3 remains incomplete. The new [native text checkpoint](NATIVE_TEXT_RENDERING.md)
+Stage 3 remains incomplete. The new [Cairo/pixman checkpoint](NATIVE_CAIRO_RENDERING.md)
+adds real software graphics with native threads and owned window presentation.
+It is a rendering dependency, not WebCore or a modern browser. The preceding [native text checkpoint](NATIVE_TEXT_RENDERING.md)
 adds real FreeType/HarfBuzz/ICU shaping and rasterization, actual JavaScript-produced
 Unicode strings and native nonlocal recovery. This is a font prerequisite, not
 WebCore/browser integration. The preceding [owned-pixel checkpoint](NATIVE_PIXEL_SURFACES.md)
@@ -24,7 +26,7 @@ suite qualification and regression evidence are recorded separately in
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
 | Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads, foreign pause and explicit engine reservation/image/stack profile; real native RunLoop and selected async engine execution |
-| Modern browser | Native FreeType/HarfBuzz/ICU text and owned pixel presentation and actual JavaScript image data; original-ICU JSC selected Test262/checked Wasm/watchdog/async execution; full conformance, WebCore rendering and browser application features remain open |
+| Modern browser | Cairo/pixman software graphics, native FreeType/HarfBuzz/ICU text and owned pixel presentation and actual JavaScript image data; original-ICU JSC selected Test262/checked Wasm/watchdog/async execution; full conformance, WebCore rendering and browser application features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
 | Release | Development 0.30.0; 0.50.0 requires all revised gates |

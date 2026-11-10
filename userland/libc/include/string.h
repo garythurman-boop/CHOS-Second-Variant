@@ -13,6 +13,9 @@ void *memchr(const void *,int,size_t);
 void *memmem(const void *,size_t,const void *,size_t);
 size_t strlen(const char *);
 size_t strnlen(const char *,size_t);
+/* Independently allocated, NUL-terminated copies; caller owns the result. */
+char *strdup(const char *);
+char *strndup(const char *,size_t);
 int strcmp(const char *,const char *);
 int strncmp(const char *,const char *,size_t);
 char *strcpy(char *,const char *);

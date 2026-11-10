@@ -4,7 +4,7 @@ Current downloadable ISO and related files: **[GitHub build downloads](artifacts
 Source is pushed each completed iteration. During Stage 3, binary downloads are
 published at selected verified milestones useful for user testing.
 
-Current rendering work: [native font shaping and JavaScript-produced Unicode text](docs/NATIVE_TEXT_RENDERING.md), following [owned pixel surfaces](docs/NATIVE_PIXEL_SURFACES.md). This is a prerequisite for WebCore, which does not yet render pages. Stage 3 remains incomplete.
+Current rendering work: [native Cairo/pixman graphics](docs/NATIVE_CAIRO_RENDERING.md), [font shaping and JavaScript-produced Unicode text](docs/NATIVE_TEXT_RENDERING.md), and [owned pixel surfaces](docs/NATIVE_PIXEL_SURFACES.md). This is a prerequisite for WebCore, which does not yet render pages. Stage 3 remains incomplete.
 
 Current Stage 3 work: the actual original-ICU JavaScriptCore engine runs selected
 Test262, checked WebAssembly, native asynchronous compilation and script watchdog

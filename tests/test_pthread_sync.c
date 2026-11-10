@@ -45,6 +45,12 @@ static void abandon_initializer(void){
      * then validates the flag separately rather than returning into once. */
 }
 int main(void){
+    pthread_mutex_t recursive=PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+    assert(!pthread_mutex_lock(&recursive)&&!pthread_mutex_trylock(&recursive));
+    assert(recursive.depth==2);current=1;assert(pthread_mutex_trylock(&recursive)==EBUSY);
+    assert(pthread_mutex_unlock(&recursive)==EPERM);current=0;
+    assert(!pthread_mutex_unlock(&recursive)&&recursive.depth==1);
+    assert(!pthread_mutex_unlock(&recursive)&&!pthread_mutex_destroy(&recursive));
     pthread_mutexattr_t ma;pthread_mutex_t m=PTHREAD_MUTEX_INITIALIZER;
     assert(pthread_mutex_lock(0)==EINVAL);assert(!pthread_mutexattr_init(&ma));
     assert(pthread_mutexattr_settype(&ma,3)==EINVAL);

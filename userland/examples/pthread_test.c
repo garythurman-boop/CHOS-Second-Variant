@@ -29,6 +29,12 @@ static void *worker(void *p){
   memset(data,(int)(a->index+1),n);unsigned char *grown=realloc(data,n+117);if(!grown)return (void *)6;
   for(size_t j=0;j<n;j++)if(grown[j]!=(unsigned char)(a->index+1))return (void *)7;
   free(grown);
+  if(!(i&31u)){
+   char source[]="owned-string";char *whole=strdup(source),*prefix=strndup(source,5);
+   if(!whole||!prefix||strcmp(whole,source)||strcmp(prefix,"owned"))return (void *)12;
+   source[0]='X';if(whole[0]!='o'||prefix[0]!='o')return (void *)13;
+   free(whole);free(prefix);
+  }
   if((i&31u)==0){if(malloc(SIZE_MAX)!=0||errno!=ENOMEM)return (void *)8;errno=expected;}
   if(pthread_mutex_lock(&mutex))return (void *)9;
   ++count;if(!(i&15u))chos_yield();pthread_mutex_unlock(&mutex);
@@ -46,6 +52,11 @@ static void *join_main(void *p){
 }
 int main(int argc,char **argv){
  pthread_t self=pthread_self();CHECK(self&&pthread_equal(self,pthread_self()));errno=42;
+ pthread_mutex_t recursive=PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
+ CHECK(!pthread_mutex_lock(&recursive)&&!pthread_mutex_trylock(&recursive));
+ CHECK(recursive.depth==2&&pthread_mutex_destroy(&recursive)==EBUSY);
+ CHECK(!pthread_mutex_unlock(&recursive)&&recursive.depth==1);
+ CHECK(!pthread_mutex_unlock(&recursive)&&!pthread_mutex_destroy(&recursive));
  void *untouched=(void *)0x55;CHECK(pthread_join(self,&untouched)==EDEADLK&&untouched==(void *)0x55);
  if(argc>1&&!strcmp(argv[1],"main-exit")){
   pthread_t t;CHECK(!pthread_create(&t,0,join_main,(void *)(uintptr_t)self));pthread_exit((void *)0x1234);

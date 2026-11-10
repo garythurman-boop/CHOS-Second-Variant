@@ -7,6 +7,7 @@ typedef struct {long long quot,rem;} lldiv_t;
 #define EXIT_SUCCESS 0
 #define EXIT_FAILURE 1
 #define MB_CUR_MAX ((size_t)4)
+#define RAND_MAX 2147483647
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,6 +15,9 @@ extern "C" {
  * an application may supply its own NULL-terminated table through environ. */
 extern char **environ;
 char *getenv(const char *);
+/* Deterministic noncryptographic PRNG. Security callers must use OS entropy. */
+int rand(void);
+void srand(unsigned);
 void *malloc(size_t);
 void free(void *);
 void *calloc(size_t,size_t);

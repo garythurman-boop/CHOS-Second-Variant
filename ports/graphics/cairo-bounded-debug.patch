@@ -1,0 +1,17 @@
+--- a/src/cairo-recording-surface.c
++++ b/src/cairo-recording-surface.c
+@@ -1,3 +1,4 @@
++/* CHOS port modification (2026-11-10): Use bounded formatting for the recording debug buffer. */
+ /* -*- Mode: c; tab-width: 8; c-basic-offset: 4; indent-tabs-mode: t; -*- */
+ /* cairo - a vector graphics library with display and print output
+  *
+@@ -2880,7 +2881,8 @@
+ 	    source_region_id  = region_element->source_id;
+ 	    mask_region_id = region_element->mask_id;
+ 	}
+-	sprintf (common + strlen(common), " op: %s", _cairo_debug_operator_to_string (command->header.op));
++	snprintf (common + strlen(common), sizeof(common) - strlen(common),
++		  " op: %s", _cairo_debug_operator_to_string (command->header.op));
+ 
+ 	switch (command->header.type) {
+ 	    case CAIRO_COMMAND_PAINT:

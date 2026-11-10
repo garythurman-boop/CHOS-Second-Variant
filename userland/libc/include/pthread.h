@@ -26,6 +26,8 @@ typedef struct { uint32_t magic;size_t stack_bytes;int detached; } pthread_attr_
 typedef struct { uint32_t state;int type;uintptr_t owner;uint32_t depth,magic; } pthread_mutex_t;
 typedef struct { uint32_t sequence,waiters,magic;clockid_t clock; } pthread_cond_t;
 #define PTHREAD_MUTEX_INITIALIZER {0,PTHREAD_MUTEX_NORMAL,0,0,CHOS_MUTEX_MAGIC}
+/* GNU extension, using the same real recursive-lock state as mutex attributes. */
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP {0,PTHREAD_MUTEX_RECURSIVE,0,0,CHOS_MUTEX_MAGIC}
 #define PTHREAD_COND_INITIALIZER {0,0,CHOS_COND_MAGIC,CLOCK_REALTIME}
 #ifdef __cplusplus
 extern "C" {

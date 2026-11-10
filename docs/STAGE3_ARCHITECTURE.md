@@ -1,5 +1,7 @@
 # Revised Stage 3: internet platform architecture
 
+Current graphics checkpoint: [native Cairo/pixman software rendering](NATIVE_CAIRO_RENDERING.md) adds real vector/image composition and explicit FreeType glyphs in isolated windows. This is a WebCore dependency; full engine/browser and wireless gates remain open.
+
 Current text checkpoint: [native FreeType/HarfBuzz shaping and rasterization](NATIVE_TEXT_RENDERING.md). Real JavaScript-produced Unicode text is drawn into owned native images. Full WebCore/HTML/CSS integration, production browser policy and native Wi-Fi remain unfinished; Stage 3 is incomplete at 0.30.0.
 
 Current rendering checkpoint: [owned native pixel surfaces and actual JavaScript image data](NATIVE_PIXEL_SURFACES.md). Isolated clients can display complete owned images, and the real JSC engine computes typed-array pixels with keyboard-driven redraw. The original184-byte GUI event ABI remains intact. This is not WebCore/HTML/CSS or the modern browser; remaining revised Stage3 gates stay open at0.30.0.

@@ -15,3 +15,9 @@ third_party/mbedtls/** -whitespace
 /third_party/freetype/** -whitespace
 /third_party/harfbuzz/** -whitespace
 /third_party/text-fixtures/** -whitespace
+# Preserve exact original software graphics sources and licenses.
+/third_party/cairo/** -whitespace
+/third_party/pixman/** -whitespace
+/ports/graphics/*.patch -whitespace
+# Original NEWS uses seven '=' signs as historical date underlines.
+/third_party/cairo/NEWS conflict-marker-size=32

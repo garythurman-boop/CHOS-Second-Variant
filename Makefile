@@ -1834,3 +1834,8 @@ native-text: native-sdk
 test-native-text-sources:
 	python3 tools/verify_native_text_sources.py
 test: test-native-text-sources
+
+.PHONY: test-native-graphics-sources
+test-native-graphics-sources:
+	python3 tools/verify_native_graphics_sources.py
+test: test-native-graphics-sources

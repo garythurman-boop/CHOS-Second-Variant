@@ -1,6 +1,6 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iinclude -Iuserland/libc/include
-LIBC_SOURCES := userland/libc/pread.c userland/libc/strings.c userland/libc/calendar.c userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
+LIBC_SOURCES := userland/libc/pread.c userland/libc/strings.c userland/libc/calendar.c userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/string_alloc.c userland/libc/prng.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
 LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h) include/chos/user_memory_limits.h include/chos/memory_api.h
 CALENDAR_SOURCE_FILES := $(addprefix third_party/musl/src/time/,__tm_to_secs.c __secs_to_tm.c __year_to_secs.c __month_to_secs.c)
 CALENDAR_NATIVE_OBJECTS := $(patsubst third_party/musl/src/time/%.c,$(BUILD)/userland/libc/calendar/%.o,$(CALENDAR_SOURCE_FILES))
@@ -280,3 +280,33 @@ $(BUILD)/userland/setjmp_test.elf: $(BUILD)/userland/start.o $(BUILD)/userland/n
 .PHONY: setjmp-test
 setjmp-test: $(BUILD)/userland/setjmp_test.elf
 test: setjmp-test
+
+STRING_ALLOC_HOST_FLAGS := -DCHOS_HOST_TEST -Dstrdup=chos_test_strdup -Dstrndup=chos_test_strndup -Dmalloc=chos_test_malloc
+$(BUILD)/test-string-alloc: tests/test_string_alloc.c userland/libc/string_alloc.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 -fno-builtin $(STRING_ALLOC_HOST_FLAGS) $(LIBC_INCLUDES) tests/test_string_alloc.c userland/libc/string_alloc.c -o $@
+$(SAN_DIR)/test-string-alloc: tests/test_string_alloc.c userland/libc/string_alloc.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -fno-builtin $(STRING_ALLOC_HOST_FLAGS) $(LIBC_INCLUDES) tests/test_string_alloc.c userland/libc/string_alloc.c -o $@
+test-string-alloc: $(BUILD)/test-string-alloc
+	./$(BUILD)/test-string-alloc
+test-string-alloc-sanitize: $(SAN_DIR)/test-string-alloc
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-string-alloc
+test: test-string-alloc
+test-sanitize: test-string-alloc-sanitize
+.PHONY: test-string-alloc test-string-alloc-sanitize
+
+STDLIB_EXT_HOST_FLAGS := -D_GNU_SOURCE=1 -DCHOS_STDLIB_HOST=1 -Drand=chos_test_rand -Dsrand=chos_test_srand -Dstrdup=chos_test_strdup -Dstrndup=chos_test_strndup
+$(BUILD)/test-stdlib-ext: tests/native_stdlib/main.c userland/libc/prng.c userland/libc/string_alloc.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -std=c11 -Wall -Wextra -Werror -O2 -fno-builtin $(STDLIB_EXT_HOST_FLAGS) $^ -pthread -o $@
+$(SAN_DIR)/test-stdlib-ext: tests/native_stdlib/main.c userland/libc/prng.c userland/libc/string_alloc.c
+	@mkdir -p $(dir $@)
+	$(CC_HOST) $(SAN_FLAGS) -fno-builtin $(STDLIB_EXT_HOST_FLAGS) $^ -pthread -o $@
+test-stdlib-ext: $(BUILD)/test-stdlib-ext
+	./$(BUILD)/test-stdlib-ext
+test-stdlib-ext-sanitize: $(SAN_DIR)/test-stdlib-ext
+	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-stdlib-ext
+test: test-stdlib-ext
+test-sanitize: test-stdlib-ext-sanitize
+.PHONY: test-stdlib-ext test-stdlib-ext-sanitize
