@@ -1839,3 +1839,13 @@ test: test-native-text-sources
 test-native-graphics-sources:
 	python3 tools/verify_native_graphics_sources.py
 test: test-native-graphics-sources
+
+# The native codec build is opt-in; original implementation and reference
+# inventories are checked by the normal host suite without a network download.
+.PHONY: test-native-png-sources native-png
+NATIVE_PNG_OUT ?= $(BUILD)/native-png
+native-png: native-sdk
+	python3 tools/build_native_png.py --native-sdk $(NATIVE_SDK_ROOT) --out $(NATIVE_PNG_OUT)
+test-native-png-sources:
+	python3 tools/verify_native_png_sources.py
+test: test-native-png-sources

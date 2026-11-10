@@ -1,0 +1,16 @@
+[GNUPG:] NEWSIG
+[GNUPG:] KEY_CONSIDERED 5ED46A6721D365587791E2AA783FCD8E58BCAFBA 0
+[GNUPG:] SIG_ID 1CYUyX/6gDop6yxH8qY2TzuiioQ 2026-11-05 1793862063
+[GNUPG:] GOODSIG 783FCD8E58BCAFBA Mark Adler <madler@alumni.caltech.edu>
+[GNUPG:] NOTATION_NAME manu
+[GNUPG:] NOTATION_FLAGS 0 1
+[GNUPG:] NOTATION_DATA 2,2.5+1.12,0,3
+[GNUPG:] VALIDSIG 5ED46A6721D365587791E2AA783FCD8E58BCAFBA 2026-11-05 1793862063 0 4 0 17 2 00 5ED46A6721D365587791E2AA783FCD8E58BCAFBA
+[GNUPG:] TRUST_UNDEFINED 0 pgp
+gpg: Signature made Thu Nov  5 07:01:03 2026 UTC
+gpg:                using DSA key 5ED46A6721D365587791E2AA783FCD8E58BCAFBA
+gpg: Good signature from "Mark Adler <madler@alumni.caltech.edu>" [unknown]
+gpg: Signature notation: manu=2,2.5+1.12,0,3
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 5ED4 6A67 21D3 6558 7791  E2AA 783F CD8E 58BC AFBA

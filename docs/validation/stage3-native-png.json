@@ -1,0 +1,1272 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "platform": "native isolated AArch64 CHOS ABI",
+  "libraries": {
+    "libpng": "1.6.59",
+    "zlib": "1.4,documented Z_SOLO memory-stream profile"
+  },
+  "source_manifest_sha256": "2e349a9d4116346903a6be755874049b80be8d64c51e74b815ec0f949e5de459",
+  "native_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "stage3_complete": false,
+    "host_reference": false,
+    "host_sanitizers": false,
+    "SDK_manifest_sha256": "b808906f7af0ad0529584775f253f8596a9dc5d824472b34ceab229cb34f1190",
+    "source_manifest_sha256": "2e349a9d4116346903a6be755874049b80be8d64c51e74b815ec0f949e5de459",
+    "port_and_fixture_sources": {
+      "ports/png/zlib-memory/CMakeLists.txt": "0012c251fef454041902aa27f3c61cc58193ea42832841dcd0fa9feac59ececa",
+      "ports/png/native-utc.patch": "4ed0f692df67e93c63c754572dd958a3b733911e4bdd48bb52b17477b87313f9",
+      "tests/native_png/main.c": "14fa2ef1ec7671ba546699ab05d2c3664ebb8225d2fe13441ba8ab39458101b0",
+      "tests/native_png/CMakeLists.txt": "3368fe18de30de44cd9b5af4141c075fb26adfeacee885df1db2796f6fc09210",
+      "tools/generate_png_cases.py": "239f2e7e06e392bd1679c4c7d30e46c879476762d85eacc9533f0faa0c68d0fe",
+      "tools/build_native_png.py": "818a4a98b84d00e560f8413aaf91481253d0b8d5480bbaf2f4b718a4228cd8ba",
+      "tools/verify_native_png_sources.py": "c9b6615a7db83501cfebbf1b913dcdcb9034900dceb40851413c73491d20643c"
+    },
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-png-20261110/target7/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/native-cairo-20261108/native-sdk4",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/png/zlib-memory",
+        "-B",
+        "/workspace/chos-evidence/native-png-20261110/target7/zlib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-png-20261110/target7/zlib",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-png-20261110/target7/zlib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-png-20261110/target7/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/native-cairo-20261108/native-sdk4",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/chos-evidence/native-png-20261110/target7/png-source",
+        "-B",
+        "/workspace/chos-evidence/native-png-20261110/target7/png",
+        "-DPNG_SHARED=OFF",
+        "-DPNG_STATIC=ON",
+        "-DPNG_TESTS=OFF",
+        "-DPNG_TOOLS=OFF",
+        "-DPNG_LIBCONF_HEADER=/workspace/chos-evidence/native-png-20261110/target7/png-source/scripts/pnglibconf.h.prebuilt",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG -DZ_SOLO=1",
+        "-DZLIB_LIBRARY=/workspace/chos-evidence/native-png-20261110/target7/prefix/lib/libz-memory.a",
+        "-DZLIB_INCLUDE_DIR=/workspace/chos-evidence/native-png-20261110/target7/prefix/include",
+        "-DCMAKE_INSTALL_LIBDIR=lib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-png-20261110/target7/png",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-png-20261110/target7/png"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/tools/generate_png_cases.py",
+        "--out",
+        "/workspace/chos-evidence/native-png-20261110/target7/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-png-20261110/target7/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/native-cairo-20261108/native-sdk4",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_png",
+        "-B",
+        "/workspace/chos-evidence/native-png-20261110/target7/application",
+        "-DPNG_PREFIX=/workspace/chos-evidence/native-png-20261110/target7/prefix",
+        "-DPNG_ARCHIVE=/workspace/chos-evidence/native-png-20261110/target7/prefix/lib/liblibpng16_static.a",
+        "-DPNG_CASES=/workspace/chos-evidence/native-png-20261110/target7/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-png-20261110/target7/application",
+        "-j4"
+      ]
+    ],
+    "limits": [
+      "PNG/zlib memory-stream prerequisite,not WebCore or full browser integration",
+      "Z_SOLO requires actual caller allocation callbacks;no gzip-file or compress/uncompress utility API",
+      "Selected RGBA8 sample normalization;ICC/gamma management and APNG playback not qualified",
+      "Selected corpus/bound/error tests do not constitute production hostile-content security or full upstream conformance"
+    ],
+    "returncode": 0,
+    "seconds": 5.908769033005228,
+    "archives": {
+      "liblibpng16_static.a": {
+        "members": 18,
+        "bytes": 447108,
+        "sha256": "f119b39caa2e1d058015d5a6911e24823101bdaaf7333e430aa46ebae9833905"
+      },
+      "libz-memory.a": {
+        "members": 9,
+        "bytes": 113856,
+        "sha256": "39312bef560e28c85bfaa0475eb8cb1e34b1aa29f8e43e491ef9a0342bb9c952"
+      }
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-png-20261110/target7/application/native_png",
+      "bytes": 1128984,
+      "sha256": "aec4a3b2e8152e9fb4b12426f57922b0d9bc9a9db09a7b0943d1264fba8977d1"
+    },
+    "cases_manifest_sha256": "f8613e4ff133bc6d51e68b9687d0f2cb1f00a1039c0a0aa81098133d5106fd22",
+    "installed_files_sha256": {
+      "bin/libpng-config": "9be4f3493cc9f66b0f2f449d36f40cc71c91e2bab3dcb0a3e41b530897197eb1",
+      "bin/libpng16-config": "9be4f3493cc9f66b0f2f449d36f40cc71c91e2bab3dcb0a3e41b530897197eb1",
+      "include/libpng16/png.h": "5758258cb691e429bafbf16057210e2d9bfa2c33b6c4636a6db562480f39b273",
+      "include/libpng16/pngconf.h": "3f1d9e8b05ec5165b65744f99af0ef3d0d10d77d6866551715b80ac884a0bf47",
+      "include/libpng16/pnglibconf.h": "4172045bef3f4032089a697f18758e24e02a3873851108409f00dadf6deb2530",
+      "include/png.h": "5758258cb691e429bafbf16057210e2d9bfa2c33b6c4636a6db562480f39b273",
+      "include/pngconf.h": "3f1d9e8b05ec5165b65744f99af0ef3d0d10d77d6866551715b80ac884a0bf47",
+      "include/pnglibconf.h": "4172045bef3f4032089a697f18758e24e02a3873851108409f00dadf6deb2530",
+      "include/zconf.h": "1e91041e94e3f13a12b770be849c4c674e37caddf94e37acddf853bb54a09adf",
+      "include/zlib.h": "2c404dcaa08709c2a129aea18f3dad4fb5acc5cb52ef12b6223bf8e78c195801",
+      "lib/cmake/PNG/PNGConfig.cmake": "658ffa30d7073e31f4c4194b83496cc03835d7340e84eda324f308345751874d",
+      "lib/cmake/PNG/PNGConfigVersion.cmake": "7770ec916a594f527f30eb3db48a38d94a3da47a5bc36f7940288b629fab2924",
+      "lib/cmake/PNG/PNGTargets-release.cmake": "d73e7027c014a4f7862e7a446573e65a6782b42f6889ce162303425592faf36a",
+      "lib/cmake/PNG/PNGTargets.cmake": "eb39c458120e2fbf1aea1e8ccec61ce74b55fdaaec1d12db3a4d5534de2299f2",
+      "lib/liblibpng16_static.a": "f119b39caa2e1d058015d5a6911e24823101bdaaf7333e430aa46ebae9833905",
+      "lib/libpng/libpng16-release.cmake": "0ea236296a92262fd696683a064ffe694ce6ecb2c618ef80ae950642ad2cee2d",
+      "lib/libpng/libpng16.cmake": "f26cc3665d19c703e1f0618c4c657c4fa36ab43453b527768227f6a09f8bd047",
+      "lib/libpng.a": "f119b39caa2e1d058015d5a6911e24823101bdaaf7333e430aa46ebae9833905",
+      "lib/libz-memory.a": "39312bef560e28c85bfaa0475eb8cb1e34b1aa29f8e43e491ef9a0342bb9c952",
+      "lib/pkgconfig/libpng.pc": "7ce764827bd4bf085a68849ab647ec9cbde7464f16411787333d0c285a35327e",
+      "lib/pkgconfig/libpng16.pc": "7ce764827bd4bf085a68849ab647ec9cbde7464f16411787333d0c285a35327e",
+      "share/man/man3/libpng.3": "b3c56e67e230a7c797fd53e0fe4b2f263b04592ca89f4f9402c68b6c0a850468",
+      "share/man/man3/libpngpf.3": "d61e076de6d7d399e9e7eb01c7b3db82e7fbdb6486be0aa504dda1b9af6a2466",
+      "share/man/man5/png.5": "96c35b86725d42b66afb031ebd4dc065672b6f4239fb1c48ff6fba80a72c98b9"
+    }
+  },
+  "host_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "stage3_complete": false,
+    "host_reference": true,
+    "host_sanitizers": true,
+    "SDK_manifest_sha256": null,
+    "source_manifest_sha256": "2e349a9d4116346903a6be755874049b80be8d64c51e74b815ec0f949e5de459",
+    "port_and_fixture_sources": {
+      "ports/png/zlib-memory/CMakeLists.txt": "0012c251fef454041902aa27f3c61cc58193ea42832841dcd0fa9feac59ececa",
+      "ports/png/native-utc.patch": "4ed0f692df67e93c63c754572dd958a3b733911e4bdd48bb52b17477b87313f9",
+      "tests/native_png/main.c": "14fa2ef1ec7671ba546699ab05d2c3664ebb8225d2fe13441ba8ab39458101b0",
+      "tests/native_png/CMakeLists.txt": "3368fe18de30de44cd9b5af4141c075fb26adfeacee885df1db2796f6fc09210",
+      "tools/generate_png_cases.py": "239f2e7e06e392bd1679c4c7d30e46c879476762d85eacc9533f0faa0c68d0fe",
+      "tools/build_native_png.py": "818a4a98b84d00e560f8413aaf91481253d0b8d5480bbaf2f4b718a4228cd8ba",
+      "tools/verify_native_png_sources.py": "c9b6615a7db83501cfebbf1b913dcdcb9034900dceb40851413c73491d20643c"
+    },
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-png-20261110/host7/prefix",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/png/zlib-memory",
+        "-B",
+        "/workspace/chos-evidence/native-png-20261110/host7/zlib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-png-20261110/host7/zlib",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-png-20261110/host7/zlib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-png-20261110/host7/prefix",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/chos-evidence/native-png-20261110/host7/png-source",
+        "-B",
+        "/workspace/chos-evidence/native-png-20261110/host7/png",
+        "-DPNG_SHARED=OFF",
+        "-DPNG_STATIC=ON",
+        "-DPNG_TESTS=OFF",
+        "-DPNG_TOOLS=OFF",
+        "-DPNG_LIBCONF_HEADER=/workspace/chos-evidence/native-png-20261110/host7/png-source/scripts/pnglibconf.h.prebuilt",
+        "-DCMAKE_C_FLAGS_RELEASE=-O3 -DNDEBUG -DZ_SOLO=1",
+        "-DZLIB_LIBRARY=/workspace/chos-evidence/native-png-20261110/host7/prefix/lib/libz-memory.a",
+        "-DZLIB_INCLUDE_DIR=/workspace/chos-evidence/native-png-20261110/host7/prefix/include",
+        "-DCMAKE_INSTALL_LIBDIR=lib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-png-20261110/host7/png",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-png-20261110/host7/png"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/tools/generate_png_cases.py",
+        "--out",
+        "/workspace/chos-evidence/native-png-20261110/host7/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-png-20261110/host7/prefix",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_png",
+        "-B",
+        "/workspace/chos-evidence/native-png-20261110/host7/application",
+        "-DPNG_PREFIX=/workspace/chos-evidence/native-png-20261110/host7/prefix",
+        "-DPNG_ARCHIVE=/workspace/chos-evidence/native-png-20261110/host7/prefix/lib/libpng16.a",
+        "-DPNG_CASES=/workspace/chos-evidence/native-png-20261110/host7/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-png-20261110/host7/application",
+        "-j4"
+      ]
+    ],
+    "limits": [
+      "PNG/zlib memory-stream prerequisite,not WebCore or full browser integration",
+      "Z_SOLO requires actual caller allocation callbacks;no gzip-file or compress/uncompress utility API",
+      "Selected RGBA8 sample normalization;ICC/gamma management and APNG playback not qualified",
+      "Selected corpus/bound/error tests do not constitute production hostile-content security or full upstream conformance"
+    ],
+    "returncode": 0,
+    "seconds": 11.720996816002298,
+    "archives": {
+      "libpng16.a": {
+        "members": 17,
+        "bytes": 5343218,
+        "sha256": "c865355fd10cd98b6129a982ba023a04cd64efbc1b4fdc6d7c7ac687b0759c3c"
+      },
+      "libz-memory.a": {
+        "members": 9,
+        "bytes": 2538656,
+        "sha256": "6ca449bab98e1508c348cb413b11c70b156204b9f3dfb5cb32c451885ab42de2"
+      }
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-png-20261110/host7/application/native_png",
+      "bytes": 7219224,
+      "sha256": "8ad476cd28566fbb166433ef0b34726ba8859a15812077a6ee411a896d06fea3"
+    },
+    "cases_manifest_sha256": "f8613e4ff133bc6d51e68b9687d0f2cb1f00a1039c0a0aa81098133d5106fd22",
+    "installed_files_sha256": {
+      "bin/libpng-config": "b7c253da9e3fe99d06641a7957c85c5d1d8dce368e2ae82ffab7decac12df624",
+      "bin/libpng16-config": "b7c253da9e3fe99d06641a7957c85c5d1d8dce368e2ae82ffab7decac12df624",
+      "include/libpng16/png.h": "5758258cb691e429bafbf16057210e2d9bfa2c33b6c4636a6db562480f39b273",
+      "include/libpng16/pngconf.h": "3f1d9e8b05ec5165b65744f99af0ef3d0d10d77d6866551715b80ac884a0bf47",
+      "include/libpng16/pnglibconf.h": "4172045bef3f4032089a697f18758e24e02a3873851108409f00dadf6deb2530",
+      "include/png.h": "5758258cb691e429bafbf16057210e2d9bfa2c33b6c4636a6db562480f39b273",
+      "include/pngconf.h": "3f1d9e8b05ec5165b65744f99af0ef3d0d10d77d6866551715b80ac884a0bf47",
+      "include/pnglibconf.h": "4172045bef3f4032089a697f18758e24e02a3873851108409f00dadf6deb2530",
+      "include/zconf.h": "1e91041e94e3f13a12b770be849c4c674e37caddf94e37acddf853bb54a09adf",
+      "include/zlib.h": "2c404dcaa08709c2a129aea18f3dad4fb5acc5cb52ef12b6223bf8e78c195801",
+      "lib/cmake/PNG/PNGConfig.cmake": "658ffa30d7073e31f4c4194b83496cc03835d7340e84eda324f308345751874d",
+      "lib/cmake/PNG/PNGConfigVersion.cmake": "7770ec916a594f527f30eb3db48a38d94a3da47a5bc36f7940288b629fab2924",
+      "lib/cmake/PNG/PNGTargets-release.cmake": "edd3ada05234d9c905034c3ef805ab352f8c9d15a46bf2b62e6a38da39d4e79a",
+      "lib/cmake/PNG/PNGTargets.cmake": "d6c7abdfdad03d24e0b5b28aeb29af0abe45ee10483f730116f22eaa63de19f3",
+      "lib/libpng/libpng16-release.cmake": "7e4bc7d01580c18e544a28a20c8ce1f7dbd59c2e483ed47d2b40f5ae35cc44b2",
+      "lib/libpng/libpng16.cmake": "a6a63aa6e2d2bf03ab7048749b513c755f9d58b4fd9ed356b0d1a5ca18d6d16b",
+      "lib/libpng.a": "c865355fd10cd98b6129a982ba023a04cd64efbc1b4fdc6d7c7ac687b0759c3c",
+      "lib/libpng16.a": "c865355fd10cd98b6129a982ba023a04cd64efbc1b4fdc6d7c7ac687b0759c3c",
+      "lib/libz-memory.a": "6ca449bab98e1508c348cb413b11c70b156204b9f3dfb5cb32c451885ab42de2",
+      "lib/pkgconfig/libpng.pc": "4f87b746852ca2f2927056ad95036e83f645431f35ec71ce20e2c0cd1d2df646",
+      "lib/pkgconfig/libpng16.pc": "4f87b746852ca2f2927056ad95036e83f645431f35ec71ce20e2c0cd1d2df646",
+      "share/man/man3/libpng.3": "b3c56e67e230a7c797fd53e0fe4b2f263b04592ca89f4f9402c68b6c0a850468",
+      "share/man/man3/libpngpf.3": "d61e076de6d7d399e9e7eb01c7b3db82e7fbdb6486be0aa504dda1b9af6a2466",
+      "share/man/man5/png.5": "96c35b86725d42b66afb031ebd4dc065672b6f4239fb1c48ff6fba80a72c98b9"
+    }
+  },
+  "independent_pixel_reference": {
+    "host_reference": "PyPNG0.20220715.0,independent from target libpng",
+    "normalization": "Straight encoded sample-space RGBA8,16-bit samples scaled to8;no sBIT rescaling,ICC/gamma transform or bKGD composition",
+    "original_pngsuite_cases": 51,
+    "cases": [
+      {
+        "name": "basn0g01.png",
+        "encoded_sha256": "c23c1848002082e128f533dc3c24a49fc57329293cc1468cc9dc36339b1abcac",
+        "bytes": 164,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "661985e83f94a569510ded43e65edb11f4ced1121c611209f7abe9a9c40c71a8",
+        "RGBA8_FNV64": "0xf76ab9c2cc275b5d",
+        "bitdepth": 1,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn0g02.png",
+        "encoded_sha256": "833dd137ab757d1aaa138148d82f3ee8109efb423a80918f47c7889b56fd8e83",
+        "bytes": 104,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "166bd68377b119b5e93e73ef554e35de7471bdd2fc3bc2070f0f7bd5be82ae97",
+        "RGBA8_FNV64": "0x100bbcf53d1fd325",
+        "bitdepth": 2,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn0g04.png",
+        "encoded_sha256": "4e0cc6742bb06cfa379323266f699a54dc483bf735288e68527d94b4f97c1f30",
+        "bytes": 145,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "b05a4bc8e7079c8aa0e491086ccb156dd4bdbc67e57bb8c9d803d7e75778da9e",
+        "RGBA8_FNV64": "0xca83a263da76ab25",
+        "bitdepth": 4,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn0g08.png",
+        "encoded_sha256": "85b19fcda452d6cbf02f570c353cfa9e47c29237f2fc8f0114deb6cd0b23f97a",
+        "bytes": 138,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "982faa277e83f73ca15b491e67eb41fa25526418ed23e057a9986c4f620eb158",
+        "RGBA8_FNV64": "0x11ed8979ce4d7b4d",
+        "bitdepth": 8,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn0g16.png",
+        "encoded_sha256": "f26eb27e99300829c42c0832acd26fa499e0f317cb4d6f165e6663024b16bf6c",
+        "bytes": 167,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "f17fa71e5e62a73b92827381f39e2702752ced03372d568b853ae1914b9dd047",
+        "RGBA8_FNV64": "0x785e25109704327c",
+        "bitdepth": 16,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn2c08.png",
+        "encoded_sha256": "ecea1ef4a001a999ce9b82d18abf47401eb92998708b306b6c9a8ac3a6a9a2c8",
+        "bytes": 145,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "23a53c674ec50d5a5eb9c3f679b6b19ba5304ae99dff76801bec4939e0f0c99e",
+        "RGBA8_FNV64": "0x6d0a594462868f25",
+        "bitdepth": 8,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn2c16.png",
+        "encoded_sha256": "71179d2905aadb86adc25de7f737869b52e80e154c5335f5e6b614942515b2d4",
+        "bytes": 302,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "a9dff6085fe81eea37100681e299a0504206137521dc59d592d87fa73b18c917",
+        "RGBA8_FNV64": "0x14fba4b7a7c90773",
+        "bitdepth": 16,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn3p01.png",
+        "encoded_sha256": "d3831ba7c495e0fb20ebf03bd7cf02766c1dc5f1a09dd1f3336e536ac9f1cd42",
+        "bytes": 112,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "614996feb597f62b913614a57be5ce64eea97efc57cd55bbba535d2f61716833",
+        "RGBA8_FNV64": "0x83e9607069333725",
+        "bitdepth": 1,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn3p02.png",
+        "encoded_sha256": "784508d49be8187c6e0126f942cce65202616384f7d0a3a112d8ce01c6c8a413",
+        "bytes": 146,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "a383497791948d8b7ae8f9158fb7b4e9fead4693814ee758a97bc426dc9a27cf",
+        "RGBA8_FNV64": "0xe1b97808c557cb25",
+        "bitdepth": 2,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": [
+          1,
+          1,
+          1
+        ]
+      },
+      {
+        "name": "basn3p04.png",
+        "encoded_sha256": "96e34367290e1776aa4b5971272d6df136cf530baced82c63569b56adc021b16",
+        "bytes": 216,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "a7abc212cf1a44c85df377773f3722dc118f0c4159df89fdac2dfe6911abe378",
+        "RGBA8_FNV64": "0x817fff880b5d72c5",
+        "bitdepth": 4,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": [
+          4,
+          4,
+          4
+        ]
+      },
+      {
+        "name": "basn3p08.png",
+        "encoded_sha256": "eca1db90338a8481e4d3f2469befa06d7564534e9323b6a8040ed0cdd281d952",
+        "bytes": 1286,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "b1c3302eceae6738c36edafa98c8054824d9440f3ba53a3f17cc81d29acc32cc",
+        "RGBA8_FNV64": "0x3733a8885d80db25",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn4a08.png",
+        "encoded_sha256": "377a67510b4ccc74cdcce14847b02035e75ccab36e9d8e00586c4c24d1ae385a",
+        "bytes": 126,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "76b94a71d3c183a362c2cf6a46ebb50adc9d3a25a89bc0afc46fda6dbb002509",
+        "RGBA8_FNV64": "0x4b4e70fc7720494d",
+        "bitdepth": 8,
+        "color_type": 4,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn4a16.png",
+        "encoded_sha256": "51896523625b1ffea7464e954e13cfff1c596c8e2c46925270dc408315e7fe71",
+        "bytes": 2206,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "e071c0ea344f34b0070c2402329ec5f165c33566b082440aa8268ac69fa86e6d",
+        "RGBA8_FNV64": "0x3fd7053b16ac1f45",
+        "bitdepth": 16,
+        "color_type": 4,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn6a08.png",
+        "encoded_sha256": "756a03364c02e3c9f85d6f4029eb3cef2488c081dc537d46e102bebcb9e02732",
+        "bytes": 184,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "2eb6a2cb3166e9c188add371157e9f81caa18fdf34d218844ed930b53b7431d2",
+        "RGBA8_FNV64": "0xf9ed41b6375b125d",
+        "bitdepth": 8,
+        "color_type": 6,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "basn6a16.png",
+        "encoded_sha256": "569040d3237a5552935a44b8bbe165cf02afe0d71caf30fba81955922ac9373f",
+        "bytes": 3435,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "3daad02ebc3eb86835c0acee955564e7fd62d2a9f37dd6230632f7655f8f8c1b",
+        "RGBA8_FNV64": "0xfc79b1d0c1759f1",
+        "bitdepth": 16,
+        "color_type": 6,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbbn0g01.png",
+        "encoded_sha256": "401b527775e56254434ba0acbdf25111823b2c8812665665e36b420f4532831f",
+        "bytes": 176,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "c73695617cce3921284eca9d03d97359d06afadfd4678e2bf2d796a41df6e576",
+        "RGBA8_FNV64": "0x375832c5d544f7a1",
+        "bitdepth": 1,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbbn0g02.png",
+        "encoded_sha256": "7f75074fb427b8b2342b504012f272c52e82a27474cf65c2f6b19b05cd67b2e6",
+        "bytes": 197,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "67a65ae5365537288ffb9e5879f91bffc7a4cda2938c4cd93c0e33aff6b3301e",
+        "RGBA8_FNV64": "0xa515a0f40cc67686",
+        "bitdepth": 2,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbbn0g04.png",
+        "encoded_sha256": "c5e7eeaffa677bfac002ee968a0423e0fea3be7701d39ccd6a015df1d2d85e40",
+        "bytes": 429,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "1c36e9d46fe44582f94be4db7d79d58ea259b0b2a59c7f3328974d0222bfaa97",
+        "RGBA8_FNV64": "0x39883b6d2d852264",
+        "bitdepth": 4,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbbn2c16.png",
+        "encoded_sha256": "8fcfd031a5b716201854fdab25691feed6cd3ed7b713a51b94e1f43fc63fe0c1",
+        "bytes": 2041,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "053eb9d28b7ac85c3639b5169a175df61856cef7ffdaa7ad218cafdde9646d08",
+        "RGBA8_FNV64": "0x1e1f86e420f8ad04",
+        "bitdepth": 16,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbbn3p08.png",
+        "encoded_sha256": "8eb43a6020fda8ed7c8c9b88b974ef794ee8452db29212ae7e5c11003bfd76a3",
+        "bytes": 1499,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbgn2c16.png",
+        "encoded_sha256": "49711ee271f96099521b83b75d58ed2f76d42ed46cb3c06656fde2cad697cf59",
+        "bytes": 2041,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "053eb9d28b7ac85c3639b5169a175df61856cef7ffdaa7ad218cafdde9646d08",
+        "RGBA8_FNV64": "0x1e1f86e420f8ad04",
+        "bitdepth": 16,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbgn3p08.png",
+        "encoded_sha256": "6f798628935a021fe446dce3d62861d1f7369aaf01bad10daa4917c5abccad7d",
+        "bytes": 1499,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbrn2c08.png",
+        "encoded_sha256": "8223d8b0c5f84b149f0c1f0e1f658346e07fcbd03ffc02b2e9eeea1481eb19bf",
+        "bytes": 1633,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "053eb9d28b7ac85c3639b5169a175df61856cef7ffdaa7ad218cafdde9646d08",
+        "RGBA8_FNV64": "0x1e1f86e420f8ad04",
+        "bitdepth": 8,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbwn0g16.png",
+        "encoded_sha256": "01e86f108b244bdee4d72e384aced8a62369965ca2993ee6ef88f131c647f7d1",
+        "bytes": 1313,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "09955bf2743754d1ad36a26e03d07b18be2e1875ff75d23e8fd1905b4dfe0599",
+        "RGBA8_FNV64": "0xe92f2104ef56df4d",
+        "bitdepth": 16,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbwn3p08.png",
+        "encoded_sha256": "978b28cec43bd219517083b63661bb30a7b9cdf9fd4476ab4e70844565980d51",
+        "bytes": 1496,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftbyn3p08.png",
+        "encoded_sha256": "7b4eb64b4bd7eb36417752873ddaca027ce77a07f474b2af569f4eea1e984111",
+        "bytes": 1499,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftp0n0g08.png",
+        "encoded_sha256": "a253e055d8cd94049cd95e9392e7aa60f3d5c922a8f0cccb84762b0c5f547545",
+        "bytes": 719,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "6930bf323b5f045b6977f99ce52c2082b781bc067aac66e53dad71a627784e0b",
+        "RGBA8_FNV64": "0x162fa510b7ff822e",
+        "bitdepth": 8,
+        "color_type": 0,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftp0n2c08.png",
+        "encoded_sha256": "5dced3fde56b950e61ce86f4ad54458336f66389ce8ca68524d4fd8ec546ff5b",
+        "bytes": 1594,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "13421e1c169afaeb1e1170ed5c1dd26dee7d37a38d14c427f89171bb0a80bb3f",
+        "RGBA8_FNV64": "0xcca7d2a511030be9",
+        "bitdepth": 8,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftp0n3p08.png",
+        "encoded_sha256": "da40ddb18bd45db32ed03dc89e2250b096d808efe975a88477e4f5a91a4677c9",
+        "bytes": 1476,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "fcfd3c6af7fcfc3f3bcca2fed5f85c8b2ff9ee495a5190d20110141b4250eb2e",
+        "RGBA8_FNV64": "0xfd1fa2a0c996ef7f",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ftp1n3p08.png",
+        "encoded_sha256": "50bc927fe6cf1816454a7c27f8c743734be8db45e37e5ee3ede540f4e895e6c5",
+        "bytes": 1483,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn0g08.png",
+        "encoded_sha256": "75387bec61ea3fe41cd25045378683ed9bcd34a5a02f7dd77da60235b28dac3b",
+        "bytes": 237,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "982faa277e83f73ca15b491e67eb41fa25526418ed23e057a9986c4f620eb158",
+        "RGBA8_FNV64": "0x11ed8979ce4d7b4d",
+        "bitdepth": 8,
+        "color_type": 0,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn0g16.png",
+        "encoded_sha256": "dbd3442baced21b4a8fedfbb6aff4092c3ca9130c5d08ec89ce7dd8d02166139",
+        "bytes": 274,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "f17fa71e5e62a73b92827381f39e2702752ced03372d568b853ae1914b9dd047",
+        "RGBA8_FNV64": "0x785e25109704327c",
+        "bitdepth": 16,
+        "color_type": 0,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn2c08.png",
+        "encoded_sha256": "67ac80581c63559889a9f5d5ba8f70ab1e77d304a2e54b916dd23953bf7d3fc7",
+        "bytes": 299,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "23a53c674ec50d5a5eb9c3f679b6b19ba5304ae99dff76801bec4939e0f0c99e",
+        "RGBA8_FNV64": "0x6d0a594462868f25",
+        "bitdepth": 8,
+        "color_type": 2,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn2c16.png",
+        "encoded_sha256": "7dcf933f1920c4564756596a8b2b7118d0dd4394f95173e32a79c5275e3c9d0e",
+        "bytes": 558,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "a9dff6085fe81eea37100681e299a0504206137521dc59d592d87fa73b18c917",
+        "RGBA8_FNV64": "0x14fba4b7a7c90773",
+        "bitdepth": 16,
+        "color_type": 2,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn3p08.png",
+        "encoded_sha256": "b91d91eeee3efef90bf9a4730422c3e39a07d163afba8567ab870ab91418d1c8",
+        "bytes": 1492,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "b1c3302eceae6738c36edafa98c8054824d9440f3ba53a3f17cc81d29acc32cc",
+        "RGBA8_FNV64": "0x3733a8885d80db25",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn4a08.png",
+        "encoded_sha256": "cf7543f7077d3fab986e03b73808fe68173a56d20cf1457b50d0e4ef05391694",
+        "bytes": 198,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "76b94a71d3c183a362c2cf6a46ebb50adc9d3a25a89bc0afc46fda6dbb002509",
+        "RGBA8_FNV64": "0x4b4e70fc7720494d",
+        "bitdepth": 8,
+        "color_type": 4,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn4a16.png",
+        "encoded_sha256": "11b160d4ec5b43b430f7587bee0f01a6ec5a9087b0f611d90805dff4f9e25b8d",
+        "bytes": 2839,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "e071c0ea344f34b0070c2402329ec5f165c33566b082440aa8268ac69fa86e6d",
+        "RGBA8_FNV64": "0x3fd7053b16ac1f45",
+        "bitdepth": 16,
+        "color_type": 4,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn6a08.png",
+        "encoded_sha256": "30e559de4768346e8f55b340b0f29ca17b259e2da2de614f1fb21d4f747dd396",
+        "bytes": 339,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "2eb6a2cb3166e9c188add371157e9f81caa18fdf34d218844ed930b53b7431d2",
+        "RGBA8_FNV64": "0xf9ed41b6375b125d",
+        "bitdepth": 8,
+        "color_type": 6,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "ibasn6a16.png",
+        "encoded_sha256": "35eea9e75f8a4abb003a5f6c265078ef779856c75f5d68fda26ec55f322f497d",
+        "bytes": 4164,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "3daad02ebc3eb86835c0acee955564e7fd62d2a9f37dd6230632f7655f8f8c1b",
+        "RGBA8_FNV64": "0xfc79b1d0c1759f1",
+        "bitdepth": 16,
+        "color_type": 6,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftbbn2c16.png",
+        "encoded_sha256": "733a3f940d41b320ae884ba74339bc94ec8ad5f5a37479ea23b19c1e7b0d0274",
+        "bytes": 2624,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "053eb9d28b7ac85c3639b5169a175df61856cef7ffdaa7ad218cafdde9646d08",
+        "RGBA8_FNV64": "0x1e1f86e420f8ad04",
+        "bitdepth": 16,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "iftbbn3p08.png",
+        "encoded_sha256": "4dd0ef44d942aa43fdd57a4a56c794201d27b2f6228008927db0a4f3d469bffb",
+        "bytes": 1507,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftbgn2c16.png",
+        "encoded_sha256": "733a3f940d41b320ae884ba74339bc94ec8ad5f5a37479ea23b19c1e7b0d0274",
+        "bytes": 2624,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "053eb9d28b7ac85c3639b5169a175df61856cef7ffdaa7ad218cafdde9646d08",
+        "RGBA8_FNV64": "0x1e1f86e420f8ad04",
+        "bitdepth": 16,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "iftbgn3p08.png",
+        "encoded_sha256": "4dd0ef44d942aa43fdd57a4a56c794201d27b2f6228008927db0a4f3d469bffb",
+        "bytes": 1507,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftbrn2c08.png",
+        "encoded_sha256": "d98223a9a3084f34609bb5dbf55b5ca156559743240bef3406466775a9950e9d",
+        "bytes": 1624,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "053eb9d28b7ac85c3639b5169a175df61856cef7ffdaa7ad218cafdde9646d08",
+        "RGBA8_FNV64": "0x1e1f86e420f8ad04",
+        "bitdepth": 8,
+        "color_type": 2,
+        "interlace": 0,
+        "sBIT": null
+      },
+      {
+        "name": "iftbwn0g16.png",
+        "encoded_sha256": "8367d01b7d0f926f6c89d6e545735a50cd35815ba7c13367ad5b0489069bd735",
+        "bytes": 1448,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "09955bf2743754d1ad36a26e03d07b18be2e1875ff75d23e8fd1905b4dfe0599",
+        "RGBA8_FNV64": "0xe92f2104ef56df4d",
+        "bitdepth": 16,
+        "color_type": 0,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftbwn3p08.png",
+        "encoded_sha256": "4dd0ef44d942aa43fdd57a4a56c794201d27b2f6228008927db0a4f3d469bffb",
+        "bytes": 1507,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftbyn3p08.png",
+        "encoded_sha256": "4dd0ef44d942aa43fdd57a4a56c794201d27b2f6228008927db0a4f3d469bffb",
+        "bytes": 1507,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftp0n0g08.png",
+        "encoded_sha256": "497c7e4babca68371b11291bdbb4d682e397dc586d0dabad5cd349da76cf2bb7",
+        "bytes": 847,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "6930bf323b5f045b6977f99ce52c2082b781bc067aac66e53dad71a627784e0b",
+        "RGBA8_FNV64": "0x162fa510b7ff822e",
+        "bitdepth": 8,
+        "color_type": 0,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftp0n2c08.png",
+        "encoded_sha256": "da119c4c2c4aa520ae32473d6f789d5f0602ae9f39c033971cdc6a95a29bfbaa",
+        "bytes": 2020,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "13421e1c169afaeb1e1170ed5c1dd26dee7d37a38d14c427f89171bb0a80bb3f",
+        "RGBA8_FNV64": "0xcca7d2a511030be9",
+        "bitdepth": 8,
+        "color_type": 2,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftp0n3p08.png",
+        "encoded_sha256": "c3d318f544fe2a54bd252bffffd1c4c5f79cb3d0f863b9bd12052d88fbf1bf3b",
+        "bytes": 1495,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "fcfd3c6af7fcfc3f3bcca2fed5f85c8b2ff9ee495a5190d20110141b4250eb2e",
+        "RGBA8_FNV64": "0xfd1fa2a0c996ef7f",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "iftp1n3p08.png",
+        "encoded_sha256": "4dd0ef44d942aa43fdd57a4a56c794201d27b2f6228008927db0a4f3d469bffb",
+        "bytes": 1507,
+        "width": 32,
+        "height": 32,
+        "RGBA8_sha256": "444403e441924fcd036c85bac271d92d399859bbba3dceb82f29ff90811fb138",
+        "RGBA8_FNV64": "0x6cdff609c65aac37",
+        "bitdepth": 8,
+        "color_type": 3,
+        "interlace": 1,
+        "sBIT": null
+      },
+      {
+        "name": "pngtest.png",
+        "encoded_sha256": "b7a468324556bf6924058acb0fb477320355da0d864728e614be83ffa6966148",
+        "bytes": 8831,
+        "width": 91,
+        "height": 69,
+        "RGBA8_sha256": "a8adc4b0c6c6b43eb25aedcf8124c96a4b177d29e7b5ef1e8912629ae245b6bc",
+        "RGBA8_FNV64": "0xf8be1096b4f7d466",
+        "bitdepth": 8,
+        "color_type": 6,
+        "interlace": 1,
+        "sBIT": [
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      {
+        "name": "large.png",
+        "encoded_sha256": "3dd4cb37346ca90bdf4e943adc4dcd1a41ab745c14d3a67b3fde0b95f2921199",
+        "bytes": 778687,
+        "width": 1024,
+        "height": 768,
+        "RGBA8_sha256": "330542380a861e926b7a6954e05fc14209a56c710fca58ddfa01528c8ee75bf8",
+        "RGBA8_FNV64": "0x14210fef5c571325",
+        "bitdepth": 8,
+        "color_type": 6,
+        "interlace": 0,
+        "sBIT": null
+      }
+    ]
+  },
+  "qualified_guests": {
+    "direct7": {
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "aec4a3b2e8152e9fb4b12426f57922b0d9bc9a9db09a7b0943d1264fba8977d1",
+        "cases_manifest_sha256": "f8613e4ff133bc6d51e68b9687d0f2cb1f00a1039c0a0aa81098133d5106fd22",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "seconds": 1.579938580020098,
+            "positive_cases": 53,
+            "cold_pages_restored": 110116,
+            "peak_decode_bytes": 3209866
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "seconds": 1.563603824004531,
+            "positive_cases": 53,
+            "cold_pages_restored": 110116,
+            "peak_decode_bytes": 3209866
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "seconds": 1.7871198409993667,
+            "positive_cases": 53,
+            "cold_pages_restored": 110116,
+            "peak_decode_bytes": 3209866
+          }
+        ],
+        "checks": [
+          "53 real PNG image dimensions and complete RGBA8 hashes match independent PyPNG reference",
+          "Selected palette/gray/RGB/alpha/transparency,8/16-bit,interlace cases and1024x768 output",
+          "Strict input CRCs,truncation,dimension and memory bounds,every allocation failure in pngtest decode",
+          "209 progressive image deliveries at1,7,64,1024-byte fragments,Adam7 combination and progressive failure cleanup",
+          "Three real pthread workers,separate decoder recovery state and caller-owned UTC calendars",
+          "Normal exit0 and exact physical-page,engine,committed-frame and futex cleanup"
+        ],
+        "limits": [
+          "Selected memory-stream codec prerequisite;not WebCore/browser integration or full upstream conformance",
+          "Encoded sample-space policy;no sBIT rescaling,ICC/gamma management or APNG playback qualification",
+          "Output uses separately bounded rows;large contiguous engine image buffers remain open",
+          "QEMU only;new Fusion,Pi5 and laptop execution NOT RUN;Stage3 incomplete"
+        ]
+      },
+      "boot_artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      },
+      "serial_sha256": "23eabdfddedc7356199f9dcd707be5126404cb626ab3d7a4e460a08e9e0dee9a"
+    },
+    "uefi7": {
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "aec4a3b2e8152e9fb4b12426f57922b0d9bc9a9db09a7b0943d1264fba8977d1",
+        "cases_manifest_sha256": "f8613e4ff133bc6d51e68b9687d0f2cb1f00a1039c0a0aa81098133d5106fd22",
+        "cold_free_pages": 494486,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "seconds": 1.6635541979921982,
+            "positive_cases": 53,
+            "cold_pages_restored": 494486,
+            "peak_decode_bytes": 3209866
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "seconds": 1.6628451219876297,
+            "positive_cases": 53,
+            "cold_pages_restored": 494486,
+            "peak_decode_bytes": 3209866
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "seconds": 1.7644241490052082,
+            "positive_cases": 53,
+            "cold_pages_restored": 494486,
+            "peak_decode_bytes": 3209866
+          }
+        ],
+        "checks": [
+          "53 real PNG image dimensions and complete RGBA8 hashes match independent PyPNG reference",
+          "Selected palette/gray/RGB/alpha/transparency,8/16-bit,interlace cases and1024x768 output",
+          "Strict input CRCs,truncation,dimension and memory bounds,every allocation failure in pngtest decode",
+          "209 progressive image deliveries at1,7,64,1024-byte fragments,Adam7 combination and progressive failure cleanup",
+          "Three real pthread workers,separate decoder recovery state and caller-owned UTC calendars",
+          "Normal exit0 and exact physical-page,engine,committed-frame and futex cleanup"
+        ],
+        "limits": [
+          "Selected memory-stream codec prerequisite;not WebCore/browser integration or full upstream conformance",
+          "Encoded sample-space policy;no sBIT rescaling,ICC/gamma management or APNG playback qualification",
+          "Output uses separately bounded rows;large contiguous engine image buffers remain open",
+          "QEMU only;new Fusion,Pi5 and laptop execution NOT RUN;Stage3 incomplete"
+        ]
+      },
+      "boot_artifacts": {
+        "kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "iso_sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7",
+        "iso_embedded_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "kernel_symbols_match_iso": true
+      },
+      "serial_sha256": "52379eb4f4c89910df805bd60ee8ccfdf2b8f25f0088bf6f665a458202bc5475"
+    }
+  },
+  "regression": {
+    "e1000e": {
+      "status": "PASS",
+      "backend": "e1000e",
+      "browser_elf_sha256": "989c45f6c06aded8932919ed1865c67e1af73024f361f946799c19a39f726d12",
+      "browser_pid": 1,
+      "requests": [
+        "/redirect",
+        "/page",
+        "/page",
+        "/slow",
+        "/page"
+      ],
+      "dns_queries": [
+        "0463686f7304746573740000010001"
+      ],
+      "checks": [
+        "native Ethernet queues and DHCP",
+        "isolated EL0 browser window bound to its actual process owner",
+        "browser TCP HTTP body and relative redirect",
+        "HTTPS blocked without TLS and no plaintext downgrade",
+        "DNS A query and reply over actual adapter",
+        "actual in-flight HTTP failure on link loss releases its process-owned socket",
+        "DHCP reconnect and new HTTP request in the same isolated browser process"
+      ]
+    },
+    "e1000e_boot_artifacts": {
+      "kernel_sha256": "c879ee35cf286a04451236284b4e2ab648f3bfc67d5932ee22ac5d9bab5a050c",
+      "iso_sha256": "e31768f23c24d0c9197a9820a668767eea4b1e849187ccaa9b73a3cd0d3e7a46",
+      "iso_embedded_kernel_sha256": "c879ee35cf286a04451236284b4e2ab648f3bfc67d5932ee22ac5d9bab5a050c",
+      "kernel_symbols_match_iso": true
+    },
+    "e1000e_serial_sha256": "865f7f6e4a63d2d20dc7692e748cc774aa8417a0da5ea9ac218dd9a77fa15ff5"
+  },
+  "host_tests": {
+    "PNG_ASAN_UBSAN_LeakSanitizer": {
+      "status": "PASS",
+      "returncode": 0,
+      "log_sha256": "d399156aee1e0f19e8658ccb58eb60e17db072ba269d14955b4490b2f8112b09",
+      "positive_classic_images": 53,
+      "progressive_deliveries_per_run": 209
+    },
+    "repository_host": {
+      "status": "PASS",
+      "returncode": 0,
+      "log_sha256": "776021b8ee462d4a54b081c81aab2102958a78feceed1cc946649594f7bfeac0"
+    },
+    "repository_sanitizers": {
+      "status": "PASS",
+      "returncode": 0,
+      "log_sha256": "b0f9cf46c44bbc35094e3358e146387dbbef3896494404f186b721438b6e933e"
+    }
+  },
+  "consumer_policy": {
+    "input_max_bytes": 2097152,
+    "width_max": 1024,
+    "height_max": 768,
+    "charged_allocation_budget_bytes": 8388608,
+    "allocation_records": 1024,
+    "ancillary_chunk_allocation_max_bytes": 65536,
+    "chunk_cache_max": 32,
+    "context_and_input_in_addition_to_charged_budget": true,
+    "warning_and_benign_errors": "fatal",
+    "normalization": "encoded-sample RGBA8,16-bit scaled to8;no sBIT rescale,ICC/gamma or bKGD composition"
+  },
+  "retained_failures": [
+    {
+      "attempt": "full zlib file profile",
+      "result": "build stopped at absent native fcntl.h",
+      "resolution": "Selected documented Z_SOLO memory-stream profile with actual caller allocators;full file API remains unavailable."
+    },
+    {
+      "attempt": "initial upstream libpng default CMake custom preprocessor",
+      "result": "Cross compiler invocation omitted target",
+      "resolution": "Select original upstream documented prebuilt configuration header for cross compilation."
+    },
+    {
+      "attempt": "host1 pixel comparison",
+      "log_sha256": "45d22a84785e27327ec176ef09c33b8a45f84adb2ff7a8afaa5357c29297bcc4",
+      "result": "pngtest.png differed because oracle convenience API rescales sBIT significant bits",
+      "resolution": "Both decoders now explicitly preserve encoded sample space;unchanged original PNG bytes;exact hashes still required."
+    },
+    {
+      "attempt": "host4/direct4 damaged deflate",
+      "host_log_sha256": "1b0a3e84fa9f6138d23b7049078392f6d9c969cc7e797ea269d07d67a4fea826",
+      "native_result_sha256": "41ea4e0829c11a7dfaa67c56c9e3107f61cb1c5934ceddd72b273d74ef480d8b",
+      "result": "Progressive reader accepted damaged ADLER32 once final row completed;test CHECK early-return also leaked its temporary8831-byte input copy.",
+      "resolution": "Consumer warnings must be fatal;test temporary inputs now freed before reporting a failed rejection."
+    },
+    {
+      "attempt": "host5/direct5 benign-errors-fatal only",
+      "host_log_sha256": "0d59f00b6afe8784e699ef7194fcdbff34d9d1bf864e6311e1f95e0fca0403ca",
+      "native_result_sha256": "467bd93b1549d4048c67659316ae285b2b0f73c9f2f558a972a0731f7ea7aea2",
+      "result": "png_set_benign_errors(0) did not cover ordinary progressive warning branch",
+      "resolution": "Make ordinary warnings fatal too;final native and sanitized host tests reject damaged stream."
+    },
+    {
+      "attempt": "repository host,default sandbox",
+      "log_sha256": "1636e5e6cdecfe0ca324865f5b8ca875bedfdf5a81a1919ccdd10b20ed797cc4",
+      "result": "Localhost HTTP fixture socket creation denied",
+      "resolution": "Identical full suite rerun with permitted local sockets;PASS."
+    },
+    {
+      "attempt": "repository sanitizers,default sandbox",
+      "log_sha256": "70bb5ca5d6851989aadd0f5f0d19a101082da735b61a941b767f2416eef19d13",
+      "result": "LeakSanitizer thread inspection unavailable under sandbox ptrace",
+      "resolution": "Identical sanitizer suite rerun with actual thread inspection;PASS;no checks disabled."
+    }
+  ],
+  "limits": [
+    "Codec and strict reference consumer prerequisite;modern browser/WebCore does not use it yet",
+    "Selected corpus and errors,not full PNG conformance,fuzzing,production hostile-content isolation or full zlib API",
+    "No ICC/gamma management,APNG playback or other image-format qualification",
+    "Output rows are separate bounded allocations;large contiguous WebCore image buffers remain open",
+    "Production browser TLS/trust/time/update and permissions/isolation gates remain open",
+    "Native Pi5 SDIO/firmware/authentication/radio and independent Fusion/Pi5/laptop qualification remain open",
+    "Source-only milestone;published Cairo user-test binaries preserved"
+  ]
+}

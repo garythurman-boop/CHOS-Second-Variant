@@ -1,0 +1,6 @@
+object cd952f49f95bb27154ae77dbb103032d95f6e580
+type commit
+tag v1.6.59
+tagger Cosmin Truta <ctruta@gmail.com> 1790639904 +0300
+
+Release libpng version 1.6.59

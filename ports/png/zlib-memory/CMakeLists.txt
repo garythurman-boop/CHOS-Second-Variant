@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSZlibMemory LANGUAGES C)
+get_filename_component(CHOS_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+set(ZROOT "${CHOS_ROOT}/third_party/zlib")
+# The upstream documented embedded profile has no file/utility API and requires
+# actual caller-provided allocators. libpng supplies its real zalloc/zfree pair.
+set(NAMES adler32 crc32 deflate inflate infback inftrees inffast trees zutil)
+set(SOURCES)
+foreach(NAME IN LISTS NAMES)
+    list(APPEND SOURCES "${ZROOT}/${NAME}.c")
+endforeach()
+add_library(chos-z-memory STATIC ${SOURCES})
+set_target_properties(chos-z-memory PROPERTIES OUTPUT_NAME z-memory)
+target_include_directories(chos-z-memory PUBLIC "${ZROOT}")
+target_compile_definitions(chos-z-memory PUBLIC Z_SOLO=1)
+install(TARGETS chos-z-memory ARCHIVE DESTINATION lib)
+install(FILES "${ZROOT}/zlib.h" "${ZROOT}/zconf.h" DESTINATION include)

@@ -1,0 +1,16 @@
+[GNUPG:] NEWSIG
+[GNUPG:] KEY_CONSIDERED 1FED507E3236B4A6E53E922BB292C64843FF5BCF 0
+[GNUPG:] SIG_ID OpW59xayv0YLManqomQOHSZJjGI 2026-09-28 1790639907
+[GNUPG:] GOODSIG B292C64843FF5BCF Cosmin Truta <ctruta@gmail.com>
+[GNUPG:] NOTATION_NAME manu
+[GNUPG:] NOTATION_FLAGS 0 1
+[GNUPG:] NOTATION_DATA 2,2.5+1.12,0,3
+[GNUPG:] VALIDSIG 1FED507E3236B4A6E53E922BB292C64843FF5BCF 2026-09-28 1790639907 0 4 0 22 10 00 1FED507E3236B4A6E53E922BB292C64843FF5BCF
+[GNUPG:] TRUST_UNDEFINED 0 pgp
+gpg: Signature made Mon Sep 28 23:58:27 2026 UTC
+gpg:                using EDDSA key 1FED507E3236B4A6E53E922BB292C64843FF5BCF
+gpg: Good signature from "Cosmin Truta <ctruta@gmail.com>" [unknown]
+gpg: Signature notation: manu=2,2.5+1.12,0,3
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 1FED 507E 3236 B4A6 E53E  922B B292 C648 43FF 5BCF

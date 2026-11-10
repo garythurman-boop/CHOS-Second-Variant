@@ -21,3 +21,8 @@ third_party/mbedtls/** -whitespace
 /ports/graphics/*.patch -whitespace
 # Original NEWS uses seven '=' signs as historical date underlines.
 /third_party/cairo/NEWS conflict-marker-size=32
+# Retain exact authenticated codec/reference sources and license bytes.
+/third_party/zlib/** -whitespace
+/third_party/libpng/** -whitespace
+/third_party/png-reference/** -whitespace
+/ports/png/*.patch -whitespace
