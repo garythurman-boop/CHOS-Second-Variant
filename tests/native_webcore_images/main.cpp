@@ -73,6 +73,36 @@ static bool invalid(bool jpeg){
     auto d=decoder(jpeg);auto input=SharedBuffer::create(std::span<const uint8_t>(bytes));d->setData(input.get(),true);
     auto surface=d->createFrameImageAtIndex(0);CHECK(!surface&&d->failed());return true;
 }
+static bool large_image(){
+    const size_t length=large_end-large_start;
+    for(unsigned mode=0;mode<2;++mode){
+        PlatformImagePtr held;
+        {
+            auto d=decoder(false);
+            if(mode){
+                const size_t cuts[]={1,7,33,length/3,length-1,length};
+                for(size_t end:cuts){
+                    auto input=SharedBuffer::create(std::span<const uint8_t>(large_start,end));
+                    d->setData(input.get(),end==length);CHECK(!d->failed());
+                    if(d->isSizeAvailable())held=d->createFrameImageAtIndex(0);
+                }
+            }else{
+                auto input=SharedBuffer::create(std::span<const uint8_t>(large_start,length));
+                d->setData(input.get(),true);held=d->createFrameImageAtIndex(0);
+            }
+            CHECK(!d->failed()&&d->frameIsCompleteAtIndex(0));
+            CHECK(held&&cairo_surface_status(held.get())==CAIRO_STATUS_SUCCESS);
+            CHECK(cairo_image_surface_get_width(held.get())==int(large_width));
+            CHECK(cairo_image_surface_get_height(held.get())==int(large_height));
+            CHECK(cairo_image_surface_get_stride(held.get())==int(large_width*4));
+            CHECK(hash(held.get())==large_hash);
+        }
+        CHECK(hash(held.get())==large_hash);
+        std::printf("[WEBCORE LARGE] mode=%u bytes=%u hash=%016llx\n",mode,
+                    large_width*large_height*4,(unsigned long long)hash(held.get()));
+    }
+    puts("[ OK ] actual WebCore large contiguous image passed");return true;
+}
 static bool compose(const PlatformImagePtr& png,const PlatformImagePtr& jpeg,unsigned epoch=1){
     cairo_surface_t* output=cairo_image_surface_create_for_data(reinterpret_cast<unsigned char*>(webcore_frame),CAIRO_FORMAT_ARGB32,512,256,512*4);
     CHECK(cairo_surface_status(output)==CAIRO_STATUS_SUCCESS);cairo_t* c=cairo_create(output);
@@ -130,7 +160,9 @@ static bool gui(){
     close.header.size_bytes=offsetof(chos_gui_message_t,payload)+sizeof(close.payload.window);close.payload.window.window_id=window_id;CHECK(!chos_gui_submit(&close,close.header.size_bytes));return true;
 }
 int main(int argc,char** argv){
-    WTF::initialize();if(!run())return 1;cairo_debug_reset_static_data();
+    WTF::initialize();if(!run())return 1;
+    if(argc==2&&!std::strcmp(argv[1],"large")&&!large_image())return 1;
+    cairo_debug_reset_static_data();
     puts("[ OK ] actual WebCore image decoding passed");
     chos_heap_stats_t warm;if(chos_libc_heap_info(&warm))return 1;
     if(!(argc==2&&!std::strcmp(argv[1],"cli"))&&!gui())return 1;

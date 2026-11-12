@@ -4,7 +4,7 @@ Current runtime checkpoint: [original WebCore PNG/JPEG image execution](NATIVE_W
 now links and runs the real decoders, in-process buffers and Cairo backing in
 owned CHOS windows. Direct/UEFI tests check complete pixels, input and cleanup.
 [Engine contiguous allocations](NATIVE_LARGE_HEAP.md) have separate native fault,
-large-byte-pattern and reclamation tests. Large-image integration, full WebCore
+large-byte-pattern and reclamation tests. The real 3 MiB WebCore image backing is now also qualified; full WebCore
 page layout and the browser remain open. Follow the accepted
 [execution roadmap](STAGE3_EXECUTION_ROADMAP.md) from this checkpoint.
 

@@ -115,6 +115,21 @@ def main():
     if sha(png) != PNG_BGRA_SHA256:
         raise ValueError('Generated PNG mathematical sample reference changed')
     (out / 'generated.bgra').write_bytes(png)
+    large_width, large_height = 1024, 768
+    large_rgba = bytes(channel for y in range(large_height) for x in range(large_width)
+                       for channel in [(x * 3 + y * 7) & 255, (x * 11 + y * 5) & 255,
+                                       (x * 7 + y * 13) & 255, [0, 85, 170, 255][(x // 8 + y // 8) & 3]])
+    large_scans = b''.join(b'\0' + large_rgba[y * large_width * 4:(y + 1) * large_width * 4]
+                           for y in range(large_height))
+    large_encoded = (b'\x89PNG\r\n\x1a\n'
+                     + chunk(b'IHDR', struct.pack('>IIBBBBB', large_width, large_height, 8, 6, 0, 0, 0))
+                     + chunk(b'IDAT', zlib.compress(large_scans, 9)) + chunk(b'IEND', b''))
+    (out / 'large.png').write_bytes(large_encoded)
+    large_png = bytes(channel for i in range(0, len(large_rgba), 4)
+                      for channel in [large_rgba[i + 2] * large_rgba[i + 3] // 255,
+                                      large_rgba[i + 1] * large_rgba[i + 3] // 255,
+                                      large_rgba[i] * large_rgba[i + 3] // 255, large_rgba[i + 3]])
+    (out / 'large.bgra').write_bytes(large_png)
     source = ROOT / 'third_party/libjpeg-turbo/testimages/testorig.jpg'
     shutil.copyfile(source, out / 'original.jpg')
     command = [str(tool), '-dct', 'int', '-ppm', '-outfile',
@@ -134,7 +149,8 @@ def main():
     records = []
     for name, filename, pixels, w, h in [
             ('generated', 'generated.png', png, width, height),
-            ('original', 'original.jpg', jpeg, jpeg_width, jpeg_height)]:
+            ('original', 'original.jpg', jpeg, jpeg_width, jpeg_height),
+            ('large', 'large.png', large_png, large_width, large_height)]:
         assembly.extend(['.balign 8', '.global ' + name + '_start', name + '_start:',
                          '.incbin ' + json.dumps(str(out / filename)),
                          '.global ' + name + '_end', name + '_end:'])

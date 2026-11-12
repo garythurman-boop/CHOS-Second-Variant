@@ -66,9 +66,13 @@ released engine ownership and zero futex waiters after every process exits.
 This is selected image-component execution. It does not establish APNG/animation,
 ICC/gamma management, EXIF display orientation, all color spaces, every malformed
 image, production hostile-content security or full WebCore conformance. The
-consumer explicitly selects ignored color profiles. Its tested small images do
-not lift the ordinary allocation bound for larger engine backing stores. Large
-contiguous engine allocations are separate work within roadmap step 1.
+consumer explicitly selects ignored color profiles. The subsequent [large-image integration](validation/stage3-webcore-large-image.json)
+uses the qualified engine allocator to decode a 1024×768 PNG into one real 3 MiB
+WebCore backing vector. Complete and fragmented input match the mathematical
+premultiplied BGRA reference, including after decoder destruction. Direct and UEFI
+each pass three process lifecycles, GUI redraw/close, warm heap stability and exact
+cold resource cleanup. This large surface is checked by its complete-sample hash;
+the visible frame comparisons continue to exercise the smaller PNG/JPEG images.
 New Fusion, physical Pi 5 and laptop execution have not been performed here.
 
 ## Reproduce
@@ -94,3 +98,9 @@ The frozen image directory contains matching `chos.elf`, `uefi-kernel.elf` and
 uses only disposable disks and firmware variables. An external WebKit checkout
 is no longer needed to build this component. Successful build reports retain
 `executed: false`; actual execution is evidenced separately by guest results.
+
+For the larger contiguous image case, use a freshly exported SDK containing the
+engine allocator checkpoint and add `--large` to the guest runner. The consumer
+receives the actual `large` argument; the default small-image mode remains separate.
+The generator includes all three encoded inputs and reference values, and the
+builder verifies its own hash against the successful build report before delivery.

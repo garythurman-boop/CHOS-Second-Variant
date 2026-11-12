@@ -38,9 +38,12 @@ Full revised Stage 3 acceptance is required before version 0.50.0.
 
 ## Current position
 
-**Step 1, dependency closure and native execution.** The standalone PNG/JPEG,
-Cairo, text and selected JavaScript checkpoints are complete within their stated
-scope. Four original WebCore image implementation units compile for AArch64, but
-have not linked or executed together. Next: close actual shared-buffer, decoder,
-color/geometry and native-image dependencies; run the real component and present
-its pixels. See [the integration boundary](WEBCORE_PORT_BOUNDARY.md).
+**Step 1 selected image checkpoint complete; step 2 starting.** Original PNG/JPEG
+adapters now link and run in owned CHOS windows, including fragmented input,
+cancellation and surface lifetime. A real 3 MiB contiguous WebCore image backing
+also passes complete/fragmented decoding and cleanup with the qualified engine
+allocator. Direct and UEFI tests compare every visible frame pixel. Broader codec,
+security and platform qualification remains open. Next: configure and build the
+real CHOS WebCore/PAL page target, supply its actual XML/SQLite dependencies, then
+reach local HTML/CSS/DOM painting. See [image execution](NATIVE_WEBCORE_IMAGES.md)
+and [the full port boundary](WEBCORE_PORT_BOUNDARY.md).
