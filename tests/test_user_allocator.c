@@ -127,4 +127,18 @@ static void external_capacity(void){
     }
     empty(&h);assert(!chos_heap_destroy(&h));assert(b.maps_total==b.unmaps_total);cleanup(&b);
 }
-int main(void){basics();alignment_and_coalescing();failure_and_quarantine();stress();external_capacity();puts("user allocator: PASS (actual core, alignment, overflow, coalescing, rollback, quarantine, 12000 mixed operations)");return 0;}
+static void mapping_limit_policy(void){
+    chos_heap_t h;backend_t b;begin(&h,&b);assert(h.mapping_limit==CHOS_HEAP_MAP_MAX);
+    assert(chos_heap_set_mapping_limit(&h,0));assert(chos_heap_set_mapping_limit(&h,SIZE_MAX));
+    assert(chos_heap_set_mapping_limit(&h,65537));
+    assert(chos_heap_set_mapping_limit(&h,CHOS_RESOURCE_ENGINE_RESERVE_MAX+4096u));
+    assert(h.mapping_limit==CHOS_HEAP_MAP_MAX);
+    void *p=chos_heap_alloc(&h,10,16);assert(p);
+    assert(chos_heap_set_mapping_limit(&h,CHOS_RESOURCE_ENGINE_RESERVE_MAX));
+    assert(h.mapping_limit==CHOS_HEAP_MAP_MAX);assert(!chos_heap_free(&h,p));
+    assert(!chos_heap_set_mapping_limit(&h,65536));
+    assert(!chos_heap_alloc(&h,65536,16)&&h.error==CHOS_HEAP_ENOMEM);
+    p=chos_heap_alloc(&h,65536-32u,16);assert(p);assert(!chos_heap_free(&h,p));
+    empty(&h);cleanup(&b);
+}
+int main(void){basics();alignment_and_coalescing();failure_and_quarantine();stress();external_capacity();mapping_limit_policy();puts("user allocator: PASS (actual core, alignment, overflow, coalescing, rollback, quarantine, 12000 mixed operations)");return 0;}

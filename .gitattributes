@@ -31,3 +31,6 @@ third_party/mbedtls/** -whitespace
 # Original upstream Markdown includes seven-character '=' heading underlines.
 /third_party/libjpeg-turbo/ChangeLog.md conflict-marker-size=32
 /third_party/libjpeg-turbo/README.md conflict-marker-size=32
+# Curated original WebCore implementation, headers and license bytes are pinned.
+/third_party/webcore-images/** -whitespace
+/ports/webcore-images/*.patch -whitespace

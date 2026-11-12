@@ -1,10 +1,18 @@
 # Modern browser engine port decision
 
+Current runtime checkpoint: [original WebCore PNG/JPEG image execution](NATIVE_WEBCORE_IMAGES.md)
+now links and runs the real decoders, in-process buffers and Cairo backing in
+owned CHOS windows. Direct/UEFI tests check complete pixels, input and cleanup.
+[Engine contiguous allocations](NATIVE_LARGE_HEAP.md) have separate native fault,
+large-byte-pattern and reclamation tests. Large-image integration, full WebCore
+page layout and the browser remain open. Follow the accepted
+[execution roadmap](STAGE3_EXECUTION_ROADMAP.md) from this checkpoint.
+
 Current integration boundary: [original WebCore adapters and the custom CHOS port](WEBCORE_PORT_BOUNDARY.md).
 The inspected WPE release uses Skia and disables Cairo. The Cairo work supports
 a proposed custom CHOS software backend; no native WebCore target, page layout
-or modern browser is running yet. Four original image adapter units now compile
-for the native target, with linking and execution still open. Earlier WPE architecture entries below are
+or modern browser is running yet. The selected original image component now
+links and runs as described above. Earlier WPE architecture entries below are
 historical proposals, not evidence of a working Cairo-based WPE build.
 
 Current image checkpoint: [native JPEG decoding](NATIVE_JPEG_DECODING.md) and

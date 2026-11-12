@@ -1,5 +1,11 @@
 # CHOS ARM64 Operating System — 0.30.0
 
+Current engine work: [original WebCore image execution](docs/NATIVE_WEBCORE_IMAGES.md)
+and [engine contiguous allocations](docs/NATIVE_LARGE_HEAP.md). The PNG/JPEG
+component displays actual decoded images in CHOS windows; full page rendering
+and the modern browser are still unfinished. Work follows the accepted
+[Stage 3 roadmap](docs/STAGE3_EXECUTION_ROADMAP.md).
+
 Current downloadable ISO and related files: **[GitHub build downloads](artifacts/README.md)**.
 Source is pushed each completed iteration. During Stage 3, binary downloads are
 published at selected verified milestones useful for user testing.

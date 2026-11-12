@@ -1,12 +1,19 @@
 # Revised Stage 3 current evidence
 
+Current runtime checkpoint: [original WebCore PNG/JPEG image execution](NATIVE_WEBCORE_IMAGES.md)
+now links and runs the real decoders, in-process buffers and Cairo backing in
+owned CHOS windows. Direct/UEFI tests check complete pixels, input and cleanup.
+[Engine contiguous allocations](NATIVE_LARGE_HEAP.md) have separate native fault,
+large-byte-pattern and reclamation tests. Large-image integration, full WebCore
+page layout and the browser remain open. Follow the accepted
+[execution roadmap](STAGE3_EXECUTION_ROADMAP.md) from this checkpoint.
+
 Stage 3 remains incomplete. The new [JPEG decoding checkpoint](NATIVE_JPEG_DECODING.md)
 adds native integer decoding, suspended input and bounded arithmetic buffering
 with checked upstream/reference pixels. The [actual WebCore boundary](WEBCORE_PORT_BOUNDARY.md)
 requires a custom CHOS port; current WPE uses Skia and disables Cairo.
-Four original WebCore image/frame/Cairo implementation units now compile for
-native AArch64 through a verified compiler probe. They remain unlinked and
-unexecuted; WebCore image integration, page layout and the browser are unfinished.
+The earlier four-unit compiler probe is superseded by the linked image runtime
+checkpoint above. Full page layout and the modern browser remain unfinished.
 The preceding [PNG decoding checkpoint](NATIVE_PNG_DECODING.md)
 adds native classic/progressive image decoding, independent reference comparisons
 and tested corruption/allocation recovery. This supplies a codec dependency;

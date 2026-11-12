@@ -72,3 +72,12 @@ target is Pi 5 CYW43455 over SDIO; do not regress Ethernet while adding it.
 The user reserves version 0.50.0 for the fully completed revised Stage 3. Keep
 the current development version until every acceptance gate has evidence. Do not
 label a prerequisite milestone 0.50.0 or release binaries to imply completion.
+
+## Accepted Stage 3 execution order and checkpoints
+
+Follow `docs/STAGE3_EXECUTION_ROADMAP.md`, the user's accepted six-step roadmap.
+Work continuously within that scope without renewed approval. Push coherent,
+reviewable source checkpoints approximately every thirty minutes during long
+sessions, recording checks, failures and the next action. Resume the latest
+checkpoint directly on “Continue” or similar instructions. Preserve existing
+verified downloads unless a new critical milestone is ready for user testing.

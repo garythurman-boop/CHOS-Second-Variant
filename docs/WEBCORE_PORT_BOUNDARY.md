@@ -1,5 +1,10 @@
 # Native WebCore integration boundary
 
+Current implementation: [the original WebCore image component](NATIVE_WEBCORE_IMAGES.md)
+now links and executes the selected PNG/JPEG decoders and Cairo backing in CHOS.
+The compiler-only checkpoint below records its earlier boundary. The complete
+WebCore/PAL port, page/DOM/CSS and browser services remain unimplemented.
+
 The existing native runtime runs JavaScriptCore and separate text, Cairo and
 image-codec consumers. It does **not** build or run WebCore, construct a DOM,
 perform CSS layout or paint a web page. The full modern browser remains open.
@@ -101,8 +106,8 @@ the complete native SDK, 2,116 published patched WTF/bmalloc source files and al
 installed target dependency files. Host dependency prefixes are rejected.
 Exported header aliases point to original headers rather than synthesizing APIs.
 
-This is **compilation only**. Objects have unresolved symbols, have not been
-linked together and have not executed. The explicit release/Cairo/FreeType flags
+That earlier checkpoint was **compilation only**. Its objects had unresolved symbols and had not been
+linked together or executed. The explicit release/Cairo/FreeType flags
 are a compiler probe, not a generated full-engine configuration or evidence that
 its ABI matches the existing JSCOnly archives. No page or decoder output is
 claimed at this boundary. Full dependency closure, consistent feature generation,

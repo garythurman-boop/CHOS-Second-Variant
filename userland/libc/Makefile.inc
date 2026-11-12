@@ -28,17 +28,25 @@ $(BUILD)/test-user-allocator: tests/test_user_allocator.c userland/libc/allocato
 $(SAN_DIR)/test-user-allocator: tests/test_user_allocator.c userland/libc/allocator.c $(LIBC_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -DCHOS_HOST_TEST $(SAN_FLAGS) -Wno-misleading-indentation -fno-builtin $(LIBC_INCLUDES) tests/test_user_allocator.c userland/libc/allocator.c -o $@
+$(BUILD)/test-large-heap: tests/test_large_heap.c userland/libc/allocator.c userland/libc/stdlib.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -DCHOS_HOST_TEST -std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -O2 -fno-builtin $(LIBC_INCLUDES) tests/test_large_heap.c userland/libc/allocator.c -o $@
+$(SAN_DIR)/test-large-heap: tests/test_large_heap.c userland/libc/allocator.c userland/libc/stdlib.c $(LIBC_HEADERS)
+	@mkdir -p $(dir $@)
+	$(CC_HOST) -DCHOS_HOST_TEST $(SAN_FLAGS) -Wno-misleading-indentation -fno-builtin $(LIBC_INCLUDES) tests/test_large_heap.c userland/libc/allocator.c -o $@
 $(BUILD)/test-libc-string: tests/test_libc_string.c userland/libc/string.c $(LIBC_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -DCHOS_HOST_TEST -std=c11 -Wall -Wextra -Werror -O2 -fno-builtin -DCHOS_LIBC_NO_EXPORTS $(LIBC_INCLUDES) tests/test_libc_string.c userland/libc/string.c -o $@
 $(SAN_DIR)/test-libc-string: tests/test_libc_string.c userland/libc/string.c $(LIBC_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CC_HOST) -DCHOS_HOST_TEST $(SAN_FLAGS) -fno-builtin -DCHOS_LIBC_NO_EXPORTS $(LIBC_INCLUDES) tests/test_libc_string.c userland/libc/string.c -o $@
-test-user-allocator: $(BUILD)/test-user-allocator $(BUILD)/test-libc-string
+test-user-allocator: $(BUILD)/test-user-allocator $(BUILD)/test-libc-string $(BUILD)/test-large-heap
 	./$(BUILD)/test-user-allocator
+	./$(BUILD)/test-large-heap
 	./$(BUILD)/test-libc-string
-test-user-allocator-sanitize: $(SAN_DIR)/test-user-allocator $(SAN_DIR)/test-libc-string
+test-user-allocator-sanitize: $(SAN_DIR)/test-user-allocator $(SAN_DIR)/test-libc-string $(SAN_DIR)/test-large-heap
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-user-allocator
+	ASAN_OPTIONS=detect_leaks=1 ./$(SAN_DIR)/test-large-heap
 	ASAN_OPTIONS=detect_leaks=0 ./$(SAN_DIR)/test-libc-string
 $(BUILD)/userland/libc-cpp-api.o: tests/test_libc_cpp_api.cpp $(LIBC_HEADERS)
 	@mkdir -p $(dir $@)

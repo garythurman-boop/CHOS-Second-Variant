@@ -1,0 +1,496 @@
+{
+  "schema": 1,
+  "project": "WebKit WebCore image component",
+  "version": "2.54.2",
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "upstream_repository": "https://github.com/WebKit/WebKit",
+  "upstream_commit_url": "https://github.com/WebKit/WebKit/commit/32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "source_provenance": "Each selected original file independently matched the pinned upstream Git blob before copying;original file bytes and per-file copyright/license notices retained. Native WTF/bmalloc headers and runtime archives are separate verified dependencies.",
+  "scope": "Curated original concrete PNG/JPEG decoders,in-process buffers,Cairo backing and compile-required headers only;not complete WebCore,shared-memory IPC,format factory,page rendering or browser",
+  "root": "third_party/webcore-images",
+  "licenses": [
+    "Source/WebCore/LICENSE-APPLE",
+    "Source/WebCore/LICENSE-LGPL-2",
+    "Source/WebCore/LICENSE-LGPL-2.1",
+    "Source/JavaScriptCore/COPYING.LIB"
+  ],
+  "source_inventory_method": "Canonical compiler dependency files from all11 original component units and the actual consumer;original modified-copy unit paths explicitly included",
+  "fixture_additional_headers": [],
+  "files": {
+    "Source/JavaScriptCore/COPYING.LIB": {
+      "sha256": "5094ecb9c9dcd0eadc34f3c11511d9b5535063032bc150164ecd1a5d5a445547",
+      "bytes": 25584,
+      "git_blob": "87c4a33dd850415a33a816146eaf09a07912c4d6"
+    },
+    "Source/JavaScriptCore/bytecode/Watchpoint.h": {
+      "sha256": "b76a229c582f7554996d740c3f5983fd44fe91942309afdbc6fa8c9aac7f91f7",
+      "bytes": 16763,
+      "git_blob": "674bee9e1d238be5d795087c750bfd0134647d35"
+    },
+    "Source/JavaScriptCore/heap/GCIncomingRefCounted.h": {
+      "sha256": "9b3e27cdff7f4f87d4497ed0eb65033632b62d124bb6aa0bf472b26635c33f3d",
+      "bytes": 3937,
+      "git_blob": "4178c449050fd4f5af5ff3150af5f1cf24630109"
+    },
+    "Source/JavaScriptCore/heap/HandleForward.h": {
+      "sha256": "324ae11c9f2d4af937402738169fb2725b59db14ca6597440f65b2157099ef93",
+      "bytes": 1487,
+      "git_blob": "2dd93dd8f8661e9239a96b81d49594bc7f8799c3"
+    },
+    "Source/JavaScriptCore/heap/StrongForward.h": {
+      "sha256": "51777901f55d24cc1d9e9ea6c5d0eefbb2c0bdfe1f5504ff7a4e3cf0a106563f",
+      "bytes": 1536,
+      "git_blob": "9405673ac2baa59009cc686631bd699d1befc8a3"
+    },
+    "Source/JavaScriptCore/heap/Weak.h": {
+      "sha256": "b7d81b15f7aa2d9143b633079a253b4a085e43b2fd58edc4a82f76ac41e6f056",
+      "bytes": 3471,
+      "git_blob": "34d8dcd8155bc7b0a89469e02d7578e4bd14bdd9"
+    },
+    "Source/JavaScriptCore/runtime/ArrayBuffer.h": {
+      "sha256": "ee0b8c2a57508d435d267a7dddd8d1af287cdb684062bb4c61ebccb26bcd2d6c",
+      "bytes": 16452,
+      "git_blob": "4cd0476abfffc30a81a9c69050b28e9592d89785"
+    },
+    "Source/JavaScriptCore/runtime/ArrayBufferSharingMode.h": {
+      "sha256": "8038032bda267ed869676ff21fde4942e04fc194615b4c0d6ae52467a3bdc92b",
+      "bytes": 2010,
+      "git_blob": "262d2731f344851a137a4405e95989d97b9151e2"
+    },
+    "Source/JavaScriptCore/runtime/BufferMemoryHandle.h": {
+      "sha256": "e7f3afe6888c3a4015f2527583030de710a54f5f26a03bbc682e495c291a46b4",
+      "bytes": 6176,
+      "git_blob": "b40eb0440893ca4bb1b4d046f582adea31c3d0f4"
+    },
+    "Source/JavaScriptCore/runtime/Forward.h": {
+      "sha256": "49532498701f8f96e5480e541d5c795570eda6cfcdc3234f8966a713ffb07d61",
+      "bytes": 1602,
+      "git_blob": "5910ec4748dc4cf88cad5f512ebb0259d65f9819"
+    },
+    "Source/JavaScriptCore/runtime/JSExportMacros.h": {
+      "sha256": "53232be50028eb888f09322dd7de21624589cb57311792b1c0c98c0a994ccf61",
+      "bytes": 1848,
+      "git_blob": "d82c52e872fcc75c7fbb3f5ec5bfcefd97b55227"
+    },
+    "Source/JavaScriptCore/runtime/MemoryMode.h": {
+      "sha256": "0f06e10e6c2d134b79bf0c977f14593e7cba33a32185745d829243657435b5f5",
+      "bytes": 1985,
+      "git_blob": "22ebb97324ee6a89f1aac415af7ffdf2657fad90"
+    },
+    "Source/JavaScriptCore/runtime/PageCount.h": {
+      "sha256": "2dc44695fc16f15b5e644a8d691af122f1cd66464f774d45596ac2bd3ecb4268",
+      "bytes": 4281,
+      "git_blob": "674baac88844e965287eb246294818806c60ed1b"
+    },
+    "Source/JavaScriptCore/runtime/TypedArrayAdaptersForwardDeclarations.h": {
+      "sha256": "270f2b3c8dd0c9f961a9e6847e25534e59f02b5702d14d66bc9a5e66374beb6c",
+      "bytes": 2732,
+      "git_blob": "1b8d653ee58e7f9d0443ae0f434dd4d6072281d9"
+    },
+    "Source/WebCore/LICENSE-APPLE": {
+      "sha256": "0b5d3a7cc325942567373b0ecd757d07c132e0ebd7c97bfc63f7e1a76094edb4",
+      "bytes": 1313,
+      "git_blob": "f29b41c3b2a316522d0e3493a28e96a851697b2e"
+    },
+    "Source/WebCore/LICENSE-LGPL-2": {
+      "sha256": "7555fa34bc131a75ca56d65c40cc1ea8f9515d23e353d4c15d58573a042f7805",
+      "bytes": 25378,
+      "git_blob": "0e1187b9cd2c3e4e6da3226f3b2242e1ffcbe4d4"
+    },
+    "Source/WebCore/LICENSE-LGPL-2.1": {
+      "sha256": "f2b3bd09663381deb99721109d22b47af1213bb43007a8b56a06c6375c8050ce",
+      "bytes": 26536,
+      "git_blob": "b2787a69a0384827fa8cbb145208760fb9179686"
+    },
+    "Source/WebCore/PAL/pal/ExportMacros.h": {
+      "sha256": "2966ecd389733b38febdded4c70267a41885a8d6e1a268fcecb0cc7920892aa6",
+      "bytes": 1829,
+      "git_blob": "da9b0b7489dc775114efd5ce5866aef1a2bd7781"
+    },
+    "Source/WebCore/animation/CompositeOperation.h": {
+      "sha256": "a38ce313c8fcb5d654dbfaaa826f7f6a66e17033afa565413679fc1e336f5759",
+      "bytes": 1827,
+      "git_blob": "ac862ad51e4d6aa360552f1dac1a2f3acb8dfdb5"
+    },
+    "Source/WebCore/config.h": {
+      "sha256": "2dc6cf3519dd1e1bc27d5582366a19a467f85cdc28152874daa43d3b3d8b439a",
+      "bytes": 1889,
+      "git_blob": "ca38f3fc23689057da25962af5dbdd457792b12e"
+    },
+    "Source/WebCore/platform/BoxExtents.h": {
+      "sha256": "5d9f1f56d9c42d1f0285cdf5232eb33e62f46c6e21822a9f7b1544fdee2ff298",
+      "bytes": 2332,
+      "git_blob": "fa41b44037df4b3e79fbb391f5af588c39177e2d"
+    },
+    "Source/WebCore/platform/BoxSides.h": {
+      "sha256": "f9fae2c8af4415990012885644041fdef3cf17ec9e066d603f424c146d8cdb5e",
+      "bytes": 11566,
+      "git_blob": "4f6b58d8b8e88f79a0c76424133c013d5a0d12fe"
+    },
+    "Source/WebCore/platform/FloatConversion.h": {
+      "sha256": "62f99e81bffc503a3d8908a8d53c5903939a54c4cef6fa3489752726ce56a063",
+      "bytes": 2376,
+      "git_blob": "791d05f6f027aeac6dcda5bd3c134492c0b22468"
+    },
+    "Source/WebCore/platform/LayoutUnit.h": {
+      "sha256": "b039ae94a33e2bc40380aa02bdfc28cc11400c1004468cdfab0d463072848727",
+      "bytes": 20531,
+      "git_blob": "58ebb85d5a22fe72a6f6ea5e274adff67739881c"
+    },
+    "Source/WebCore/platform/NotImplemented.h": {
+      "sha256": "150d73e03309abc02c7ac824de225d6c3e6aa7aecfcbb5e7934c2173b96428d4",
+      "bytes": 2126,
+      "git_blob": "26c77c634507c6ee173cc77f4f8b518db935e98a"
+    },
+    "Source/WebCore/platform/PlatformExportMacros.h": {
+      "sha256": "8050e330d3e2a58e60b1d7b4b8879ce6ecd06d1cc31459bf9876d635b47d54d7",
+      "bytes": 2100,
+      "git_blob": "8609d288c83aa5382c6ad075445628fec520b977"
+    },
+    "Source/WebCore/platform/RectEdges.h": {
+      "sha256": "a534d56c9d9ddad325f00baa036277a3a70bd48471b8e55fd1bb91d45415e94d",
+      "bytes": 9764,
+      "git_blob": "e8c7e7b7e34cd3078008e83f16ea75ac5c182b08"
+    },
+    "Source/WebCore/platform/SharedBuffer.cpp": {
+      "sha256": "8d9f4faa40143466ffef8687c8cab939a6e413d7a49c0e468df60e7b964256a6",
+      "bytes": 25822,
+      "git_blob": "a75d34002072996c383018693df410a5d11bfd12"
+    },
+    "Source/WebCore/platform/SharedBuffer.h": {
+      "sha256": "0ad8b7dad9fa906df86d2845fb4e8f33a8e1e95da4b8b29d29aacabbfd37dd3d",
+      "bytes": 16659,
+      "git_blob": "2f2e72c966f432c02f8a3606a71d6df03872a00d"
+    },
+    "Source/WebCore/platform/graphics/Color.h": {
+      "sha256": "d28f408c30d17e253f5b00cf068ec6ae6beda0da1a042e023e909876c17b64e6",
+      "bytes": 23088,
+      "git_blob": "a1b3f3cdc9f11eea86fabbc1cee30f3b0d8f1849"
+    },
+    "Source/WebCore/platform/graphics/ColorComponents.h": {
+      "sha256": "d12c73f53e7fe4312154fd42d3abf35c1b2783b934b3346f806086bc17e239d2",
+      "bytes": 6192,
+      "git_blob": "c8022545c97412c4e214a3aecbe1a4b231eccdbf"
+    },
+    "Source/WebCore/platform/graphics/ColorConversion.h": {
+      "sha256": "2aaaab9d3b9c78f2830a8c6735e896f7daa3499f750a3623e1d4247afc892e7f",
+      "bytes": 35976,
+      "git_blob": "47fd455299f2d40226035c9d3f2884a4bcdcba9f"
+    },
+    "Source/WebCore/platform/graphics/ColorMatrix.h": {
+      "sha256": "c673dfe7aed8e65e0f5a01819e11cde0a77e8382752c7f6f08615e3f3f6fc50a",
+      "bytes": 9689,
+      "git_blob": "06a4e215186c1a999605dfdacbc759a82a19bafd"
+    },
+    "Source/WebCore/platform/graphics/ColorModels.h": {
+      "sha256": "736a778cb63eb97512beedb0ee0414ee4ad6624f68872969db8be08c1c89c1fa",
+      "bytes": 18721,
+      "git_blob": "7993edee67544355af047a7d7de505925e91dd47"
+    },
+    "Source/WebCore/platform/graphics/ColorSpace.h": {
+      "sha256": "55e66a42938734acbf008c0500632d4f23786cea4cbbe3a55736f67f1755b900",
+      "bytes": 7892,
+      "git_blob": "3daf94c9b4a5cb6b5b82030bbf7eb21ece050fd2"
+    },
+    "Source/WebCore/platform/graphics/ColorTransferFunctions.h": {
+      "sha256": "1d216066587051479a9204e5a1f6153e48e4be6237c540a55d74ccfe66f6df41",
+      "bytes": 6151,
+      "git_blob": "ee36ad9ae02932d1db9dac95fb7b7d5b28b51952"
+    },
+    "Source/WebCore/platform/graphics/ColorTypes.h": {
+      "sha256": "c0e550ae61920d1def9b589ce5fe88f9873af1f01b82cb940da9243a69a6b229",
+      "bytes": 31878,
+      "git_blob": "55f36e2342450e39ca4c5b8e62fab1d8b8acd331"
+    },
+    "Source/WebCore/platform/graphics/ColorUtilities.cpp": {
+      "sha256": "ae5dede79ba0076f4c9ee5611c46b4c84660e933f5d33981c889f48f31da3b4e",
+      "bytes": 2948,
+      "git_blob": "7d67e3b98d323421709803a7585c323a88733176"
+    },
+    "Source/WebCore/platform/graphics/ColorUtilities.h": {
+      "sha256": "f65d87b17df88aef73a311d87c08312a4932e45a258ce3c44e247ffd52acb8c7",
+      "bytes": 9805,
+      "git_blob": "e9079f3cea8c629c41e4399ab5aade41ab8d7bf5"
+    },
+    "Source/WebCore/platform/graphics/CornerRadii.h": {
+      "sha256": "defa0b53078ea9b84cb8dec793a5f179dd8770ab3af35e41d8a45951ee489175",
+      "bytes": 4809,
+      "git_blob": "c702d064355416988768f1bb2d1974e9e0732d5e"
+    },
+    "Source/WebCore/platform/graphics/DecodingOptions.h": {
+      "sha256": "49ec482a39440c40d61d54349dafedc70cde73ce1ae4fd2fb889a72f8f59073e",
+      "bytes": 3695,
+      "git_blob": "30e75ae4f8ae9598692c187ca89a7714efcae421"
+    },
+    "Source/WebCore/platform/graphics/DoublePoint.h": {
+      "sha256": "7745374259b14538d56e1dce0c81664fc66dfea0bc71179ab06dc89eed663a5a",
+      "bytes": 4291,
+      "git_blob": "afbdaad32902e28185a962e2f6f5e86cd7f48dc6"
+    },
+    "Source/WebCore/platform/graphics/DoubleSize.h": {
+      "sha256": "457f5729ca693467ca5a00afc62a4c3e8dd008160cbaa0797f93937936f9804f",
+      "bytes": 2415,
+      "git_blob": "bd2ab99128f94f93dc38024f0aed0ad70a506fb0"
+    },
+    "Source/WebCore/platform/graphics/FloatPoint.h": {
+      "sha256": "884d2420d47968550f525b2d1432bf92578d50d36ff1131bc4c22a641c4aedbc",
+      "bytes": 9426,
+      "git_blob": "b99b3faf0a82587e3aa987fc25d8ef00990818b3"
+    },
+    "Source/WebCore/platform/graphics/FloatRect.h": {
+      "sha256": "8b268314926a392cf8862d3bfd2414309f77377c00f312152461b1840f7630de",
+      "bytes": 12479,
+      "git_blob": "277e550304f20521d714c6aa83e709bdeca65ec6"
+    },
+    "Source/WebCore/platform/graphics/FloatRoundedRect.h": {
+      "sha256": "2e704346deeb785d8b400979868167f06c9b3baaac71f1e5a20e2310a1c3342f",
+      "bytes": 5599,
+      "git_blob": "bbd7e05dba9b14c752d7df4c2abe69d0fe72c0c3"
+    },
+    "Source/WebCore/platform/graphics/FloatSize.h": {
+      "sha256": "30ac1c36372c9e8c93e7a2e48e389a6b4b497459e32b3d3f320d29eee2f865fc",
+      "bytes": 8965,
+      "git_blob": "d9d5eab6cc2d8ba7ab819cd8d3d45b2b02ea64fd"
+    },
+    "Source/WebCore/platform/graphics/FontRenderOptions.h": {
+      "sha256": "e43635cc21180a54afda69b2deebde9bb4bb85d36b1eaf6351c2f1e59ba6560b",
+      "bytes": 4081,
+      "git_blob": "9496e1145d26a04557b0233ac7682700ed28bbbc"
+    },
+    "Source/WebCore/platform/graphics/GainMap.h": {
+      "sha256": "757844b80a82e08854696fca2d35d67a3404a1e4788e3af14f1e31e45f5c5e70",
+      "bytes": 1788,
+      "git_blob": "c8bbf5aa53508b24f274ba75283c198bae498392"
+    },
+    "Source/WebCore/platform/graphics/GraphicsTypes.h": {
+      "sha256": "c0e781f24ba8ee286d8d118a3f7174bf75dae8660aadd27e897bc38f4424fc55",
+      "bytes": 5246,
+      "git_blob": "5f7a14c3ad749cccdf1b88be97c1392ae1a3f073"
+    },
+    "Source/WebCore/platform/graphics/ImageBackingStore.h": {
+      "sha256": "c56ecb99daee34dec5e1e63f86c21087cf3e17d1dbad0f40c9ec246347b597a7",
+      "bytes": 8651,
+      "git_blob": "158b26ae75b8a67a5372747020b1245ad544a773"
+    },
+    "Source/WebCore/platform/graphics/ImageDecoder.cpp": {
+      "sha256": "96b2893f79849b078381c446bf122036a57316ac60e2127ea84015821aee1081",
+      "bytes": 6836,
+      "git_blob": "d840b3c471f8e9707d04e5706d3c6240534f4699"
+    },
+    "Source/WebCore/platform/graphics/ImageDecoder.h": {
+      "sha256": "beb11a0de5757ba5d0f13f9683613ca03d2584d69a2724a8a8ff1f5356a7911c",
+      "bytes": 6125,
+      "git_blob": "db3fb621145795131400c569d93f89b7b894cedc"
+    },
+    "Source/WebCore/platform/graphics/ImageFrame.h": {
+      "sha256": "d52b24dc28fc70c1ed0a841665df8bcec846351d1d813f5cf8bf4d33b3032d09",
+      "bytes": 6791,
+      "git_blob": "1fd6b82e692cb0c1f0d4e1b3d3cf24b3c08d9efb"
+    },
+    "Source/WebCore/platform/graphics/ImageOrientation.h": {
+      "sha256": "62489401aa1e108fc0e2707ee90aca0c6bac731a72d1d71ae3688182576d43ea",
+      "bytes": 6791,
+      "git_blob": "e71e8a63f2a9f269b03e477213ad0f9a537ccf26"
+    },
+    "Source/WebCore/platform/graphics/ImageResolution.h": {
+      "sha256": "cbfc222835db21653e97f755dfce1db845df7bbd8e45eeed4cb6f168b394d79f",
+      "bytes": 2150,
+      "git_blob": "cca68b52ad2ca8fb99d9ebb1022d81b11978cee8"
+    },
+    "Source/WebCore/platform/graphics/ImageTypes.h": {
+      "sha256": "e1f9aa495e6cfa78aa3a9dd61fbb223e5593e190f548b6e18e76f9cfdffef843",
+      "bytes": 3685,
+      "git_blob": "6a5fba5ece137e9ff6647d3f3e2a9492b813680d"
+    },
+    "Source/WebCore/platform/graphics/IntPoint.h": {
+      "sha256": "72012968a1ba65ef8284a8e5c4b02213ba5fafd67dd29e169bdc8374f0c79a3a",
+      "bytes": 5648,
+      "git_blob": "a8828bd8fff92aea9fc07e1e65d7e55cc287a161"
+    },
+    "Source/WebCore/platform/graphics/IntRect.cpp": {
+      "sha256": "7eb5a64487ed418e6c6b0e3693f06f909761150ff83076c30e3d1b081e47312c",
+      "bytes": 5436,
+      "git_blob": "a0a8d4e6c416562bd5f3c54ee80f4ea63c7fac33"
+    },
+    "Source/WebCore/platform/graphics/IntRect.h": {
+      "sha256": "55fdd1dcfc219705f31697f4af2ab8ff56756f1b71c3852efee2992b817df4ff",
+      "bytes": 8486,
+      "git_blob": "dfb51f5df5925fe5530d3592d48c74b2bdb2ea54"
+    },
+    "Source/WebCore/platform/graphics/IntSize.h": {
+      "sha256": "9837f0a790985e5b85949e6a46fdce541f1eeaf515b86b35a10d7325cbb2721d",
+      "bytes": 6598,
+      "git_blob": "fe83be845e2130a53ba9762f8c2c0c30188dad61"
+    },
+    "Source/WebCore/platform/graphics/LayoutPoint.h": {
+      "sha256": "d69844a8174529f81ff3cec2e81dc510ee9d4d08409b55d32650fbd07be54fe9",
+      "bytes": 7953,
+      "git_blob": "3b2c5d954c263351f17cf580cac249f9526f45ad"
+    },
+    "Source/WebCore/platform/graphics/LayoutRange.h": {
+      "sha256": "09d9d61abe475a55e97f7b017563b80cc482bd1b3a7f0891a61c02fbb3277040",
+      "bytes": 4455,
+      "git_blob": "39ea15f9fe08930f86a663f488e9e7615d8f430f"
+    },
+    "Source/WebCore/platform/graphics/LayoutRect.h": {
+      "sha256": "66576db26c9bb66fc85f25451a472d5531df973ed433f96b87c0561dcfccfd59",
+      "bytes": 13163,
+      "git_blob": "74e8e11c3860e5487c8d9036d8a18ba73837b4da"
+    },
+    "Source/WebCore/platform/graphics/LayoutRoundedRect.h": {
+      "sha256": "2c233565017dbbc1169d55ab563698aad5fddadc46d1917d57f06f01377f8211",
+      "bytes": 6342,
+      "git_blob": "e0f7287159bdcb267487e65d7dce38db23ae6b4e"
+    },
+    "Source/WebCore/platform/graphics/LayoutSize.h": {
+      "sha256": "516adb08ea57f472cdcc0835e774f6f267b75882bd45e6a78f70240f7cb4bb50",
+      "bytes": 7114,
+      "git_blob": "9510fd9d471ba0ef95112d34d3ebe77a5df1d042"
+    },
+    "Source/WebCore/platform/graphics/NativeImage.h": {
+      "sha256": "ea3e947b0da5ffd1c5e7ca902ef42aa40d6c12e44db53735a422347ab4863e06",
+      "bytes": 4998,
+      "git_blob": "540cce809fdeec70af49625dfcf5d671e0c20857"
+    },
+    "Source/WebCore/platform/graphics/Path.h": {
+      "sha256": "05104e9e0f12138badfd42c5fc72e0f12949cf52aeb26263d08e313a785154fb",
+      "bytes": 9992,
+      "git_blob": "a1fbc0087a27d0329816e7bc977ce479a9da2087"
+    },
+    "Source/WebCore/platform/graphics/PathElement.h": {
+      "sha256": "ab857490ab8b0132eebde87a6ffa33ba61d07c002cc90974336aeeeb88744f3a",
+      "bytes": 1750,
+      "git_blob": "d6db254401b89f75046187b1635f781ae6f4e2ee"
+    },
+    "Source/WebCore/platform/graphics/PathImpl.h": {
+      "sha256": "7e626abbd2a9f04e0ed980d1c5b17f77b8c281132bc90cfefd4fb0069bd80ef3",
+      "bytes": 4746,
+      "git_blob": "2eb82be3cf16f1454c0acacc319dc71e9c75f525"
+    },
+    "Source/WebCore/platform/graphics/PathSegment.h": {
+      "sha256": "7785786d85457e40ad4a3d7d9a97111f4d21a2ad8b91ebb5b0f499a1e7b6bc34",
+      "bytes": 3158,
+      "git_blob": "f22671f1117903b95b1f6d722c868c2f0c0d60ed"
+    },
+    "Source/WebCore/platform/graphics/PathSegmentData.h": {
+      "sha256": "0e52ec9f231df499e49b4d61ecb982a663d448fbe8b18d17c54de36927527dd4",
+      "bytes": 16483,
+      "git_blob": "68a9daced91193370ec058aa258d5f3453fda103"
+    },
+    "Source/WebCore/platform/graphics/PlatformImage.h": {
+      "sha256": "fa4fcca99ae569ab99b76012a75ad17a9c7e1b02ea207e56f22fadf82fe107a4",
+      "bytes": 1850,
+      "git_blob": "bfec7161aa5f550d593d66ce7214618e873e2849"
+    },
+    "Source/WebCore/platform/graphics/PlatformPath.h": {
+      "sha256": "4f4f1d7c0b3b193581549b843c4a2f6d7859a350584cd72b1577e53a7749e364",
+      "bytes": 1898,
+      "git_blob": "72094e4386de77c6ad5a69a002f5cd9170e13873"
+    },
+    "Source/WebCore/platform/graphics/Region.h": {
+      "sha256": "b1e4e34a114c617ff1cd6b84e27c5d409c99c841989c848ae4cfbf243ad0caba",
+      "bytes": 6808,
+      "git_blob": "9a9998fa77f8bfe3498eb7f6b0c62946d4c75883"
+    },
+    "Source/WebCore/platform/graphics/RenderingResource.h": {
+      "sha256": "306ae803744c7ef151adaba494cbf1a26ec35d5d220ab6b7c8225cade354ea97",
+      "bytes": 3407,
+      "git_blob": "b37659b5422d107636ca662cbaab86765063d6b4"
+    },
+    "Source/WebCore/platform/graphics/RenderingResourceIdentifier.h": {
+      "sha256": "bf5819039d9e8b699bbdc6df586ddc181848dcadd994842ce480da8e400b34e1",
+      "bytes": 1583,
+      "git_blob": "ee420fe2124e8c7ba611c07c8c8b84113d11efa8"
+    },
+    "Source/WebCore/platform/graphics/RotationDirection.h": {
+      "sha256": "4fe880e6ee1f7c97de419f488888722095df7ed4ee28c0049a50d90a5e4f21eb",
+      "bytes": 1576,
+      "git_blob": "e707d411df585aebb31b8d29f149714afa6d87cf"
+    },
+    "Source/WebCore/platform/graphics/WindRule.h": {
+      "sha256": "3d26786e347bb6d2a5614d23c9ac8d6e39a8b386e355b4452d74dc5cda5a5e90",
+      "bytes": 1524,
+      "git_blob": "3f35925434865cffd952278de3e9460a23bbf51c"
+    },
+    "Source/WebCore/platform/graphics/cairo/CairoUniquePtr.h": {
+      "sha256": "0440c374582f08d082bc31d1a8316b5bf3f635223337d9d8af3ae93c5a181073",
+      "bytes": 1901,
+      "git_blob": "b7d29790eafd821f948d42844a785a9bf893accf"
+    },
+    "Source/WebCore/platform/graphics/cairo/CairoUtilities.cpp": {
+      "sha256": "15732fccb881463646d0ac9f4f82906d05f9b24f708f33aaaf4fa54a119c4575",
+      "bytes": 15896,
+      "git_blob": "6f664b78ff54090db563c34dd111ad7d581fb755"
+    },
+    "Source/WebCore/platform/graphics/cairo/CairoUtilities.h": {
+      "sha256": "256c6b9b21e1d0595926954bed14cc770dc009377cc288549c0518291a9769b0",
+      "bytes": 4303,
+      "git_blob": "6a2c690711107c5fcf8c584ddf5000f086ebfb85"
+    },
+    "Source/WebCore/platform/graphics/cairo/RefPtrCairo.cpp": {
+      "sha256": "b3c91f96522d982b0157f22bef59582da86203a8811a6dec868d6f0d9f0c8ab7",
+      "bytes": 2881,
+      "git_blob": "ab88412586e862816f5a582d114068d63a26dd60"
+    },
+    "Source/WebCore/platform/graphics/cairo/RefPtrCairo.h": {
+      "sha256": "553b922f0e7bc8f0bf537f9082a78e91c07d29f36dfdb742e92052e87ad7a6f9",
+      "bytes": 2355,
+      "git_blob": "05dadeaef20d24c169b292e7212759784743f1dc"
+    },
+    "Source/WebCore/platform/graphics/transforms/AffineTransform.h": {
+      "sha256": "c25f4a6529a6b7436b826a837c061c0bfc74ce5564fa4adef1f0aa0d0da8fc8d",
+      "bytes": 9489,
+      "git_blob": "3ae8339850008d049df5f38d9d53a1c776827c67"
+    },
+    "Source/WebCore/platform/image-decoders/ScalableImageDecoder.cpp": {
+      "sha256": "762dc77a4dba03d657e2bafcea60eb7c327d53de827fd9bbd7f6998f2e1dcd7e",
+      "bytes": 7715,
+      "git_blob": "3f46090c1c8905a7ab80a942c252395153170f6a"
+    },
+    "Source/WebCore/platform/image-decoders/ScalableImageDecoder.h": {
+      "sha256": "9d6249ab04b3c1e2b9f26c7d64ef0f36ae549990c4f899bb799ac31e2e90b6d7",
+      "bytes": 8142,
+      "git_blob": "4da7f761d4a2a0cfa988b78f685f33b802b78521"
+    },
+    "Source/WebCore/platform/image-decoders/ScalableImageDecoderFrame.cpp": {
+      "sha256": "a582c0f752fb01070845cd6c0a10b9472a21d654c031592eea8d5411faac9bf5",
+      "bytes": 3144,
+      "git_blob": "5b61b63c70b89c543fef0942e9edec569fc783f6"
+    },
+    "Source/WebCore/platform/image-decoders/ScalableImageDecoderFrame.h": {
+      "sha256": "de921c120a42885bff3ff2bb69dc61a600f5b07ec270761e39f48ea0d437c161",
+      "bytes": 3621,
+      "git_blob": "877c9f0bf3e2bbe208f01776384d5756e9f38b41"
+    },
+    "Source/WebCore/platform/image-decoders/cairo/ImageBackingStoreCairo.cpp": {
+      "sha256": "09e061ba7ba3d5935033381c6df3568fe023af129ca9936d365f565b52850a21",
+      "bytes": 2093,
+      "git_blob": "5f4e411d20fecd1791d4fe5dd2b4d3520f5151d6"
+    },
+    "Source/WebCore/platform/image-decoders/jpeg/JPEGImageDecoder.cpp": {
+      "sha256": "c0c7283705497bbd0042db1a130eebb3b073a7316988c1b0c62fe347c46dd674",
+      "bytes": 26978,
+      "git_blob": "dc9e4228ce30dfe365048ab83d3ec52fe79edf35"
+    },
+    "Source/WebCore/platform/image-decoders/jpeg/JPEGImageDecoder.h": {
+      "sha256": "ee4cfa64418552763407de71d6b76af5f87f0b618473feca3827264d1f0756bb",
+      "bytes": 3580,
+      "git_blob": "8772ef3e08846c534911e2166cebfbbd56f96185"
+    },
+    "Source/WebCore/platform/image-decoders/png/PNGImageDecoder.cpp": {
+      "sha256": "b080c26a189cf0aea3f1d82abb4057f80179656bdfa83ad9041e95401d96e59e",
+      "bytes": 38821,
+      "git_blob": "1d62ace6ad2a3deaddea73895b9e5425367cb397"
+    },
+    "Source/WebCore/platform/image-decoders/png/PNGImageDecoder.h": {
+      "sha256": "83ad3cf6123a104f00cb9cf32725c071d35d3c80da243c287c7a1078b04c6077",
+      "bytes": 5562,
+      "git_blob": "77ad6fdc527db22bd3db39cc6f69832c1540e004"
+    },
+    "Source/WebCore/platform/text/WritingMode.h": {
+      "sha256": "9cff3d33309c9091c71e18c37d73b3e8a41f4d123d6e2dc1f781631ffbf9e9b1",
+      "bytes": 16200,
+      "git_blob": "05e390222f2c2d32e43576e74d81849fe4961bfc"
+    }
+  }
+}

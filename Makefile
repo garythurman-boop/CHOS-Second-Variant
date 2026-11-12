@@ -1858,3 +1858,8 @@ native-jpeg: native-sdk
 test-native-jpeg-sources:
 	python3 tools/verify_native_jpeg_sources.py
 test: test-native-jpeg-sources
+
+.PHONY: test-webcore-image-sources
+test-webcore-image-sources:
+	python3 tools/verify_webcore_image_sources.py
+test: test-webcore-image-sources

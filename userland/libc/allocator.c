@@ -21,7 +21,7 @@ static void copy_bytes(void *dst,const void *src,size_t n){
 static void zero_bytes(void *dst,size_t n){unsigned char *p=dst;while(n--)*p++=0;}
 void chos_heap_init(chos_heap_t *h,chos_heap_map_fn map,chos_heap_unmap_fn unmap,void *context){
     if(!h)return;zero_bytes(h,sizeof(*h));h->map=map;h->unmap=unmap;h->context=context;
-    h->active_regions=h->regions;h->region_limit=CHOS_HEAP_REGIONS;
+    h->active_regions=h->regions;h->region_limit=CHOS_HEAP_REGIONS;h->mapping_limit=CHOS_HEAP_MAP_MAX;
 }
 int chos_heap_init_external(chos_heap_t *h,chos_heap_map_fn map,chos_heap_unmap_fn unmap,
         void *context,chos_heap_region_t *storage,unsigned count){
@@ -36,10 +36,18 @@ int chos_heap_init_external(chos_heap_t *h,chos_heap_map_fn map,chos_heap_unmap_
 }
 static int configured(chos_heap_t *h){
     if(!h->active_regions||!h->region_limit||h->region_limit>CHOS_RESOURCE_ENGINE_REGIONS||
+       h->mapping_limit<DEFAULT_MAP||h->mapping_limit>CHOS_RESOURCE_ENGINE_RESERVE_MAX||
+       (h->mapping_limit&(CHOS_HEAP_PAGE-1u))||
        (h->active_regions==h->regions&&h->region_limit>CHOS_HEAP_REGIONS)){
         h->error=CHOS_HEAP_EIO;return 0;
     }
     return 1;
+}
+int chos_heap_set_mapping_limit(chos_heap_t *h,size_t limit){
+    if(!h||!configured(h)||limit<DEFAULT_MAP||limit>CHOS_RESOURCE_ENGINE_RESERVE_MAX||
+       (limit&(CHOS_HEAP_PAGE-1u)))return -1;
+    for(unsigned i=0;i<h->region_limit;i++)if(h->active_regions[i].base)return -1;
+    h->mapping_limit=limit;return 0;
 }
 static int corrupt(chos_heap_t *h,chos_heap_region_t *r){r->quarantined=1;h->error=CHOS_HEAP_EIO;return -1;}
 static int region_valid(chos_heap_t *h,chos_heap_region_t *r){
@@ -77,9 +85,10 @@ void *chos_heap_alloc(chos_heap_t *h,size_t size,size_t alignment){
     if(!configured(h))return 0;
     if(!h->map||!h->unmap||alignment<CHOS_HEAP_ALIGNMENT||
        (alignment&(alignment-1u))){h->error=CHOS_HEAP_EINVAL;return 0;}
-    if(alignment>CHOS_HEAP_MAP_MAX){h->error=CHOS_HEAP_ENOMEM;return 0;}
+    size_t limit=h->mapping_limit;
+    if(alignment>limit){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t requested=size; if(!size)size=1;
-    if(size>CHOS_HEAP_MAP_MAX-HEADER){h->error=CHOS_HEAP_ENOMEM;return 0;}
+    if(size>limit-HEADER){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t need=(size+CHOS_HEAP_ALIGNMENT-1u)&~(size_t)(CHOS_HEAP_ALIGNMENT-1u);
     for(unsigned i=0;i<h->region_limit;i++){
         chos_heap_region_t *r=&h->active_regions[i];
@@ -90,12 +99,14 @@ void *chos_heap_alloc(chos_heap_t *h,size_t size,size_t alignment){
     for(unsigned i=0;i<h->region_limit;i++)if(!h->active_regions[i].base){slot=i;break;}
     if(slot==h->region_limit){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t extra=alignment>CHOS_HEAP_ALIGNMENT ? alignment+MIN_SPAN : 0;
-    if(need>CHOS_HEAP_MAP_MAX-HEADER || extra>CHOS_HEAP_MAP_MAX-HEADER-need){h->error=CHOS_HEAP_ENOMEM;return 0;}
+    if(need>limit-HEADER || extra>limit-HEADER-need){h->error=CHOS_HEAP_ENOMEM;return 0;}
     size_t bytes=need+HEADER+extra;
     bytes=(bytes+CHOS_HEAP_PAGE-1u)&~(size_t)(CHOS_HEAP_PAGE-1u);
     if(bytes<DEFAULT_MAP)bytes=DEFAULT_MAP;
     void *base=h->map(h->context,bytes);
-    if(!base){h->error=CHOS_HEAP_ENOMEM;return 0;}
+    /* A mapping backend may report a more precise failure through its owned
+     * heap context, including quarantine after an uncertain rollback. */
+    if(!base){if(!h->error)h->error=CHOS_HEAP_ENOMEM;return 0;}
     chos_heap_region_t *r=&h->active_regions[slot];r->base=base;r->bytes=bytes;r->quarantined=0;
     if(((uintptr_t)base&(CHOS_HEAP_PAGE-1u)) || (uintptr_t)base>UINTPTR_MAX-bytes){
         /* A broken mapping backend cannot be used for aligned metadata. */

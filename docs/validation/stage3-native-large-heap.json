@@ -1,0 +1,267 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "scope": "Engine-only contiguous ordinary allocations composed from existing bounded virtual-reservation operations",
+  "sources_sha256": {
+    "userland/libc/allocator.c": "002a41c9a3d5dd912cfca9b239ed53afb89e8ad262ca8161ad012e369ffd195e",
+    "userland/libc/stdlib.c": "fd38a1973c5db2769af6740de9cb5c263a97b9ad45e02f63dbff5f40a1224538",
+    "userland/libc/include/chos/allocator.h": "1c7a7916467501494fa26503920abe7515ad1a79dbdd271fdced193b5e26e857",
+    "userland/libc/Makefile.inc": "a672fb36ee2efa8aa4fb122affe78e70973373c71ce2ccfb31f1e3f079f81587",
+    "tests/test_user_allocator.c": "6483b3b1c75450f93a313f26b0ad7e3b344c0560ffc302fdc5d38f76fb61b76b",
+    "tests/test_large_heap.c": "23e55b3ba663c24ff913ef2e1b0b05a9aa93a94b52740d427874d154b118d891",
+    "tests/native_large_heap/main.c": "a0bed6239bce561e405463dc3e2aea181ae240a2f1d936d2d14b8b1e7d4a639c",
+    "tests/native_large_heap/CMakeLists.txt": "d639f23aaf5587e9404af161bf9e50be73b5bfff9494ef42fe6181b3a818a721",
+    "tests/qemu_native_large_heap.py": "c80ed257d3e1e1bcb1b063b48d70851e7ccb28afdb48540c70c90d96088c2680"
+  },
+  "native_SDK_manifest_sha256": "039cbc45cdf3064a3d381862a1b33de6701b7ec07d7f021454c4b1bd1430625e",
+  "native_SDK_files": 1214,
+  "engine_application_sha256": "f3fdbba4e09aaf4fba29d4a9a705277267f6c461a5a36c5f5e1a4a3e6f4bddb2",
+  "legacy_application_sha256": "99c448d47488aca4a01438c7a96bf26ac7b4f2de1cf73115593c14f0e9cf3476",
+  "qualified_guests": {
+    "direct1": {
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "f3fdbba4e09aaf4fba29d4a9a705277267f6c461a5a36c5f5e1a4a3e6f4bddb2",
+        "legacy_sha256": "99c448d47488aca4a01438c7a96bf26ac7b4f2de1cf73115593c14f0e9cf3476",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "path": "/LARGE.ELF",
+            "pid": 1,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 0,
+            "path": "/LEGACY.ELF",
+            "pid": 2,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 0,
+            "guard": "low",
+            "pid": 3,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 0,
+            "guard": "high",
+            "pid": 4,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "path": "/LARGE.ELF",
+            "pid": 5,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "path": "/LEGACY.ELF",
+            "pid": 6,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "guard": "low",
+            "pid": 7,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "guard": "high",
+            "pid": 8,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "path": "/LARGE.ELF",
+            "pid": 9,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "path": "/LEGACY.ELF",
+            "pid": 10,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "guard": "low",
+            "pid": 11,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "guard": "high",
+            "pid": 12,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 110116
+          }
+        ],
+        "checks": [
+          "Actual engine malloc contiguous8/16MiB and32MiB backing boundary,complete byte patterns/zeroing,alignment and realloc preservation",
+          "Three concurrent native workers per engine process,zero native heap before return",
+          "Unchanged legacy1MiB mapping admission",
+          "Actual low/high unmapped guard writes fault only owning process",
+          "Three lifecycles,normal exits and exact cold physical-page/committed-frame/engine/futex cleanup"
+        ],
+        "limits": [
+          "Engine-only allocator prerequisite;not full browser/WebCore qualification",
+          "Kernel physical work remains<=1MiB per syscall;user allocator composes transactions",
+          "QEMU only;newFusion/Pi5/laptop execution NOT RUN"
+        ]
+      },
+      "boot_artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      },
+      "serial_sha256": "7f2fc5bef725f0f0812525c95f44c575c89ccd790972cfc577df31b7c5cd7156"
+    },
+    "uefi1": {
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "f3fdbba4e09aaf4fba29d4a9a705277267f6c461a5a36c5f5e1a4a3e6f4bddb2",
+        "legacy_sha256": "99c448d47488aca4a01438c7a96bf26ac7b4f2de1cf73115593c14f0e9cf3476",
+        "cold_free_pages": 494486,
+        "runs": [
+          {
+            "cycle": 0,
+            "path": "/LARGE.ELF",
+            "pid": 1,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 0,
+            "path": "/LEGACY.ELF",
+            "pid": 2,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 0,
+            "guard": "low",
+            "pid": 3,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 0,
+            "guard": "high",
+            "pid": 4,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 1,
+            "path": "/LARGE.ELF",
+            "pid": 5,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 1,
+            "path": "/LEGACY.ELF",
+            "pid": 6,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 1,
+            "guard": "low",
+            "pid": 7,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 1,
+            "guard": "high",
+            "pid": 8,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 2,
+            "path": "/LARGE.ELF",
+            "pid": 9,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 2,
+            "path": "/LEGACY.ELF",
+            "pid": 10,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 2,
+            "guard": "low",
+            "pid": 11,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 2,
+            "guard": "high",
+            "pid": 12,
+            "isolated_user_fault": true,
+            "cold_pages_restored": 494486
+          }
+        ],
+        "checks": [
+          "Actual engine malloc contiguous8/16MiB and32MiB backing boundary,complete byte patterns/zeroing,alignment and realloc preservation",
+          "Three concurrent native workers per engine process,zero native heap before return",
+          "Unchanged legacy1MiB mapping admission",
+          "Actual low/high unmapped guard writes fault only owning process",
+          "Three lifecycles,normal exits and exact cold physical-page/committed-frame/engine/futex cleanup"
+        ],
+        "limits": [
+          "Engine-only allocator prerequisite;not full browser/WebCore qualification",
+          "Kernel physical work remains<=1MiB per syscall;user allocator composes transactions",
+          "QEMU only;newFusion/Pi5/laptop execution NOT RUN"
+        ]
+      },
+      "boot_artifacts": {
+        "kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "iso_sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7",
+        "iso_embedded_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "kernel_symbols_match_iso": true
+      },
+      "serial_sha256": "54d571d1f0f31f213ef75b155e043e717eb608d0263d56ec416feef5976a7309"
+    }
+  },
+  "host_tests": {
+    "core_ASAN_UBSAN_LeakSanitizer": {
+      "status": "PASS",
+      "log_sha256": "5bcc275024db6bfdc9e54a445ed24b22484fcae58ea98913e9ef18aec35c1e92"
+    },
+    "wrapper_ASAN_UBSAN_LeakSanitizer": {
+      "status": "PASS",
+      "log_sha256": "df844e7ed799b3caa00d3d71556ccb100c14f627122dd22573c04c55a1e56725"
+    },
+    "checks": [
+      "Mapping-limit initialization/invalid/active-heap refusal and unchanged legacy default",
+      "Existing12000mixedoperations,alignment,coalescing,external512regioncapacity",
+      "Actual wrapper reservation/commit/release calls capped1MiB,32MiBbackingboundary,largezeroingandpatterns",
+      "Reallocfailurepreservesoldbytes;overflow/invalidalignmentrefusal",
+      "Eachof9commitsfor8MiBpayloadfailsinturnandrollsback",
+      "Rollbackandpartialreleasefailurequarantineaccounting,noreuse/retryofuncertainranges"
+    ]
+  },
+  "retained_infrastructure_failure": {
+    "attempt": "Focused host make with absolute BUILD path",
+    "result": "Existing recipe prefixes executable paths with ./, producing .//workspace/... lookup failure after compilation",
+    "resolution": "Executed the exact produced host binaries directly;core/wrapper/string tests PASS. Standard default BUILD targets remain unchanged."
+  },
+  "limits": [
+    "Maximum backingregion32MiB;ordinary16bytealignedpayloadmax32MiBminus32byteheader,lesswithadditionalalignment",
+    "Kernelphysicalworkmaximum1MiBunchanged;engine96MiBapertureandframequotasunchanged",
+    "Headerlayoutchanged;staticclientsneedmatchingfreshSDK",
+    "Quarantined diagnostics retain conservative virtual spans,notexactphysicalresidency",
+    "Hostfaultinjectiondoesnotproveactualnativehardwarepage-table/freefailureswereinduced",
+    "Allocatorprerequisiteonly;WebCorecomponent/fullbrowserintegrationandphysicalFusion/Pi5/laptopqualificationremainopen"
+  ]
+}

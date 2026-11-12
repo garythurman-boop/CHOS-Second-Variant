@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "scope": "Concrete in-process original WebCore PNG/JPEG image decoding and Cairo backing only;not full format factory,shared-memory IPC,page rendering or a browser",
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "defines": {
+    "CHOS_WEBCORE_IMAGE_COMPONENT": 1,
+    "HAVE_MMAP": 1,
+    "USE_SYSTEM_MALLOC": 1,
+    "USE_CAIRO": 1,
+    "USE_FREETYPE": 1,
+    "USE_HARFBUZZ": 1,
+    "BUILDING_JSCONLY__": 1,
+    "BUILDING_WebCore": 1,
+    "STATICALLY_LINKED_WITH_JavaScriptCore": 1,
+    "STATICALLY_LINKED_WITH_WTF": 1,
+    "ENABLE_JIT": 0,
+    "ENABLE_DFG_JIT": 0,
+    "ENABLE_FTL_JIT": 0,
+    "ENABLE_WEBASSEMBLY": 0
+  },
+  "units": {
+    "shared": "Source/WebCore/platform/SharedBuffer.cpp",
+    "scalable": "Source/WebCore/platform/image-decoders/ScalableImageDecoder.cpp",
+    "decoder": "Source/WebCore/platform/graphics/ImageDecoder.cpp",
+    "rect": "Source/WebCore/platform/graphics/IntRect.cpp",
+    "color": "Source/WebCore/platform/graphics/ColorUtilities.cpp",
+    "frame": "Source/WebCore/platform/image-decoders/ScalableImageDecoderFrame.cpp",
+    "png": "Source/WebCore/platform/image-decoders/png/PNGImageDecoder.cpp",
+    "cairo": "Source/WebCore/platform/image-decoders/cairo/ImageBackingStoreCairo.cpp",
+    "jpeg": "Source/WebCore/platform/image-decoders/jpeg/JPEGImageDecoder.cpp",
+    "refcairo": "Source/WebCore/platform/graphics/cairo/RefPtrCairo.cpp",
+    "cairoutils": "Source/WebCore/platform/graphics/cairo/CairoUtilities.cpp"
+  },
+  "patches": [
+    "native-component.patch"
+  ],
+  "unsupported_omitted_definitions": [
+    "WebCore::ScalableImageDecoder::create format-autodetection factory",
+    "WebCore::FragmentedSharedBuffer::fromIPCData",
+    "WebCore::FragmentedSharedBuffer::toIPCData"
+  ],
+  "layout_notes": [
+    "HAVE_MMAP enables the real MmapSpan-backed MappedFileData layout already implemented by native WTF FileHandleCHOS;the prior compiler-only probe did not establish this layout.",
+    "All component and consumer translation units must share these definitions and the same native WTF headers/archive.",
+    "BUILDING_JSCONLY__ selects the existing native WTF configuration;this selected component is not evidence of a complete generated WebCore port configuration."
+  ]
+}

@@ -22,6 +22,7 @@ typedef struct {
     chos_heap_region_t regions[CHOS_HEAP_REGIONS];
     chos_heap_region_t *active_regions;
     unsigned region_limit;
+    size_t mapping_limit;
     chos_heap_map_fn map;
     chos_heap_unmap_fn unmap;
     void *context;
@@ -37,6 +38,9 @@ void chos_heap_init(chos_heap_t *,chos_heap_map_fn,chos_heap_unmap_fn,void *);
 /* Optional caller-owned metadata; no hidden allocation or larger legacy stack.
  * Storage must remain alive, be serialized with the heap and not overlap it. */
 int chos_heap_init_external(chos_heap_t *,chos_heap_map_fn,chos_heap_unmap_fn,void *,chos_heap_region_t *,unsigned);
+/* An empty heap may opt into a larger backing-region limit when its backend
+ * really provides contiguous mappings. This never changes kernel syscall caps. */
+int chos_heap_set_mapping_limit(chos_heap_t *,size_t);
 void *chos_heap_alloc(chos_heap_t *,size_t,size_t alignment);
 void *chos_heap_calloc(chos_heap_t *,size_t,size_t);
 void *chos_heap_realloc(chos_heap_t *,void *,size_t);

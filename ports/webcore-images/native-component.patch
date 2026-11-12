@@ -1,0 +1,99 @@
+--- a/Source/WebCore/platform/image-decoders/ScalableImageDecoder.cpp
++++ b/Source/WebCore/platform/image-decoders/ScalableImageDecoder.cpp
+@@ -1,3 +1,4 @@
++/* CHOS component modification (2026-11-12): concrete PNG/JPEG component omits the full format-detection factory. */
+ /*
+  * Copyright (C) 2016-2023 Apple Inc. All rights reserved.
+  * Copyright (C) 2008-2009 Torch Mobile, Inc.
+@@ -27,7 +28,7 @@
+ #include "SharedBuffer.h"
+ #include <wtf/TZoneMallocInlines.h>
+ 
+-#if !PLATFORM(COCOA)
++#if !PLATFORM(COCOA) && !defined(CHOS_WEBCORE_IMAGE_COMPONENT)
+ #include "BMPImageDecoder.h"
+ #include "GIFImageDecoder.h"
+ #include "ICOImageDecoder.h"
+@@ -62,7 +63,7 @@
+ 
+ namespace {
+ 
+-#if !PLATFORM(COCOA)
++#if !PLATFORM(COCOA) && !defined(CHOS_WEBCORE_IMAGE_COMPONENT)
+ static bool matchesGIFSignature(std::span<const uint8_t> contents)
+ {
+     return spanHasPrefix(contents, "GIF87a"_span) || spanHasPrefix(contents, "GIF89a"_span);
+@@ -130,6 +131,7 @@
+ 
+ } // Anonymous namespace
+ 
++#if !defined(CHOS_WEBCORE_IMAGE_COMPONENT)
+ RefPtr<ScalableImageDecoder> ScalableImageDecoder::create(FragmentedSharedBuffer& data, AlphaOption alphaOption, GammaAndColorProfileOption gammaAndColorProfileOption)
+ {
+     constexpr size_t lengthOfLongestSignature = 14; // To wit: "RIFF????WEBPVP"
+@@ -141,7 +143,7 @@
+ 
+     std::span contentsSpan { contents };
+ 
+-#if !PLATFORM(COCOA)
++#if !PLATFORM(COCOA) && !defined(CHOS_WEBCORE_IMAGE_COMPONENT)
+     if (matchesGIFSignature(contentsSpan))
+         return GIFImageDecoder::create(alphaOption, gammaAndColorProfileOption);
+ 
+@@ -176,6 +178,7 @@
+ 
+     return nullptr;
+ }
++#endif
+ 
+ bool ScalableImageDecoder::frameIsCompleteAtIndex(size_t index) const
+ {
+--- a/Source/WebCore/platform/SharedBuffer.cpp
++++ b/Source/WebCore/platform/SharedBuffer.cpp
+@@ -1,3 +1,4 @@
++/* CHOS component modification (2026-11-12): in-process image component omits shared-memory IPC entry points. */
+ /*
+  * Copyright (C) 2006-2021 Apple Inc. All rights reserved.
+  * Copyright (C) Research In Motion Limited 2009-2010. All rights reserved.
+@@ -28,7 +29,9 @@
+ #include "config.h"
+ #include "SharedBuffer.h"
+ 
++#if !defined(CHOS_WEBCORE_IMAGE_COMPONENT)
+ #include "SharedMemory.h"
++#endif
+ #include <JavaScriptCore/ArrayBuffer.h>
+ #include <algorithm>
+ #include <wtf/HexNumber.h>
+@@ -61,6 +64,7 @@
+ 
+ WTF_MAKE_TZONE_ALLOCATED_IMPL(SharedBufferBuilder);
+ 
++#if !defined(CHOS_WEBCORE_IMAGE_COMPONENT)
+ std::optional<Ref<FragmentedSharedBuffer>> FragmentedSharedBuffer::fromIPCData(IPCData&& ipcData)
+ {
+     return WTF::switchOn(WTF::move(ipcData), [](Vector<std::span<const uint8_t>>&& data) -> std::optional<Ref<FragmentedSharedBuffer>> {
+@@ -90,6 +94,7 @@
+     });
+ }
+ 
++#endif
+ FragmentedSharedBuffer::FragmentedSharedBuffer(Ref<const DataSegment>&& segment)
+     : m_size(segment->size())
+     , m_segments(DataSegmentVector::from(DataSegmentVectorEntry { 0, WTF::move(segment) }))
+@@ -128,6 +133,7 @@
+     return SharedBuffer::create(WTF::move(combinedData));
+ }
+ 
++#if !defined(CHOS_WEBCORE_IMAGE_COMPONENT)
+ auto FragmentedSharedBuffer::toIPCData() const -> IPCData
+ {
+     auto segmentSpans = [&] {
+@@ -151,6 +157,7 @@
+     return segmentSpans();
+ }
+ 
++#endif
+ Vector<uint8_t> FragmentedSharedBuffer::copyData() const
+ {
+     Vector<uint8_t> data;
