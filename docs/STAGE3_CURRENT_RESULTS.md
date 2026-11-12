@@ -1,6 +1,11 @@
 # Revised Stage 3 current evidence
 
-Stage 3 remains incomplete. The new [PNG decoding checkpoint](NATIVE_PNG_DECODING.md)
+Stage 3 remains incomplete. The new [JPEG decoding checkpoint](NATIVE_JPEG_DECODING.md)
+adds native integer decoding, suspended input and bounded arithmetic buffering
+with checked upstream/reference pixels. The [actual WebCore boundary](WEBCORE_PORT_BOUNDARY.md)
+requires a custom CHOS port; current WPE uses Skia and disables Cairo.
+WebCore adapters, page layout and the modern browser remain unfinished.
+The preceding [PNG decoding checkpoint](NATIVE_PNG_DECODING.md)
 adds native classic/progressive image decoding, independent reference comparisons
 and tested corruption/allocation recovery. This supplies a codec dependency;
 WebCore and browser image integration remain unfinished. The preceding [Cairo/pixman checkpoint](NATIVE_CAIRO_RENDERING.md)
@@ -29,7 +34,7 @@ suite qualification and regression evidence are recorded separately in
 | Ethernet and graphical manager | Implemented for selected backends; prior Fusion Ethernet is user-confirmed; continued QEMU regressions |
 | IPv4/IPv6 secure transport | Native TLS clients and validation fixtures work; production browser trust/time/update integration remains open |
 | Native runtime | Owned EL0 memory/I/O, ICU, bounded C/C++ threads, foreign pause and explicit engine reservation/image/stack profile; real native RunLoop and selected async engine execution |
-| Modern browser | Native classic/progressive PNG decoding, Cairo/pixman software graphics, FreeType/HarfBuzz/ICU text, owned pixel presentation and actual JavaScript image data; original-ICU JSC selected Test262/checked Wasm/watchdog/async execution; full conformance, WebCore rendering and browser application features remain open |
+| Modern browser | Native JPEG and classic/progressive PNG decoding, Cairo/pixman software graphics, FreeType/HarfBuzz/ICU text, owned pixel presentation and actual JavaScript image data; original-ICU JSC selected Test262/checked Wasm/watchdog/async execution; full conformance, WebCore rendering and browser application features remain open |
 | Pi5 Wi-Fi | CYW43455 selected and protocol foundations present; native host/firmware/authentication/radio support remains unimplemented |
 | Final platform/security acceptance | New independent Fusion qualification and physical Pi5/laptop tests remain open; component tests do not certify production security |
 | Release | Development 0.30.0; 0.50.0 requires all revised gates |

@@ -1849,3 +1849,12 @@ native-png: native-sdk
 test-native-png-sources:
 	python3 tools/verify_native_png_sources.py
 test: test-native-png-sources
+
+.PHONY: test-native-jpeg-sources native-jpeg
+NATIVE_JPEG_OUT ?= $(BUILD)/native-jpeg
+NATIVE_JPEG_REFERENCE ?= $(BUILD)/host-jpeg/jpeg
+native-jpeg: native-sdk
+	python3 tools/build_native_jpeg.py --native-sdk $(NATIVE_SDK_ROOT) --reference-build $(NATIVE_JPEG_REFERENCE) --out $(NATIVE_JPEG_OUT)
+test-native-jpeg-sources:
+	python3 tools/verify_native_jpeg_sources.py
+test: test-native-jpeg-sources

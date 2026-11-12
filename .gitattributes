@@ -26,3 +26,8 @@ third_party/mbedtls/** -whitespace
 /third_party/libpng/** -whitespace
 /third_party/png-reference/** -whitespace
 /ports/png/*.patch -whitespace
+# Preserve authenticated original JPEG implementation and regression assets.
+/third_party/libjpeg-turbo/** -whitespace
+# Original upstream Markdown includes seven-character '=' heading underlines.
+/third_party/libjpeg-turbo/ChangeLog.md conflict-marker-size=32
+/third_party/libjpeg-turbo/README.md conflict-marker-size=32

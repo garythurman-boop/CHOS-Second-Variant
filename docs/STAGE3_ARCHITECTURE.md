@@ -1,10 +1,17 @@
 # Revised Stage 3: internet platform architecture
 
-Current image checkpoint: [native PNG and progressive decoding](NATIVE_PNG_DECODING.md)
-adds the upstream codec dependency and real native fragmented-input/error-recovery
+Current integration boundary: [original WebCore adapters and the custom CHOS port](WEBCORE_PORT_BOUNDARY.md).
+The inspected WPE release uses Skia and disables Cairo. The Cairo work supports
+a proposed custom CHOS software backend; no native WebCore target, page layout
+or modern browser is running yet. Earlier WPE architecture entries below are
+historical proposals, not evidence of a working Cairo-based WPE build.
+
+Current image checkpoint: [native JPEG decoding](NATIVE_JPEG_DECODING.md) and
+[native PNG and progressive decoding](NATIVE_PNG_DECODING.md)
+add upstream codec prerequisites and real native fragmented-input/error-recovery
 tests. WebCore image integration, other image formats and browser features remain open.
 
-Current graphics checkpoint: [native Cairo/pixman software rendering](NATIVE_CAIRO_RENDERING.md) adds real vector/image composition and explicit FreeType glyphs in isolated windows. This is a WebCore dependency; full engine/browser and wireless gates remain open.
+Current graphics checkpoint: [native Cairo/pixman software rendering](NATIVE_CAIRO_RENDERING.md) adds real vector/image composition and explicit FreeType glyphs in isolated windows. This supports a proposed CHOS WebCore backend; full engine/browser and wireless gates remain open.
 
 Current text checkpoint: [native FreeType/HarfBuzz shaping and rasterization](NATIVE_TEXT_RENDERING.md). Real JavaScript-produced Unicode text is drawn into owned native images. Full WebCore/HTML/CSS integration, production browser policy and native Wi-Fi remain unfinished; Stage 3 is incomplete at 0.30.0.
 

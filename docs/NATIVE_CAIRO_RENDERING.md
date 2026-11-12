@@ -6,7 +6,10 @@ clipped dashed curves, transformed groups with alpha, repeating image patterns
 and FreeType glyphs into owned window images. Its workers use real native
 pthreads; pixman includes the original AArch64 NEON implementation.
 
-This is a graphics prerequisite. It does not implement WebCore, HTML/CSS/DOM,
+This is graphics infrastructure for a proposed custom CHOS WebCore port. Current
+WPE uses Skia and explicitly disables Cairo; see the verified
+[WebCore integration boundary](WEBCORE_PORT_BOUNDARY.md). This checkpoint does not
+implement WebCore, HTML/CSS/DOM,
 Canvas, page navigation or the modern browser. Cairo's low-level glyph API does
 not shape text; the separate [HarfBuzz/ICU backend](NATIVE_TEXT_RENDERING.md)
 qualifies selected shaping cases. Stage 3 remains incomplete at version 0.30.0.

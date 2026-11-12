@@ -1,0 +1,1237 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "component": "Original libjpeg-turbo3.2.1 selected native8bit decoding",
+  "source_manifest_sha256": "8d5e9c9bbfe3886dda3c4f52098cf75e02b24eceafeac757342fbd0ad1e82c8a",
+  "native_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "stage3_complete": false,
+    "host_reference": false,
+    "host_sanitizers": false,
+    "source_manifest_sha256": "8d5e9c9bbfe3886dda3c4f52098cf75e02b24eceafeac757342fbd0ad1e82c8a",
+    "SDK_manifest_sha256": "b808906f7af0ad0529584775f253f8596a9dc5d824472b34ceab229cb34f1190",
+    "port_and_fixture_sources": {
+      "tools/build_native_jpeg.py": "06250af0748749098f3be9a0122be9d0808b4417b5edd3a4e8b79b047d8c985e",
+      "tools/verify_native_jpeg_sources.py": "50acc3baf20f4f34ce4c95a76bc70b28ab64470d857e282b3b97e624bc6810f0",
+      "tools/generate_jpeg_cases.py": "f708ac905129a172ae7840f6496dac2e999732123425627e6e5bb09e1587b813",
+      "tests/native_jpeg/main.c": "c613a590aa96dcf7f00befb2de2fe02aeb0e5ebae88d26a5519ddfcf4ef4973f",
+      "tests/native_jpeg/CMakeLists.txt": "576062bd9c6e541446dcdb13078bee40cd8ebfe241dc40909bcf4a454cbaa191"
+    },
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-jpeg-20261111/target2/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/native-cairo-20261108/native-sdk4",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-DCMAKE_C_FLAGS=-DNO_PUTENV",
+        "-S",
+        "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo",
+        "-B",
+        "/workspace/chos-evidence/native-jpeg-20261111/target2/jpeg",
+        "-DENABLE_SHARED=OFF",
+        "-DENABLE_STATIC=ON",
+        "-DWITH_TURBOJPEG=OFF",
+        "-DWITH_TOOLS=OFF",
+        "-DWITH_TESTS=OFF",
+        "-DWITH_SIMD=ON",
+        "-DREQUIRE_SIMD=ON"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-jpeg-20261111/target2/jpeg",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-jpeg-20261111/target2/jpeg"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/tools/generate_jpeg_cases.py",
+        "--host-build",
+        "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1",
+        "--out",
+        "/workspace/chos-evidence/native-jpeg-20261111/target2/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-jpeg-20261111/target2/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/native-cairo-20261108/native-sdk4",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-DCMAKE_C_FLAGS=-DNO_PUTENV",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_jpeg",
+        "-B",
+        "/workspace/chos-evidence/native-jpeg-20261111/target2/application",
+        "-DJPEG_PREFIX=/workspace/chos-evidence/native-jpeg-20261111/target2/prefix",
+        "-DJPEG_CASES=/workspace/chos-evidence/native-jpeg-20261111/target2/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-jpeg-20261111/target2/application",
+        "-j4"
+      ]
+    ],
+    "limits": [
+      "Original libjpeg API prerequisite;not WebCore or browser integration",
+      "Target TurboJPEG,command-line tools and mutable environment helper excluded",
+      "Selected8-bit decode tests;not full native upstream conformance,production hostile-content isolation or color management"
+    ],
+    "returncode": 0,
+    "seconds": 10.174091294000391,
+    "application": {
+      "path": "/workspace/chos-evidence/native-jpeg-20261111/target2/application/native_jpeg",
+      "bytes": 1068512,
+      "sha256": "6b43573c6a95a3d2b44c8187c07ffb8d82b66157074348472e898b1f73762ec0"
+    },
+    "archive": {
+      "members": 117,
+      "bytes": 799250,
+      "sha256": "5a8fadf0f778e104bfb5369efe85d648f9f50bbd0e693e1bd9a0a4e88f5fd4b6"
+    },
+    "cases_manifest_sha256": "8356105c7cdda10361f8af40bcf43b4c882be869365ea02000a636da17054715",
+    "installed_files_sha256": {
+      "include/jconfig.h": "5f8c9d230961cff35f0465779d20274eacb51e66000d677bd450702ce25c8375",
+      "include/jerror.h": "b4e8697b3d2e06071f23a3f32c50f62f782cdee03f7b82e4595eed5e33d67288",
+      "include/jmorecfg.h": "b86b4abf452d39b737cb45503591e04e9ca38c5fd0e90d429387d0464005a28b",
+      "include/jpeglib.h": "dc3e8220f34b7e9f9e48620f5cb8dc070834feb3214bb12bbad78478ebb29e60",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboConfig.cmake": "38db955d4754e03c50ee289b215d0a214249e9ab21b1a585f9baa396625c55f7",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboConfigVersion.cmake": "9e6ed553c9bae19c96dfae0fbbbd91784b90bb8e5a05ea7f59a9714e3de54663",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboTargets-release.cmake": "38c143b9d16ebedda399af455bacae5475f352c1685867495481acc8fcabba71",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboTargets.cmake": "95eee1833b101b8098312a0d02d070b2f939ecaa2271c2a98e73ac2020ff705c",
+      "lib/libjpeg.a": "5a8fadf0f778e104bfb5369efe85d648f9f50bbd0e693e1bd9a0a4e88f5fd4b6",
+      "lib/pkgconfig/libjpeg.pc": "6f86d8d94a69d96591d96d6655be96d434acb8e48bef8e6bf5f957ebd5e2d4bb",
+      "share/doc/libjpeg-turbo/LICENSE.md": "ba6bceebcba0fdd35488477c2cca8c4632ce82c74dbfbc87d886ce6fc4433579",
+      "share/doc/libjpeg-turbo/README.ijg": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6",
+      "share/doc/libjpeg-turbo/README.md": "bd71f6ebae1c151e4b5fe7072dc2cedcf33671fa40d91ad5f9058ecdc0b01721",
+      "share/doc/libjpeg-turbo/example.c": "1c0aeda4768fb884fc3f052deff778e2a86d13b17803b629e374007460bec328",
+      "share/doc/libjpeg-turbo/libjpeg.txt": "a23488dfb4ff36f2f98fa2fee7ff0b86989ed29a9a83308bc86109a3515bd3e7",
+      "share/doc/libjpeg-turbo/structure.txt": "ef5f75523e96d352d9153a627b07bc35f24d4de951bdad694d1a527b7bb95a12",
+      "share/doc/libjpeg-turbo/usage.txt": "fea2350c8120eeb532593375ca01f893e5eac04383069b484c73b4d3f44f6cff",
+      "share/doc/libjpeg-turbo/wizard.txt": "3728907472df90ce30b1da41d11e9f23a66d051037c743be74cafd0e36ff176a"
+    }
+  },
+  "host_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "stage3_complete": false,
+    "host_reference": true,
+    "host_sanitizers": true,
+    "source_manifest_sha256": "8d5e9c9bbfe3886dda3c4f52098cf75e02b24eceafeac757342fbd0ad1e82c8a",
+    "SDK_manifest_sha256": null,
+    "port_and_fixture_sources": {
+      "tools/build_native_jpeg.py": "06250af0748749098f3be9a0122be9d0808b4417b5edd3a4e8b79b047d8c985e",
+      "tools/verify_native_jpeg_sources.py": "50acc3baf20f4f34ce4c95a76bc70b28ab64470d857e282b3b97e624bc6810f0",
+      "tools/generate_jpeg_cases.py": "f708ac905129a172ae7840f6496dac2e999732123425627e6e5bb09e1587b813",
+      "tests/native_jpeg/main.c": "c613a590aa96dcf7f00befb2de2fe02aeb0e5ebae88d26a5519ddfcf4ef4973f",
+      "tests/native_jpeg/CMakeLists.txt": "576062bd9c6e541446dcdb13078bee40cd8ebfe241dc40909bcf4a454cbaa191"
+    },
+    "commands": [
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-jpeg-20261111/host2/prefix",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-DCMAKE_C_FLAGS=-DNO_PUTENV -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-S",
+        "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo",
+        "-B",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/jpeg",
+        "-DENABLE_SHARED=OFF",
+        "-DENABLE_STATIC=ON",
+        "-DWITH_TURBOJPEG=OFF",
+        "-DWITH_TOOLS=ON",
+        "-DWITH_TESTS=ON",
+        "-DWITH_SIMD=OFF",
+        "-DREQUIRE_SIMD=OFF"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/jpeg",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/jpeg"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/ctest",
+        "--test-dir",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/jpeg",
+        "--output-on-failure",
+        "-j1"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/tools/generate_jpeg_cases.py",
+        "--host-build",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/jpeg",
+        "--out",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-jpeg-20261111/host2/prefix",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-DCMAKE_C_FLAGS=-DNO_PUTENV -fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_jpeg",
+        "-B",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/application",
+        "-DJPEG_PREFIX=/workspace/chos-evidence/native-jpeg-20261111/host2/prefix",
+        "-DJPEG_CASES=/workspace/chos-evidence/native-jpeg-20261111/host2/cases"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-jpeg-20261111/host2/application",
+        "-j4"
+      ]
+    ],
+    "limits": [
+      "Original libjpeg API prerequisite;not WebCore or browser integration",
+      "Target TurboJPEG,command-line tools and mutable environment helper excluded",
+      "Selected8-bit decode tests;not full native upstream conformance,production hostile-content isolation or color management"
+    ],
+    "upstream_host_tests": {
+      "status": "PASS",
+      "log_sha256": "4ab54cd0335b522e82581ac33dd236915af1e1b9aab0d9bea4f521720bf6eda3"
+    },
+    "returncode": 0,
+    "seconds": 47.15583046700158,
+    "application": {
+      "path": "/workspace/chos-evidence/native-jpeg-20261111/host2/application/native_jpeg",
+      "bytes": 11595616,
+      "sha256": "e0c73067ea49a5a2429d50f6b133edfbe19171025baac7a1bc09e0f8dd9d9d0d"
+    },
+    "archive": {
+      "members": 101,
+      "bytes": 24738978,
+      "sha256": "005c7a3042888914749d8c6ef0b43155af7220eee82c4364531876d27d65c7e6"
+    },
+    "cases_manifest_sha256": "07977ebde08aa490e83a3832e00a75a2afba93ba4dfc608b89da2d33d381e119",
+    "installed_files_sha256": {
+      "bin/cjpeg": "ae18236a60173873fb7d35f1eda1dcd25744b86e57c26b9c300fa4dcb4571e16",
+      "bin/djpeg": "c3281e120530452a9b212c50ee25ab5ebe2dc0811bf3099c0cce95ed6a0eef51",
+      "bin/jpegtran": "0d3d6c52ed05519e461ebc98cb69c87bf7e5bdf7d45caefc6150b348e2569f08",
+      "bin/rdjpgcom": "b1e97fafbb209c809975f15080bd630149d76b83f0350f7217485f211934be54",
+      "bin/wrjpgcom": "3f0cb908ce859da43aecb83ae90c11e927a450aacc68d0a32517cf8df852caa4",
+      "include/jconfig.h": "59b2454c0bb3ec8256d011ff86c3f847b8945f77f9c155a7c56769176a60a223",
+      "include/jerror.h": "b4e8697b3d2e06071f23a3f32c50f62f782cdee03f7b82e4595eed5e33d67288",
+      "include/jmorecfg.h": "b86b4abf452d39b737cb45503591e04e9ca38c5fd0e90d429387d0464005a28b",
+      "include/jpeglib.h": "dc3e8220f34b7e9f9e48620f5cb8dc070834feb3214bb12bbad78478ebb29e60",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboConfig.cmake": "25f1d094aae40ad9a41752a4a2048bf1e3b30535858d226438443ed9259c99d5",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboConfigVersion.cmake": "9e6ed553c9bae19c96dfae0fbbbd91784b90bb8e5a05ea7f59a9714e3de54663",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboTargets-release.cmake": "38c143b9d16ebedda399af455bacae5475f352c1685867495481acc8fcabba71",
+      "lib/cmake/libjpeg-turbo/libjpeg-turboTargets.cmake": "95eee1833b101b8098312a0d02d070b2f939ecaa2271c2a98e73ac2020ff705c",
+      "lib/libjpeg.a": "005c7a3042888914749d8c6ef0b43155af7220eee82c4364531876d27d65c7e6",
+      "lib/pkgconfig/libjpeg.pc": "2ebbb069f965fd4a13b2aa00b0e701681e23b4904ab96556027fd749f25bb82a",
+      "share/doc/libjpeg-turbo/LICENSE.md": "ba6bceebcba0fdd35488477c2cca8c4632ce82c74dbfbc87d886ce6fc4433579",
+      "share/doc/libjpeg-turbo/README.ijg": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6",
+      "share/doc/libjpeg-turbo/README.md": "bd71f6ebae1c151e4b5fe7072dc2cedcf33671fa40d91ad5f9058ecdc0b01721",
+      "share/doc/libjpeg-turbo/example.c": "1c0aeda4768fb884fc3f052deff778e2a86d13b17803b629e374007460bec328",
+      "share/doc/libjpeg-turbo/libjpeg.txt": "a23488dfb4ff36f2f98fa2fee7ff0b86989ed29a9a83308bc86109a3515bd3e7",
+      "share/doc/libjpeg-turbo/structure.txt": "ef5f75523e96d352d9153a627b07bc35f24d4de951bdad694d1a527b7bb95a12",
+      "share/doc/libjpeg-turbo/usage.txt": "fea2350c8120eeb532593375ca01f893e5eac04383069b484c73b4d3f44f6cff",
+      "share/doc/libjpeg-turbo/wizard.txt": "3728907472df90ce30b1da41d11e9f23a66d051037c743be74cafd0e36ff176a",
+      "share/man/man1/cjpeg.1": "0796fa53a5d4f16f7a77f4f811fcbefd1b848151ced278102524c6d035244b1d",
+      "share/man/man1/djpeg.1": "14af7298bf63bca5824d28a9cb0673f60c8c9868430294668eef44345dcee0d2",
+      "share/man/man1/jpegtran.1": "6f98c1d2001527061115f42d22cfe38e681f3895046cdfdb37f92e5498554228",
+      "share/man/man1/rdjpgcom.1": "9f6920585ec2f7fe3f72fe2c7d9be1562806e5850b5c9af35b2abc54971c8f79",
+      "share/man/man1/wrjpgcom.1": "d5725d2ae72e8029bccc0cb79f7b02b1d0080bf9ac96ac01bf7160d0fdba9574"
+    }
+  },
+  "reference_cases": {
+    "schema": 1,
+    "source_manifest_sha256": "8d5e9c9bbfe3886dda3c4f52098cf75e02b24eceafeac757342fbd0ad1e82c8a",
+    "reference": "Generic non-SIMD upstream host tools checked against original historical goldens",
+    "historical_upstream_cases": 21,
+    "additional_host_reference_cases": 1,
+    "historical_MD5_is_not_source_authentication": true,
+    "ctest_metadata_sha256": "949b58cd2af64c84482cb3415c7c12efb59d89b326244952cd95fcce3eecd6be",
+    "reference_tools_sha256": {
+      "djpeg-static": "77f52f41f96d184a0b2e3b8e85325482a077a0fb95d89a52d21e7c5100ddebe9",
+      "test/md5cmp": "f44116455e8edbeffc974aa19598e4b6026d430afca022a921140f04d4ba0177"
+    },
+    "cases": [
+      {
+        "name": "rgb-islow",
+        "asset": "assets/d6b302f95892d620214885cd7b8bc53fe3bdd277f577793ca5799deb50ce8c64.jpg",
+        "encoded_sha256": "d6b302f95892d620214885cd7b8bc53fe3bdd277f577793ca5799deb50ce8c64",
+        "encoded_bytes": 570569,
+        "reference_PNM_sha256": "fb784aa5a42950d91352251515f8b3e3755a32e4c51e92864efb90022ed63785",
+        "pixel_sha256": "8534ed640923f6967869a062a0c4ac1c100aadf6d079f6b5e5f0792aa36a1bf2",
+        "pixel_FNV64": "0x446b4e75e6d24a30",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-ppm",
+          "-icc",
+          "testout-static_rgb_islow.icc",
+          "-outfile",
+          "testout-static_rgb_islow.ppm",
+          "testout-static_rgb_islow.jpg"
+        ],
+        "historical_upstream_MD5": "00a257f5393fef8821f2b88ac7421291",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "00a257f5393fef8821f2b88ac7421291",
+          "testout-static_rgb_islow.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "422-ifast",
+        "asset": "assets/ca5432f594cfa4477525842929641da0c67161ac9a276b82cab233ff79026cc5.jpg",
+        "encoded_sha256": "ca5432f594cfa4477525842929641da0c67161ac9a276b82cab233ff79026cc5",
+        "encoded_bytes": 5928,
+        "reference_PNM_sha256": "d8383e8c8c2c60a4b46a27cf44cec2f33e53ac377382ca146e6b65f6473698b9",
+        "pixel_sha256": "b2074d49a83ed5810b8368d64a43f980302857b8f5d3a988a052f484d843048d",
+        "pixel_FNV64": "0xe4460fc0e3188224",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 1,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "fast",
+          "-ppm",
+          "-outfile",
+          "testout-static_422_ifast.ppm",
+          "testout-static_422_ifast_opt.jpg"
+        ],
+        "historical_upstream_MD5": "35bd6b3f833bad23de82acea847129fa",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "35bd6b3f833bad23de82acea847129fa",
+          "testout-static_422_ifast.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "440-islow",
+        "asset": "assets/066b484e6e50b30a8ed5b97f0cda88916aa1b55832a316d5b2a21054c25a4e9e.jpg",
+        "encoded_sha256": "066b484e6e50b30a8ed5b97f0cda88916aa1b55832a316d5b2a21054c25a4e9e",
+        "encoded_bytes": 6250,
+        "reference_PNM_sha256": "046817d34d07d5045631f07240e5fb67eac43f5ade6fdbc421dbefa83c4b9984",
+        "pixel_sha256": "3212b1bd199db0e8a3d2de50ef4bc4e81d3f737cbbb3a9a8c1403e87cc0dcd82",
+        "pixel_FNV64": "0x571e5d7926468b3d",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-ppm",
+          "-outfile",
+          "testout-static_440_islow.ppm",
+          "testout-static_440_islow.jpg"
+        ],
+        "historical_upstream_MD5": "11e7eab7ef7ef3276934bb7e7b6bb377",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "11e7eab7ef7ef3276934bb7e7b6bb377",
+          "testout-static_440_islow.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "422m-ifast",
+        "asset": "assets/ca5432f594cfa4477525842929641da0c67161ac9a276b82cab233ff79026cc5.jpg",
+        "encoded_sha256": "ca5432f594cfa4477525842929641da0c67161ac9a276b82cab233ff79026cc5",
+        "encoded_bytes": 5928,
+        "reference_PNM_sha256": "fd0b7ba708ab37309ba34f9be2e2609b1ff3230668115ff15f7374b5edafa1e4",
+        "pixel_sha256": "1f6ebd37c89327f496160419b755034408a627ad2cca98e667f8cf4da2a2d9a5",
+        "pixel_FNV64": "0xe36746e81a0a3383",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 1,
+        "fancy": 0,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "fast",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_422m_ifast.ppm",
+          "testout-static_422_ifast_opt.jpg"
+        ],
+        "historical_upstream_MD5": "8dbc65323d62cca7c91ba02dd1cfa81d",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "8dbc65323d62cca7c91ba02dd1cfa81d",
+          "testout-static_422m_ifast.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420-q100-ifast-prog",
+        "asset": "assets/2e1c96984c2b65cd24ed54ab01aa1245f1a68db3d6ddfb0e1a0eeb052a9e226e.jpg",
+        "encoded_sha256": "2e1c96984c2b65cd24ed54ab01aa1245f1a68db3d6ddfb0e1a0eeb052a9e226e",
+        "encoded_bytes": 18406,
+        "reference_PNM_sha256": "c83e11b414387ac9d7607d58dc656b452098b1a2daaf3f5b4cc1a16d12dbfc9a",
+        "pixel_sha256": "d5f5a9e3fe1caaa63312c42a0e456a04faca8942a0c1911f6f959984977fc37e",
+        "pixel_FNV64": "0x2cdec57b824c744c",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 1,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "fast",
+          "-ppm",
+          "-outfile",
+          "testout-static_420_q100_ifast.ppm",
+          "testout-static_420_q100_ifast_prog.jpg"
+        ],
+        "historical_upstream_MD5": "5a732542015c278ff43635e473a8a294",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "5a732542015c278ff43635e473a8a294",
+          "testout-static_420_q100_ifast.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-q100-ifast-prog",
+        "asset": "assets/2e1c96984c2b65cd24ed54ab01aa1245f1a68db3d6ddfb0e1a0eeb052a9e226e.jpg",
+        "encoded_sha256": "2e1c96984c2b65cd24ed54ab01aa1245f1a68db3d6ddfb0e1a0eeb052a9e226e",
+        "encoded_bytes": 18406,
+        "reference_PNM_sha256": "743a6b5ab88d2988e8b3c96f6765ddce7e8623434b1c122d7df90843e9db40a7",
+        "pixel_sha256": "16b5b3871982fe79d03521e8aa584cc01589f8003393acfa18844316ed7eea5b",
+        "pixel_FNV64": "0xea8f6a2d652c51fb",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 1,
+        "fancy": 0,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "fast",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_q100_ifast.ppm",
+          "testout-static_420_q100_ifast_prog.jpg"
+        ],
+        "historical_upstream_MD5": "ff692ee9323a3b424894862557c092f1",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "ff692ee9323a3b424894862557c092f1",
+          "testout-static_420m_q100_ifast.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "gray-islow",
+        "asset": "assets/b39ba716128c02501db3e461d025d76225f7b68710e41227fead5389a3e2288f.jpg",
+        "encoded_sha256": "b39ba716128c02501db3e461d025d76225f7b68710e41227fead5389a3e2288f",
+        "encoded_bytes": 4333,
+        "reference_PNM_sha256": "ac5cf239fcdb60cd11128eac249ad5d4641772d4e5d61eff1950b45a533be25f",
+        "pixel_sha256": "5c50271eaaa986830673732d1ce9ea28c29acf21cc45f6fdcce70f91ab94de67",
+        "pixel_FNV64": "0xcb1ba6e70f96b844",
+        "width": 227,
+        "height": 149,
+        "components": 1,
+        "dct_fast": 0,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-ppm",
+          "-outfile",
+          "testout-static_gray_islow.ppm",
+          "testout-static_gray_islow.jpg"
+        ],
+        "historical_upstream_MD5": "8d3596c56eace32f205deccc229aa5ed",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "8d3596c56eace32f205deccc229aa5ed",
+          "testout-static_gray_islow.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "gray-islow-rgb",
+        "asset": "assets/b39ba716128c02501db3e461d025d76225f7b68710e41227fead5389a3e2288f.jpg",
+        "encoded_sha256": "b39ba716128c02501db3e461d025d76225f7b68710e41227fead5389a3e2288f",
+        "encoded_bytes": 4333,
+        "reference_PNM_sha256": "352f17a8caa5b50a95da0168740a91bca2347a34f37391bdeba5559cc6f1f228",
+        "pixel_sha256": "f0b71d10069b932194e5714835e7db42a4e5dc044431b4e40d8fd3dd5e9be7dd",
+        "pixel_FNV64": "0x74f8b820143583de",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-rgb",
+          "-ppm",
+          "-outfile",
+          "testout-static_gray_islow_rgb.ppm",
+          "testout-static_gray_islow.jpg"
+        ],
+        "historical_upstream_MD5": "116424ac07b79e5e801f00508eab48ec",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "116424ac07b79e5e801f00508eab48ec",
+          "testout-static_gray_islow_rgb.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "3x2-ifast-prog",
+        "asset": "assets/aff4efb205fa7cd2a9a8fd186ed8e50a773fb97de379e67564358b5beccf7666.jpg",
+        "encoded_sha256": "aff4efb205fa7cd2a9a8fd186ed8e50a773fb97de379e67564358b5beccf7666",
+        "encoded_bytes": 5335,
+        "reference_PNM_sha256": "e97378d7b6488096429b0e797d6e8ef4118d17d60051477f11acd9b23eb9f40d",
+        "pixel_sha256": "fd90749504c144ed03168b6f08d9ff6ed0431568ada476e3433a62e3d2cffd0e",
+        "pixel_FNV64": "0xa2a08e0a03900dcf",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 1,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "fast",
+          "-ppm",
+          "-outfile",
+          "testout-static_3x2_ifast.ppm",
+          "testout-static_3x2_ifast_prog.jpg"
+        ],
+        "historical_upstream_MD5": "fd283664b3b49127984af0a7f118fccd",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "fd283664b3b49127984af0a7f118fccd",
+          "testout-static_3x2_ifast.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-2_1",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "a425bbf60b7d05127749a283e7572c27719b97c1874e2de38e94fa9559c36496",
+        "pixel_sha256": "7f33a354683ec81ac8f59846e500ec143b69dbc9780c1f3db1ef48ed485ef23d",
+        "pixel_FNV64": "0x930b6c9613de34b5",
+        "width": 454,
+        "height": 298,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 2,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "2/1",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_2_1.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "9f9de8c0612f8d06869b960b05abf9c9",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "9f9de8c0612f8d06869b960b05abf9c9",
+          "testout-static_420m_islow_2_1.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-15_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "059385050e5d07fcbb37087aee0daa4bb82e4bf95d22ab2f926b37f9d8686286",
+        "pixel_sha256": "d69a1219013c0e47a7dd4f2ad5a04a2f797add056d28eb6f4e754a268d31a64a",
+        "pixel_FNV64": "0x85b6c2c7a4c11763",
+        "width": 426,
+        "height": 280,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 15,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "15/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_15_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "b6875bc070720b899566cc06459b63b7",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "b6875bc070720b899566cc06459b63b7",
+          "testout-static_420m_islow_15_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-13_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "4fbee388a83ccbaddef74970880a311b23628e977c98d45b9fb5b9d9fedf26f4",
+        "pixel_sha256": "b61aa7ad9f22bc39ef5a8ef26aa227c0cfeb2a6365f2a8bd69eddc275318efc5",
+        "pixel_FNV64": "0xc72688ae24f2bafe",
+        "width": 369,
+        "height": 243,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 13,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "13/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_13_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "bc3452573c8152f6ae552939ee19f82f",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "bc3452573c8152f6ae552939ee19f82f",
+          "testout-static_420m_islow_13_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-11_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "76702a2fa7e95d8e67cdaaa3a6258cc7493eae6b5b787c19edb13109cc454b40",
+        "pixel_sha256": "f603141a008734bf3a3ddb4ac1b990c055831b10dd780fc4d99ab87ea4f2ad2d",
+        "pixel_FNV64": "0xd5afa090fdf76862",
+        "width": 313,
+        "height": 205,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 11,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "11/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_11_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "d8cc73c0aaacd4556569b59437ba00a5",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "d8cc73c0aaacd4556569b59437ba00a5",
+          "testout-static_420m_islow_11_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-9_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "9c7039e4b63523a4b679e4a78b1914c1ca5b2ea1420eeb22a8e46ea53d6a6270",
+        "pixel_sha256": "83b6d77c9daa02f247e689ec677d2f46a28768c37e6b159516456e614744326a",
+        "pixel_FNV64": "0x32ca4b7de55cf286",
+        "width": 256,
+        "height": 168,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 9,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "9/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_9_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "d25e61bc7eac0002f5b393aa223747b6",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "d25e61bc7eac0002f5b393aa223747b6",
+          "testout-static_420m_islow_9_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-7_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "b97c18c8ffe1b814e40fe94c73e38f02efb9cea31b247fbfe066ead2ec0636e8",
+        "pixel_sha256": "d3e7ad4d81f3628db3ac2c504e92cd34472202e62441bc1441e6f57db10531fd",
+        "pixel_FNV64": "0xa06bc32fcaa8e75f",
+        "width": 199,
+        "height": 131,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 7,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "7/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_7_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "ddb564b7c74a09494016d6cd7502a946",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "ddb564b7c74a09494016d6cd7502a946",
+          "testout-static_420m_islow_7_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-3_4",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "40e304046236331040f79069958cbed430986d7457ae938ded8b2359b80b314f",
+        "pixel_sha256": "8160f707680ba2283d04cbb09ea4b8a7dee43d2e549535d98f3d75a1287b5250",
+        "pixel_FNV64": "0x2217135b2b7e75a2",
+        "width": 171,
+        "height": 112,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 3,
+        "scale_denom": 4,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "3/4",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_3_4.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "8ed8e68808c3fbc4ea764fc9d2968646",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "8ed8e68808c3fbc4ea764fc9d2968646",
+          "testout-static_420m_islow_3_4.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-5_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "835e60ca0ccc281348f3788ff79403a46b1618e411fe287fa0b3edcdd0835b6e",
+        "pixel_sha256": "4cb925bb1c1673d8e244c5369844b89ec2ebbf5c6dfa5e18b0782a5cf89b6e88",
+        "pixel_FNV64": "0x72f54259032ba22",
+        "width": 142,
+        "height": 94,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 5,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "5/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_5_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "a3363274999da2366a024efae6d16c9b",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "a3363274999da2366a024efae6d16c9b",
+          "testout-static_420m_islow_5_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-1_2",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "65d762bf59613a0af695ace2ab80ecd75d21d8204df58bc7fc6e8b7263157b86",
+        "pixel_sha256": "5f39433a3c2ba8ac64a0ad3db55bb7f50b4911876b315d2e64b54e47ec9cce93",
+        "pixel_FNV64": "0xd03c3d933794bffb",
+        "width": 114,
+        "height": 75,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 1,
+        "scale_denom": 2,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "1/2",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_1_2.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "e692a315cea26b988c8e8b29a5dbcd81",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "e692a315cea26b988c8e8b29a5dbcd81",
+          "testout-static_420m_islow_1_2.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-3_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "23ae0875f4f42bfd60811779072f7a9ddebd60ff234415e710ddcd2d8c2c98d4",
+        "pixel_sha256": "9f49761e15fe404b978b399c2f99c19fbaa7a26de7fb767ae1432cd770d34e09",
+        "pixel_FNV64": "0x68b56f911575d195",
+        "width": 86,
+        "height": 56,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 3,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "3/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_3_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "79eca9175652ced755155c90e785a996",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "79eca9175652ced755155c90e785a996",
+          "testout-static_420m_islow_3_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-1_4",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "14e6107513f8b807e3a01a1c67659bbedd1b8b75c2fd3bf1bfb9ba427292c7d4",
+        "pixel_sha256": "ef3bf1b4ea6338d814ca6698ceb3f473b16624c1ea65c46a6c08e127b3911aa4",
+        "pixel_FNV64": "0xb9479e0944d94de0",
+        "width": 57,
+        "height": 38,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 1,
+        "scale_denom": 4,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "1/4",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_1_4.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "79cd778f8bf1a117690052cacdd54eca",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "79cd778f8bf1a117690052cacdd54eca",
+          "testout-static_420m_islow_1_4.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "420m-islow-1_8",
+        "asset": "assets/acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b.jpg",
+        "encoded_sha256": "acc6ec555d41d15b368320edaa3b20958ee6fa97cb6e4a18d1213d5ae8bec73b",
+        "encoded_bytes": 5770,
+        "reference_PNM_sha256": "720c645c02e13ee4deb0d9e7d25651fe0f21f7a89804d18d48bb51e1c9f85e0f",
+        "pixel_sha256": "121328a62e66d992735e2f3b691da2d908378be44e86e0a8855f4f408ed39b8f",
+        "pixel_FNV64": "0x268f0e59ea7a5357",
+        "width": 29,
+        "height": 19,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 0,
+        "scale_num": 1,
+        "scale_denom": 8,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-scale",
+          "1/8",
+          "-nosmooth",
+          "-ppm",
+          "-outfile",
+          "testout-static_420m_islow_1_8.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testorig.jpg"
+        ],
+        "historical_upstream_MD5": "391b3d4aca640c8567d6f8745eb2142f",
+        "comparison_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/test/md5cmp",
+          "391b3d4aca640c8567d6f8745eb2142f",
+          "testout-static_420m_islow_1_8.ppm"
+        ],
+        "reference_kind": "upstream historical pixel regression"
+      },
+      {
+        "name": "arithmetic-full-islow",
+        "asset": "assets/4672c7f08864cd0a8c73a4fa4b66ca32b635d38464551c1ecf06564ae8c89b38.jpg",
+        "encoded_sha256": "4672c7f08864cd0a8c73a4fa4b66ca32b635d38464551c1ecf06564ae8c89b38",
+        "encoded_bytes": 5126,
+        "reference_PNM_sha256": "c495b9838693f7314dbc25e7c6429506a1c42970ecef068a207ffa16e7efb580",
+        "pixel_sha256": "0a42217ec0ee16e2473fed4d73c5d6331e811d21c14b3732f188a01e42659021",
+        "pixel_FNV64": "0xcc30ec4defc0ec6",
+        "width": 227,
+        "height": 149,
+        "components": 3,
+        "dct_fast": 0,
+        "fancy": 1,
+        "scale_num": 1,
+        "scale_denom": 1,
+        "reference_command": [
+          "/workspace/chos-evidence/native-jpeg-20261111/host-upstream1/djpeg-static",
+          "-dct",
+          "int",
+          "-ppm",
+          "-outfile",
+          "/workspace/chos-evidence/native-jpeg-20261111/target2/cases/arithmetic-reference.ppm",
+          "/workspace/CHOS-Second-Variant/third_party/libjpeg-turbo/testimages/testimgari.jpg"
+        ],
+        "historical_upstream_MD5": null,
+        "comparison_command": null,
+        "reference_kind": "generic host decode of original signed arithmetic image"
+      }
+    ]
+  },
+  "qualified_guests": {
+    "direct3": {
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "6b43573c6a95a3d2b44c8187c07ffb8d82b66157074348472e898b1f73762ec0",
+        "cases_manifest_sha256": "8356105c7cdda10361f8af40bcf43b4c882be869365ea02000a636da17054715",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "seconds": 2.7648137680007494,
+            "positive_cases": 22,
+            "cold_pages_restored": 110116,
+            "peak_decode_bytes": 143141
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "seconds": 2.5578666170004,
+            "positive_cases": 22,
+            "cold_pages_restored": 110116,
+            "peak_decode_bytes": 143141
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "seconds": 2.924549367000509,
+            "positive_cases": 22,
+            "cold_pages_restored": 110116,
+            "peak_decode_bytes": 143141
+          }
+        ],
+        "checks": [
+          "Original JPEG input dimensions and complete sample hashes match checked upstream/reference outputs",
+          "Selected integer IDCT,gray/RGB,upsampling,scaling,progressive and arithmetic decode cases",
+          "88 fragmented deliveries:84 suspend-capable Huffman paths and4 bounded complete-input arithmetic entropy paths",
+          "Real suspended source input,strict truncation/error policy,dimension and allocation bounds",
+          "Three real pthread workers and separate per-decoder error recovery",
+          "Normal exit0 and exact physical-page,engine,committed-frame and futex cleanup"
+        ],
+        "limits": [
+          "Selected native JPEG codec prerequisite;not WebCore/browser integration or full native upstream conformance",
+          "Upstream arithmetic entropy cannot suspend;the consumer buffers its bounded complete input before entropy decoding",
+          "Historical upstream MD5 values are regression checks,not security authentication;source uses signed SHA256-pinned release",
+          "8-bit output samples;ICC/color management,EXIF display orientation and other precision modes not qualified",
+          "Consumer hashes separate rows;large contiguous WebCore image buffers remain open",
+          "QEMU only;new Fusion,Pi5 and laptop execution NOT RUN;Stage3 incomplete"
+        ]
+      },
+      "boot_artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      },
+      "serial_sha256": "a7a691def6aec3856e1c530d79ad0d3de5366b76e44d66f6dc3627242217a140"
+    },
+    "uefi3": {
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "6b43573c6a95a3d2b44c8187c07ffb8d82b66157074348472e898b1f73762ec0",
+        "cases_manifest_sha256": "8356105c7cdda10361f8af40bcf43b4c882be869365ea02000a636da17054715",
+        "cold_free_pages": 494486,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "seconds": 2.7778595939998922,
+            "positive_cases": 22,
+            "cold_pages_restored": 494486,
+            "peak_decode_bytes": 143141
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "seconds": 2.7287402660003863,
+            "positive_cases": 22,
+            "cold_pages_restored": 494486,
+            "peak_decode_bytes": 143141
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "seconds": 2.9535767960005614,
+            "positive_cases": 22,
+            "cold_pages_restored": 494486,
+            "peak_decode_bytes": 143141
+          }
+        ],
+        "checks": [
+          "Original JPEG input dimensions and complete sample hashes match checked upstream/reference outputs",
+          "Selected integer IDCT,gray/RGB,upsampling,scaling,progressive and arithmetic decode cases",
+          "88 fragmented deliveries:84 suspend-capable Huffman paths and4 bounded complete-input arithmetic entropy paths",
+          "Real suspended source input,strict truncation/error policy,dimension and allocation bounds",
+          "Three real pthread workers and separate per-decoder error recovery",
+          "Normal exit0 and exact physical-page,engine,committed-frame and futex cleanup"
+        ],
+        "limits": [
+          "Selected native JPEG codec prerequisite;not WebCore/browser integration or full native upstream conformance",
+          "Upstream arithmetic entropy cannot suspend;the consumer buffers its bounded complete input before entropy decoding",
+          "Historical upstream MD5 values are regression checks,not security authentication;source uses signed SHA256-pinned release",
+          "8-bit output samples;ICC/color management,EXIF display orientation and other precision modes not qualified",
+          "Consumer hashes separate rows;large contiguous WebCore image buffers remain open",
+          "QEMU only;new Fusion,Pi5 and laptop execution NOT RUN;Stage3 incomplete"
+        ]
+      },
+      "boot_artifacts": {
+        "kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "iso_sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7",
+        "iso_embedded_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "kernel_symbols_match_iso": true
+      },
+      "serial_sha256": "c8ed74fc5981d5194566e97c63293444725ed7f5998d8dcc35c22b2aff8d3d59"
+    }
+  },
+  "host_tests": {
+    "consumer_ASAN_UBSAN_LeakSanitizer": {
+      "status": "PASS",
+      "returncode": 0,
+      "log_sha256": "ff4178d5a6945646acebe089904f5c560d3dc623f00b2042dcad188af50cace8"
+    },
+    "original_upstream_generic_core_sanitized": {
+      "status": "PASS",
+      "tests": 212,
+      "log_sha256": "4ab54cd0335b522e82581ac33dd236915af1e1b9aab0d9bea4f521720bf6eda3"
+    },
+    "repository_host": {
+      "status": "PASS",
+      "returncode": 0,
+      "log_sha256": "3655be5bb2d8f0f3bd4873f5f6f27b602ca41c9e5ba73bc7b33913c15c6ce7bb"
+    },
+    "repository_sanitizers": {
+      "status": "PASS",
+      "returncode": 0,
+      "log_sha256": "36f81b2669d8862fdc5ec6b8b75c4d15233b3bef3e3dc8aa503cef6ee224d24b"
+    }
+  },
+  "regression": {
+    "e1000e": {
+      "status": "PASS",
+      "backend": "e1000e",
+      "browser_elf_sha256": "989c45f6c06aded8932919ed1865c67e1af73024f361f946799c19a39f726d12",
+      "browser_pid": 1,
+      "requests": [
+        "/redirect",
+        "/page",
+        "/page",
+        "/slow",
+        "/page"
+      ],
+      "dns_queries": [
+        "0463686f7304746573740000010001"
+      ],
+      "checks": [
+        "native Ethernet queues and DHCP",
+        "isolated EL0 browser window bound to its actual process owner",
+        "browser TCP HTTP body and relative redirect",
+        "HTTPS blocked without TLS and no plaintext downgrade",
+        "DNS A query and reply over actual adapter",
+        "actual in-flight HTTP failure on link loss releases its process-owned socket",
+        "DHCP reconnect and new HTTP request in the same isolated browser process"
+      ]
+    },
+    "boot_artifacts": {
+      "kernel_sha256": "c879ee35cf286a04451236284b4e2ab648f3bfc67d5932ee22ac5d9bab5a050c",
+      "iso_sha256": "e31768f23c24d0c9197a9820a668767eea4b1e849187ccaa9b73a3cd0d3e7a46",
+      "iso_embedded_kernel_sha256": "c879ee35cf286a04451236284b4e2ab648f3bfc67d5932ee22ac5d9bab5a050c",
+      "kernel_symbols_match_iso": true
+    },
+    "serial_sha256": "2a62d9e442a379292207dae192691171df27b69e02b8723e36f5ba3a12e08ac9"
+  },
+  "consumer_policy": {
+    "input_max_bytes": 2097152,
+    "width_max": 1024,
+    "height_max": 768,
+    "charged_codec_budget_bytes": 8388608,
+    "allocation_ledger_entries": 512,
+    "context_and_output_row_and_input_additional": true,
+    "all_warnings_and_errors_fatal": true,
+    "allocation_hooks": "Consumer-only linker interposition calls real upstream small/large allocation/free routines",
+    "arithmetic_entropy": "Upstream does not support entropy suspension;header remains fragmented,entropy waits for bounded complete input",
+    "Huffman_fragmented_delivery_sizes": [
+      1,
+      7,
+      64,
+      1024
+    ],
+    "normalization": "8bit integer sample-space RGB/gray with explicit IDCT,upsampling and scale parameters"
+  },
+  "retained_failures": [
+    {
+      "attempt": "prototype1",
+      "result": "Missing native setenv declaration for unused inline upstream environment setter",
+      "resolution": "Select upstream NO_PUTENV guard for the selected libjpeg API;no fabricated setter or successful environment operation."
+    },
+    {
+      "attempt": "initial native direct1 and host1 consumer",
+      "native_result_sha256": "7f6fa5482ef76d9eff8430f06d7664b45d330386fe2339f17a2dca8fb64c64ab",
+      "host_log_sha256": "d26035df7b310d107e091aeb590cec74d4712f8ac4163b847a77d3f0ae13a10a",
+      "result": "All22ordinarypixelchecks passed;fragmented arithmetic entropy returned upstream JERR_CANT_SUSPEND",
+      "resolution": "Bounded complete-input arithmetic entropy path after fragmented header;keep all22cases and exact hashes."
+    }
+  ],
+  "limits": [
+    "Codec prerequisite and strict consumer,not WebCore image integration,page layout or a modern browser",
+    "21historical upstream fullPNM regressions plus1explicit generic arithmetic reference;historical MD5 is not source authentication",
+    "Compiled8/12/16andencoder code is broader than selected native8bit decode evidence",
+    "No ICC color management,EXIF display orientation,CMYK or higher precision native qualification,encoder/fuzzing/fullnativeCTest qualification",
+    "Output is hashed row by row;larger contiguous WebCore backing stores remain open",
+    "Runtime/kernel/driver implementations unchanged;new physical Fusion/Pi5/laptop execution NOT RUN",
+    "Custom CHOS WebCore backend,production trust/time/update/isolation and nativePi5wireless remain open",
+    "Source-only iteration;prior critical Cairo artifacts retained"
+  ]
+}

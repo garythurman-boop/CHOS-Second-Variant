@@ -1,0 +1,12 @@
+[GNUPG:] NEWSIG
+gpg: Signature made Tue Oct 27 19:34:13 2026 UTC
+gpg:                using RSA key 0338C8D8D9FDA62CF9C421BD7EC2DBB6F4DBF434
+[GNUPG:] KEY_CONSIDERED 0338C8D8D9FDA62CF9C421BD7EC2DBB6F4DBF434 0
+[GNUPG:] SIG_ID zBXhn7ucmd6rUtKog67T5wVHjv0 2026-10-27 1793129653
+[GNUPG:] GOODSIG 7EC2DBB6F4DBF434 The libjpeg-turbo Project (Signing key for official binaries) <information@libjpeg-turbo.org>
+gpg: Good signature from "The libjpeg-turbo Project (Signing key for official binaries) <information@libjpeg-turbo.org>" [unknown]
+[GNUPG:] VALIDSIG 0338C8D8D9FDA62CF9C421BD7EC2DBB6F4DBF434 2026-10-27 1793129653 0 4 0 1 8 00 0338C8D8D9FDA62CF9C421BD7EC2DBB6F4DBF434
+[GNUPG:] TRUST_UNDEFINED 0 pgp
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 0338 C8D8 D9FD A62C F9C4  21BD 7EC2 DBB6 F4DB F434
