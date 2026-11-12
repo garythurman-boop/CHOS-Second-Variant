@@ -3,7 +3,8 @@
 Current integration boundary: [original WebCore adapters and the custom CHOS port](WEBCORE_PORT_BOUNDARY.md).
 The inspected WPE release uses Skia and disables Cairo. The Cairo work supports
 a proposed custom CHOS software backend; no native WebCore target, page layout
-or modern browser is running yet. Earlier WPE architecture entries below are
+or modern browser is running yet. Four original image adapter units now compile
+for the native target, with linking and execution still open. Earlier WPE architecture entries below are
 historical proposals, not evidence of a working Cairo-based WPE build.
 
 Current image checkpoint: [native JPEG decoding](NATIVE_JPEG_DECODING.md) and

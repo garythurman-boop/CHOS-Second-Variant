@@ -89,6 +89,37 @@ engine operations. A small first image test must be labeled accordingly, and
 larger contiguous engine buffers must be implemented and qualified before
 claiming ordinary browser-size image support.
 
+## Native compiler checkpoint
+
+The [reusable image probe](../tools/probe_native_webcore_images.py) now compiles
+four original WebCore implementation units into actual AArch64 objects:
+`ScalableImageDecoderFrame.cpp`, `PNGImageDecoder.cpp`, `JPEGImageDecoder.cpp`
+and `ImageBackingStoreCairo.cpp`. [The compile report](validation/stage3-webcore-image-compile.json)
+retains exact commands, source/object hashes, ELF headers and unresolved symbols.
+The probe verifies the pinned upstream commit and unchanged WebCore/JSC source,
+the complete native SDK, 2,116 published patched WTF/bmalloc source files and all
+installed target dependency files. Host dependency prefixes are rejected.
+Exported header aliases point to original headers rather than synthesizing APIs.
+
+This is **compilation only**. Objects have unresolved symbols, have not been
+linked together and have not executed. The explicit release/Cairo/FreeType flags
+are a compiler probe, not a generated full-engine configuration or evidence that
+its ABI matches the existing JSCOnly archives. No page or decoder output is
+claimed at this boundary. Full dependency closure, consistent feature generation,
+linking and actual decoder/window execution are the next implementation steps.
+
+For reproducible compiler checks, provide verified target build prefixes and the
+published native engine source/header kit. Every output directory must be fresh:
+
+```sh
+python3 tools/probe_native_webcore_images.py --out build/webcore-image-probe \
+  --webkit-source /path/to/pinned/webkit-2.54.2 \
+  --native-sdk build/native-sdk --engine-kit /path/to/published/engine-kit \
+  --graphics-prefix /path/to/native-graphics/prefix \
+  --font-prefix /path/to/native-fonts/prefix \
+  --png-prefix /path/to/native-png/prefix --jpeg-prefix /path/to/native-jpeg/prefix
+```
+
 ## Route from the component to real page painting
 
 Create an explicit `CHOS` port identity rather than selecting WPE or PlayStation

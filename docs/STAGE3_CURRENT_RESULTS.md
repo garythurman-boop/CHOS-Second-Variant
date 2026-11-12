@@ -4,7 +4,9 @@ Stage 3 remains incomplete. The new [JPEG decoding checkpoint](NATIVE_JPEG_DECOD
 adds native integer decoding, suspended input and bounded arithmetic buffering
 with checked upstream/reference pixels. The [actual WebCore boundary](WEBCORE_PORT_BOUNDARY.md)
 requires a custom CHOS port; current WPE uses Skia and disables Cairo.
-WebCore adapters, page layout and the modern browser remain unfinished.
+Four original WebCore image/frame/Cairo implementation units now compile for
+native AArch64 through a verified compiler probe. They remain unlinked and
+unexecuted; WebCore image integration, page layout and the browser are unfinished.
 The preceding [PNG decoding checkpoint](NATIVE_PNG_DECODING.md)
 adds native classic/progressive image decoding, independent reference comparisons
 and tested corruption/allocation recovery. This supplies a codec dependency;
