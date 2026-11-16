@@ -24,6 +24,16 @@ void *chos_libc_memchr(const void *s,int c,size_t n){
 }
 size_t chos_libc_strlen(const char *s){size_t n=0;while(s[n])n++;return n;}
 size_t chos_libc_strnlen(const char *s,size_t max){size_t n=0;while(n<max&&s[n])n++;return n;}
+static size_t span(const char *s,const char *set,unsigned accepted){
+    unsigned char bits[32]={0};
+    for(const unsigned char *p=(const unsigned char *)set;*p;++p)
+        bits[*p>>3]|=(unsigned char)(1u<<(*p&7u));
+    const unsigned char *p=(const unsigned char *)s;size_t n=0;
+    while(p[n]&&((bits[p[n]>>3]>>(p[n]&7u))&1u)==accepted)++n;
+    return n;
+}
+size_t chos_libc_strspn(const char *s,const char *set){return span(s,set,1);}
+size_t chos_libc_strcspn(const char *s,const char *set){return span(s,set,0);}
 int chos_libc_strcmp(const char *a,const char *b){
     while(*a && *a==*b){a++;b++;}return (int)(unsigned char)*a-(int)(unsigned char)*b;
 }
@@ -48,6 +58,8 @@ int memcmp(const void *a,const void *b,size_t n){return chos_libc_memcmp(a,b,n);
 void *memchr(const void *s,int c,size_t n){return chos_libc_memchr(s,c,n);}
 size_t strlen(const char *s){return chos_libc_strlen(s);}
 size_t strnlen(const char *s,size_t n){return chos_libc_strnlen(s,n);}
+size_t strspn(const char *s,const char *set){return chos_libc_strspn(s,set);}
+size_t strcspn(const char *s,const char *set){return chos_libc_strcspn(s,set);}
 int strcmp(const char *a,const char *b){return chos_libc_strcmp(a,b);}
 int strncmp(const char *a,const char *b,size_t n){return chos_libc_strncmp(a,b,n);}
 char *strcpy(char *d,const char *s){return chos_libc_strcpy(d,s);}

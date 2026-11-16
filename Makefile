@@ -1863,3 +1863,10 @@ test: test-native-jpeg-sources
 test-webcore-image-sources:
 	python3 tools/verify_webcore_image_sources.py
 test: test-webcore-image-sources
+
+.PHONY: test-native-xml-sources test-native-sqlite-sources
+test-native-xml-sources:
+	python3 tools/verify_native_xml_sources.py
+test-native-sqlite-sources:
+	python3 tools/verify_native_sqlite_sources.py
+test: test-native-xml-sources test-native-sqlite-sources

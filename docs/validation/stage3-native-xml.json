@@ -1,0 +1,327 @@
+{
+  "schema": 1,
+  "scope": "Roadmap step 2: original libxml2 selected native memory/custom-I/O prerequisite",
+  "stage3_complete": false,
+  "physical_hardware_run": false,
+  "source": {
+    "name": "libxml2",
+    "version": "2.15.4",
+    "manifest": "docs/dependencies/native-xml.json",
+    "manifest_sha256": "e21fb06468231080f637c14b7af2796d540374b52d25cae2de8423a5da202538",
+    "original_files": 4426,
+    "original_bytes": 42464381,
+    "top_level_original_c_files": 55,
+    "archive_sha256": "98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821",
+    "authentication_scope": "GNOME release checksum over verified TLS; independently signed Debian metadata authenticates all 975 shared source files, with zero differences. Additional GNOME release files are checksum-pinned. No GNOME detached signature claimed.",
+    "signed_debian_archive_sha256": "5868d20db42ee21e4881bc53050c7fa226286a277cb3d0543f76b81f7571e934",
+    "authentication_material": {
+      "ports/xml/authentication/cross-origin-comparison.json": "88611c6638bec2b97fe331496c4af4b66f8430095ed85a482baf94bb113f7c13",
+      "ports/xml/authentication/debian-InRelease": "994bd97cc1736bc19c2e021e650e82747811832a5cf3c0316626134e179870ce",
+      "ports/xml/authentication/debian-InRelease-verified.log": "7c82f3703cfcf81c7903870f0053b6efb493760b8ae1eb8e47005799b44b06a0",
+      "ports/xml/authentication/debian-source-metadata.txt": "34263ec37ddc618781fd3abf986633e5c63e9c80f82e93e1578f8c020f1ff9dd",
+      "ports/xml/authentication/libxml2-2.15.4.sha256sum": "85f6295d2d7d31e2eaac0c4b1cafd74efa43cbe66c597bddfd51b80b4ecfd50b"
+    }
+  },
+  "build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed_by_separate_fixture_runs": true,
+    "native_sdk_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+    "port_and_fixture_sources": {
+      "ports/xml/native-memory-io.patch": "e7b5f0c5f7e86db43ece792775e6973397f2626c32ae457efc539d21b0751f58",
+      "tools/build_native_xml.py": "7d9b6213b517260983a2ca341a1ebea2eb18c022c86428b7ca2ca887de5f735b",
+      "tools/verify_native_xml_sources.py": "b2b9fba3b9882e96763013cf332eb673a3aa1988a6b058b16d4860160c4245ff",
+      "tests/native_xml/main.c": "6e3f63893855e1ad8746c07565effc96123a1b790d1235a498371973d46efcf3",
+      "tests/native_xml/CMakeLists.txt": "ad247bf2b64056e9b411835eecba92c87474c05eff1520d50121bcccc4f26152"
+    },
+    "harness": {
+      "path": "tests/native_xml/qemu.py",
+      "sha256": "a3fedab3117154416f430923f6bd017dc51c812b58b4e42bf6207740f98cd940"
+    },
+    "archive": {
+      "bytes": 2365122,
+      "members": 34,
+      "sha256": "68c1fec22fcfd6f4a1bfef32edcda93b604359369f0bea38cade413bf6a726a5"
+    },
+    "archive_architecture": "All 34 ELF archive members AArch64",
+    "application": {
+      "path": "/workspace/chos-evidence/native-xml-20261112/target3/application/native_xml",
+      "bytes": 625384,
+      "sha256": "2703b2f6ba263a9e8f359ba7ecca91c1eaeef9089285e3729012e69306629377"
+    },
+    "closed_executable_link": true,
+    "no_TLS_program_header": true,
+    "no_writable_executable_load_segments": true,
+    "options": {
+      "BUILD_SHARED_LIBS": "OFF",
+      "LIBXML2_WITH_PROGRAMS": "OFF",
+      "LIBXML2_WITH_TESTS": "OFF",
+      "LIBXML2_WITH_PYTHON": "OFF",
+      "LIBXML2_WITH_MODULES": "OFF",
+      "LIBXML2_WITH_ICONV": "OFF",
+      "LIBXML2_WITH_ICU": "OFF",
+      "LIBXML2_WITH_ZLIB": "OFF",
+      "LIBXML2_WITH_CATALOG": "OFF",
+      "LIBXML2_WITH_XINCLUDE": "OFF",
+      "LIBXML2_WITH_TLS": "ON"
+    },
+    "installed_prefix": "/workspace/chos-evidence/native-xml-20261112/target3/prefix",
+    "installed_files_sha256": {
+      "bin/xml2-config": "928b68a68ad144ff5d5e43b7f96fd56c4bd62a69dc1fd68df1c03ca20db958d9",
+      "include/libxml2/libxml/HTMLparser.h": "c4f81e8cbd194fbd4c121db47ff0eadf4b3efa9d0c780300787fb0e08372ffa4",
+      "include/libxml2/libxml/HTMLtree.h": "d2280b971a031a5ed2f7f8ecff4906a9df6c3f35cb40c588eb05d60e24d8fdcb",
+      "include/libxml2/libxml/SAX.h": "777fc2057fd2a39a6ca7648ee5f148014a65643e750cc5a2fe2e2fc3b4a0ff79",
+      "include/libxml2/libxml/SAX2.h": "d3228dc9e18dec65660f7ff43eb5af2cb7a9e6dad00369f76f058300c0cb1b37",
+      "include/libxml2/libxml/c14n.h": "c9adaf74b4d5c0f5e23e06deb9194e7d595142914a8c36f5e725010a37e6a7c6",
+      "include/libxml2/libxml/catalog.h": "8418816149bed7463eb13fd6d260354a91f1819d2180685dc8d285181932b9c5",
+      "include/libxml2/libxml/chvalid.h": "00acfc327dc00dfb2dd640ab4e1156effd8f5fb8311f0c20d2707440456dc7ce",
+      "include/libxml2/libxml/debugXML.h": "1380bb85a7dccdbfebb1cc9ba9921873e6be11cbd4b0813824754feaa5aa5820",
+      "include/libxml2/libxml/dict.h": "12302fd488f2b735c791f2b1d9fa5b2008dd5e40f94da12e56da0aebea6e1321",
+      "include/libxml2/libxml/encoding.h": "0eabe928a57824d52b95daba1ee3e663f004d8622800f8c1f40177ea15a8a74c",
+      "include/libxml2/libxml/entities.h": "ff61a6eedb81b52ad7e6bd5c005a705c871587c68314d94f7a3511f4afff8739",
+      "include/libxml2/libxml/globals.h": "4e4a9866916b928b201d0ff4a544d90098c6b639da50ca25cc9c7ce395c26349",
+      "include/libxml2/libxml/hash.h": "ee8ba2adce87d740581d6763e783828b622ea8da93a5e9ac4ff36436f607bc75",
+      "include/libxml2/libxml/list.h": "ba1174b44be729cde0eb443180968def8a2879db54199af670e965d331648912",
+      "include/libxml2/libxml/nanoftp.h": "b902e60279e35a4818cf1834a04e654a9cf51b5136f785e89179047304cc52ef",
+      "include/libxml2/libxml/nanohttp.h": "8000d0196f6e6defd5e2468118cf3b534b15da7818b7db18167259ed857d4b7e",
+      "include/libxml2/libxml/parser.h": "3062aaa97d435de0afc34630162c0b3c8a994e76854a92a0e3a217b6297545e2",
+      "include/libxml2/libxml/parserInternals.h": "543da365c6c72699926ff11c0f4afa6c1990f028d7b8fcaaa30de2f284ae0718",
+      "include/libxml2/libxml/pattern.h": "169dca568e076cba001c9a445b22fb73ffa64c9699fd785abcfaf31a8e22337a",
+      "include/libxml2/libxml/relaxng.h": "7d46056b24c572f8a656637cb287fe462e880c7a1fbcd32d5ca7e618f838564c",
+      "include/libxml2/libxml/schemasInternals.h": "e05a6496f4ca8e5017a94812b25bba7856110d7d85d91590ed50780ea6d98cdf",
+      "include/libxml2/libxml/schematron.h": "a3d96d68d801f984b0eaab68d2b193b571ec3b27ba50bbc1c66d3f4dca187f0e",
+      "include/libxml2/libxml/threads.h": "8cee9610d9e3ec2146af6a074a2c6161bd87629e55ab231e61c0fbd8686142d2",
+      "include/libxml2/libxml/tree.h": "29bb46867633b5da9ac289f72f8667863a14b7105843f8fa2b16df21b26d0496",
+      "include/libxml2/libxml/uri.h": "f761d9ac289b051ec7bbc73ae723468fa80f96461dc664fe5781bc009a92ac90",
+      "include/libxml2/libxml/valid.h": "e51b4ca60f3f7921b3be0e78fe750f202b9d0a47fafc0750a806d665239f1fb9",
+      "include/libxml2/libxml/xinclude.h": "54df174ccb9f272aa5483b9c18c83153ca6bbea93e706453240ad09381fad037",
+      "include/libxml2/libxml/xlink.h": "6b0495de5f706d571995cde9e41ae6673d906a53899f7cae2061108ddad00d39",
+      "include/libxml2/libxml/xmlIO.h": "e623b00dcabbf5c559567fcea561cc97f03b9fb3c8642d9edcaf70ade988385d",
+      "include/libxml2/libxml/xmlautomata.h": "41eeba10a1dc5f727694618a5513ffef4b1dcb0c27169d91b264e54eedad7d08",
+      "include/libxml2/libxml/xmlerror.h": "ff6fb62996e5478f08ef99258c4f49b1a0830f93565ff3a92f47a316f792202f",
+      "include/libxml2/libxml/xmlexports.h": "36f6cc28976fed8b6c8587fd521f14ee1f4b96615f10e9b7c35c76ef2876e525",
+      "include/libxml2/libxml/xmlmemory.h": "b8a8addf9376aa9bee7d3f5b6f8b58d2af4c2c284921bd418da5b27b70fe1085",
+      "include/libxml2/libxml/xmlmodule.h": "ed0d48e89b3f1aac1618d4f74e87ee64bde0a8b4c7057fa56a03b56703af67cb",
+      "include/libxml2/libxml/xmlreader.h": "11fd34156675d65c73bfa83c69c8dda3d87a56553df92a5ab713bd95ab525c16",
+      "include/libxml2/libxml/xmlregexp.h": "7df116616ee4319f0654ce00b467bc165dbaf38ed318b1193d4a474a73ee1298",
+      "include/libxml2/libxml/xmlsave.h": "fb99635f075e4d1c2fe858b16ef0d8853839c5df971f5dec54dcb29b872ccbbe",
+      "include/libxml2/libxml/xmlschemas.h": "0e4eeabaa87ede8e7deb65e25078bfd0caa1ddfe5c7c9a98a043f2b870fa10fd",
+      "include/libxml2/libxml/xmlschemastypes.h": "9c9b26c8badbcbf12e580ad301bc261051a4b861a9cf5801b79585b218886622",
+      "include/libxml2/libxml/xmlstring.h": "479db08576ff1a61dee723ca0285893e19d806a23c1c287f75be5242f22e8aaa",
+      "include/libxml2/libxml/xmlunicode.h": "8a5b06d87968144cdb77908a4d6c3f8b04012a26f0cf64b186869d240a696f7e",
+      "include/libxml2/libxml/xmlversion.h": "c65309ac555fd6fb7e94223e406870959b1483dc302552998c9a892c2d890030",
+      "include/libxml2/libxml/xmlwriter.h": "9cf89ac9e8485869db835ed25643fe58a0dbb7ee30f9191d6c400ffd7c1405d9",
+      "include/libxml2/libxml/xpath.h": "5f6392d4a0fa7fe97407738baf692a99be31218cb786cc2225d28ea66c413f9c",
+      "include/libxml2/libxml/xpathInternals.h": "4daa466e29c75e91e70556911278542c65ac3168c7ce0287ccb566bf0ce58807",
+      "include/libxml2/libxml/xpointer.h": "f39e26a9380e0035c3f1c26f0a5ae2bc84ec7d1f2a172af809541c74eb1697b6",
+      "lib/cmake/libxml2/libxml2-config-version.cmake": "cca8ccf104f99ff0349c6797b0749808bd1fb687f4980480b64b0738c9c98aa6",
+      "lib/cmake/libxml2/libxml2-config.cmake": "6d78e824c983b22c584a1465c36fa5c9ff9abfccee18ede96ae9fb031ca84a0f",
+      "lib/cmake/libxml2/libxml2-export-release.cmake": "5ffef884337864d6d285fca677c0321d3eaa1802e23a0a2dc4541b1b7f22e15f",
+      "lib/cmake/libxml2/libxml2-export.cmake": "2481c6da17bb1442ab959c908ad7c452b9220b13273c7a6d5cf3eaab451ab7d7",
+      "lib/libxml2.a": "68c1fec22fcfd6f4a1bfef32edcda93b604359369f0bea38cade413bf6a726a5",
+      "lib/pkgconfig/libxml-2.0.pc": "a29afdafdc416cb2756e521c070efc7193b90d7b9d4f81ebb81b05912e6d8544"
+    }
+  },
+  "host_sanitizers": {
+    "status": "PASS",
+    "host_only": true,
+    "returncode": 0,
+    "instrumented_library_and_fixture": true,
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-xml-20261112/host3/application/native_xml",
+      "bytes": 20948104,
+      "sha256": "cc12e01a0d3d985020b59614386386168849765c6f450491406d97b5e8d8167d"
+    },
+    "log": "host3-unsandboxed-run.log",
+    "log_sha256": "81ba1b39860d9f9ce14987d97506b7ebb5f9cca0087854e12f8711ad9280458f",
+    "scope": "Selected parser fixture; host sanitizer execution does not exercise the native ABI or CHOS-only descriptor rejection branches."
+  },
+  "guest_results": {
+    "direct": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "2703b2f6ba263a9e8f359ba7ecca91c1eaeef9089285e3729012e69306629377",
+      "harness_sha256": "a3fedab3117154416f430923f6bd017dc51c812b58b4e42bf6207740f98cd940",
+      "cold_free_pages": 110116,
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "seconds": 0.3675183089944767,
+          "cold_pages_restored": 110116,
+          "heap_before_main_return": [
+            {
+              "allocations": 2,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "seconds": 0.3877459350042045,
+          "cold_pages_restored": 110116,
+          "heap_before_main_return": [
+            {
+              "allocations": 2,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "seconds": 0.5369557829981204,
+          "cold_pages_restored": 110116,
+          "heap_before_main_return": [
+            {
+              "allocations": 2,
+              "mapped_bytes": 65536
+            }
+          ]
+        }
+      ],
+      "checks": [
+        "Actual memory tree/XPath/UTF8/push/SAX/custom I/O and denied external resources",
+        "Three real pthread workers, parser cleanup, normal exit and cold resource accounting"
+      ],
+      "limits": [
+        "Selected native XML memory component; full XML conformance and WebCore/browser are not qualified",
+        "Default POSIX file/fd transport unsupported; physical hardware not run; Stage 3 incomplete",
+        "Main-thread runtime TLS remains allocated until CRT teardown after main returns"
+      ]
+    },
+    "uefi": {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "2703b2f6ba263a9e8f359ba7ecca91c1eaeef9089285e3729012e69306629377",
+      "harness_sha256": "a3fedab3117154416f430923f6bd017dc51c812b58b4e42bf6207740f98cd940",
+      "cold_free_pages": 494486,
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "seconds": 0.625349241992808,
+          "cold_pages_restored": 494486,
+          "heap_before_main_return": [
+            {
+              "allocations": 2,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "seconds": 0.43756602000212297,
+          "cold_pages_restored": 494486,
+          "heap_before_main_return": [
+            {
+              "allocations": 2,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "seconds": 0.4286240719957277,
+          "cold_pages_restored": 494486,
+          "heap_before_main_return": [
+            {
+              "allocations": 2,
+              "mapped_bytes": 65536
+            }
+          ]
+        }
+      ],
+      "checks": [
+        "Actual memory tree/XPath/UTF8/push/SAX/custom I/O and denied external resources",
+        "Three real pthread workers, parser cleanup, normal exit and cold resource accounting"
+      ],
+      "limits": [
+        "Selected native XML memory component; full XML conformance and WebCore/browser are not qualified",
+        "Default POSIX file/fd transport unsupported; physical hardware not run; Stage 3 incomplete",
+        "Main-thread runtime TLS remains allocated until CRT teardown after main returns"
+      ]
+    }
+  },
+  "guest_artifacts": {
+    "direct": {
+      "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+    },
+    "uefi": {
+      "kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+      "iso_sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7",
+      "iso_embedded_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+      "kernel_symbols_match_iso": true
+    }
+  },
+  "resource_accounting": {
+    "main_before_CRT_teardown": {
+      "observed_allocations": 2,
+      "observed_mapped_bytes": 65536,
+      "interpretation": "Main-thread runtime TLS survives until CRT teardown after main returns; zero heap is not asserted inside main."
+    },
+    "after_each_process_exit": "Full cold physical-page baseline restored, zero committed engine frames, no engine owner, zero futex waiters, exit status 0."
+  },
+  "preserved_failures": [
+    {
+      "path": "prototype1-build.log",
+      "diagnosis": "Unported default descriptor I/O requires fcntl.h; explicit CHOS memory/custom-I/O patch excludes unsupported default file/fd transport."
+    },
+    {
+      "path": "prototype2-build2.log",
+      "diagnosis": "Prepared CMake missing from PATH; subsequent commands use its actual executable path."
+    },
+    {
+      "path": "direct1/result.json",
+      "diagnosis": "Harness inspected an incomplete serial process row; final harness waits for the process report end marker."
+    },
+    {
+      "path": "host3-run.log",
+      "diagnosis": "Sandbox restriction prevents LeakSanitizer thread inspection; approved execution outside sandbox passed."
+    },
+    {
+      "path": "direct3.log",
+      "diagnosis": "Sandbox denies QMP Unix socket creation before guest boot; approved direct4 passed."
+    },
+    {
+      "path": "uefi3.log",
+      "diagnosis": "Sandbox denies QMP Unix socket creation before guest boot; approved uefi4 passed."
+    }
+  ],
+  "evidence_root": "/workspace/chos-evidence/native-xml-20261112",
+  "evidence_files_sha256": {
+    "target3/build.json": "ad0b70f26f8383ecb7285b96c145acfdd4694ab4c3b30497f7ad77db85aaf88b",
+    "target3/xml-setup.log": "1b5eaef9687644af1b28257c78cc4440a1d33037ff00ed5e4de0f074cf6fdfd2",
+    "target3/xml-build.log": "c26e4cd922e8bc6b844819c69fe28b58605bbcae3d1603104d09f52afa7b6bba",
+    "target3/application-build.log": "925ed341479a0f794f896e321bba60e3765a179cb5b7cfab1fe4ff0443dfd4bf",
+    "host3/build.json": "0bed95db59783b3b1b4056be70b52892957fbc6d62f69bb5985eb3755bc754fa",
+    "host3-unsandboxed-run.log": "81ba1b39860d9f9ce14987d97506b7ebb5f9cca0087854e12f8711ad9280458f",
+    "host3-run.log": "5ce7cc877947c8a232627f8e2da6db247f2d70ae38a3cc914c0dd120c9a04d77",
+    "direct1/result.json": "4c8916e9f7ab5260171dc866227310322ef886e00634b17243c3dac7e71e31f8",
+    "direct3.log": "473314aaaa64bea6ffae6aca2086afddef27c17114ff8911fc5a6a7238b3b965",
+    "uefi3.log": "da97fdd44c8bd729d9c3f09b5440091cdc5e216415e7d1422b6ab89b4d23f93e",
+    "direct4/result.json": "cdb8d5af5fbd35a3ff1c3922d935afdc21214aede7c42d265aa67f166f3690f2",
+    "direct4/artifacts.json": "5fec608d2ef32fc0217c281600ff2379771f6a892b3a3ec121eafe1022e5c736",
+    "direct4/command.json": "d7a52a8b878e067d17a68bc14df554638d755624a71380fed018447a6349e924",
+    "direct4/serial.log": "a2bdc9b8be00ea445a610b5d3181b165b6e0b6296235e42ae4f6eaf911d01de2",
+    "uefi4/result.json": "fbe88c5f6b15fa38e9311826d7d09b4abfb78af5eda81fb6e769770c8dfe4452",
+    "uefi4/artifacts.json": "314be6fc387ffeb7d9eac39a14ff77d5cff850f7804cbac1616f6db30cc133b5",
+    "uefi4/command.json": "4717295dda53c041e31c548a185cf65b4fb45ea6ea280742902d74264547ac5b",
+    "uefi4/serial.log": "32c9d10a46201fa586de4703b95e68488b8590777d67782270c5fc0680c6c616",
+    "host3-execution.json": "e9188fff8b58fe5c86c444a7eb839887e8258598709908a6598a53c7b2d57533"
+  },
+  "limits": [
+    "Selected memory tree, namespace, UTF-8, entity, XPath, serialization, push/SAX and custom-I/O corpus; full upstream XML conformance suite was not run.",
+    "HTML/schema/reader/writer code compiled but not comprehensively exercised.",
+    "Default POSIX file/fd transport unsupported; Catalog, XInclude, modules, iconv, ICU conversion and zlib disabled.",
+    "Per-context resource denial and parser bounds are selected tests, not a production hostile-XML security certification.",
+    "LIBXML2_WITH_TLS means thread-local storage, not TLS cryptography or HTTPS transport.",
+    "WebCore XML integration, actual modern browser behavior, physical Fusion/Pi 5/laptop qualification and revised Stage 3 acceptance remain open."
+  ]
+}

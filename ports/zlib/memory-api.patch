@@ -1,0 +1,10 @@
+--- a/zutil.c
++++ b/zutil.c
+@@ -1 +1,2 @@
++/* CHOS port modification (2026-11-13): memory API omits gzFile internals. */
+ /* zutil.c -- target dependent utility functions for the compression library
+@@ -8,3 +9,3 @@
+ #include "zutil.h"
+-#ifndef Z_SOLO
++#if !defined(Z_SOLO) && !defined(CHOS_ZLIB_MEMORY_API)
+ #  include "gzguts.h"

@@ -1,5 +1,12 @@
 # Revised Stage 3 current evidence
 
+Current page-build prerequisites: [native LibXml2](NATIVE_XML.md),
+[SQLite memory core](NATIVE_SQLITE.md) and [zlib memory streams](NATIVE_ZLIB_STREAMS.md)
+now have actual native and sanitizer qualification. The full host and sanitizer
+suites also pass; see the [dependency checkpoint report](validation/stage3-page-dependencies.json). SQLite disk persistence and
+full WebCore/page rendering remain unimplemented. These dependencies advance
+step 2 of the accepted roadmap; they do not complete the browser.
+
 Current runtime checkpoint: [original WebCore PNG/JPEG image execution](NATIVE_WEBCORE_IMAGES.md)
 now links and runs the real decoders, in-process buffers and Cairo backing in
 owned CHOS windows. Direct/UEFI tests check complete pixels, input and cleanup.

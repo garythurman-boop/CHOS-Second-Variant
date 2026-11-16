@@ -1,0 +1,30 @@
+--- a/sqlite3.c
++++ b/sqlite3.c
+@@ -18602,7 +18602,7 @@
+ #if !SQLITE_THREADSAFE
+ # define SQLITE_MUTEX_OMIT
+ #endif
+-#if SQLITE_THREADSAFE && !defined(SQLITE_MUTEX_NOOP)
++#if SQLITE_THREADSAFE && !defined(SQLITE_MUTEX_NOOP) && !defined(SQLITE_MUTEX_CHOS)
+ #  if SQLITE_OS_UNIX || defined(__CYGWIN__)
+ #    define SQLITE_MUTEX_PTHREADS
+ #  elif SQLITE_OS_WIN
+@@ -22036,6 +22036,18 @@
+ #ifndef SQLITE_MUTEX_OMIT
+ SQLITE_PRIVATE   sqlite3_mutex_methods const *sqlite3DefaultMutex(void);
+ SQLITE_PRIVATE   sqlite3_mutex_methods const *sqlite3NoopMutex(void);
++/* CHOS adaptation (2026-11-12): real native pthread mutex backend; no
++** NOOP default is selected for the OS_OTHER profile. */
++#ifdef SQLITE_MUTEX_CHOS
++extern sqlite3_mutex_methods const *chos_sqlite_mutex_methods(void);
++SQLITE_PRIVATE sqlite3_mutex_methods const *sqlite3DefaultMutex(void){
++  return chos_sqlite_mutex_methods();
++}
++SQLITE_PRIVATE void sqlite3MemoryBarrier(void){
++  __atomic_thread_fence(__ATOMIC_SEQ_CST);
++}
++#endif
++
+ SQLITE_PRIVATE   sqlite3_mutex *sqlite3MutexAlloc(int);
+ SQLITE_PRIVATE   int sqlite3MutexInit(void);
+ SQLITE_PRIVATE   int sqlite3MutexEnd(void);

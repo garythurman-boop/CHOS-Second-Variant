@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "component": "NativeCstrspn/strcspn",
+  "sources_sha256": {
+    "userland/libc/string.c": "2a00b2767c90f6a8aa302ff768c28633c771d763db931748092cd830d128bd61",
+    "userland/libc/include/string.h": "fb61111a1a69edcc200471a3e9249d4d73217fa5d5105e72ffe0856e3f861eff",
+    "userland/libc/include/chos/libc_string.h": "5b373dc218331949c7eb9f5fdfea6c0dcf286eab749afd9250f4387e48fb4b41",
+    "tests/test_libc_string.c": "9d4b750bc0629f098ee0151cf493c4ecc5439c68656acd50cc64850d0e66997f"
+  },
+  "SDK_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+  "host_reference_cases_per_function": 65280,
+  "host_tests": {
+    "string-spans-host2.log": {
+      "status": "PASS",
+      "log_sha256": "91c8e5fbcf49e37481fc1159e86d665c4c14ea23d9f079031502f4e912dc7b3e"
+    },
+    "string-spans-sanitize2.log": {
+      "status": "PASS",
+      "log_sha256": "91c8e5fbcf49e37481fc1159e86d665c4c14ea23d9f079031502f4e912dc7b3e"
+    }
+  },
+  "retained_failure": {
+    "initial_host_setup": "NativeSC_PAGESIZEselectorreadbyhostsysconf producedinvalidguardalignment;switchtoargument-freehostgetpagesize",
+    "first_log_sha256": "6b361d3b978912a1be724588e925344b19eff8a736b315d65110deeeff7766cf"
+  },
+  "native_dependency_reports": [
+    "docs/validation/stage3-native-sqlite.json",
+    "docs/validation/stage3-native-xml.json"
+  ]
+}

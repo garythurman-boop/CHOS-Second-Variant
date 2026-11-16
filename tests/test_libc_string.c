@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <unistd.h>
 #include "chos/libc_string.h"
 int main(void){
     unsigned char a[128],b[128],source[128];for(unsigned i=0;i<128;i++)source[i]=(unsigned char)(i*91u);
@@ -25,5 +27,27 @@ int main(void){
     memset(text,0x51,sizeof(text));chos_libc_strncpy(text,"abc",7);assert(!memcmp(text,"abc\0\0\0\0Q",8));
     chos_libc_strncpy(text,"abcdef",3);assert(!memcmp(text,"abc",3));
     unsigned char c[]={0xff},d[]={0};assert(chos_libc_memcmp(c,d,1)>0);
+    for(unsigned first=1;first<=255;++first){
+        char values[257],set[257];
+        for(unsigned i=0;i<255;++i)values[i]=(char)(1+(i+first)%255);
+        values[255]=0;
+        for(unsigned n=0;n<=255;++n){
+            for(unsigned i=0;i<n;++i)set[i]=(char)(1+(i*131+first)%255);
+            set[n]=0;
+            assert(chos_libc_strspn(values,set)==strspn(values,set));
+            assert(chos_libc_strcspn(values,set)==strcspn(values,set));
+        }
+    }
+    assert(!chos_libc_strspn("","abc")&&!chos_libc_strcspn("","abc"));
+    /* Native sysconf selectors intentionally differ from the host ABI. The
+     * argument-free host getpagesize symbol avoids using a native selector. */
+    long page=getpagesize();assert(page>0);
+    unsigned char *guard=mmap(NULL,(size_t)page*2,PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS,-1,0);
+    assert(guard!=MAP_FAILED&&!mprotect(guard+page,(size_t)page,PROT_NONE));
+    char *end=(char *)guard+page;end[-3]=(char)255;end[-2]='x';end[-1]=0;
+    assert(chos_libc_strspn(end-3,"\xffx")==2&&chos_libc_strcspn(end-3,"a")==2);
+    assert(chos_libc_strspn("\xffxx",end-3)==3&&chos_libc_strcspn("abx",end-3)==2);
+    assert(!chos_libc_strspn(end-1,end-1)&&chos_libc_strcspn(end-3,end-1)==2);
+    assert(!munmap(guard,(size_t)page*2));
     puts("libc strings: PASS (overlap, bounded operations, unsigned bytes, strings and terminators)");return 0;
 }

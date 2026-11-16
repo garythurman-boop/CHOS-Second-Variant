@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_PAGE_DEPENDENCIES",
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "qualification": [
+    "Original libxml2 memory/custom-I/O profile",
+    "Serialized in-memory SQLite with real native pthread mutexes",
+    "Original zlib raw/zlib/gzip memory streams",
+    "Native strspn/strcspn unsigned-byte and terminator handling"
+  ],
+  "staged_original_vendor_files_sha256_verified": 4430,
+  "required_suites": {
+    "host": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log_bytes": 588567,
+      "log_sha256": "19d8e39a2a63e1ed7b539a47747612df1b0d021e95116e92d1ce9cb10af98e62",
+      "evidence_path": "/workspace/chos-evidence/webcore-link-20261112/dependency-full-host.log"
+    },
+    "sanitize": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log_bytes": 45616,
+      "log_sha256": "a0739ab3c8ae8ef3f0e09026c0888ceb293e55b90b759bb9ebeffb395f5c3835",
+      "evidence_path": "/workspace/chos-evidence/webcore-link-20261112/dependency-full-sanitize.log"
+    }
+  },
+  "sources_sha256": {
+    "Makefile": "566639756a4b0767e408858fff8fd2e3008c678184c4a58a0c51a4d4d40784fa",
+    "userland/libc/string.c": "2a00b2767c90f6a8aa302ff768c28633c771d763db931748092cd830d128bd61",
+    "userland/libc/include/string.h": "fb61111a1a69edcc200471a3e9249d4d73217fa5d5105e72ffe0856e3f861eff",
+    "userland/libc/include/chos/libc_string.h": "5b373dc218331949c7eb9f5fdfea6c0dcf286eab749afd9250f4387e48fb4b41",
+    "tests/test_libc_string.c": "9d4b750bc0629f098ee0151cf493c4ecc5439c68656acd50cc64850d0e66997f"
+  },
+  "component_reports": [
+    "stage3-native-xml.json",
+    "stage3-native-sqlite.json",
+    "stage3-native-zlib.json",
+    "stage3-libc-spans.json"
+  ],
+  "unimplemented": [
+    "Full WebCore page rendering and modern browser",
+    "SQLite persistent file VFS and browser storage",
+    "Default POSIX libxml2 file/fd transports",
+    "zlib gzFile APIs",
+    "Physical Pi5 Wi-Fi and final Fusion/Pi5/laptop acceptance"
+  ],
+  "retained_failures": "Component reports retain setup and fixture failures and document the corrected final runs. Environment interruption delayed commit/push; it did not establish new runtime qualification."
+}

@@ -1,0 +1,460 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "scope": "Actual SQLite 3.54.1 serialized native memory-only core prerequisite",
+  "native_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "host_reference": false,
+    "host_sanitizers": false,
+    "stage3_complete": false,
+    "executed": false,
+    "source_manifest_sha256": "79b87ebcab94373b8c674a839c767234796b20ccb8434e56442772cf97de61a1",
+    "SDK_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+    "sources_sha256": {
+      "tools/build_native_sqlite.py": "b527c6e26c1678d4a991454524d9edd8bd124e110d0609dfe9f5acb5c374f7c6",
+      "tools/verify_native_sqlite_sources.py": "7669e0077a3920aaaa5479868dcad41d5edc0463a3f4759bc665f5455520f11c",
+      "ports/sqlite/native-mutex.patch": "7a099bef201a0070dce69c796130def18a8a831fbd0838e279cc8ce3946b190b",
+      "ports/sqlite/native_os.c": "5583dad3fe6bbfb96636f1b5357c2c8342c53089f5af3f3c24e62d1069a86811",
+      "ports/sqlite/CMakeLists.txt": "d1f4f14052778df63d3922f92698341f0fac32a07b67149d47e6caa86d56f8d6",
+      "tests/native_sqlite/main.c": "1d251e718285853a0fcf869cd316fe5483a96a4684e2c1d26b11876f5c279279",
+      "tests/native_sqlite/CMakeLists.txt": "99166fed8ab8e2290ec9b348ed52f3b78801a4a44496bf1f031a644f121f920c"
+    },
+    "commands": [
+      [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--no-backup-if-mismatch",
+        "-p1",
+        "-i",
+        "/workspace/CHOS-Second-Variant/ports/sqlite/native-mutex.patch"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-sqlite-20261112/target1/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk6",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/sqlite",
+        "-B",
+        "/workspace/chos-evidence/native-sqlite-20261112/target1/sqlite",
+        "-DSQLITE_SOURCE=/workspace/chos-evidence/native-sqlite-20261112/target1/source"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-sqlite-20261112/target1/sqlite",
+        "-j2"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-sqlite-20261112/target1/sqlite"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-sqlite-20261112/target1/prefix",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk6",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_sqlite",
+        "-B",
+        "/workspace/chos-evidence/native-sqlite-20261112/target1/application",
+        "-DSQLITE_PREFIX=/workspace/chos-evidence/native-sqlite-20261112/target1/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-sqlite-20261112/target1/application",
+        "-j2"
+      ]
+    ],
+    "limits": [
+      "Genuine in-memory SQLite core prerequisite,not WebCore/browser integration",
+      "OS_OTHER uses real pthread mutexes,real entropy and guest wall clock;trustworthy production time remains separate",
+      "Persistent disk VFS,WAL filesystem/browser persistence and upstream full conformance not qualified"
+    ],
+    "seconds": 24.06071918899761,
+    "archive": {
+      "bytes": 2178426,
+      "sha256": "68c2eb67ee2b57a7c2d50e7d2494350c28b9df74aee23437843d58de4fcdd7bb"
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-sqlite-20261112/target1/application/native_sqlite",
+      "bytes": 1509096,
+      "sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337"
+    },
+    "installed_files_sha256": {
+      "include/sqlite3.h": "d6c84557261893439b341d2e6c35187ae3ea24fbfd843ad94616f72d89242b8c",
+      "include/sqlite3ext.h": "48963abfefb41ac329ef9d706acb5eadba952a99a748285c9ded6b5e0942721b",
+      "lib/libsqlite3.a": "68c2eb67ee2b57a7c2d50e7d2494350c28b9df74aee23437843d58de4fcdd7bb",
+      "lib/pkgconfig/sqlite3.pc": "2b21a95555cda8c231224a0ba6bf0e1e1489eeea1b72af97249608be0bd899be"
+    }
+  },
+  "host_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "host_reference": true,
+    "host_sanitizers": true,
+    "stage3_complete": false,
+    "executed": false,
+    "source_manifest_sha256": "79b87ebcab94373b8c674a839c767234796b20ccb8434e56442772cf97de61a1",
+    "SDK_manifest_sha256": null,
+    "sources_sha256": {
+      "tools/build_native_sqlite.py": "b527c6e26c1678d4a991454524d9edd8bd124e110d0609dfe9f5acb5c374f7c6",
+      "tools/verify_native_sqlite_sources.py": "7669e0077a3920aaaa5479868dcad41d5edc0463a3f4759bc665f5455520f11c",
+      "ports/sqlite/native-mutex.patch": "7a099bef201a0070dce69c796130def18a8a831fbd0838e279cc8ce3946b190b",
+      "ports/sqlite/native_os.c": "5583dad3fe6bbfb96636f1b5357c2c8342c53089f5af3f3c24e62d1069a86811",
+      "ports/sqlite/CMakeLists.txt": "d1f4f14052778df63d3922f92698341f0fac32a07b67149d47e6caa86d56f8d6",
+      "tests/native_sqlite/main.c": "1d251e718285853a0fcf869cd316fe5483a96a4684e2c1d26b11876f5c279279",
+      "tests/native_sqlite/CMakeLists.txt": "99166fed8ab8e2290ec9b348ed52f3b78801a4a44496bf1f031a644f121f920c"
+    },
+    "commands": [
+      [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--no-backup-if-mismatch",
+        "-p1",
+        "-i",
+        "/workspace/CHOS-Second-Variant/ports/sqlite/native-mutex.patch"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-sqlite-20261112/host2/prefix",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/sqlite",
+        "-B",
+        "/workspace/chos-evidence/native-sqlite-20261112/host2/sqlite",
+        "-DSQLITE_SOURCE=/workspace/chos-evidence/native-sqlite-20261112/host2/source"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-sqlite-20261112/host2/sqlite",
+        "-j2"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-sqlite-20261112/host2/sqlite"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-sqlite-20261112/host2/prefix",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_sqlite",
+        "-B",
+        "/workspace/chos-evidence/native-sqlite-20261112/host2/application",
+        "-DSQLITE_PREFIX=/workspace/chos-evidence/native-sqlite-20261112/host2/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-sqlite-20261112/host2/application",
+        "-j2"
+      ]
+    ],
+    "limits": [
+      "Genuine in-memory SQLite core prerequisite,not WebCore/browser integration",
+      "OS_OTHER uses real pthread mutexes,real entropy and guest wall clock;trustworthy production time remains separate",
+      "Persistent disk VFS,WAL filesystem/browser persistence and upstream full conformance not qualified"
+    ],
+    "seconds": 43.102489919998334,
+    "archive": {
+      "bytes": 21510126,
+      "sha256": "c170e4df4874e568154a3e1d85c67e2a9fef5049feb6cdab437c42f1d6f403e7"
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-sqlite-20261112/host2/application/native_sqlite",
+      "bytes": 18145904,
+      "sha256": "cf3ffc2eea31a05223f05fdd669127209313b4421f753a403674c62c562f527f"
+    },
+    "installed_files_sha256": {
+      "include/sqlite3.h": "d6c84557261893439b341d2e6c35187ae3ea24fbfd843ad94616f72d89242b8c",
+      "include/sqlite3ext.h": "48963abfefb41ac329ef9d706acb5eadba952a99a748285c9ded6b5e0942721b",
+      "lib/libsqlite3.a": "c170e4df4874e568154a3e1d85c67e2a9fef5049feb6cdab437c42f1d6f403e7",
+      "lib/pkgconfig/sqlite3.pc": "6736035bb44f71259c4c7712d69fa12037169c8d1e2c773511de52726a269aa9"
+    }
+  },
+  "host_sanitizers": {
+    "status": "PASS",
+    "returncode": 0,
+    "command": [
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "/workspace/chos-evidence/native-sqlite-20261112/host2/application/native_sqlite"
+    ],
+    "execution_environment": "Outside restrictive sandbox to permit LeakSanitizer thread scanning",
+    "log_path": "/workspace/chos-evidence/native-sqlite-20261112/host2-final-unsandboxed.log",
+    "ASAN_UBSAN_LeakSanitizer_log_sha256": "8cbebd98afe6e4b9c1cbf387283f2aa8e2abdd83fa2b586305711fdd54577c70"
+  },
+  "qualified_guests": {
+    "direct3": {
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/direct3",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "missing_entropy": false,
+        "application_sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "cold_pages_restored": 110116
+          }
+        ],
+        "checks": [
+          "Actual SQLite 3.54.1 memory SQL, transactions, UTF-8/blob/real bindings, metadata, JSON and date/error tests",
+          "Real recursive mutex contention, three pthread workers, 900 serialized shared connection updates and independent databases",
+          "Actual hard heap quota rejection/recovery, disk file/extension refusal and complete SQLite/native heap cleanup",
+          "Three normal exits with exact physical-page, engine, commit and futex baseline restoration"
+        ],
+        "limits": [
+          "Selected native memory SQL prerequisite; persistent disk VFS, WAL/browser storage and full SQLite conformance remain unqualified",
+          "Guest wall clock used; production trusted time policy remains separate",
+          "QEMU only; physical Fusion/Pi 5/laptop not run; Stage 3 incomplete"
+        ]
+      },
+      "result_sha256": "59f37e323d59cc7721ce26fa1e217661538416ae2adb786580f90fac2b1280dd",
+      "artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      },
+      "serial_sha256": "4d53b3fe0f3f65ced68522d5a291732ee4c854f5147fa1793f56edcb4d9e9cdf",
+      "command_sha256": "84b6dd7e56a9983712f092a7eb44589ef0f9e778593573ecc5f48ca8c25f7e9e",
+      "exit_code": 0
+    },
+    "uefi3": {
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/uefi3",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "missing_entropy": false,
+        "application_sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337",
+        "cold_free_pages": 494486,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "cold_pages_restored": 494486
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "cold_pages_restored": 494486
+          }
+        ],
+        "checks": [
+          "Actual SQLite 3.54.1 memory SQL, transactions, UTF-8/blob/real bindings, metadata, JSON and date/error tests",
+          "Real recursive mutex contention, three pthread workers, 900 serialized shared connection updates and independent databases",
+          "Actual hard heap quota rejection/recovery, disk file/extension refusal and complete SQLite/native heap cleanup",
+          "Three normal exits with exact physical-page, engine, commit and futex baseline restoration"
+        ],
+        "limits": [
+          "Selected native memory SQL prerequisite; persistent disk VFS, WAL/browser storage and full SQLite conformance remain unqualified",
+          "Guest wall clock used; production trusted time policy remains separate",
+          "QEMU only; physical Fusion/Pi 5/laptop not run; Stage 3 incomplete"
+        ]
+      },
+      "result_sha256": "842a353e39b431098eda4d53400d78c2f670986148f13b621fe73640c451cb95",
+      "artifacts": {
+        "kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "iso_sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7",
+        "iso_embedded_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "kernel_symbols_match_iso": true
+      },
+      "serial_sha256": "bfa499a034efc805da00b51eb947807d3af51b1b68f91759e6529279cfab32e8",
+      "command_sha256": "efc8e15bc3d374f5911dccf2395190d5bb18b8ccab66d2e976661bdd8aa94d5e",
+      "exit_code": 0
+    },
+    "no-entropy3": {
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/no-entropy3",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "missing_entropy": true,
+        "application_sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "cold_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "cold_pages_restored": 110116
+          }
+        ],
+        "checks": [
+          "Missing OS entropy makes sqlite3_initialize return SQLITE_IOERR",
+          "Failed initialization shuts down with zero SQLite and native heap allocations",
+          "Three normal exits with exact physical-page, engine, commit and futex baseline restoration"
+        ],
+        "limits": [
+          "Selected native memory SQL prerequisite; persistent disk VFS, WAL/browser storage and full SQLite conformance remain unqualified",
+          "Guest wall clock used; production trusted time policy remains separate",
+          "QEMU only; physical Fusion/Pi 5/laptop not run; Stage 3 incomplete"
+        ]
+      },
+      "result_sha256": "0c60941dac0cfbdea4425cfbb6f3952f7e7fc8655828c9aa76502d6b8a7c40b5",
+      "artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      },
+      "serial_sha256": "128587113ae5148548c2f890710b604506cde7c89fdd7351a4a3ac3b8c68e455",
+      "command_sha256": "84f5a3407486c1477011a63c9bae42def42c5c5b7f90164a77ed102ec066c2a4",
+      "exit_code": 0
+    }
+  },
+  "sources_sha256": {
+    "tests/native_sqlite/qemu.py": "c02ba3cf600427630aab0fbb556dcd2b70e5f29e2e2daa1a724526fb8540b778",
+    "ports/sqlite/README.md": "09f8c54cb8c51948b6fbb12559694c5cb85ef6c1bb02976d6c7c79ffab3df359",
+    "docs/NATIVE_SQLITE.md": "bd2787c835e3149893573b2c784ed17d231de11c7622299699528518915294e5"
+  },
+  "retained_failures": [
+    {
+      "attempt": "prototype1 with SDK5",
+      "result": "Compilation failed because localtime fallback and strspn/strcspn declarations were unavailable",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/prototype1-build.log",
+      "log_sha256": "d6e5bc7be6e24730116ea126d004571e7321b661873a96a055671dae24a33875",
+      "resolution": "HAVE_LOCALTIME_R selects existing real reentrant UTC conversion; actual strspn/strcspn runtime implementations and declarations were added and exported in SDK6"
+    },
+    {
+      "attempt": "host1 build",
+      "result": "The fixture changed during the build; the build script rejected its stale source hash",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/host1.log",
+      "log_sha256": "2c9aae8f58c29af14773270361eb6b685dac4c15601c6fcc168affc05ef1edea",
+      "resolution": "Fresh host2 and target1 builds used frozen matching sources; final source/hash audit passes"
+    },
+    {
+      "attempt": "initial allocation quota fixture",
+      "result": "Applying quota before preparing the statement caused an earlier legitimate allocation failure; the failing test returned with an open database and LeakSanitizer reported leaks",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/host1-run.log",
+      "log_sha256": "6e94c952fa522ad57c19761851b5eb053db8b1ce5e7eb896d0abe17eadef37b9",
+      "resolution": "Prepare first, then tighten the quota; accept SQLITE_NOMEM at execution or materialization, restore quota and finalize/close before testing recovery. Final ASan/UBSan/leak run passes"
+    },
+    {
+      "attempt": "final sandboxed host2 sanitizer rerun",
+      "result": "Fixture checks passed, but LeakSanitizer exited 1 because its ptrace thread scan is restricted in the sandbox",
+      "stdout_path": "/workspace/chos-evidence/native-sqlite-20261112/host2-final-run.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "LeakSanitizer has encountered a fatal error; LeakSanitizer does not work under ptrace (strace, gdb, etc)",
+      "resolution": "The same unchanged fixture passed with ASan, UBSan and leak detection outside the sandbox"
+    },
+    {
+      "attempt": "final sandboxed direct2, uefi2 and no-entropy2 QEMU reruns",
+      "result": "QEMU could not bind its QMP Unix socket: Operation not permitted; guest monitor startup timed out",
+      "evidence": {
+        "direct2": {
+          "serial_sha256": "f6f8664fccf2e6dde838297ac7bb35c9419543f1da7f0058e658d34a353a21ce",
+          "command_sha256": "c2eb24a4d0f2bf7c4cfb3ec1274be1d7060b473116e47f640502768b9736b13f"
+        },
+        "uefi2": {
+          "serial_sha256": "67b9abda559f73501f52d3a948c7845a6c8543fc6f347e58886bf88958b4f13d",
+          "command_sha256": "291ff974678cb1a31759d86832099fd5e1dec48f83e6a82ea5feeaf0dccb73d7"
+        },
+        "no-entropy2": {
+          "serial_sha256": "d5b1aae2932d4f1846a82b2ae681a57bc068da0089605e62b44ad06fa5224261",
+          "command_sha256": "acf69f8c0cfaa32c42e598aa6aa0f5514b9170718e5838c1521f16f7187bdbb2"
+        }
+      },
+      "resolution": "Same application and frozen images passed final direct3, uefi3 and no-entropy3 profiles outside the sandbox"
+    },
+    {
+      "attempt": "missing-entropy report review",
+      "result": "The original no-entropy1 result listed generic ordinary SQL/concurrency checks although its branch only tests initialization failure and cleanup",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/no-entropy1/result.json",
+      "result_sha256": "d17916506229225b699bc3838b82fcf5880a5c122b5abfdade7be6e47282d13a",
+      "resolution": "Reporter now selects checks by the actual branch; final no-entropy3 report records SQLITE_IOERR and cleanup only"
+    },
+    {
+      "attempt": "QMP constructor failure reporting regression",
+      "result": "The original constructor ran before the error-reporting try block, so early socket failures lacked a result.json",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/qmp-negative",
+      "expected_failure_result_sha256": "8334e697191c3b47fd443f9b0b20f63c5f432c05183800a7f34a26e221820fcb",
+      "serial_sha256": "f42de877cec5126b3e36f000a60fc3d9ae01eb911472f297a44812886842e8c3",
+      "resolution": "Constructor now runs inside the reporting try block. A deliberate sandbox-restricted retry verified a failed result report is written; all final outside-sandbox profiles pass"
+    }
+  ],
+  "limits": [
+    "Persistent disk VFS, file locking, WAL shared memory, crash durability and browser cookies/history/cache persistence are unimplemented; file operations return errors",
+    "Selected actual in-memory SQL and pthread concurrency are qualified; the full upstream SQLite conformance suite is not run",
+    "OS entropy is required; guest wall clock and UTC conversion are provided, while production trusted time and browser timezone policy remain open",
+    "This is a dependency prerequisite for roadmap step 2; complete WebCore/PAL/browser integration is not qualified",
+    "QEMU and host evidence only; new Fusion, Pi 5 and laptop physical execution is not run; revised Stage 3 remains incomplete"
+  ],
+  "status": "PASS_SELECTED_NATIVE_SQLITE",
+  "audit_utc": "2026-11-13T19:50:17.796275+00:00",
+  "source_base": "e69073d82ae63d2dc940e404d03d9a5cf22baac2",
+  "source_base_note": "SQLite files are identified by explicit source hashes; this base commit does not itself attest to uncommitted files",
+  "native_prefix": "/workspace/chos-evidence/native-sqlite-20261112/target1/prefix",
+  "prior_qualification": {
+    "path": "/workspace/chos-evidence/native-sqlite-20261112/qualification-before-final-audit.json",
+    "sha256": "674f3b751594faac6c295031ffcb441f602ff393468c8f5b82d08ccd87723a1b",
+    "note": "Original direct1, uefi1 and no-entropy1 reports and the initial failure history remain preserved; final missing-entropy labels supersede generic labels in the original result"
+  },
+  "final_source_audit": {
+    "status": "PASS",
+    "source_manifest_sha256": "79b87ebcab94373b8c674a839c767234796b20ccb8434e56442772cf97de61a1",
+    "native_and_host_recorded_build_input_hashes_match_current": true,
+    "built_source_copies_equal_current_originals_plus_exact_patch": true,
+    "installed_native_and_host_file_inventory_and_hashes_match": true,
+    "SDK_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+    "SDK_staged_files_verified": 1214,
+    "official_archive_sha3_256": "92281c86e2957f9b9305890f9ac04204caa7b677cc868dc326d942689df28e30",
+    "official_archive_sha256": "0a9c8e34352dad46006aa82836d5383bff9dc6bc9ce5a60553c05aa30e6ad1f9",
+    "published_download_page_sha256": "d0e3fb1a3d9a813560fb525c7124e0088f976a3bd66c330a64963649eb5b2a77",
+    "published_digest_matches_archive": true,
+    "original_amalgamation_files_verified": 4,
+    "native_ELF_AArch64": true,
+    "native_ELF_undefined_symbols": 0,
+    "native_archive_AArch64_members": 2,
+    "current_toolchain_file_sha256": "f4ad3b3dd06031f496805d686f26660092f251bbba2ab01ee2a965ad13cf9cd4"
+  }
+}

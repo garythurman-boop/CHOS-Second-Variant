@@ -1,0 +1,41 @@
+Package: libxml2
+Binary: libxml2-16, libxml2-utils, libxml2-dev, libxml2-doc, python3-libxml2, libxml2-source
+Version: 2.15.4+dfsg-1
+Maintainer: Debian XML/SGML Group <debian-xml-sgml-pkgs@lists.alioth.debian.org>
+Uploaders: Aron Xu <aron@debian.org>, YunQiang Su <wzssyqa@gmail.com>,
+Build-Depends: debhelper-compat (= 13)
+Build-Depends-Indep: pkgconf, doxygen, xsltproc, docbook-xsl, xz-utils
+Architecture: any all
+Standards-Version: 4.7.4
+Format: 3.0 (quilt)
+Files:
+ cbdf4a3815ac31cd5ec1b1dac11717eb 2738 libxml2_2.15.4+dfsg-1.dsc
+ 0a853c709c8a11e695f7e34e000aa0c2 2367580 libxml2_2.15.4+dfsg.orig.tar.xz
+ dda75bd7e9a40bdd95173c914662548d 36420 libxml2_2.15.4+dfsg-1.debian.tar.xz
+Vcs-Browser: https://salsa.debian.org/xml-sgml-team/libxml2
+Vcs-Git: https://salsa.debian.org/xml-sgml-team/libxml2.git
+Checksums-Sha256:
+ 430fa25d8bb4a31eaf3f314c40fe12a1d0ea19d15576d90c95490e79fcc1d5d1 2738 libxml2_2.15.4+dfsg-1.dsc
+ 5868d20db42ee21e4881bc53050c7fa226286a277cb3d0543f76b81f7571e934 2367580 libxml2_2.15.4+dfsg.orig.tar.xz
+ a125823450895c0785596a6fce26931ab0a369c82da4d6cfa6bbdac782ed9010 36420 libxml2_2.15.4+dfsg-1.debian.tar.xz
+Description: GNOME XML library
+ XML is a metalanguage to let you design your own markup language.
+ A regular markup language defines a way to describe information in
+ a certain class of documents (eg HTML). XML lets you define your
+ own customized markup languages for many classes of document. It
+ can do this because it's written in SGML, the international standard
+ metalanguage for markup languages.
+Homepage: http://xmlsoft.org
+Build-Depends-Arch: dh-sequence-python3 <!nopython>, liblzma-dev, libpython3-all-dev <!nopython>, pkgconf, python3-all-dev:any (>= 3.5) <!nopython>, python3-setuptools <!nopython>, rename, zlib1g-dev | libz-dev, libreadline-dev, doxygen, xsltproc, docbook-xsl
+Package-List: 
+ libxml2-16 deb libs optional arch=any
+ libxml2-dev deb libdevel optional arch=any
+ libxml2-doc deb doc optional arch=all
+ libxml2-source deb devel optional arch=all
+ libxml2-utils deb text optional arch=any
+ python3-libxml2 deb python optional arch=any profile=!nopython
+Testsuite: autopkgtest
+Testsuite-Triggers: build-essential, pkgconf
+Directory: pool/main/libx/libxml2
+Priority: optional
+Section: libs

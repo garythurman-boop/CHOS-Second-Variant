@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSZlibMemoryAPI VERSION 1.4 LANGUAGES C)
+include(CMakePackageConfigHelpers)
+
+# The driver verifies the original inventory, copies it, and applies the dated
+# include-only adaptation. Never compile or patch the original vendor directory.
+if(NOT CHOS_ZLIB_SOURCE_DIR)
+    message(FATAL_ERROR "Use tools/build_native_zlib.py with a fresh verified source copy")
+endif()
+get_filename_component(ZROOT "${CHOS_ZLIB_SOURCE_DIR}" ABSOLUTE)
+file(READ "${ZROOT}/zutil.c" ZUTIL)
+if(NOT ZUTIL MATCHES "!defined\\(CHOS_ZLIB_MEMORY_API\\)")
+    message(FATAL_ERROR "The explicit memory API include adaptation is required")
+endif()
+if(CMAKE_C_FLAGS MATCHES "Z_SOLO|NO_GZIP|NO_GZCOMPRESS")
+    message(FATAL_ERROR "The memory API profile requires default allocation and gzip streams")
+endif()
+set(NAMES adler32 compress crc32 deflate infback inffast inflate inftrees trees uncompr zutil)
+set(SOURCES)
+foreach(NAME IN LISTS NAMES)
+    list(APPEND SOURCES "${ZROOT}/${NAME}.c")
+endforeach()
+add_library(chos-zlib STATIC ${SOURCES})
+add_library(ZLIB::ZLIB ALIAS chos-zlib)
+set_target_properties(chos-zlib PROPERTIES OUTPUT_NAME z EXPORT_NAME ZLIB)
+target_compile_features(chos-zlib PRIVATE c_std_99)
+target_compile_definitions(chos-zlib PRIVATE CHOS_ZLIB_MEMORY_API=1)
+target_include_directories(chos-zlib PUBLIC
+    $<BUILD_INTERFACE:${ZROOT}> $<INSTALL_INTERFACE:include>)
+install(TARGETS chos-zlib EXPORT ZLIBTargets ARCHIVE DESTINATION lib)
+install(FILES "${ZROOT}/zlib.h" "${ZROOT}/zconf.h" DESTINATION include)
+install(FILES "${ZROOT}/LICENSE" DESTINATION share/licenses/zlib)
+install(EXPORT ZLIBTargets NAMESPACE ZLIB:: DESTINATION lib/cmake/ZLIB)
+configure_package_config_file(ZLIBConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/ZLIBConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/ZLIB)
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/ZLIBConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION} COMPATIBILITY SameMajorVersion)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/ZLIBConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/ZLIBConfigVersion.cmake" DESTINATION lib/cmake/ZLIB)
+configure_file(zlib.pc.in "${CMAKE_CURRENT_BINARY_DIR}/zlib.pc" @ONLY)
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/zlib.pc" DESTINATION lib/pkgconfig)

@@ -1,0 +1,720 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_MEMORY_API",
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "platform": "native isolated AArch64 CHOS ABI",
+  "library": "zlib1.4 original memory API with default allocation;gzFile/filesystem omitted",
+  "native_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "stage3_complete": false,
+    "host_reference": false,
+    "host_sanitizers": false,
+    "SDK_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+    "source_manifest_sha256": "2e349a9d4116346903a6be755874049b80be8d64c51e74b815ec0f949e5de459",
+    "port_and_fixture_sources": {
+      "tools/build_native_zlib.py": "bb1d70120d3bbd1975b6e0bdfd5e071ce25c59b5563c26a51724a3fc502569b8",
+      "tools/verify_native_png_sources.py": "c9b6615a7db83501cfebbf1b913dcdcb9034900dceb40851413c73491d20643c",
+      "ports/zlib/CMakeLists.txt": "287a30ae0f79b3545b84292327927f47998566751ed9af34e3678b4d93d9fe92",
+      "ports/zlib/ZLIBConfig.cmake.in": "8619ff2162c8a4840d990d3116fc153a94bf50bcc332299b33c6c6950da3c2a2",
+      "ports/zlib/memory-api.patch": "b74e0a76278c04e85b5f9d363851a384263a2940e88d1ddc42423df1a7467b9c",
+      "ports/zlib/zlib.pc.in": "329e6680267ba2528e20fb257e055830f91eb4a10309244daa5f0b0ed3db665e",
+      "tests/native_zlib/CMakeLists.txt": "e59c577534d062eb97ed46e6d1c56e07e1c19a56999d68b2e10d8258de62e2fe",
+      "tests/native_zlib/generate_cases.py": "9d849f81c963ea7d3f6cf8bd341dd4be8e97d6a75393a41957dd36364e143c31",
+      "tests/native_zlib/main.c": "118344694a9c80a3972b763124d7cc4ebe978a87e70919cb9175c64ca7dcf61e",
+      "tests/native_zlib/qemu.py": "ba699cc065859bab8cc74a6afd1c62357bf423c3df52eff4957c20f9c6042161"
+    },
+    "profile": {
+      "upstream_version": "1.4",
+      "translation_units": 11,
+      "memory_formats": [
+        "raw deflate",
+        "zlib",
+        "gzip"
+      ],
+      "default_allocators": "Original zcalloc/zcfree use real malloc/calloc/free",
+      "utilities": [
+        "compress",
+        "compress2",
+        "compressBound",
+        "uncompress",
+        "uncompress2",
+        "upstream size_t variants"
+      ],
+      "excluded": [
+        "gzFile and filesystem entry points"
+      ],
+      "private_definition": "CHOS_ZLIB_MEMORY_API=1",
+      "forbidden_definitions": [
+        "Z_SOLO",
+        "NO_GZIP",
+        "NO_GZCOMPRESS"
+      ]
+    },
+    "commands": [
+      [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--no-backup-if-mismatch",
+        "-p1",
+        "-i",
+        "/workspace/CHOS-Second-Variant/ports/zlib/memory-api.patch"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-zlib-20261113/native-qualified/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk6",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/zlib",
+        "-B",
+        "/workspace/chos-evidence/native-zlib-20261113/native-qualified/zlib",
+        "-DCHOS_ZLIB_SOURCE_DIR=/workspace/chos-evidence/native-zlib-20261113/native-qualified/zlib-source"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-zlib-20261113/native-qualified/zlib",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-zlib-20261113/native-qualified/zlib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-zlib-20261113/native-qualified/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk6",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_zlib",
+        "-B",
+        "/workspace/chos-evidence/native-zlib-20261113/native-qualified/application",
+        "-DZLIB_PREFIX=/workspace/chos-evidence/native-zlib-20261113/native-qualified/prefix",
+        "-DCMAKE_PREFIX_PATH=/workspace/chos-evidence/native-zlib-20261113/native-qualified/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-zlib-20261113/native-qualified/application",
+        "-j4"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/tools/verify_native_png_sources.py"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/tools/verify_native_sdk.py",
+        "/workspace/chos-evidence/webcore-link-20261112/memory/sdk6"
+      ]
+    ],
+    "limits": [
+      "Memory API prerequisite; not WebCore integration or a full browser",
+      "gzFile declarations remain in original public header; entry points intentionally do not link",
+      "Selected streams and failures; not the complete upstream conformance suite or a security audit"
+    ],
+    "fresh_copy_modifications": {
+      "zutil.c": {
+        "original_sha256": "c195fe0ff472545b231542ab6a633a97117710cea64f98c5d468775ed89eff55",
+        "adapted_sha256": "e5c59e9bd808247925e6f403f0e0c49ff28979fb992006f17ed319a47a90c50c"
+      }
+    },
+    "returncode": 0,
+    "seconds": 3.4076981020043604,
+    "archive": {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/native-qualified/prefix/lib/libz.a",
+      "members": 11,
+      "bytes": 118212,
+      "sha256": "c6a0cc19d01b9645bc27eeeeb0fc346db5018aa8d388d0ad31d21395be3f9bd4",
+      "gzFile_entrypoints": [],
+      "required_memory_symbols_present": [
+        "compress",
+        "compress2",
+        "compressBound",
+        "deflate",
+        "deflateInit2_",
+        "inflate",
+        "inflateInit2_",
+        "uncompress",
+        "uncompress2",
+        "zcalloc",
+        "zcfree"
+      ]
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/native-qualified/application/native_zlib",
+      "bytes": 241912,
+      "sha256": "e839261d6e1df6621e3c2abbfc74b953ed3694e6af530db70e5937650381f1bd"
+    },
+    "cases_manifest_sha256": "5c1008e9ba2929d87255ea5225d851ede17150c5dfe0c13bd056e1a428e44791",
+    "cases": {
+      "oracle": "Python standard-library zlib extension (host only)",
+      "runtime_version": "1.3.2",
+      "compile_version": "1.3.2",
+      "cases": [
+        {
+          "name": "empty-raw",
+          "plain_length": 0,
+          "encoded_length": 2,
+          "window_bits": -15,
+          "plain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "encoded_sha256": "9b4fb24edd6d1d8830e272398263cdbf026b97392cc35387b991dc0248a628f9"
+        },
+        {
+          "name": "empty-zlib",
+          "plain_length": 0,
+          "encoded_length": 8,
+          "window_bits": 15,
+          "plain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "encoded_sha256": "aca503def43dc086a5aaa5c3d6f86bcbbc2aa6a80007ddea4a81bce2b376fceb"
+        },
+        {
+          "name": "empty-gzip",
+          "plain_length": 0,
+          "encoded_length": 20,
+          "window_bits": 31,
+          "plain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "encoded_sha256": "59869db34853933b239f1e2219cf7d431da006aa919635478511fabbfc8849d2"
+        },
+        {
+          "name": "binary-text-raw",
+          "plain_length": 646,
+          "encoded_length": 44,
+          "window_bits": -15,
+          "plain_sha256": "3ea19379a06ed0b7b7cd36795f450ff4cce4e9f71ace201b1b7406cbc920bc09",
+          "encoded_sha256": "523e68c6b84442a17c492a594d481a933c3df3fa2aa8e0a95ee0c24fb19c4b26"
+        },
+        {
+          "name": "binary-text-zlib",
+          "plain_length": 646,
+          "encoded_length": 50,
+          "window_bits": 15,
+          "plain_sha256": "3ea19379a06ed0b7b7cd36795f450ff4cce4e9f71ace201b1b7406cbc920bc09",
+          "encoded_sha256": "52af525f5f5401f0116662fa65bc57a814f77f64f71fbaf48542296b1e511a3e"
+        },
+        {
+          "name": "binary-text-gzip",
+          "plain_length": 646,
+          "encoded_length": 62,
+          "window_bits": 31,
+          "plain_sha256": "3ea19379a06ed0b7b7cd36795f450ff4cce4e9f71ace201b1b7406cbc920bc09",
+          "encoded_sha256": "ffec3b90141c6f99abaa9e2768cd4ce8b2ae2eb32c95e8eb08aa8b0bb24a3a88"
+        },
+        {
+          "name": "window-crossing-raw",
+          "plain_length": 49152,
+          "encoded_length": 12694,
+          "window_bits": -15,
+          "plain_sha256": "1b364adee8f9c745a274f67d43e7d4c78c82f85e0f8ea6d6b6a58963a137d85c",
+          "encoded_sha256": "58982fe92e523ec7434b293548e5f2f246a17f3a8539a4aa58a10c0281c91d63"
+        },
+        {
+          "name": "window-crossing-zlib",
+          "plain_length": 49152,
+          "encoded_length": 12700,
+          "window_bits": 15,
+          "plain_sha256": "1b364adee8f9c745a274f67d43e7d4c78c82f85e0f8ea6d6b6a58963a137d85c",
+          "encoded_sha256": "b795e34ce1b2d29528643f08a3d7a7cb36c138bda34b68ecf5b278a2a21fb40a"
+        },
+        {
+          "name": "window-crossing-gzip",
+          "plain_length": 49152,
+          "encoded_length": 12712,
+          "window_bits": 31,
+          "plain_sha256": "1b364adee8f9c745a274f67d43e7d4c78c82f85e0f8ea6d6b6a58963a137d85c",
+          "encoded_sha256": "7d33453959fd1c9cc7ece9c2bcdeb6ab2645a5fb78415cca222dc283d67d3568"
+        }
+      ],
+      "header_sha256": "ff89c65406078b1d80de5ba528678d3a1ec6818a30e4619fd12031784ffdaf5d"
+    },
+    "compile_commands_sha256": "d68b269660e29ab268202e661089dff6c9914bc6b6c3f3a03b4ffcf415f0a431",
+    "installed_files_sha256": {
+      "include/zconf.h": "1e91041e94e3f13a12b770be849c4c674e37caddf94e37acddf853bb54a09adf",
+      "include/zlib.h": "2c404dcaa08709c2a129aea18f3dad4fb5acc5cb52ef12b6223bf8e78c195801",
+      "lib/cmake/ZLIB/ZLIBConfig.cmake": "125b58569ee821c45b961dc8d4a31920c1d0d6734463f112831e2034b5b8554b",
+      "lib/cmake/ZLIB/ZLIBConfigVersion.cmake": "406e49d07c55b7ff222219ae4a7bc3df2c9957b0a6ce3da05ae8dbf3d1c082e8",
+      "lib/cmake/ZLIB/ZLIBTargets-release.cmake": "a598264133a37f6c62bcc1deb9f87624ed6fb867c01408bfe5b63c9100ebf65c",
+      "lib/cmake/ZLIB/ZLIBTargets.cmake": "6698fc45df819edde4cfb7273d96fbf19338b79e2d8b0654c93ecc8d0cb6a02d",
+      "lib/libz.a": "c6a0cc19d01b9645bc27eeeeb0fc346db5018aa8d388d0ad31d21395be3f9bd4",
+      "lib/pkgconfig/zlib.pc": "3444a5e255720fca80fbf104c98c4265d01f9832823caa22cc8e69f70cf6a0ae",
+      "share/licenses/zlib/LICENSE": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2"
+    }
+  },
+  "host_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "stage3_complete": false,
+    "host_reference": true,
+    "host_sanitizers": true,
+    "SDK_manifest_sha256": null,
+    "source_manifest_sha256": "2e349a9d4116346903a6be755874049b80be8d64c51e74b815ec0f949e5de459",
+    "port_and_fixture_sources": {
+      "tools/build_native_zlib.py": "bb1d70120d3bbd1975b6e0bdfd5e071ce25c59b5563c26a51724a3fc502569b8",
+      "tools/verify_native_png_sources.py": "c9b6615a7db83501cfebbf1b913dcdcb9034900dceb40851413c73491d20643c",
+      "ports/zlib/CMakeLists.txt": "287a30ae0f79b3545b84292327927f47998566751ed9af34e3678b4d93d9fe92",
+      "ports/zlib/ZLIBConfig.cmake.in": "8619ff2162c8a4840d990d3116fc153a94bf50bcc332299b33c6c6950da3c2a2",
+      "ports/zlib/memory-api.patch": "b74e0a76278c04e85b5f9d363851a384263a2940e88d1ddc42423df1a7467b9c",
+      "ports/zlib/zlib.pc.in": "329e6680267ba2528e20fb257e055830f91eb4a10309244daa5f0b0ed3db665e",
+      "tests/native_zlib/CMakeLists.txt": "e59c577534d062eb97ed46e6d1c56e07e1c19a56999d68b2e10d8258de62e2fe",
+      "tests/native_zlib/generate_cases.py": "9d849f81c963ea7d3f6cf8bd341dd4be8e97d6a75393a41957dd36364e143c31",
+      "tests/native_zlib/main.c": "118344694a9c80a3972b763124d7cc4ebe978a87e70919cb9175c64ca7dcf61e",
+      "tests/native_zlib/qemu.py": "ba699cc065859bab8cc74a6afd1c62357bf423c3df52eff4957c20f9c6042161"
+    },
+    "profile": {
+      "upstream_version": "1.4",
+      "translation_units": 11,
+      "memory_formats": [
+        "raw deflate",
+        "zlib",
+        "gzip"
+      ],
+      "default_allocators": "Original zcalloc/zcfree use real malloc/calloc/free",
+      "utilities": [
+        "compress",
+        "compress2",
+        "compressBound",
+        "uncompress",
+        "uncompress2",
+        "upstream size_t variants"
+      ],
+      "excluded": [
+        "gzFile and filesystem entry points"
+      ],
+      "private_definition": "CHOS_ZLIB_MEMORY_API=1",
+      "forbidden_definitions": [
+        "Z_SOLO",
+        "NO_GZIP",
+        "NO_GZCOMPRESS"
+      ]
+    },
+    "commands": [
+      [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--no-backup-if-mismatch",
+        "-p1",
+        "-i",
+        "/workspace/CHOS-Second-Variant/ports/zlib/memory-api.patch"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-zlib-20261113/host-qualified/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_C_COMPILER=cc",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/zlib",
+        "-B",
+        "/workspace/chos-evidence/native-zlib-20261113/host-qualified/zlib",
+        "-DCHOS_ZLIB_SOURCE_DIR=/workspace/chos-evidence/native-zlib-20261113/host-qualified/zlib-source"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-zlib-20261113/host-qualified/zlib",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-zlib-20261113/host-qualified/zlib"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-zlib-20261113/host-qualified/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_C_COMPILER=cc",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_zlib",
+        "-B",
+        "/workspace/chos-evidence/native-zlib-20261113/host-qualified/application",
+        "-DZLIB_PREFIX=/workspace/chos-evidence/native-zlib-20261113/host-qualified/prefix",
+        "-DCMAKE_PREFIX_PATH=/workspace/chos-evidence/native-zlib-20261113/host-qualified/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-zlib-20261113/host-qualified/application",
+        "-j4"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/tools/verify_native_png_sources.py"
+      ]
+    ],
+    "limits": [
+      "Memory API prerequisite; not WebCore integration or a full browser",
+      "gzFile declarations remain in original public header; entry points intentionally do not link",
+      "Selected streams and failures; not the complete upstream conformance suite or a security audit"
+    ],
+    "fresh_copy_modifications": {
+      "zutil.c": {
+        "original_sha256": "c195fe0ff472545b231542ab6a633a97117710cea64f98c5d468775ed89eff55",
+        "adapted_sha256": "e5c59e9bd808247925e6f403f0e0c49ff28979fb992006f17ed319a47a90c50c"
+      }
+    },
+    "returncode": 0,
+    "seconds": 5.417802651994862,
+    "archive": {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/host-qualified/prefix/lib/libz.a",
+      "members": 11,
+      "bytes": 2651716,
+      "sha256": "a483f3f7e23658ba8babc9e92dc5b3a9a60a1f2022f927a75c93dec75d9f241e",
+      "gzFile_entrypoints": [],
+      "required_memory_symbols_present": [
+        "compress",
+        "compress2",
+        "compressBound",
+        "deflate",
+        "deflateInit2_",
+        "inflate",
+        "inflateInit2_",
+        "uncompress",
+        "uncompress2",
+        "zcalloc",
+        "zcfree"
+      ]
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/host-qualified/application/native_zlib",
+      "bytes": 2274072,
+      "sha256": "dfb252f7f7835a8cb368b43b1605bc6ec632f352be1767ce463fbf342a9fbfae"
+    },
+    "cases_manifest_sha256": "5c1008e9ba2929d87255ea5225d851ede17150c5dfe0c13bd056e1a428e44791",
+    "cases": {
+      "oracle": "Python standard-library zlib extension (host only)",
+      "runtime_version": "1.3.2",
+      "compile_version": "1.3.2",
+      "cases": [
+        {
+          "name": "empty-raw",
+          "plain_length": 0,
+          "encoded_length": 2,
+          "window_bits": -15,
+          "plain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "encoded_sha256": "9b4fb24edd6d1d8830e272398263cdbf026b97392cc35387b991dc0248a628f9"
+        },
+        {
+          "name": "empty-zlib",
+          "plain_length": 0,
+          "encoded_length": 8,
+          "window_bits": 15,
+          "plain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "encoded_sha256": "aca503def43dc086a5aaa5c3d6f86bcbbc2aa6a80007ddea4a81bce2b376fceb"
+        },
+        {
+          "name": "empty-gzip",
+          "plain_length": 0,
+          "encoded_length": 20,
+          "window_bits": 31,
+          "plain_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "encoded_sha256": "59869db34853933b239f1e2219cf7d431da006aa919635478511fabbfc8849d2"
+        },
+        {
+          "name": "binary-text-raw",
+          "plain_length": 646,
+          "encoded_length": 44,
+          "window_bits": -15,
+          "plain_sha256": "3ea19379a06ed0b7b7cd36795f450ff4cce4e9f71ace201b1b7406cbc920bc09",
+          "encoded_sha256": "523e68c6b84442a17c492a594d481a933c3df3fa2aa8e0a95ee0c24fb19c4b26"
+        },
+        {
+          "name": "binary-text-zlib",
+          "plain_length": 646,
+          "encoded_length": 50,
+          "window_bits": 15,
+          "plain_sha256": "3ea19379a06ed0b7b7cd36795f450ff4cce4e9f71ace201b1b7406cbc920bc09",
+          "encoded_sha256": "52af525f5f5401f0116662fa65bc57a814f77f64f71fbaf48542296b1e511a3e"
+        },
+        {
+          "name": "binary-text-gzip",
+          "plain_length": 646,
+          "encoded_length": 62,
+          "window_bits": 31,
+          "plain_sha256": "3ea19379a06ed0b7b7cd36795f450ff4cce4e9f71ace201b1b7406cbc920bc09",
+          "encoded_sha256": "ffec3b90141c6f99abaa9e2768cd4ce8b2ae2eb32c95e8eb08aa8b0bb24a3a88"
+        },
+        {
+          "name": "window-crossing-raw",
+          "plain_length": 49152,
+          "encoded_length": 12694,
+          "window_bits": -15,
+          "plain_sha256": "1b364adee8f9c745a274f67d43e7d4c78c82f85e0f8ea6d6b6a58963a137d85c",
+          "encoded_sha256": "58982fe92e523ec7434b293548e5f2f246a17f3a8539a4aa58a10c0281c91d63"
+        },
+        {
+          "name": "window-crossing-zlib",
+          "plain_length": 49152,
+          "encoded_length": 12700,
+          "window_bits": 15,
+          "plain_sha256": "1b364adee8f9c745a274f67d43e7d4c78c82f85e0f8ea6d6b6a58963a137d85c",
+          "encoded_sha256": "b795e34ce1b2d29528643f08a3d7a7cb36c138bda34b68ecf5b278a2a21fb40a"
+        },
+        {
+          "name": "window-crossing-gzip",
+          "plain_length": 49152,
+          "encoded_length": 12712,
+          "window_bits": 31,
+          "plain_sha256": "1b364adee8f9c745a274f67d43e7d4c78c82f85e0f8ea6d6b6a58963a137d85c",
+          "encoded_sha256": "7d33453959fd1c9cc7ece9c2bcdeb6ab2645a5fb78415cca222dc283d67d3568"
+        }
+      ],
+      "header_sha256": "ff89c65406078b1d80de5ba528678d3a1ec6818a30e4619fd12031784ffdaf5d"
+    },
+    "compile_commands_sha256": "f0f755da72162ab249bc532c65cbff2fbba0eae9acbfa86f4f9098809c5f1daa",
+    "installed_files_sha256": {
+      "include/zconf.h": "1e91041e94e3f13a12b770be849c4c674e37caddf94e37acddf853bb54a09adf",
+      "include/zlib.h": "2c404dcaa08709c2a129aea18f3dad4fb5acc5cb52ef12b6223bf8e78c195801",
+      "lib/cmake/ZLIB/ZLIBConfig.cmake": "125b58569ee821c45b961dc8d4a31920c1d0d6734463f112831e2034b5b8554b",
+      "lib/cmake/ZLIB/ZLIBConfigVersion.cmake": "406e49d07c55b7ff222219ae4a7bc3df2c9957b0a6ce3da05ae8dbf3d1c082e8",
+      "lib/cmake/ZLIB/ZLIBTargets-release.cmake": "a598264133a37f6c62bcc1deb9f87624ed6fb867c01408bfe5b63c9100ebf65c",
+      "lib/cmake/ZLIB/ZLIBTargets.cmake": "6698fc45df819edde4cfb7273d96fbf19338b79e2d8b0654c93ecc8d0cb6a02d",
+      "lib/libz.a": "a483f3f7e23658ba8babc9e92dc5b3a9a60a1f2022f927a75c93dec75d9f241e",
+      "lib/pkgconfig/zlib.pc": "3444a5e255720fca80fbf104c98c4265d01f9832823caa22cc8e69f70cf6a0ae",
+      "share/licenses/zlib/LICENSE": "e32ff4e00d9d94930537635291da39e7e612703334bf6fde8c7f1686fe8a45a2"
+    }
+  },
+  "host_execution": {
+    "status": "PASS",
+    "returncode": 0,
+    "sanitizers": [
+      "address",
+      "undefined-behavior",
+      "leak"
+    ],
+    "environment": {
+      "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS": "halt_on_error=1"
+    },
+    "statistics": "ZLIB_NATIVE_PASS version=1.4 formats=3 vectors=9 streams=81 partial=54 rejected=59 allocation_failures=21 workers=3 worker_rounds=36 live=0 mapped=0"
+  },
+  "profile_audit": {
+    "status": "PASS",
+    "macros": {
+      "STDC": "",
+      "STDC99": "",
+      "CHOS_ZLIB_MEMORY_API": "1",
+      "HAVE_MEMCPY": "",
+      "Z_U4": "unsigned",
+      "Z_U8": "unsigned long",
+      "OS_CODE": "3",
+      "z_off_t": "long",
+      "z_off64_t": "z_off_t",
+      "__SIZEOF_INT__": "4",
+      "__SIZEOF_LONG__": "8",
+      "__SIZEOF_POINTER__": "8",
+      "__STDC_VERSION__": "201710L"
+    },
+    "command": [
+      "/workspace/chos-tools/root/usr/bin/clang",
+      "--target=aarch64-none-elf",
+      "--sysroot=/workspace/chos-evidence/webcore-link-20261112/memory/sdk6",
+      "-DCHOS_ZLIB_MEMORY_API=1",
+      "-I/workspace/chos-evidence/native-zlib-20261113/native-qualified/zlib-source",
+      "-D__CHOS__=1",
+      "-fhosted",
+      "-fno-builtin",
+      "-fno-stack-protector",
+      "-fno-pic",
+      "-fno-pie",
+      "-femulated-tls",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-mcpu=cortex-a72",
+      "-mstrict-align",
+      "-isystem",
+      "/workspace/chos-evidence/webcore-link-20261112/memory/sdk6/include",
+      "-O3",
+      "-DNDEBUG",
+      "/workspace/chos-evidence/native-zlib-20261113/native-qualified/zlib-source/zutil.c",
+      "-dM",
+      "-E"
+    ],
+    "macro_dump_sha256": "7bc3fa6a9ff806ee1d9e588b6533c0aa1583db1cbef49001b1a387f77a312065",
+    "upstream_gzguts_dependencies": [
+      "stdio.h (gzFile only)",
+      "fcntl.h",
+      "POSIX feature macros",
+      "gzFile internal prototypes",
+      "legacy Windows/MSDOS formatting adaptations"
+    ],
+    "audit": "C99 STDC/STDC99 from original zconf; SDK stdlib/string/limits and sys/types are actual. LP64 z_off_t long. zutil uses no gzFile internals. Skipping the include introduces no replacement file declarations or macros; original default allocator body retained."
+  },
+  "direct": {
+    "status": "PASS",
+    "mode": "direct",
+    "application_sha256": "e839261d6e1df6621e3c2abbfc74b953ed3694e6af530db70e5937650381f1bd",
+    "cold_free_pages": 110116,
+    "runs": [
+      {
+        "cycle": 0,
+        "pid": 1,
+        "seconds": 1.533547473998624,
+        "cold_pages_restored": 110116,
+        "fixture_statistics": [
+          "chos> ZLIB_NATIVE_PASS version=1.4 formats=3 vectors=9 streams=81 partial=54 rejected=59 allocation_failures=21 workers=3 worker_rounds=36 live=0 mapped=0"
+        ]
+      },
+      {
+        "cycle": 1,
+        "pid": 2,
+        "seconds": 1.5157465460069943,
+        "cold_pages_restored": 110116,
+        "fixture_statistics": [
+          "chos> ZLIB_NATIVE_PASS version=1.4 formats=3 vectors=9 streams=81 partial=54 rejected=59 allocation_failures=21 workers=3 worker_rounds=36 live=0 mapped=0"
+        ]
+      },
+      {
+        "cycle": 2,
+        "pid": 3,
+        "seconds": 1.4633439259923762,
+        "cold_pages_restored": 110116,
+        "fixture_statistics": [
+          "chos> ZLIB_NATIVE_PASS version=1.4 formats=3 vectors=9 streams=81 partial=54 rejected=59 allocation_failures=21 workers=3 worker_rounds=36 live=0 mapped=0"
+        ]
+      }
+    ],
+    "checks": [
+      "Real default allocation and raw/zlib/gzip fragmented memory streams",
+      "Independent host-produced streams, compression utilities and selected malformed inputs",
+      "Allocation failure cleanup and three actual pthread workers",
+      "Normal exit 0, exact cold physical pages, released engine ownership, zero frame reservations and futex waiters"
+    ],
+    "limits": [
+      "Memory API dependency prerequisite; no gzFile/filesystem API or WebCore/browser claim",
+      "Selected tests; not full upstream conformance, fuzzing or a security audit",
+      "QEMU only; new Fusion, Pi 5 and laptop execution NOT RUN; Stage 3 incomplete"
+    ]
+  },
+  "uefi": {
+    "status": "PASS",
+    "mode": "uefi",
+    "application_sha256": "e839261d6e1df6621e3c2abbfc74b953ed3694e6af530db70e5937650381f1bd",
+    "cold_free_pages": 494486,
+    "runs": [
+      {
+        "cycle": 0,
+        "pid": 1,
+        "seconds": 1.7075479769991944,
+        "cold_pages_restored": 494486,
+        "fixture_statistics": [
+          "chos> ZLIB_NATIVE_PASS version=1.4 formats=3 vectors=9 streams=81 partial=54 rejected=59 allocation_failures=21 workers=3 worker_rounds=36 live=0 mapped=0"
+        ]
+      },
+      {
+        "cycle": 1,
+        "pid": 2,
+        "seconds": 1.587355073002982,
+        "cold_pages_restored": 494486,
+        "fixture_statistics": [
+          "chos> ZLIB_NATIVE_PASS version=1.4 formats=3 vectors=9 streams=81 partial=54 rejected=59 allocation_failures=21 workers=3 worker_rounds=36 live=0 mapped=0"
+        ]
+      },
+      {
+        "cycle": 2,
+        "pid": 3,
+        "seconds": 1.5500534839957254,
+        "cold_pages_restored": 494486,
+        "fixture_statistics": [
+          "chos> ZLIB_NATIVE_PASS version=1.4 formats=3 vectors=9 streams=81 partial=54 rejected=59 allocation_failures=21 workers=3 worker_rounds=36 live=0 mapped=0"
+        ]
+      }
+    ],
+    "checks": [
+      "Real default allocation and raw/zlib/gzip fragmented memory streams",
+      "Independent host-produced streams, compression utilities and selected malformed inputs",
+      "Allocation failure cleanup and three actual pthread workers",
+      "Normal exit 0, exact cold physical pages, released engine ownership, zero frame reservations and futex waiters"
+    ],
+    "limits": [
+      "Memory API dependency prerequisite; no gzFile/filesystem API or WebCore/browser claim",
+      "Selected tests; not full upstream conformance, fuzzing or a security audit",
+      "QEMU only; new Fusion, Pi 5 and laptop execution NOT RUN; Stage 3 incomplete"
+    ]
+  },
+  "failed_attempts": [
+    {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/host-attempt1",
+      "status": "BUILD_FAILED",
+      "reason": "Python cmake wrapper missing module path; no compilation completed"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/host-attempt2",
+      "status": "BUILD_FAILED",
+      "reason": "Prepared clang19 missing host ASAN runtime archives; final host uses installed GCC14 runtimes"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/native",
+      "status": "BUILD_FAILED",
+      "reason": "First consumer CMake find_package rooted external target prefix inside immutable SDK; explicit NO_CMAKE_FIND_ROOT_PATH corrected target-only lookup"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-zlib-20261113/host/run.log",
+      "status": "SANITIZER_ENVIRONMENT_FAILURE",
+      "reason": "LeakSanitizer cannot run under ptrace sandbox; final exact binary launched outside tracing sandbox, exit0 with leak detection enabled"
+    }
+  ],
+  "evidence_root": "/workspace/chos-evidence/native-zlib-20261113",
+  "evidence_files_sha256": {
+    "direct/artifacts.json": "5fec608d2ef32fc0217c281600ff2379771f6a892b3a3ec121eafe1022e5c736",
+    "direct/command.json": "8a2fb09c47a3d3e9278ecd53d82bdb65043a205c772c699e8c46bdc695981813",
+    "direct/result.json": "634f9e22a8d6a3406a5620a778fdf6d8978dfd023399f4a5ba2b37727fbbb8b4",
+    "direct/serial.log": "2f385cf93c405f6969f0f44496058a3037c858c3dbe8a50ea5cda67c40806b43",
+    "host-qualified/build.json": "70fc80362374d6789b797a6b7cf1d9760b900c1e9a425155669ed5f0123b86a2",
+    "host-qualified/run.log": "d50abf929cbdf3f8305ce6ea3a4bff7fcd0f07279aa4a64e881ba2e3db4998c9",
+    "native-qualified/application/cases/cases.json": "5c1008e9ba2929d87255ea5225d851ede17150c5dfe0c13bd056e1a428e44791",
+    "native-qualified/application/gzfile-probe.log": "5e562078c680b6ed34b0a3a56d25206cd9fe4d0f4dd98f213466715e42d382b6",
+    "native-qualified/build.json": "3923cf1bbc42872552eef19bd7268b7df171153d5f74be4dfa86dfe6f4526fa3",
+    "native-qualified/native-zutil-preprocessor-macros.txt": "7bc3fa6a9ff806ee1d9e588b6533c0aa1583db1cbef49001b1a387f77a312065",
+    "native-qualified/profile-audit.json": "9826dcfc444ec21667d88a017485f6206bfa7a263755be920457b88fbe94dbec",
+    "uefi/artifacts.json": "314be6fc387ffeb7d9eac39a14ff77d5cff850f7804cbac1616f6db30cc133b5",
+    "uefi/command.json": "5fb08bd1989bb1e33b03f86325876b09448002a5cb51e601b96249b46ada8f7b",
+    "uefi/result.json": "5a5349e610c9534a0781877a606f91d522523a4dda631deb43d98990f4b53f27",
+    "uefi/serial.log": "af192856ebcffcb88adf5fa089d9e917cb709a9174ee9df15adeaaa5ba506b08"
+  },
+  "limits": [
+    "All gzFile and filesystem entrypoints intentionally omitted;original public headers retain upstream declarations",
+    "Selected memory codec qualification,not complete upstream conformance,fuzzing or hostile-content security audit",
+    "Actual WebCore CompressionStream integration and page rendering not executed by this fixture",
+    "No new Fusion,Pi5 or laptop run;Stage3 incomplete"
+  ],
+  "build_requalification": {
+    "reason": "Removed legal unified-patch blank context whitespace so the patch itself passes git diff --check",
+    "adapted_source_unchanged": true,
+    "native_archive_unchanged": true,
+    "native_executable_unchanged": true,
+    "guest_evidence_reused_by_exact_executable_sha256": "e839261d6e1df6621e3c2abbfc74b953ed3694e6af530db70e5937650381f1bd",
+    "retained_prior_passing_builds": [
+      "native-final",
+      "host-final"
+    ]
+  }
+}

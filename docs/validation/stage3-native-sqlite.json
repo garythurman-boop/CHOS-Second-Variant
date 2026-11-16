@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_NATIVE_SQLITE",
+  "stage3_complete": false,
+  "component": "SQLite 3.54.1 native memory core",
+  "documentation": "docs/NATIVE_SQLITE.md",
+  "detailed_report": {
+    "path": "tests/native_sqlite/qualification.json",
+    "sha256": "e45bae778440115c9dfb8244791a50c718b3a8acb10579435a54bc93250c1db3"
+  },
+  "native_prefix": "/workspace/chos-evidence/native-sqlite-20261112/target1/prefix",
+  "native_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "SDK_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+    "source_manifest_sha256": "79b87ebcab94373b8c674a839c767234796b20ccb8434e56442772cf97de61a1",
+    "archive": {
+      "bytes": 2178426,
+      "sha256": "68c2eb67ee2b57a7c2d50e7d2494350c28b9df74aee23437843d58de4fcdd7bb"
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-sqlite-20261112/target1/application/native_sqlite",
+      "bytes": 1509096,
+      "sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337"
+    }
+  },
+  "final_source_audit": {
+    "status": "PASS",
+    "source_manifest_sha256": "79b87ebcab94373b8c674a839c767234796b20ccb8434e56442772cf97de61a1",
+    "native_and_host_recorded_build_input_hashes_match_current": true,
+    "built_source_copies_equal_current_originals_plus_exact_patch": true,
+    "installed_native_and_host_file_inventory_and_hashes_match": true,
+    "SDK_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+    "SDK_staged_files_verified": 1214,
+    "official_archive_sha3_256": "92281c86e2957f9b9305890f9ac04204caa7b677cc868dc326d942689df28e30",
+    "official_archive_sha256": "0a9c8e34352dad46006aa82836d5383bff9dc6bc9ce5a60553c05aa30e6ad1f9",
+    "published_download_page_sha256": "d0e3fb1a3d9a813560fb525c7124e0088f976a3bd66c330a64963649eb5b2a77",
+    "published_digest_matches_archive": true,
+    "original_amalgamation_files_verified": 4,
+    "native_ELF_AArch64": true,
+    "native_ELF_undefined_symbols": 0,
+    "native_archive_AArch64_members": 2,
+    "current_toolchain_file_sha256": "f4ad3b3dd06031f496805d686f26660092f251bbba2ab01ee2a965ad13cf9cd4"
+  },
+  "host_sanitizers": {
+    "status": "PASS",
+    "returncode": 0,
+    "command": [
+      "env",
+      "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "/workspace/chos-evidence/native-sqlite-20261112/host2/application/native_sqlite"
+    ],
+    "execution_environment": "Outside restrictive sandbox to permit LeakSanitizer thread scanning",
+    "log_path": "/workspace/chos-evidence/native-sqlite-20261112/host2-final-unsandboxed.log",
+    "ASAN_UBSAN_LeakSanitizer_log_sha256": "8cbebd98afe6e4b9c1cbf387283f2aa8e2abdd83fa2b586305711fdd54577c70"
+  },
+  "qualified_guests": {
+    "direct3": {
+      "status": "PASS",
+      "mode": "direct",
+      "missing_entropy": false,
+      "lifetimes": 3,
+      "cold_free_pages": 110116,
+      "all_lifetimes_restore_cold_baseline": true,
+      "application_sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337",
+      "result_sha256": "59f37e323d59cc7721ce26fa1e217661538416ae2adb786580f90fac2b1280dd",
+      "serial_sha256": "4d53b3fe0f3f65ced68522d5a291732ee4c854f5147fa1793f56edcb4d9e9cdf",
+      "artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      }
+    },
+    "uefi3": {
+      "status": "PASS",
+      "mode": "uefi",
+      "missing_entropy": false,
+      "lifetimes": 3,
+      "cold_free_pages": 494486,
+      "all_lifetimes_restore_cold_baseline": true,
+      "application_sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337",
+      "result_sha256": "842a353e39b431098eda4d53400d78c2f670986148f13b621fe73640c451cb95",
+      "serial_sha256": "bfa499a034efc805da00b51eb947807d3af51b1b68f91759e6529279cfab32e8",
+      "artifacts": {
+        "kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "iso_sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7",
+        "iso_embedded_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "kernel_symbols_match_iso": true
+      }
+    },
+    "no-entropy3": {
+      "status": "PASS",
+      "mode": "direct",
+      "missing_entropy": true,
+      "lifetimes": 3,
+      "cold_free_pages": 110116,
+      "all_lifetimes_restore_cold_baseline": true,
+      "application_sha256": "1510d0da5531f03e2a07720afa76dabda256ab2f2a9d8cdd939b83dc83da4337",
+      "result_sha256": "0c60941dac0cfbdea4425cfbb6f3952f7e7fc8655828c9aa76502d6b8a7c40b5",
+      "serial_sha256": "128587113ae5148548c2f890710b604506cde7c89fdd7351a4a3ac3b8c68e455",
+      "artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      }
+    }
+  },
+  "retained_failures": [
+    {
+      "attempt": "prototype1 with SDK5",
+      "result": "Compilation failed because localtime fallback and strspn/strcspn declarations were unavailable",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/prototype1-build.log",
+      "log_sha256": "d6e5bc7be6e24730116ea126d004571e7321b661873a96a055671dae24a33875",
+      "resolution": "HAVE_LOCALTIME_R selects existing real reentrant UTC conversion; actual strspn/strcspn runtime implementations and declarations were added and exported in SDK6"
+    },
+    {
+      "attempt": "host1 build",
+      "result": "The fixture changed during the build; the build script rejected its stale source hash",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/host1.log",
+      "log_sha256": "2c9aae8f58c29af14773270361eb6b685dac4c15601c6fcc168affc05ef1edea",
+      "resolution": "Fresh host2 and target1 builds used frozen matching sources; final source/hash audit passes"
+    },
+    {
+      "attempt": "initial allocation quota fixture",
+      "result": "Applying quota before preparing the statement caused an earlier legitimate allocation failure; the failing test returned with an open database and LeakSanitizer reported leaks",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/host1-run.log",
+      "log_sha256": "6e94c952fa522ad57c19761851b5eb053db8b1ce5e7eb896d0abe17eadef37b9",
+      "resolution": "Prepare first, then tighten the quota; accept SQLITE_NOMEM at execution or materialization, restore quota and finalize/close before testing recovery. Final ASan/UBSan/leak run passes"
+    },
+    {
+      "attempt": "final sandboxed host2 sanitizer rerun",
+      "result": "Fixture checks passed, but LeakSanitizer exited 1 because its ptrace thread scan is restricted in the sandbox",
+      "stdout_path": "/workspace/chos-evidence/native-sqlite-20261112/host2-final-run.log",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "LeakSanitizer has encountered a fatal error; LeakSanitizer does not work under ptrace (strace, gdb, etc)",
+      "resolution": "The same unchanged fixture passed with ASan, UBSan and leak detection outside the sandbox"
+    },
+    {
+      "attempt": "final sandboxed direct2, uefi2 and no-entropy2 QEMU reruns",
+      "result": "QEMU could not bind its QMP Unix socket: Operation not permitted; guest monitor startup timed out",
+      "evidence": {
+        "direct2": {
+          "serial_sha256": "f6f8664fccf2e6dde838297ac7bb35c9419543f1da7f0058e658d34a353a21ce",
+          "command_sha256": "c2eb24a4d0f2bf7c4cfb3ec1274be1d7060b473116e47f640502768b9736b13f"
+        },
+        "uefi2": {
+          "serial_sha256": "67b9abda559f73501f52d3a948c7845a6c8543fc6f347e58886bf88958b4f13d",
+          "command_sha256": "291ff974678cb1a31759d86832099fd5e1dec48f83e6a82ea5feeaf0dccb73d7"
+        },
+        "no-entropy2": {
+          "serial_sha256": "d5b1aae2932d4f1846a82b2ae681a57bc068da0089605e62b44ad06fa5224261",
+          "command_sha256": "acf69f8c0cfaa32c42e598aa6aa0f5514b9170718e5838c1521f16f7187bdbb2"
+        }
+      },
+      "resolution": "Same application and frozen images passed final direct3, uefi3 and no-entropy3 profiles outside the sandbox"
+    },
+    {
+      "attempt": "missing-entropy report review",
+      "result": "The original no-entropy1 result listed generic ordinary SQL/concurrency checks although its branch only tests initialization failure and cleanup",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/no-entropy1/result.json",
+      "result_sha256": "d17916506229225b699bc3838b82fcf5880a5c122b5abfdade7be6e47282d13a",
+      "resolution": "Reporter now selects checks by the actual branch; final no-entropy3 report records SQLITE_IOERR and cleanup only"
+    },
+    {
+      "attempt": "QMP constructor failure reporting regression",
+      "result": "The original constructor ran before the error-reporting try block, so early socket failures lacked a result.json",
+      "evidence_path": "/workspace/chos-evidence/native-sqlite-20261112/qmp-negative",
+      "expected_failure_result_sha256": "8334e697191c3b47fd443f9b0b20f63c5f432c05183800a7f34a26e221820fcb",
+      "serial_sha256": "f42de877cec5126b3e36f000a60fc3d9ae01eb911472f297a44812886842e8c3",
+      "resolution": "Constructor now runs inside the reporting try block. A deliberate sandbox-restricted retry verified a failed result report is written; all final outside-sandbox profiles pass"
+    }
+  ],
+  "limits": [
+    "Persistent disk VFS, file locking, WAL shared memory, crash durability and browser cookies/history/cache persistence are unimplemented; file operations return errors",
+    "Selected actual in-memory SQL and pthread concurrency are qualified; the full upstream SQLite conformance suite is not run",
+    "OS entropy is required; guest wall clock and UTC conversion are provided, while production trusted time and browser timezone policy remain open",
+    "This is a dependency prerequisite for roadmap step 2; complete WebCore/PAL/browser integration is not qualified",
+    "QEMU and host evidence only; new Fusion, Pi 5 and laptop physical execution is not run; revised Stage 3 remains incomplete"
+  ]
+}

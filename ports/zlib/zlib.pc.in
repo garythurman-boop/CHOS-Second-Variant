@@ -1,0 +1,10 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: zlib
+Description: zlib memory API with default allocation and raw/zlib/gzip streams; no gzFile API
+Version: @PROJECT_VERSION@
+Libs: -L${libdir} -lz
+Cflags: -I${includedir}

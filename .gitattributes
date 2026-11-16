@@ -34,3 +34,11 @@ third_party/mbedtls/** -whitespace
 # Curated original WebCore implementation, headers and license bytes are pinned.
 /third_party/webcore-images/** -whitespace
 /ports/webcore-images/*.patch -whitespace
+# Preserve exact original parser/database sources and license/test data bytes.
+/third_party/libxml2/** -whitespace
+/third_party/sqlite/** -whitespace
+/ports/xml/*.patch -whitespace
+/ports/sqlite/*.patch -whitespace
+
+# Signed source authentication receipts retain their exact original bytes.
+/ports/xml/authentication/** -whitespace
