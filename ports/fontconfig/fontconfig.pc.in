@@ -1,0 +1,9 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/lib
+includedir=${prefix}/include
+Name: Fontconfig
+Description: Real Fontconfig explicit in-memory/app-font catalogue profile for CHOS
+Version: 2.17.1
+Requires.private: freetype2 libxml-2.0
+Libs: -L${libdir} -lfontconfig
+Cflags: -I${includedir}

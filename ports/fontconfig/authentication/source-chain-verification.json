@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "status": "VERIFIED_SIGNED_SOURCE_CHAIN",
+  "signature_command": [
+    "gpg",
+    "--homedir",
+    "/workspace/chos-evidence/native-fontconfig-20261113/gnupg",
+    "--no-default-keyring",
+    "--keyring",
+    "/usr/share/keyrings/debian-archive-keyring.gpg",
+    "--status-fd",
+    "1",
+    "--verify",
+    "/workspace/chos-evidence/native-fontconfig-20261113/debian-InRelease"
+  ],
+  "keyring_sha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017",
+  "source_index": {
+    "path": "main/source/Sources.xz",
+    "bytes": 12183912,
+    "sha256": "2b81c4fbe7e600dacee42add9fcc7bd92344ec70984f00e68414e5ebaf58305f",
+    "signed_release_entry_matched": true
+  },
+  "package": {
+    "name": "fontconfig",
+    "version": "2.17.1-5",
+    "exact_source_stanza_matched": true
+  },
+  "original_archive": {
+    "name": "fontconfig_2.17.1.orig.tar.gz",
+    "bytes": 622045,
+    "sha256": "f07504cef87f171ee1748352e2df9b9f125352f620fa0d03a9284306ea2c40a4",
+    "archive_files_compared_to_extracted": 618,
+    "all_files_byte_identical": true,
+    "symlinks": 0
+  },
+  "upstream_detached_signature": "Not claimed; provenance is the Debian archive signature chain"
+}

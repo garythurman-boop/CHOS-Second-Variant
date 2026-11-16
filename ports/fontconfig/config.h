@@ -1,0 +1,30 @@
+/* CHOS memory-catalogue profile; no POSIX filesystem capability is implied. */
+#define HAVE_UNISTD_H 1
+#define HAVE_PTHREAD 1
+#define HAVE_INTEL_ATOMIC_PRIMITIVES 1
+#define ENABLE_LIBXML2 1
+#define SIZEOF_VOID_P 8
+#define ALIGNOF_VOID_P 8
+#define ALIGNOF_DOUBLE 8
+#define FC_GPERF_SIZE_T size_t
+#define HAVE_RAND 1
+#define HAVE_STRERROR 1
+#define HAVE_FT_GET_BDF_PROPERTY 1
+#define HAVE_FT_GET_PS_FONT_INFO 1
+#define HAVE_FT_HAS_PS_GLYPH_NAMES 1
+#define HAVE_FT_GET_X11_FONT_FORMAT 1
+#define HAVE_FT_DONE_MM_VAR 1
+#define HAVE_STDINT_H 1
+#define HAVE_SYS_TYPES_H 1
+#define USE_ICONV 0
+#define FC_DEFAULT_FONTS ""
+#define FC_FONTPATH ""
+#define FC_CACHEDIR "/UNSUPPORTED/FONTCONFIG"
+#define FONTCONFIG_PATH "/UNSUPPORTED/FONTCONFIG"
+#define CONFIGDIR "/UNSUPPORTED/FONTCONFIG"
+#define PACKAGE "fontconfig"
+#define PACKAGE_VERSION "2.17.1"
+#define PACKAGE_STRING "fontconfig 2.17.1"
+#define FC_TEMPLATEDIR "/UNSUPPORTED/FONTCONFIG"
+#define FLEXIBLE_ARRAY_MEMBER /**/
+#define FC_CONFIG_PATH "fonts.conf"

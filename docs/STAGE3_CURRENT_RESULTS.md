@@ -1,5 +1,14 @@
 # Revised Stage 3 current evidence
 
+The next page-build checkpoint qualifies [native Fontconfig catalogues](NATIVE_FONTCONFIG.md),
+[WebP decoding/demux/animation](NATIVE_WEBP.md), [native string search](NATIVE_LIBC_SPANS.md)
+and [original WebCore local buffer ownership](../ports/webcore-page/LOCAL_MEMORY.md).
+Native direct/UEFI lifecycle tests pass for these selected components. Fontconfig
+requires an explicitly installed catalogue; default scans and disk caches remain
+unsupported. Local ReadWrite backing shares actual bytes inside one process;
+read-only aliases, copy-on-write and cross-process mappings fail explicitly.
+Full WebCore page painting, the modern browser and revised Stage 3 remain open.
+
 Current page-build prerequisites: [native LibXml2](NATIVE_XML.md),
 [SQLite memory core](NATIVE_SQLITE.md) and [zlib memory streams](NATIVE_ZLIB_STREAMS.md)
 now have actual native and sanitizer qualification. The full host and sanitizer

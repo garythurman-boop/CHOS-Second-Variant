@@ -13,6 +13,7 @@ size_t chos_libc_strlen(const char *);
 size_t chos_libc_strnlen(const char *,size_t);
 size_t chos_libc_strspn(const char *,const char *);
 size_t chos_libc_strcspn(const char *,const char *);
+char *chos_libc_strpbrk(const char *,const char *);
 int chos_libc_strcmp(const char *,const char *);
 int chos_libc_strncmp(const char *,const char *,size_t);
 char *chos_libc_strcpy(char *,const char *);

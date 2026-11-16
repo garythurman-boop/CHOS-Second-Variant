@@ -34,6 +34,9 @@ static size_t span(const char *s,const char *set,unsigned accepted){
 }
 size_t chos_libc_strspn(const char *s,const char *set){return span(s,set,1);}
 size_t chos_libc_strcspn(const char *s,const char *set){return span(s,set,0);}
+char *chos_libc_strpbrk(const char *s,const char *set){
+    size_t n=chos_libc_strcspn(s,set);return s[n]?(char *)s+n:NULL;
+}
 int chos_libc_strcmp(const char *a,const char *b){
     while(*a && *a==*b){a++;b++;}return (int)(unsigned char)*a-(int)(unsigned char)*b;
 }
@@ -60,6 +63,7 @@ size_t strlen(const char *s){return chos_libc_strlen(s);}
 size_t strnlen(const char *s,size_t n){return chos_libc_strnlen(s,n);}
 size_t strspn(const char *s,const char *set){return chos_libc_strspn(s,set);}
 size_t strcspn(const char *s,const char *set){return chos_libc_strcspn(s,set);}
+char *strpbrk(const char *s,const char *set){return chos_libc_strpbrk(s,set);}
 int strcmp(const char *a,const char *b){return chos_libc_strcmp(a,b);}
 int strncmp(const char *a,const char *b,size_t n){return chos_libc_strncmp(a,b,n);}
 char *strcpy(char *d,const char *s){return chos_libc_strcpy(d,s);}

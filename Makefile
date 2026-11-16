@@ -1870,3 +1870,10 @@ test-native-xml-sources:
 test-native-sqlite-sources:
 	python3 tools/verify_native_sqlite_sources.py
 test: test-native-xml-sources test-native-sqlite-sources
+
+.PHONY: test-native-fontconfig-sources test-native-webp-sources
+test-native-fontconfig-sources:
+	python3 tools/verify_native_fontconfig_sources.py
+test-native-webp-sources:
+	python3 tools/verify_native_webp_sources.py
+test: test-native-fontconfig-sources test-native-webp-sources

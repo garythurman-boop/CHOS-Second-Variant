@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_NATIVE_STRING_SEARCH",
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "component": "Actual public strpbrk plus native span/terminator regression",
+  "SDK_manifest_sha256": "d492179e2d83bf46f38f9913149b4c98787267e3e3641f01fc8dec18ab4fce0f",
+  "sources_sha256": {
+    "userland/libc/string.c": "2df7880ff8e34a1661e6eae03a99d7101e691599b7567968f217d76ec6b3b5a7",
+    "userland/libc/include/string.h": "aac5967925a6ace855f0e0f3e265f0d5b309ff10a28c9f0f99772f5ab190d5d6",
+    "userland/libc/include/chos/libc_string.h": "af6500045d79c0d19fe896e789195fe38efd42a534d439be4c55a004c4d31fad",
+    "tests/test_libc_string.c": "66377c3c7de8488681fe76ca885f0a8c92f7d1c29cb6e81538a5b346a3413050",
+    "tests/native_strings/main.c": "447e2fafd6d721e78f70464d384cb66562d1de2346b67e0ff5ace01d0ae115d2",
+    "tests/native_strings/CMakeLists.txt": "911f293952034497e5b7b8b6dd0b30d3aa8014ba8bb0d86a58a33fe18bea3232",
+    "tests/native_strings/qemu.py": "93ed033bfc576a66a6f039973f8d55ce72e3550f5c57d5e9cba5dba4a70da1b2"
+  },
+  "host_reference_cases_per_operation": 65280,
+  "host_qualification": {
+    "host": {
+      "status": "PASS",
+      "log_sha256": "91c8e5fbcf49e37481fc1159e86d665c4c14ea23d9f079031502f4e912dc7b3e",
+      "binary_sha256": "548c2478219141d49ef9ca6988257537c8c1c3c25b816a9f1c374d2e6f6def24",
+      "sanitizers": null
+    },
+    "sanitize": {
+      "status": "PASS",
+      "log_sha256": "91c8e5fbcf49e37481fc1159e86d665c4c14ea23d9f079031502f4e912dc7b3e",
+      "binary_sha256": "2c4d5ab7af05142723ccc25fccb4f2ec9ea4587b1bc6e52d4c4022f1f5bf8db6",
+      "sanitizers": "ASan/UBSan/LeakSanitizer with detect_leaks=1"
+    }
+  },
+  "native_application": {
+    "path": "/workspace/chos-evidence/webcore-link-20261112/strings7/native_strings",
+    "sha256": "88774db03d6b37a14bcb25704170d24a272b389bf20fc3c33b0033e8ed1328e3"
+  },
+  "native_runs": {
+    "direct": {
+      "path": "/workspace/chos-evidence/webcore-link-20261112/strings7-direct1/result.json",
+      "sha256": "6ddbdfc4a5d4f70b4f7f3df9c218e9e4617a5557b8a76951176b15e2b22013b7",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "88774db03d6b37a14bcb25704170d24a272b389bf20fc3c33b0033e8ed1328e3",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_free_pages_restored": 110116
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "cold_free_pages_restored": 110116
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "cold_free_pages_restored": 110116
+          }
+        ],
+        "checks": [
+          "Actual native public strpbrk: 65280 unsigned byte-alphabet/set-length cases, plus 24576 cases in three workers",
+          "Inaccessible pages immediately follow input and set NUL terminators; selected strpbrk/strspn/strcspn operations complete without faults",
+          "Real pthread workers, zero native heap/mappings after cleanup and exact cold process/frame/futex restoration"
+        ],
+        "limits": [
+          "Host reference/sanitizer checks are separate evidence; this native byte oracle uses linear memchr membership",
+          "Selected C runtime prerequisite only, not WebCore/browser or new physical platform qualification",
+          "Stage 3 remains incomplete"
+        ]
+      }
+    },
+    "uefi": {
+      "path": "/workspace/chos-evidence/webcore-link-20261112/strings7-uefi1/result.json",
+      "sha256": "887c2b272a60895ff27fbfab0197820ac3cf7a1e88e10206d09f064954f0141f",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "88774db03d6b37a14bcb25704170d24a272b389bf20fc3c33b0033e8ed1328e3",
+        "cold_free_pages": 494486,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_free_pages_restored": 494486
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "cold_free_pages_restored": 494486
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "cold_free_pages_restored": 494486
+          }
+        ],
+        "checks": [
+          "Actual native public strpbrk: 65280 unsigned byte-alphabet/set-length cases, plus 24576 cases in three workers",
+          "Inaccessible pages immediately follow input and set NUL terminators; selected strpbrk/strspn/strcspn operations complete without faults",
+          "Real pthread workers, zero native heap/mappings after cleanup and exact cold process/frame/futex restoration"
+        ],
+        "limits": [
+          "Host reference/sanitizer checks are separate evidence; this native byte oracle uses linear memchr membership",
+          "Selected C runtime prerequisite only, not WebCore/browser or new physical platform qualification",
+          "Stage 3 remains incomplete"
+        ]
+      }
+    }
+  },
+  "limits": [
+    "Selected C-runtime and memory-protection prerequisite, not WebCore/browser acceptance",
+    "Host independent glibc comparison is separate from native linear-membership oracle",
+    "Existing strspn/strcspn qualification remains recorded at source checkpoint51; SDK7 adds actual strpbrk for Fontconfig",
+    "Physical Fusion/Pi5/laptop execution not run"
+  ],
+  "required_suites": {
+    "host": {
+      "status": "PASS",
+      "exit_code": 0,
+      "path": "/workspace/chos-evidence/webcore-link-20261112/string-search-full-host7.log",
+      "log_sha256": "c835dbcba1fea60666e33dcb1e90b3f5920f8ceb791f1b779c6a309891585549"
+    },
+    "sanitize": {
+      "status": "PASS",
+      "exit_code": 0,
+      "path": "/workspace/chos-evidence/webcore-link-20261112/string-search-full-sanitize7.log",
+      "log_sha256": "a0739ab3c8ae8ef3f0e09026c0888ceb293e55b90b759bb9ebeffb395f5c3835"
+    }
+  }
+}

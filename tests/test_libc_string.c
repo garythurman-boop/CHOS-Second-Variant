@@ -36,9 +36,12 @@ int main(void){
             set[n]=0;
             assert(chos_libc_strspn(values,set)==strspn(values,set));
             assert(chos_libc_strcspn(values,set)==strcspn(values,set));
+            assert(chos_libc_strpbrk(values,set)==strpbrk(values,set));
         }
     }
     assert(!chos_libc_strspn("","abc")&&!chos_libc_strcspn("","abc"));
+    assert(!chos_libc_strpbrk("","abc")&&!chos_libc_strpbrk("abc",""));
+    assert(!chos_libc_strpbrk("abc","xyz"));
     /* Native sysconf selectors intentionally differ from the host ABI. The
      * argument-free host getpagesize symbol avoids using a native selector. */
     long page=getpagesize();assert(page>0);
@@ -48,6 +51,12 @@ int main(void){
     assert(chos_libc_strspn(end-3,"\xffx")==2&&chos_libc_strcspn(end-3,"a")==2);
     assert(chos_libc_strspn("\xffxx",end-3)==3&&chos_libc_strcspn("abx",end-3)==2);
     assert(!chos_libc_strspn(end-1,end-1)&&chos_libc_strcspn(end-3,end-1)==2);
+    assert(chos_libc_strpbrk(end-3,"x")==end-2);
+    assert(chos_libc_strpbrk(end-3,"\xff")==end-3);
+    assert(chos_libc_strpbrk(end-3,"a")==NULL);
+    char query[]="abx";
+    assert(chos_libc_strpbrk(query,end-3)==strpbrk(query,end-3));
+    assert(!chos_libc_strpbrk(end-1,end-3)&&!chos_libc_strpbrk(end-3,end-1));
     assert(!munmap(guard,(size_t)page*2));
     puts("libc strings: PASS (overlap, bounded operations, unsigned bytes, strings and terminators)");return 0;
 }

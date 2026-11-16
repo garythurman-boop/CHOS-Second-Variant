@@ -1,0 +1,32 @@
+Package: fontconfig
+Binary: fontconfig, fontconfig-config, fontconfig-udeb, libfontconfig-dev, libfontconfig1-dev, libfontconfig1, libfontconfig-doc
+Version: 2.17.1-5
+Maintainer: Debian freedesktop.org maintainers <pkg-freedesktop-maintainers@lists.alioth.debian.org>
+Uploaders: Keith Packard <keithp@debian.org>, Emilio Pozuelo Monfort <pochu@debian.org>
+Build-Depends: debhelper-compat (= 13), docbook, docbook-utils, libfreetype-dev (>= 2.8.1), libexpat1-dev, uuid-dev, pkgconf, python3:any, gperf, po-debconf
+Build-Depends-Indep: texlive-formats-extra <!nodoc>
+Architecture: any all
+Standards-Version: 4.7.3
+Format: 3.0 (quilt)
+Files:
+ 37d4a39bd230db859561711e61e51cee 2680 fontconfig_2.17.1-5.dsc
+ c552927a996725d0164d902493bf2af8 622045 fontconfig_2.17.1.orig.tar.gz
+ b1930c3d5a0ee89f98e9e8209a9d76c9 59296 fontconfig_2.17.1-5.debian.tar.xz
+Vcs-Browser: https://salsa.debian.org/freedesktop-team/fontconfig
+Vcs-Git: https://salsa.debian.org/freedesktop-team/fontconfig.git
+Checksums-Sha256:
+ a450cf5d81cacdcc9172386c0906489c22017ecfc53c918548ae7e5ebce7d799 2680 fontconfig_2.17.1-5.dsc
+ f07504cef87f171ee1748352e2df9b9f125352f620fa0d03a9284306ea2c40a4 622045 fontconfig_2.17.1.orig.tar.gz
+ 7af5d559173a130b1e296c4f27fc7131e125854aa3fc4da655a2415189c51550 59296 fontconfig_2.17.1-5.debian.tar.xz
+Homepage: https://www.freedesktop.org/wiki/Software/fontconfig/
+Package-List: 
+ fontconfig deb fonts optional arch=any
+ fontconfig-config deb fonts optional arch=any
+ fontconfig-udeb udeb debian-installer optional arch=any profile=!noudeb profile:v1=!noudeb
+ libfontconfig-dev deb libdevel optional arch=any
+ libfontconfig-doc deb doc optional arch=all profile=!nodoc profile:v1=!nodoc
+ libfontconfig1 deb libs optional arch=any
+ libfontconfig1-dev deb oldlibs optional arch=any
+Directory: pool/main/f/fontconfig
+Priority: optional
+Section: fonts

@@ -1,0 +1,16 @@
+# Static CHOS memory-catalogue profile; dependency prefixes are immutable build inputs.
+set(Fontconfig_VERSION "2.17.1")
+if(NOT TARGET Fontconfig::Fontconfig)
+ get_filename_component(_fc_prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
+ add_library(Fontconfig::Fontconfig STATIC IMPORTED)
+ set_target_properties(Fontconfig::Fontconfig PROPERTIES
+  IMPORTED_LOCATION "${_fc_prefix}/lib/libfontconfig.a"
+  INTERFACE_INCLUDE_DIRECTORIES "${_fc_prefix}/include;@FT_PREFIX@/include/freetype2;@XML_PREFIX@/include/libxml2"
+  INTERFACE_LINK_LIBRARIES "@FT_PREFIX@/lib/libfreetype.a;@XML_PREFIX@/lib/libxml2.a")
+endif()
+
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "CHOS")
+ include(CMakeFindDependencyMacro)
+ find_dependency(Threads REQUIRED)
+ set_property(TARGET Fontconfig::Fontconfig APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads m)
+endif()

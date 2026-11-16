@@ -1,0 +1,38 @@
+Package: libwebp
+Binary: libwebp-dev, libwebp7, libwebpdemux2, libwebpmux3, libwebpdecoder3, libsharpyuv0, libsharpyuv-dev, webp
+Version: 1.6.0-0.1
+Maintainer: Jeff Breidenbach <jab@debian.org>
+Build-Depends: cmake, debhelper-compat (= 14), libgif-dev, libglut-dev, libjpeg-dev, libpng-dev, libtiff-dev <!pkg.libwebp.notiff>, pkgconf
+Architecture: any
+Standards-Version: 4.7.4
+Format: 3.0 (quilt)
+Files:
+ cc8f6858b4a1e997def2bd531f4aa776 2865 libwebp_1.6.0-0.1.dsc
+ cceb6447180f961473b181c9ef38b630 4296070 libwebp_1.6.0.orig.tar.gz
+ cad8d208f67be7dee249c24059d1fda9 833 libwebp_1.6.0.orig.tar.gz.asc
+ 32ccac1c2fbec9b7150937ba3809f76b 11168 libwebp_1.6.0-0.1.debian.tar.xz
+Vcs-Browser: https://salsa.debian.org/debian/libwebp
+Vcs-Git: https://salsa.debian.org/debian/libwebp.git
+Checksums-Sha256:
+ d8ee6905fbb6c44be12c13f47e7c48eb42be557c7e05e7ed466fb550615bb26d 2865 libwebp_1.6.0-0.1.dsc
+ e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564 4296070 libwebp_1.6.0.orig.tar.gz
+ bf561cfc1609cdafa8be4029184b35e75affd155335cc2ce6c2438fbb546c074 833 libwebp_1.6.0.orig.tar.gz.asc
+ 3148d1178cb1bd20a34f79bf856a1e975b0fabef58fbc457024adc9425701158 11168 libwebp_1.6.0-0.1.debian.tar.xz
+Description: Lossy compression of digital photographic images
+ Image Compression format, based on the VP8 codec.
+ WebP uses the modern VP8 compression format to deliver efficient
+ compression of images for the web. More than 30% extra gain over
+ optimized JPEG, for same quality, is not unusual.
+Homepage: https://developers.google.com/speed/webp/
+Package-List: 
+ libsharpyuv-dev deb libdevel optional arch=any
+ libsharpyuv0 deb libs optional arch=any
+ libwebp-dev deb libdevel optional arch=any
+ libwebp7 deb libs optional arch=any
+ libwebpdecoder3 deb libs optional arch=any
+ libwebpdemux2 deb libs optional arch=any
+ libwebpmux3 deb libs optional arch=any
+ webp deb graphics optional arch=any
+Directory: pool/main/libw/libwebp
+Priority: optional
+Section: libs

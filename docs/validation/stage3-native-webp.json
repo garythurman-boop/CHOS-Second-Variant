@@ -1,0 +1,874 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_NATIVE_MEMORY_DECODE_DEMUX_ANIMATION",
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "component": "Original libwebp 1.6.0 selected native decoder/demux/animation prerequisite",
+  "native_encoder_executed": false,
+  "WebCore_adapter_executed": false,
+  "native_build_metadata_status_meaning": "The immutable build report records linkage only; execution qualification is recorded separately below.",
+  "source_manifest_sha256": "78f161c04c2b773dd061d863b99b4a475e584a66eadf49705281433de0ed21f3",
+  "original_files": 367,
+  "sources_sha256": {
+    "tools/build_native_webp.py": "01a9b6169a89847918f06b3dc66fa4425f343a93a212cf059105bdfa65d67a3d",
+    "tools/verify_native_webp_sources.py": "fc6d9ec24af9834c0b006a2ce5201520ff308a1da578a91d11775643261eacf4",
+    "ports/webp/CMakeLists.txt": "a99618367526fec9882375c0f45f4460ade40a87fe68f09aa723169376c313b2",
+    "tests/native_webp/CMakeLists.txt": "7d3d7b49faca3032206691ce9e655f54fcbdc3726d1ea8362c7b7f2a16480b85",
+    "tests/native_webp/generate_cases.c": "d53e8bdd5baa65fed46bf7f5511997aabf8571424ec46e8cc6af9008d35408d8",
+    "tests/native_webp/generate_cases.py": "6de1dac42a7a6ed18b1410d08329f08e2502d31d7ea011d279b32a40be371d79",
+    "tests/native_webp/main.c": "b7f11964e725e7e9c5130dfd6e404ceb0c7d91436a940f64a8a8d7722a5ca2b1",
+    "tests/native_webp/qemu.py": "cfc38a6f7bf5400c946640930574aa4fca309e23d5f98a8e8a8f5ca8692cc613"
+  },
+  "source_authentication": {
+    "archive_sha256": "e4ab7009bf0629fd11982d4c2aa83964cf244cffba7347ecd39019a9e38c4564",
+    "debian_sources_sha256": "2b81c4fbe7e600dacee42add9fcc7bd92344ec70984f00e68414e5ebaf58305f",
+    "debian_inrelease_sha256": "8f92240b07df679da934d3edc2a23c9aded945a3301813ac8d146844c6f4b135",
+    "authentication": "Debian archive keyring verifies sid InRelease;InRelease SHA256 authenticates Sources.xz;Sources original-archive SHA256 authenticates this unmodified upstream release. Detached upstream signature retained but not independently verified."
+  },
+  "native_build": {
+    "path": "/workspace/chos-evidence/native-webp-20261113/target6/build.json",
+    "sha256": "39cf40418bbf8d7280306fd933050b08b6af6bd0158d0acff5aec9346902a244",
+    "metadata": {
+      "status": "LINKED_NOT_EXECUTED",
+      "host_reference": false,
+      "host_sanitizers": false,
+      "executed": false,
+      "stage3_complete": false,
+      "source_manifest_sha256": "78f161c04c2b773dd061d863b99b4a475e584a66eadf49705281433de0ed21f3",
+      "SDK_manifest_sha256": "d58d59cd7f671120f207161c88e65fe884b4dd0a419109294a95176de091f210",
+      "sources_sha256": {
+        "tools/build_native_webp.py": "01a9b6169a89847918f06b3dc66fa4425f343a93a212cf059105bdfa65d67a3d",
+        "tools/verify_native_webp_sources.py": "fc6d9ec24af9834c0b006a2ce5201520ff308a1da578a91d11775643261eacf4",
+        "ports/webp/CMakeLists.txt": "a99618367526fec9882375c0f45f4460ade40a87fe68f09aa723169376c313b2",
+        "tests/native_webp/main.c": "b7f11964e725e7e9c5130dfd6e404ceb0c7d91436a940f64a8a8d7722a5ca2b1",
+        "tests/native_webp/CMakeLists.txt": "7d3d7b49faca3032206691ce9e655f54fcbdc3726d1ea8362c7b7f2a16480b85",
+        "tests/native_webp/generate_cases.c": "d53e8bdd5baa65fed46bf7f5511997aabf8571424ec46e8cc6af9008d35408d8",
+        "tests/native_webp/generate_cases.py": "6de1dac42a7a6ed18b1410d08329f08e2502d31d7ea011d279b32a40be371d79"
+      },
+      "commands": [
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-webp-20261113/target6/prefix",
+          "-DCMAKE_INSTALL_LIBDIR=lib",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk6",
+          "-DCHOS_APPLICATION_PROFILE=engine",
+          "-S",
+          "/workspace/CHOS-Second-Variant/ports/webp",
+          "-B",
+          "/workspace/chos-evidence/native-webp-20261113/target6/webp",
+          "-DWEBP_SOURCE=/workspace/chos-evidence/native-webp-20261113/target6/source"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-evidence/native-webp-20261113/target6/webp",
+          "-j4"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--install",
+          "/workspace/chos-evidence/native-webp-20261113/target6/webp"
+        ],
+        [
+          "/usr/bin/cc",
+          "-std=c11",
+          "-O1",
+          "-I/workspace/chos-evidence/native-webp-20261113/host7/prefix/include",
+          "/workspace/CHOS-Second-Variant/tests/native_webp/generate_cases.c",
+          "/workspace/chos-evidence/native-webp-20261113/host7/prefix/lib/libwebp.a",
+          "/workspace/chos-evidence/native-webp-20261113/host7/prefix/lib/libsharpyuv.a",
+          "-lm",
+          "-pthread",
+          "-o",
+          "/workspace/chos-evidence/native-webp-20261113/target6/generate_cases"
+        ],
+        [
+          "python3",
+          "/workspace/CHOS-Second-Variant/tests/native_webp/generate_cases.py",
+          "--out",
+          "/workspace/chos-evidence/native-webp-20261113/target6/cases",
+          "--encoder",
+          "/workspace/chos-evidence/native-webp-20261113/target6/generate_cases"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-webp-20261113/target6/prefix",
+          "-DCMAKE_INSTALL_LIBDIR=lib",
+          "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+          "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk6",
+          "-DCHOS_APPLICATION_PROFILE=engine",
+          "-S",
+          "/workspace/CHOS-Second-Variant/tests/native_webp",
+          "-B",
+          "/workspace/chos-evidence/native-webp-20261113/target6/application",
+          "-DWEBP_PREFIX=/workspace/chos-evidence/native-webp-20261113/target6/prefix",
+          "-DWEBP_CASES=/workspace/chos-evidence/native-webp-20261113/target6/cases"
+        ],
+        [
+          "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+          "--build",
+          "/workspace/chos-evidence/native-webp-20261113/target6/application",
+          "-j4"
+        ]
+      ],
+      "fixture_sources_available": true,
+      "limits": [
+        "Original WebP memory encoder/decoder,SharpYUV and demux dependency;not WebCore/page/browser integration",
+        "No command-line image/file transport,GL,codec plugin or mux target in this profile",
+        "Genuine upstream compiler/Threads probes retained;native AArch64 NEON required",
+        "Selected codec fixtures do not establish full upstream conformance,production security or physical-platform qualification"
+      ],
+      "seconds": 15.894345401000464,
+      "generated_configuration": {
+        "path": "/workspace/chos-evidence/native-webp-20261113/target6/webp/upstream/src/webp/config.h",
+        "sha256": "54f498f1ca37336f17bb1a92abe13361d7a5320ba9ef7acfc23c6532fe8b027e",
+        "upstream_NEON": true,
+        "upstream_threads": true
+      },
+      "archives": {
+        "libwebp.a": {
+          "bytes": 1015774,
+          "members": 112,
+          "sha256": "1821b93c85af2c0bc691d35ab8fba0a92825352d5caff8f4007d4ec15f6510a8"
+        },
+        "libwebpdecoder.a": {
+          "bytes": 545552,
+          "members": 64,
+          "sha256": "1cf3d94dee18e5571efea1118d0c370af84cb8a1a9fe9edcca057eff76917282"
+        },
+        "libwebpdemux.a": {
+          "bytes": 19306,
+          "members": 2,
+          "sha256": "ecd91305aba7706b22fce4566c6b1a81e14f7c60ff00d30b9d245b1cef4ca2e1"
+        },
+        "libsharpyuv.a": {
+          "bytes": 38608,
+          "members": 7,
+          "sha256": "a0b54e16dc4c227ca785d84608d5685b354f5772fd75d6094bc337d92dd5ee03"
+        }
+      },
+      "installed_files_sha256": {
+        "include/webp/decode.h": "e554551d085f234e930f36b5879a77ef58bfea34c48ebfd620426e63b224025c",
+        "include/webp/demux.h": "9b0d10c0fa1ac2dc750c4d687b038e40a685bb9240cb045759f5b9546017361d",
+        "include/webp/encode.h": "928e8d3ed502baa0f47ed10913ee018ed6172afcd4f308e0ea005a126b83f27e",
+        "include/webp/mux_types.h": "ca789c9fe2edc52f759cb3888e9171ee44b5c12f2db21458f96176d578bc897e",
+        "include/webp/sharpyuv/sharpyuv.h": "4fcb150246232b0e8e605752deb66ca861872f86dd692308d9f854e10ad964ee",
+        "include/webp/sharpyuv/sharpyuv_csp.h": "80c23c727edb1ce6a42b38f9458c3d75c572856c898f0cd913ba03468afb9d3a",
+        "include/webp/types.h": "992d2ffe864adb6d80cc91b7a062074d167ed96772f28d104a650148eca31794",
+        "lib/libsharpyuv.a": "a0b54e16dc4c227ca785d84608d5685b354f5772fd75d6094bc337d92dd5ee03",
+        "lib/libwebp.a": "1821b93c85af2c0bc691d35ab8fba0a92825352d5caff8f4007d4ec15f6510a8",
+        "lib/libwebpdecoder.a": "1cf3d94dee18e5571efea1118d0c370af84cb8a1a9fe9edcca057eff76917282",
+        "lib/libwebpdemux.a": "ecd91305aba7706b22fce4566c6b1a81e14f7c60ff00d30b9d245b1cef4ca2e1",
+        "lib/pkgconfig/libsharpyuv.pc": "b909685067cc0a9e8b61db745c5a2d148f6800fd739bee782fd867accfbbf556",
+        "lib/pkgconfig/libwebp.pc": "ac6fdb4f60ff491920e4b9c08dfa1e5a598129514936874361310ff18bdd9d71",
+        "lib/pkgconfig/libwebpdecoder.pc": "a89625df9eb9b8dbc4bd50d734fb51e055f3f5217b38f31283b6a431a8b7f698",
+        "lib/pkgconfig/libwebpdemux.pc": "deaa4d7d1ffea30acdc240bf172ebf28af200216164e252a83320da0e47f052c",
+        "share/WebP/cmake/WebPConfig.cmake": "ce46fdcf9e1a133780a91f4fc55edb4175b2912b4221b7e53e713eb95ee5511f",
+        "share/WebP/cmake/WebPConfigVersion.cmake": "c9be14d51d2108603dd1bd53c9e27945cea0d40bd970e5f27c6318373af3ade0",
+        "share/WebP/cmake/WebPTargets-release.cmake": "b82e532239e180beb1c7eac55a635cef56fc78c925877670997d9a75f1c95c66",
+        "share/WebP/cmake/WebPTargets.cmake": "2a7462659b2d70021f638d14f8eea9e090f7abae2a916f581acc03d8c960db92"
+      },
+      "fixture_host_build_report_sha256": "65658a6c3860da45b340f69e113a2adf8c6ddae973ea4e7951bebeb4d35e5cd2",
+      "generated_cases_sha256": {
+        "animation.webp": "49a1c5303c0d3937bdb224fe2c95d823a1f6d3422d601b1445166940cbc37687",
+        "cases.json": "6a50f12b5366511ff1edf1258739519219df07e002a8bc052848c0934bb8d406",
+        "frame2.rgba": "e7f1e1fed7d4d565baa54b364bdf54f7fe971f57312c4cd567c3196ca3d1128c",
+        "frame2.webp": "e91af282ddc739a91450377275149eb64930ccda0d2b79edbea4a54298fab0e6",
+        "lossless.rgba": "c3d2b53fb57c8e5e5a7a27a95e5faf39d3543335ab2173b5415457a0ed91be45",
+        "lossless.webp": "1ab7930179e4d313754148de625b06f9314534372ee05b9fa90b4c6a815c9aea",
+        "lossy.rgba": "11631e9e6c6201fceeda8b4542e9de54511750410000c94d31029af1e987b2b6",
+        "lossy.webp": "bc3312f8842b8a06ce572d5564dc96247dd783cfce37a519348e787fd6ebc669",
+        "webp-cases.h": "a601bfee9764317fc012f6ea7878b475700bea36122ac8e8cbf8be27d56f155c"
+      },
+      "application": {
+        "path": "/workspace/chos-evidence/native-webp-20261113/target6/application/native_webp",
+        "bytes": 442960,
+        "sha256": "6554ebe117fc5283f59390a2493a7d7776e5a8a1e728d5d566f1be9b4d3d030b"
+      },
+      "returncode": 0
+    }
+  },
+  "native_execution": {
+    "direct": {
+      "report_path": "/workspace/chos-evidence/native-webp-20261113/direct5/result.json",
+      "report_sha256": "d3c14d7d79465477f2275aaa079aa01c48c65e9a36c3f4a58c7c72fbfcdffcae",
+      "serial_log_sha256": "a14f32ea9a2f3d9454d1811d2a14d7ad957769ecf46d7d3a7b9a1575690f2dd1",
+      "artifacts_report_sha256": "5fec608d2ef32fc0217c281600ff2379771f6a892b3a3ec121eafe1022e5c736",
+      "artifacts": {
+        "kernel_sha256": "934a477ffb46b0de7891e315b6bce2670a0abb97315a3707792b670605bb37d6"
+      },
+      "qemu_command": [
+        "qemu-system-aarch64",
+        "-M",
+        "virt,gic-version=2",
+        "-cpu",
+        "cortex-a72",
+        "-m",
+        "512M",
+        "-display",
+        "none",
+        "-no-reboot",
+        "-global",
+        "virtio-mmio.force-legacy=false",
+        "-serial",
+        "stdio",
+        "-qmp",
+        "unix:/workspace/chos-evidence/native-webp-20261113/direct5/qmp.sock,server=on,wait=off",
+        "-L",
+        "/workspace/chos-tools/root/usr/share/qemu",
+        "-device",
+        "loader,file=/workspace/chos-evidence/native-webp-20261113/direct5/kernel.elf,cpu-num=0",
+        "-device",
+        "virtio-gpu-device",
+        "-device",
+        "virtio-keyboard-device",
+        "-device",
+        "virtio-mouse-device",
+        "-drive",
+        "if=none,file=/workspace/chos-evidence/native-webp-20261113/direct5/disposable.img,format=raw,id=disk",
+        "-device",
+        "virtio-blk-device,drive=disk",
+        "-netdev",
+        "user,id=net",
+        "-device",
+        "virtio-net-device,netdev=net",
+        "-object",
+        "rng-random,filename=/dev/urandom,id=rng",
+        "-device",
+        "virtio-rng-device,rng=rng"
+      ],
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "6554ebe117fc5283f59390a2493a7d7776e5a8a1e728d5d566f1be9b4d3d030b",
+        "cases_manifest_sha256": "6a50f12b5366511ff1edf1258739519219df07e002a8bc052848c0934bb8d406",
+        "cold_free_pages": 110116,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "seconds": 0.9815673019984388,
+            "cold_pages_restored": 110116,
+            "fixture_statistics": [
+              "chos> [ OK ] actual WebP complete pixels=1482 fragmented deliveries=1171 partial demux=124 allocation failures=27"
+            ]
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "seconds": 1.1550273959983315,
+            "cold_pages_restored": 110116,
+            "fixture_statistics": [
+              "chos> [ OK ] actual WebP complete pixels=1482 fragmented deliveries=1171 partial demux=124 allocation failures=27"
+            ]
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "seconds": 0.9448783669977274,
+            "cold_pages_restored": 110116,
+            "fixture_statistics": [
+              "chos> [ OK ] actual WebP complete pixels=1482 fragmented deliveries=1171 partial demux=124 allocation failures=27"
+            ]
+          }
+        ],
+        "checks": [
+          "Exact independent-formula lossless RGBA and original-host-reference lossy RGBA pixels",
+          "Incremental append/update,partial demux,two-frame animation,reset,cancellation and malformed inputs",
+          "Allocation failure cleanup and three actual pthread workers",
+          "Normal exit 0, exact cold physical pages, released engine ownership, zero frame reservations and futex waiters"
+        ],
+        "limits": [
+          "Memory WebP dependency prerequisite; no WebCore/page/browser integration claim",
+          "Selected tests; not full upstream conformance, fuzzing or a security audit",
+          "QEMU only; new Fusion, Pi 5 and laptop execution NOT RUN; Stage 3 incomplete"
+        ]
+      }
+    },
+    "uefi": {
+      "report_path": "/workspace/chos-evidence/native-webp-20261113/uefi5/result.json",
+      "report_sha256": "f408ba3eaa0832a9def7eae04a6368eae44cb9905c73ad4d7d53c9ddde215d22",
+      "serial_log_sha256": "04733bea622f3af64ea3bb419404ad8fc1ff75cca7a1a38a46893be77e4181c2",
+      "artifacts_report_sha256": "314be6fc387ffeb7d9eac39a14ff77d5cff850f7804cbac1616f6db30cc133b5",
+      "artifacts": {
+        "kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "iso_sha256": "d83929263a40d18ba1daa2634687d3a3a3e50a05680dc075121510991ed3e2a7",
+        "iso_embedded_kernel_sha256": "b82d8293f74477138f2649933478c6b2e582dc6fbcc621d0272dc8dd567c260a",
+        "kernel_symbols_match_iso": true
+      },
+      "qemu_command": [
+        "qemu-system-aarch64",
+        "-M",
+        "virt,gic-version=3",
+        "-cpu",
+        "cortex-a72",
+        "-m",
+        "2G",
+        "-display",
+        "none",
+        "-no-reboot",
+        "-global",
+        "virtio-mmio.force-legacy=false",
+        "-serial",
+        "stdio",
+        "-qmp",
+        "unix:/workspace/chos-evidence/native-webp-20261113/uefi5/qmp.sock,server=on,wait=off",
+        "-L",
+        "/workspace/chos-tools/root/usr/share/qemu",
+        "-drive",
+        "if=pflash,format=raw,readonly=on,file=/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd",
+        "-drive",
+        "if=pflash,format=raw,file=/workspace/chos-evidence/native-webp-20261113/uefi5/vars.fd",
+        "-device",
+        "ramfb",
+        "-device",
+        "qemu-xhci,id=xhci",
+        "-drive",
+        "if=none,file=/workspace/chos-evidence/native-webp-20261113/uefi5/disposable.img,format=raw,id=storage",
+        "-device",
+        "virtio-blk-pci,disable-legacy=on,drive=storage",
+        "-netdev",
+        "user,id=net",
+        "-device",
+        "e1000e,id=nic,netdev=net,romfile=",
+        "-object",
+        "rng-random,filename=/dev/urandom,id=rng",
+        "-device",
+        "virtio-rng-pci,disable-legacy=on,rng=rng",
+        "-device",
+        "usb-kbd,bus=xhci.0,id=kbd",
+        "-device",
+        "usb-tablet,bus=xhci.0,id=mouse",
+        "-device",
+        "virtio-scsi-device,id=scsi",
+        "-drive",
+        "if=none,file=/workspace/chos-evidence/native-webp-20261113/uefi5/boot.iso,format=raw,media=cdrom,id=cd",
+        "-device",
+        "scsi-cd,drive=cd"
+      ],
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "6554ebe117fc5283f59390a2493a7d7776e5a8a1e728d5d566f1be9b4d3d030b",
+        "cases_manifest_sha256": "6a50f12b5366511ff1edf1258739519219df07e002a8bc052848c0934bb8d406",
+        "cold_free_pages": 494486,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "seconds": 1.2161438289986108,
+            "cold_pages_restored": 494486,
+            "fixture_statistics": [
+              "chos> [ OK ] actual WebP complete pixels=1482 fragmented deliveries=1171 partial demux=124 allocation failures=27"
+            ]
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "seconds": 0.6951767219979956,
+            "cold_pages_restored": 494486,
+            "fixture_statistics": [
+              "chos> [ OK ] actual WebP complete pixels=1482 fragmented deliveries=1171 partial demux=124 allocation failures=27"
+            ]
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "seconds": 0.6663302380002278,
+            "cold_pages_restored": 494486,
+            "fixture_statistics": [
+              "chos> [ OK ] actual WebP complete pixels=1482 fragmented deliveries=1171 partial demux=124 allocation failures=27"
+            ]
+          }
+        ],
+        "checks": [
+          "Exact independent-formula lossless RGBA and original-host-reference lossy RGBA pixels",
+          "Incremental append/update,partial demux,two-frame animation,reset,cancellation and malformed inputs",
+          "Allocation failure cleanup and three actual pthread workers",
+          "Normal exit 0, exact cold physical pages, released engine ownership, zero frame reservations and futex waiters"
+        ],
+        "limits": [
+          "Memory WebP dependency prerequisite; no WebCore/page/browser integration claim",
+          "Selected tests; not full upstream conformance, fuzzing or a security audit",
+          "QEMU only; new Fusion, Pi 5 and laptop execution NOT RUN; Stage 3 incomplete"
+        ]
+      }
+    }
+  },
+  "host_execution": {
+    "host7": {
+      "build": {
+        "path": "/workspace/chos-evidence/native-webp-20261113/host7/build.json",
+        "sha256": "65658a6c3860da45b340f69e113a2adf8c6ddae973ea4e7951bebeb4d35e5cd2",
+        "metadata": {
+          "status": "LINKED_NOT_EXECUTED",
+          "host_reference": true,
+          "host_sanitizers": false,
+          "executed": false,
+          "stage3_complete": false,
+          "source_manifest_sha256": "78f161c04c2b773dd061d863b99b4a475e584a66eadf49705281433de0ed21f3",
+          "SDK_manifest_sha256": null,
+          "sources_sha256": {
+            "tools/build_native_webp.py": "01a9b6169a89847918f06b3dc66fa4425f343a93a212cf059105bdfa65d67a3d",
+            "tools/verify_native_webp_sources.py": "fc6d9ec24af9834c0b006a2ce5201520ff308a1da578a91d11775643261eacf4",
+            "ports/webp/CMakeLists.txt": "a99618367526fec9882375c0f45f4460ade40a87fe68f09aa723169376c313b2",
+            "tests/native_webp/main.c": "b7f11964e725e7e9c5130dfd6e404ceb0c7d91436a940f64a8a8d7722a5ca2b1",
+            "tests/native_webp/CMakeLists.txt": "7d3d7b49faca3032206691ce9e655f54fcbdc3726d1ea8362c7b7f2a16480b85",
+            "tests/native_webp/generate_cases.c": "d53e8bdd5baa65fed46bf7f5511997aabf8571424ec46e8cc6af9008d35408d8",
+            "tests/native_webp/generate_cases.py": "6de1dac42a7a6ed18b1410d08329f08e2502d31d7ea011d279b32a40be371d79"
+          },
+          "commands": [
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "-G",
+              "Ninja",
+              "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-webp-20261113/host7/prefix",
+              "-DCMAKE_INSTALL_LIBDIR=lib",
+              "-S",
+              "/workspace/CHOS-Second-Variant/ports/webp",
+              "-B",
+              "/workspace/chos-evidence/native-webp-20261113/host7/webp",
+              "-DWEBP_SOURCE=/workspace/chos-evidence/native-webp-20261113/host7/source"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "--build",
+              "/workspace/chos-evidence/native-webp-20261113/host7/webp",
+              "-j4"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "--install",
+              "/workspace/chos-evidence/native-webp-20261113/host7/webp"
+            ],
+            [
+              "/usr/bin/cc",
+              "-std=c11",
+              "-O1",
+              "-I/workspace/chos-evidence/native-webp-20261113/host7/prefix/include",
+              "/workspace/CHOS-Second-Variant/tests/native_webp/generate_cases.c",
+              "/workspace/chos-evidence/native-webp-20261113/host7/prefix/lib/libwebp.a",
+              "/workspace/chos-evidence/native-webp-20261113/host7/prefix/lib/libsharpyuv.a",
+              "-lm",
+              "-pthread",
+              "-o",
+              "/workspace/chos-evidence/native-webp-20261113/host7/generate_cases"
+            ],
+            [
+              "python3",
+              "/workspace/CHOS-Second-Variant/tests/native_webp/generate_cases.py",
+              "--out",
+              "/workspace/chos-evidence/native-webp-20261113/host7/cases",
+              "--encoder",
+              "/workspace/chos-evidence/native-webp-20261113/host7/generate_cases"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "-G",
+              "Ninja",
+              "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-webp-20261113/host7/prefix",
+              "-DCMAKE_INSTALL_LIBDIR=lib",
+              "-S",
+              "/workspace/CHOS-Second-Variant/tests/native_webp",
+              "-B",
+              "/workspace/chos-evidence/native-webp-20261113/host7/application",
+              "-DWEBP_PREFIX=/workspace/chos-evidence/native-webp-20261113/host7/prefix",
+              "-DWEBP_CASES=/workspace/chos-evidence/native-webp-20261113/host7/cases"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "--build",
+              "/workspace/chos-evidence/native-webp-20261113/host7/application",
+              "-j4"
+            ]
+          ],
+          "fixture_sources_available": true,
+          "limits": [
+            "Original WebP memory encoder/decoder,SharpYUV and demux dependency;not WebCore/page/browser integration",
+            "No command-line image/file transport,GL,codec plugin or mux target in this profile",
+            "Genuine upstream compiler/Threads probes retained;native AArch64 NEON required",
+            "Selected codec fixtures do not establish full upstream conformance,production security or physical-platform qualification"
+          ],
+          "seconds": 12.142240754998056,
+          "generated_configuration": {
+            "path": "/workspace/chos-evidence/native-webp-20261113/host7/webp/upstream/src/webp/config.h",
+            "sha256": "a6d2f229a6bf19c18c7eadad7ccf3a969badc8fa06d834c81a6c5c1c2345dd94",
+            "upstream_NEON": false,
+            "upstream_threads": true
+          },
+          "archives": {
+            "libwebp.a": {
+              "bytes": 1069460,
+              "members": 112,
+              "sha256": "f042e22c176cf37a8d8bc3f759d57e938924f7ba5c4167c7befec04c6f00050f"
+            },
+            "libwebpdecoder.a": {
+              "bytes": 617116,
+              "members": 64,
+              "sha256": "e444823eecb398eafeb7bbb098c6122ffd64b151801a410b6bd566eabf317a06"
+            },
+            "libwebpdemux.a": {
+              "bytes": 17026,
+              "members": 2,
+              "sha256": "f04e2c1eed273fe7a4dd93c8f6c30a423c0ac83927c6214b0fe8f97a3857bec1"
+            },
+            "libsharpyuv.a": {
+              "bytes": 56564,
+              "members": 7,
+              "sha256": "8666d66e4c738245641d09475230d63f1572fbe4aaaf919ec97449d040571898"
+            }
+          },
+          "installed_files_sha256": {
+            "include/webp/decode.h": "e554551d085f234e930f36b5879a77ef58bfea34c48ebfd620426e63b224025c",
+            "include/webp/demux.h": "9b0d10c0fa1ac2dc750c4d687b038e40a685bb9240cb045759f5b9546017361d",
+            "include/webp/encode.h": "928e8d3ed502baa0f47ed10913ee018ed6172afcd4f308e0ea005a126b83f27e",
+            "include/webp/mux_types.h": "ca789c9fe2edc52f759cb3888e9171ee44b5c12f2db21458f96176d578bc897e",
+            "include/webp/sharpyuv/sharpyuv.h": "4fcb150246232b0e8e605752deb66ca861872f86dd692308d9f854e10ad964ee",
+            "include/webp/sharpyuv/sharpyuv_csp.h": "80c23c727edb1ce6a42b38f9458c3d75c572856c898f0cd913ba03468afb9d3a",
+            "include/webp/types.h": "992d2ffe864adb6d80cc91b7a062074d167ed96772f28d104a650148eca31794",
+            "lib/libsharpyuv.a": "8666d66e4c738245641d09475230d63f1572fbe4aaaf919ec97449d040571898",
+            "lib/libwebp.a": "f042e22c176cf37a8d8bc3f759d57e938924f7ba5c4167c7befec04c6f00050f",
+            "lib/libwebpdecoder.a": "e444823eecb398eafeb7bbb098c6122ffd64b151801a410b6bd566eabf317a06",
+            "lib/libwebpdemux.a": "f04e2c1eed273fe7a4dd93c8f6c30a423c0ac83927c6214b0fe8f97a3857bec1",
+            "lib/pkgconfig/libsharpyuv.pc": "e1509070d953c37edef8d2a1d6fd01bd65f30413dab48f3f92fc3ff9d9d8852b",
+            "lib/pkgconfig/libwebp.pc": "61ca3ee182ad07f391806f90a796d63272599c25b7200e3ecab01ceb0e367280",
+            "lib/pkgconfig/libwebpdecoder.pc": "5b2c9848211b09b2d88031562bc6bf13520ad74fb1b06ea0e248f118887325fa",
+            "lib/pkgconfig/libwebpdemux.pc": "098acce4213faf42cda7086a42b0bc58aeb4e45cd4b74103fb7c315256dab253",
+            "share/WebP/cmake/WebPConfig.cmake": "ce46fdcf9e1a133780a91f4fc55edb4175b2912b4221b7e53e713eb95ee5511f",
+            "share/WebP/cmake/WebPConfigVersion.cmake": "c9be14d51d2108603dd1bd53c9e27945cea0d40bd970e5f27c6318373af3ade0",
+            "share/WebP/cmake/WebPTargets-release.cmake": "b82e532239e180beb1c7eac55a635cef56fc78c925877670997d9a75f1c95c66",
+            "share/WebP/cmake/WebPTargets.cmake": "94206e65425ec984b7e8a4b2f6ec2b931c30a21b935fedb8799a06c1872740b1"
+          },
+          "generated_cases_sha256": {
+            "animation.webp": "49a1c5303c0d3937bdb224fe2c95d823a1f6d3422d601b1445166940cbc37687",
+            "cases.json": "6a50f12b5366511ff1edf1258739519219df07e002a8bc052848c0934bb8d406",
+            "frame2.rgba": "e7f1e1fed7d4d565baa54b364bdf54f7fe971f57312c4cd567c3196ca3d1128c",
+            "frame2.webp": "e91af282ddc739a91450377275149eb64930ccda0d2b79edbea4a54298fab0e6",
+            "lossless.rgba": "c3d2b53fb57c8e5e5a7a27a95e5faf39d3543335ab2173b5415457a0ed91be45",
+            "lossless.webp": "1ab7930179e4d313754148de625b06f9314534372ee05b9fa90b4c6a815c9aea",
+            "lossy.rgba": "11631e9e6c6201fceeda8b4542e9de54511750410000c94d31029af1e987b2b6",
+            "lossy.webp": "bc3312f8842b8a06ce572d5564dc96247dd783cfce37a519348e787fd6ebc669",
+            "webp-cases.h": "a601bfee9764317fc012f6ea7878b475700bea36122ac8e8cbf8be27d56f155c"
+          },
+          "application": {
+            "path": "/workspace/chos-evidence/native-webp-20261113/host7/application/native_webp",
+            "bytes": 492712,
+            "sha256": "ab9a108be7e34b13f222ba852a44c34e08059ca9de025ae70e92ec6d154f06ff"
+          },
+          "returncode": 0
+        }
+      },
+      "execution_report_path": "/workspace/chos-evidence/native-webp-20261113/host7-execution.json",
+      "execution_report_sha256": "80ebe5876116f07627eb1ba326ffe1af607c33a37e99b0a274fd22f209844f32",
+      "execution": {
+        "status": "PASS",
+        "host_reference": true,
+        "host_sanitizers": [],
+        "native_executed": false,
+        "stage3_complete": false,
+        "execution_outside_ptrace_sandbox": true,
+        "sanitizer_options_disabled": false,
+        "command": [
+          "/workspace/chos-evidence/native-webp-20261113/host7/application/native_webp"
+        ],
+        "sanitizer_options": {},
+        "executable_sha256": "ab9a108be7e34b13f222ba852a44c34e08059ca9de025ae70e92ec6d154f06ff",
+        "build_report_sha256": "65658a6c3860da45b340f69e113a2adf8c6ddae973ea4e7951bebeb4d35e5cd2",
+        "log_sha256": "f0223fede1c3f1c1a912644a644a31c0aa79a0dbfc2422fcf20996b952a7bcc5",
+        "returncode": 0
+      }
+    },
+    "host-sanitize5": {
+      "build": {
+        "path": "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/build.json",
+        "sha256": "e703352053ba16d8796748d86d43acfaca8fb87dc5fbf6b6cbb18c1799a35ced",
+        "metadata": {
+          "status": "LINKED_NOT_EXECUTED",
+          "host_reference": true,
+          "host_sanitizers": true,
+          "executed": false,
+          "stage3_complete": false,
+          "source_manifest_sha256": "78f161c04c2b773dd061d863b99b4a475e584a66eadf49705281433de0ed21f3",
+          "SDK_manifest_sha256": null,
+          "sources_sha256": {
+            "tools/build_native_webp.py": "01a9b6169a89847918f06b3dc66fa4425f343a93a212cf059105bdfa65d67a3d",
+            "tools/verify_native_webp_sources.py": "fc6d9ec24af9834c0b006a2ce5201520ff308a1da578a91d11775643261eacf4",
+            "ports/webp/CMakeLists.txt": "a99618367526fec9882375c0f45f4460ade40a87fe68f09aa723169376c313b2",
+            "tests/native_webp/main.c": "b7f11964e725e7e9c5130dfd6e404ceb0c7d91436a940f64a8a8d7722a5ca2b1",
+            "tests/native_webp/CMakeLists.txt": "7d3d7b49faca3032206691ce9e655f54fcbdc3726d1ea8362c7b7f2a16480b85",
+            "tests/native_webp/generate_cases.c": "d53e8bdd5baa65fed46bf7f5511997aabf8571424ec46e8cc6af9008d35408d8",
+            "tests/native_webp/generate_cases.py": "6de1dac42a7a6ed18b1410d08329f08e2502d31d7ea011d279b32a40be371d79"
+          },
+          "commands": [
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "-G",
+              "Ninja",
+              "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-webp-20261113/host-sanitize5/prefix",
+              "-DCMAKE_INSTALL_LIBDIR=lib",
+              "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-S",
+              "/workspace/CHOS-Second-Variant/ports/webp",
+              "-B",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/webp",
+              "-DWEBP_SOURCE=/workspace/chos-evidence/native-webp-20261113/host-sanitize5/source"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "--build",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/webp",
+              "-j4"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "--install",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/webp"
+            ],
+            [
+              "/usr/bin/cc",
+              "-std=c11",
+              "-O1",
+              "-I/workspace/chos-evidence/native-webp-20261113/host-sanitize5/prefix/include",
+              "/workspace/CHOS-Second-Variant/tests/native_webp/generate_cases.c",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/prefix/lib/libwebp.a",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/prefix/lib/libsharpyuv.a",
+              "-lm",
+              "-pthread",
+              "-o",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/generate_cases",
+              "-fsanitize=address,undefined",
+              "-fno-omit-frame-pointer"
+            ],
+            [
+              "python3",
+              "/workspace/CHOS-Second-Variant/tests/native_webp/generate_cases.py",
+              "--out",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/cases",
+              "--encoder",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/generate_cases"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "-G",
+              "Ninja",
+              "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+              "-DCMAKE_BUILD_TYPE=Release",
+              "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-webp-20261113/host-sanitize5/prefix",
+              "-DCMAKE_INSTALL_LIBDIR=lib",
+              "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+              "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+              "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+              "-S",
+              "/workspace/CHOS-Second-Variant/tests/native_webp",
+              "-B",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/application",
+              "-DWEBP_PREFIX=/workspace/chos-evidence/native-webp-20261113/host-sanitize5/prefix",
+              "-DWEBP_CASES=/workspace/chos-evidence/native-webp-20261113/host-sanitize5/cases"
+            ],
+            [
+              "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+              "--build",
+              "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/application",
+              "-j4"
+            ]
+          ],
+          "fixture_sources_available": true,
+          "limits": [
+            "Original WebP memory encoder/decoder,SharpYUV and demux dependency;not WebCore/page/browser integration",
+            "No command-line image/file transport,GL,codec plugin or mux target in this profile",
+            "Genuine upstream compiler/Threads probes retained;native AArch64 NEON required",
+            "Selected codec fixtures do not establish full upstream conformance,production security or physical-platform qualification"
+          ],
+          "seconds": 13.208184137998614,
+          "generated_configuration": {
+            "path": "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/webp/upstream/src/webp/config.h",
+            "sha256": "a6d2f229a6bf19c18c7eadad7ccf3a969badc8fa06d834c81a6c5c1c2345dd94",
+            "upstream_NEON": false,
+            "upstream_threads": true
+          },
+          "archives": {
+            "libwebp.a": {
+              "bytes": 11615608,
+              "members": 112,
+              "sha256": "78473898d91763b7796e9ad86da844aadcebf9f2fbf0ec2da767350d666b1e74"
+            },
+            "libwebpdecoder.a": {
+              "bytes": 5766130,
+              "members": 64,
+              "sha256": "37d8f1183314bc639966c7dd6c9994e62fec1681b56fb2caa2b1888323192216"
+            },
+            "libwebpdemux.a": {
+              "bytes": 334810,
+              "members": 2,
+              "sha256": "7cb36bc42e54fe6d228a53379d035f0d62a2a94609be0ddcdb06030026efb111"
+            },
+            "libsharpyuv.a": {
+              "bytes": 351600,
+              "members": 7,
+              "sha256": "c5b219d9147091ec41677e56c29e6de9a4f958ebeeecaa4c7c86977b9ce7b0a2"
+            }
+          },
+          "installed_files_sha256": {
+            "include/webp/decode.h": "e554551d085f234e930f36b5879a77ef58bfea34c48ebfd620426e63b224025c",
+            "include/webp/demux.h": "9b0d10c0fa1ac2dc750c4d687b038e40a685bb9240cb045759f5b9546017361d",
+            "include/webp/encode.h": "928e8d3ed502baa0f47ed10913ee018ed6172afcd4f308e0ea005a126b83f27e",
+            "include/webp/mux_types.h": "ca789c9fe2edc52f759cb3888e9171ee44b5c12f2db21458f96176d578bc897e",
+            "include/webp/sharpyuv/sharpyuv.h": "4fcb150246232b0e8e605752deb66ca861872f86dd692308d9f854e10ad964ee",
+            "include/webp/sharpyuv/sharpyuv_csp.h": "80c23c727edb1ce6a42b38f9458c3d75c572856c898f0cd913ba03468afb9d3a",
+            "include/webp/types.h": "992d2ffe864adb6d80cc91b7a062074d167ed96772f28d104a650148eca31794",
+            "lib/libsharpyuv.a": "c5b219d9147091ec41677e56c29e6de9a4f958ebeeecaa4c7c86977b9ce7b0a2",
+            "lib/libwebp.a": "78473898d91763b7796e9ad86da844aadcebf9f2fbf0ec2da767350d666b1e74",
+            "lib/libwebpdecoder.a": "37d8f1183314bc639966c7dd6c9994e62fec1681b56fb2caa2b1888323192216",
+            "lib/libwebpdemux.a": "7cb36bc42e54fe6d228a53379d035f0d62a2a94609be0ddcdb06030026efb111",
+            "lib/pkgconfig/libsharpyuv.pc": "47e3809b751063c1155abe2ba301f34591079c705bb226114c2a5a10ec48af67",
+            "lib/pkgconfig/libwebp.pc": "bb5c4dcccf09a6bd0e777add8f28ce48df8509f639b143993e79b905c91b6c86",
+            "lib/pkgconfig/libwebpdecoder.pc": "83da799385928b02a0ccdbf0f9f6b73ed3c858e8bc387d374c01dc5d47ffabc5",
+            "lib/pkgconfig/libwebpdemux.pc": "b65ae8ac08da2121df6f6e0c4880287741ba3231ec38670074f1f0808ccb1e0a",
+            "share/WebP/cmake/WebPConfig.cmake": "ce46fdcf9e1a133780a91f4fc55edb4175b2912b4221b7e53e713eb95ee5511f",
+            "share/WebP/cmake/WebPConfigVersion.cmake": "c9be14d51d2108603dd1bd53c9e27945cea0d40bd970e5f27c6318373af3ade0",
+            "share/WebP/cmake/WebPTargets-release.cmake": "b82e532239e180beb1c7eac55a635cef56fc78c925877670997d9a75f1c95c66",
+            "share/WebP/cmake/WebPTargets.cmake": "94206e65425ec984b7e8a4b2f6ec2b931c30a21b935fedb8799a06c1872740b1"
+          },
+          "generated_cases_sha256": {
+            "animation.webp": "49a1c5303c0d3937bdb224fe2c95d823a1f6d3422d601b1445166940cbc37687",
+            "cases.json": "35a885f8fe413fb4208978d23a0ef4accfdb4e5cd738bad719c1c8dc8615031d",
+            "frame2.rgba": "e7f1e1fed7d4d565baa54b364bdf54f7fe971f57312c4cd567c3196ca3d1128c",
+            "frame2.webp": "e91af282ddc739a91450377275149eb64930ccda0d2b79edbea4a54298fab0e6",
+            "lossless.rgba": "c3d2b53fb57c8e5e5a7a27a95e5faf39d3543335ab2173b5415457a0ed91be45",
+            "lossless.webp": "1ab7930179e4d313754148de625b06f9314534372ee05b9fa90b4c6a815c9aea",
+            "lossy.rgba": "11631e9e6c6201fceeda8b4542e9de54511750410000c94d31029af1e987b2b6",
+            "lossy.webp": "bc3312f8842b8a06ce572d5564dc96247dd783cfce37a519348e787fd6ebc669",
+            "webp-cases.h": "a601bfee9764317fc012f6ea7878b475700bea36122ac8e8cbf8be27d56f155c"
+          },
+          "application": {
+            "path": "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/application/native_webp",
+            "bytes": 4869648,
+            "sha256": "62dc3c3ae672aaf2f850af26f17c8fdeb9a241aef174ee61cf76bba3ff2ba338"
+          },
+          "returncode": 0
+        }
+      },
+      "execution_report_path": "/workspace/chos-evidence/native-webp-20261113/host-sanitize5-execution.json",
+      "execution_report_sha256": "9f596279a6cb82133e0351ea5560610bf350063f404cbbe94582e7dd00ae45e1",
+      "execution": {
+        "status": "PASS",
+        "host_reference": true,
+        "host_sanitizers": [
+          "address",
+          "undefined",
+          "leak"
+        ],
+        "native_executed": false,
+        "stage3_complete": false,
+        "execution_outside_ptrace_sandbox": true,
+        "sanitizer_options_disabled": false,
+        "command": [
+          "/workspace/chos-evidence/native-webp-20261113/host-sanitize5/application/native_webp"
+        ],
+        "sanitizer_options": {
+          "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+          "UBSAN_OPTIONS": "halt_on_error=1"
+        },
+        "executable_sha256": "62dc3c3ae672aaf2f850af26f17c8fdeb9a241aef174ee61cf76bba3ff2ba338",
+        "build_report_sha256": "e703352053ba16d8796748d86d43acfaca8fb87dc5fbf6b6cbb18c1799a35ced",
+        "log_sha256": "f0223fede1c3f1c1a912644a644a31c0aa79a0dbfc2422fcf20996b952a7bcc5",
+        "returncode": 0
+      }
+    }
+  },
+  "retained_failures": [
+    {
+      "path": "/workspace/chos-evidence/native-webp-20261113/host1/build.json",
+      "sha256": "92a30b33047f1277af4926bf3d4376df279936fd569ac2b5b2b309f57c1e6ce3",
+      "status": "BUILD_FAILED",
+      "failed_step": "webp-setup",
+      "diagnosis": "Selected Python cmake wrapper lacked its module path; final builds select the actual CMake binary"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-webp-20261113/target1/build.json",
+      "sha256": "084ead580190034d6a448decd9afccd234bd4920e92630c161d834809f86ff13",
+      "status": "BUILD_FAILED",
+      "failed_step": "application-build",
+      "diagnosis": "Initial native fixture compile omitted WEBP_EXPECTED_VERSION declaration; corrected real target compile definition"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-webp-20261113/host-sanitize1/build.json",
+      "sha256": "63c51e0f1d5751a742ec8996f557c4843a81b68166d42b216ba27ecc10aa6717",
+      "status": "BUILD_FAILED",
+      "failed_step": "generate-cases",
+      "diagnosis": "Sanitized generator blocked by ptrace/LeakSanitizer restriction; final sanitizer launches outside sandbox"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-webp-20261113/direct1/result.json",
+      "sha256": "4006a50ca09d21e777334917e76cb8a7dd8970f819694009b937074f287758f0",
+      "result": {
+        "status": "FAIL",
+        "qualified": false,
+        "phase": "guest-startup",
+        "error": "QEMU local QMP Unix socket creation denied by sandbox; serial.log retains exact Operation not permitted output"
+      },
+      "diagnosis": "Private QMP socket creation denied by sandbox; later QEMU runs use permitted context"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-webp-20261113/uefi1/result.json",
+      "sha256": "4006a50ca09d21e777334917e76cb8a7dd8970f819694009b937074f287758f0",
+      "result": {
+        "status": "FAIL",
+        "qualified": false,
+        "phase": "guest-startup",
+        "error": "QEMU local QMP Unix socket creation denied by sandbox; serial.log retains exact Operation not permitted output"
+      },
+      "diagnosis": "Private QMP socket creation denied by sandbox; later QEMU runs use permitted context"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-webp-20261113/direct2/result.json",
+      "sha256": "c6bd08e18e6653ac5f6be82cb62531b90d8fc584a194ab4d16e0df8e6fa4ee46",
+      "result": {
+        "status": "FAIL",
+        "qualified": false,
+        "error": "exec /WEBP.ELF\n[SPAWNED] pid=1 path=/WEBP.ELF (running asynchronously)\nchos> \n[USER FAULT] EL0 context trapped; ESR=0x0000000092000047 ELR=0x0000000020053790 FAR=0x000000002FEFFFF0\n"
+      },
+      "diagnosis": "Fixture malloc interposer recursed while allocating its own emulated-TLS ledger; serial ledger correction, no codec/runtime source change"
+    },
+    {
+      "path": "/workspace/chos-evidence/native-webp-20261113/uefi2/result.json",
+      "sha256": "c6bd08e18e6653ac5f6be82cb62531b90d8fc584a194ab4d16e0df8e6fa4ee46",
+      "result": {
+        "status": "FAIL",
+        "qualified": false,
+        "error": "exec /WEBP.ELF\n[SPAWNED] pid=1 path=/WEBP.ELF (running asynchronously)\nchos> \n[USER FAULT] EL0 context trapped; ESR=0x0000000092000047 ELR=0x0000000020053790 FAR=0x000000002FEFFFF0\n"
+      },
+      "diagnosis": "Same fixture-only emulated-TLS recursion; corrected and requalified"
+    }
+  ],
+  "limits": [
+    "Actual native decoder/demux/animation dependency only; no WebCore adapter/page/browser integration",
+    "Native encoder/SharpYUV archive compilation is not native encoder execution qualification",
+    "Lossless expected RGBA uses an independent formula; lossy uses separately built original host decoder reference",
+    "Two full-replacement animation frames; other blend/disposal combinations remain unqualified",
+    "Selected fixtures, not exhaustive upstream conformance/fuzzing/hostile-content security qualification",
+    "New Fusion, physical Pi5 and ARM64 laptop execution not run"
+  ],
+  "source_verification": {
+    "original_archive_full_file_inventory_matches_manifest": true,
+    "all_final_build_source_copies_byte_identical": true,
+    "source_and_receipt_verifier": "PASS"
+  }
+}

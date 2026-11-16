@@ -1,0 +1,703 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_EXPLICIT_CATALOGUE",
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "profile": "Original Fontconfig2.17.1 memory/appfont catalogue; no automatic config/directory scan/serialized disk cache",
+  "native_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "host_reference": false,
+    "host_sanitizers": false,
+    "stage3_complete": false,
+    "source_manifest_sha256": "39d11ecc6f3f695ebf67832bfc6be7ff2c2b868eb24013dfb82b7259fb67c877",
+    "SDK_manifest_sha256": "d492179e2d83bf46f38f9913149b4c98787267e3e3641f01fc8dec18ab4fce0f",
+    "sources_sha256": {
+      "tools/build_native_fontconfig.py": "c31310bfc2c55f3d8a5b0f35551b876c096487f0520e92f317fb6d29fcb82670",
+      "tools/verify_native_fontconfig_sources.py": "2858ee244cd47f325f2c2367d3679bf0d8322737a5423fa9092d5f431816e15f",
+      "ports/fontconfig/memory-catalogue.patch": "4a600138b3e163878bba9ce9c88edbee26b89f1f93f54161da1ac02b528a1216",
+      "ports/fontconfig/generate_headers.py": "758918a178e227a459bc3912868c580f669c9e07bb6b6337e7a9adf2e01bc11f",
+      "ports/fontconfig/config.h": "bd380639dff136c430d8f7e10705d2a933eece927bfced71d29df46c857feed0",
+      "ports/fontconfig/CMakeLists.txt": "ed93a894ec2837ad3a743210dffff672b14f132b899e777c5232e7b02ad1c754",
+      "ports/fontconfig/fontconfig.pc.in": "57127e9ad03eecacff392a288c808d2c830c0a5c1ac994314bdf09088471b50c",
+      "ports/fontconfig/FontconfigConfig.cmake.in": "1893b7b69333fde286189a6dd497ca09d8762a5201bc6bbd0910937c775df597",
+      "tests/native_fontconfig/main.c": "dfb7def34878418d5a90ea4ea068befbdb4e79ba9c7f146f99750eba55ce699f",
+      "tests/native_fontconfig/CMakeLists.txt": "36cd4e6e06f1917a50d72d5c7594abe9dfdda008104711ba8ad220e2d64f05f8"
+    },
+    "dependency_files_sha256": {
+      "/workspace/chos-evidence/native-fontconfig-20261113/tools/usr/bin/gperf": "abe6a160086f7bc4f7706522a37faa1043398cce2d485afdcab72d105fb01147",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/ftconfig.h": "9731d71090d0181237b27f9b2db8fb96c904aa07da35aad51baad6ad2d8115ea",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/ftheader.h": "0b099b85a787ef6a20774dad096bb74e6cbb89e244f198baad8b135709123d0b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/ftmodule.h": "f695657e4a8b02427296414d144d9dafc5b073538718d5e0c4290ba9d318c579",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/ftoption.h": "2115ceb051433d1596a63649923ace29441debd9f10de43c4c61259fc7b81384",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/ftstdlib.h": "de81744697b6f9f7fe3a49ca320f2a7ea8f2ae905bb96ff161b5b2d1eed25fe2",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/integer-types.h": "0aeaf74f638d1584ccae37f580076a7ac24ef89049749839c3c90dcdda148d5b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/mac-support.h": "be37d3886a1a1ab1bcf894259d6a50d90b5fc71e3284b12e818c57710a9c945d",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/config/public-macros.h": "7557630cb407f98fbc003300c507ae444b0f7449cab99d80c13f5c343710d06e",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/freetype.h": "7a343a0240598631b53adea94284d376979f42cf215e6ad7cfe932d96762497b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftadvanc.h": "6f0c22af9c16eb0459736db8c60e27269db6b774addd196a845e417c851d3813",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftbbox.h": "4389ec87328ba568415fe4919b9399ff38fa766956b0940e494fbccd1427a6da",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftbdf.h": "d394c0d427d75efbb04ee06d55e2793bfab969d6ca94dba9f743707b109adbcd",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftbitmap.h": "92b63e93b151d96fd985cfaba4ec60e47204bbc922f3bee82412ae2fc426fb03",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftbzip2.h": "be324bc70ad4b355d7a2ae78a540019db17146a140cdcc59676079afc174ca38",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftcache.h": "ba20c0391cc39373474ce3d57adb65559e3954d413d98c2100d77d40bf82bf07",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftchapters.h": "c7d1c2ca13903fb6d0b3b37850344d805280856fb87c7597087ce2352573f752",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftcid.h": "e71180811abd5f87bb9c5eb058904b32c037ed29f8666e8a9b3561936b5b6ecc",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftcolor.h": "217af290dc25ceba7b77ed62bf7710e17d6396d6a20438072ab3a0685f4b2137",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftdriver.h": "459e4688340c8fc66545768e360b7fa126a4939c8de33d729181ca23572cf695",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/fterrdef.h": "376e05cbda2fe270031ef19722c6f9d76b9c4c444ff9e0e9c97cf9e3a016111f",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/fterrors.h": "a7547172143ce6309f89492b47ab0e6e69c7fb7f7caa8c81635811fd42673050",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftfntfmt.h": "54f23d9c103f0c485e837ea1a9db5f0736372b7d781d1adafb8cff6aa950d4d1",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftgasp.h": "a1453a8faeba8845c7b35bcdbbfc43afcc51bfaea89470f813e344a5c9fb06af",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftglyph.h": "79a94788388fee750f7cb1deac0c2dfe23d6a6232f29eb9bc056ca4d5a74f137",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftgxval.h": "06bb3bd9450ac2534f738849df72de6e618313a61d4b4866bc0bdf44ecefdbcf",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftgzip.h": "75f54dfef82233d9a9a1f9d4b4560a258b052784aff9859137cc232f468805df",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftimage.h": "779afe61188e7b91dca89a3b9665b8db2d70e57b7bf1c2ec322c5a5fcc1c6816",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftincrem.h": "073a9dd3b7585989ee68540b3688a1e11bbd3498dd8210809b0869529861df05",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftlcdfil.h": "462073b97096be0c7e485d802fee6e6046f1aa36050c14f7771c31b99bab30fa",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftlist.h": "fea6f521193148308630725ae5de0ec736c135910704239967c541c8ab3e0cd1",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftlogging.h": "3c353c71c09de36f847cdc209f6e7d92dd92304b1d11c1d8d7300d439a24ef88",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftlzw.h": "fd8b72704427c0d8d4c6f2efdd30fdbfc55a7d1246a3c627dcb82661b324aae3",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftmac.h": "4203c770c57d3f09ea16e1dd6535da3a1bda62673cb9bedaacab90ac4b736bad",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftmm.h": "5d134d486b89d9a3dbaa54e581168be3868d04951c1ec3260542d852a14dddb1",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftmodapi.h": "1e526ff1f741cce96bf8d5e935bd9f1ba8db4afdd5c76f387ac54964b25d3fde",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftmoderr.h": "27a2a1aabbc9f2a99d77c65292272151f12626d10a37ad29571e1847984c4ad6",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftotval.h": "da5bfb9e509556bfc16ce899a161ea26555cc3ff019cdcc67e6b3af3723f6361",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftoutln.h": "db0585ea338debdb9b721adc5f6d138ec7f88df30ff44cf6fb3cac79a70982f8",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftparams.h": "4db8f53c9b62aa5adfd2f89877a96c522198e9a780402be7aafba9fdace5f485",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftpfr.h": "dd40f7a041f345c8ae12664f52d2def53ec5dd2a49e65aba2b95bdef5b63a1d0",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftrender.h": "9579d3d9ff09e98ee09a49c8588d97a910c8fe698fe465a3f33965921fea77ec",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftsizes.h": "2afecd7a4dabbf89e9f76d373829b4e8e70a5c593ecccb7646e190c47a2b398e",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftsnames.h": "621faad855dfd4cc5e9a90b5a4554b706767653c5c2d41acd1b03d2e118b52dd",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftstroke.h": "ba4ed8f81ac66e9e6a2cdf772b69da02a0085fc5576cd233e4da661c6fb1967c",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftsynth.h": "f75aa75f8cb754c37db6ac16e1c9648997e06d280d8b28490d502838e6c649ca",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftsystem.h": "9a41ef1877a9f5f7e5debbf0d701bd393e53e2ae36fb6c34faebf26b8cbc43f2",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/fttrigon.h": "924526c9b662973f64eb5b4f5034ae897684cb08b9cca7262aba097e49471ade",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/fttypes.h": "dcaa79e39c7495d8f622555bd64b2ea87d6ddcfb8c9bbe9f8c33befcdda4eb9b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ftwinfnt.h": "a2d77ef372f2c874d61179687b71a2d034e1d51430266c46ec0854593d02b779",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/otsvg.h": "3f7b2484cf4980c5dfb568e8f57b687d3add3b7cc499054f46164ca6d2690e53",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/t1tables.h": "3bf63affe3fd88daa017ee7fcd894e37e961be9abdcd168b39a328ad3e6db3ba",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/ttnameid.h": "c7f9f5b9d7f90bb77f0b5e5fb643039f47ded753130b9c4521d6070fe7dcd7ce",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/tttables.h": "7fd1ce25de661e802dbff67ad5e9927bcdef1730527a5d453120586f13698280",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/freetype/tttags.h": "7b177ab5c05aa1ed60e23649745242886e2587f8c1a34f31dae5ea00ef4835e8",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/include/freetype2/ft2build.h": "1e8028d455a85db4dd19b2019a721d56409f802c2223e78ab5199c22f8b33397",
+      "/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix/lib/libfreetype.a": "80dbd60147f5ceb8ccdd2e96b40ece6e8e0bd95e7b9db8ea9d6a5cc994e8b748",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/HTMLparser.h": "c4f81e8cbd194fbd4c121db47ff0eadf4b3efa9d0c780300787fb0e08372ffa4",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/HTMLtree.h": "d2280b971a031a5ed2f7f8ecff4906a9df6c3f35cb40c588eb05d60e24d8fdcb",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/SAX.h": "777fc2057fd2a39a6ca7648ee5f148014a65643e750cc5a2fe2e2fc3b4a0ff79",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/SAX2.h": "d3228dc9e18dec65660f7ff43eb5af2cb7a9e6dad00369f76f058300c0cb1b37",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/c14n.h": "c9adaf74b4d5c0f5e23e06deb9194e7d595142914a8c36f5e725010a37e6a7c6",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/catalog.h": "8418816149bed7463eb13fd6d260354a91f1819d2180685dc8d285181932b9c5",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/chvalid.h": "00acfc327dc00dfb2dd640ab4e1156effd8f5fb8311f0c20d2707440456dc7ce",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/debugXML.h": "1380bb85a7dccdbfebb1cc9ba9921873e6be11cbd4b0813824754feaa5aa5820",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/dict.h": "12302fd488f2b735c791f2b1d9fa5b2008dd5e40f94da12e56da0aebea6e1321",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/encoding.h": "0eabe928a57824d52b95daba1ee3e663f004d8622800f8c1f40177ea15a8a74c",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/entities.h": "ff61a6eedb81b52ad7e6bd5c005a705c871587c68314d94f7a3511f4afff8739",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/globals.h": "4e4a9866916b928b201d0ff4a544d90098c6b639da50ca25cc9c7ce395c26349",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/hash.h": "ee8ba2adce87d740581d6763e783828b622ea8da93a5e9ac4ff36436f607bc75",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/list.h": "ba1174b44be729cde0eb443180968def8a2879db54199af670e965d331648912",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/nanoftp.h": "b902e60279e35a4818cf1834a04e654a9cf51b5136f785e89179047304cc52ef",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/nanohttp.h": "8000d0196f6e6defd5e2468118cf3b534b15da7818b7db18167259ed857d4b7e",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/parser.h": "3062aaa97d435de0afc34630162c0b3c8a994e76854a92a0e3a217b6297545e2",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/parserInternals.h": "543da365c6c72699926ff11c0f4afa6c1990f028d7b8fcaaa30de2f284ae0718",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/pattern.h": "169dca568e076cba001c9a445b22fb73ffa64c9699fd785abcfaf31a8e22337a",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/relaxng.h": "7d46056b24c572f8a656637cb287fe462e880c7a1fbcd32d5ca7e618f838564c",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/schemasInternals.h": "e05a6496f4ca8e5017a94812b25bba7856110d7d85d91590ed50780ea6d98cdf",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/schematron.h": "a3d96d68d801f984b0eaab68d2b193b571ec3b27ba50bbc1c66d3f4dca187f0e",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/threads.h": "8cee9610d9e3ec2146af6a074a2c6161bd87629e55ab231e61c0fbd8686142d2",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/tree.h": "29bb46867633b5da9ac289f72f8667863a14b7105843f8fa2b16df21b26d0496",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/uri.h": "f761d9ac289b051ec7bbc73ae723468fa80f96461dc664fe5781bc009a92ac90",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/valid.h": "e51b4ca60f3f7921b3be0e78fe750f202b9d0a47fafc0750a806d665239f1fb9",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xinclude.h": "54df174ccb9f272aa5483b9c18c83153ca6bbea93e706453240ad09381fad037",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xlink.h": "6b0495de5f706d571995cde9e41ae6673d906a53899f7cae2061108ddad00d39",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlIO.h": "e623b00dcabbf5c559567fcea561cc97f03b9fb3c8642d9edcaf70ade988385d",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlautomata.h": "41eeba10a1dc5f727694618a5513ffef4b1dcb0c27169d91b264e54eedad7d08",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlerror.h": "ff6fb62996e5478f08ef99258c4f49b1a0830f93565ff3a92f47a316f792202f",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlexports.h": "36f6cc28976fed8b6c8587fd521f14ee1f4b96615f10e9b7c35c76ef2876e525",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlmemory.h": "b8a8addf9376aa9bee7d3f5b6f8b58d2af4c2c284921bd418da5b27b70fe1085",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlmodule.h": "ed0d48e89b3f1aac1618d4f74e87ee64bde0a8b4c7057fa56a03b56703af67cb",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlreader.h": "11fd34156675d65c73bfa83c69c8dda3d87a56553df92a5ab713bd95ab525c16",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlregexp.h": "7df116616ee4319f0654ce00b467bc165dbaf38ed318b1193d4a474a73ee1298",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlsave.h": "fb99635f075e4d1c2fe858b16ef0d8853839c5df971f5dec54dcb29b872ccbbe",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlschemas.h": "0e4eeabaa87ede8e7deb65e25078bfd0caa1ddfe5c7c9a98a043f2b870fa10fd",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlschemastypes.h": "9c9b26c8badbcbf12e580ad301bc261051a4b861a9cf5801b79585b218886622",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlstring.h": "479db08576ff1a61dee723ca0285893e19d806a23c1c287f75be5242f22e8aaa",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlunicode.h": "8a5b06d87968144cdb77908a4d6c3f8b04012a26f0cf64b186869d240a696f7e",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlversion.h": "c65309ac555fd6fb7e94223e406870959b1483dc302552998c9a892c2d890030",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xmlwriter.h": "9cf89ac9e8485869db835ed25643fe58a0dbb7ee30f9191d6c400ffd7c1405d9",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xpath.h": "5f6392d4a0fa7fe97407738baf692a99be31218cb786cc2225d28ea66c413f9c",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xpathInternals.h": "4daa466e29c75e91e70556911278542c65ac3168c7ce0287ccb566bf0ce58807",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/include/libxml2/libxml/xpointer.h": "f39e26a9380e0035c3f1c26f0a5ae2bc84ec7d1f2a172af809541c74eb1697b6",
+      "/workspace/chos-evidence/native-xml-20261112/target3/prefix/lib/libxml2.a": "68c1fec22fcfd6f4a1bfef32edcda93b604359369f0bea38cade413bf6a726a5"
+    },
+    "commands": [
+      [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--no-backup-if-mismatch",
+        "-p1",
+        "-i",
+        "/workspace/CHOS-Second-Variant/ports/fontconfig/memory-catalogue.patch"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/ports/fontconfig/generate_headers.py",
+        "--source",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-native4/source",
+        "--original-source",
+        "/workspace/CHOS-Second-Variant/third_party/fontconfig",
+        "--gperf",
+        "/workspace/chos-evidence/native-fontconfig-20261113/tools/usr/bin/gperf",
+        "--host-cc",
+        "clang"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-fontconfig-20261113/final-native4/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk7",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/fontconfig",
+        "-B",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-native4/fontconfig",
+        "-DFONTCONFIG_SOURCE=/workspace/chos-evidence/native-fontconfig-20261113/final-native4/source",
+        "-DFT_PREFIX=/workspace/chos-evidence/native-fonts-20261107/final-jsc-text/prefix",
+        "-DXML_PREFIX=/workspace/chos-evidence/native-xml-20261112/target3/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-native4/fontconfig",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-native4/fontconfig"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-fontconfig-20261113/final-native4/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_TOOLCHAIN_FILE=/workspace/CHOS-Second-Variant/ports/native/chos-toolchain.cmake",
+        "-DCHOS_SDK_ROOT=/workspace/chos-evidence/webcore-link-20261112/memory/sdk7",
+        "-DCHOS_APPLICATION_PROFILE=engine",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_fontconfig",
+        "-B",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-native4/application",
+        "-DFONTCONFIG_PREFIX=/workspace/chos-evidence/native-fontconfig-20261113/final-native4/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-native4/application",
+        "-j4"
+      ]
+    ],
+    "limits": [
+      "Actual original Fontconfig matching, app-font files, patterns/charset/language/XML rules and real pthreads",
+      "Application explicitly installs memory catalogue before global FcInit succeeds",
+      "Default config loading, directory scans, serialized disk caches/watcher remain unsupported; not full filesystem Fontconfig",
+      "Regular fixture fonts only; actual bold/italic face catalogue selection remains unqualified",
+      "WebCore, browser, physical hardware and Stage 3 acceptance incomplete"
+    ],
+    "returncode": 0,
+    "seconds": 4.473192289002327,
+    "archive": {
+      "sha256": "94764795d0fb575789081ad8efd0c9c62f8a7d1895ab2fa9981290354fddcf42",
+      "bytes": 554310,
+      "members": 25
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-fontconfig-20261113/final-native4/application/native_fontconfig",
+      "sha256": "355c2dc3b7efbd3421ed45db5dcc170804766187a3e8cb8b71979c40e5078949",
+      "bytes": 1583376
+    },
+    "installed_files_sha256": {
+      "include/fontconfig/fcfreetype.h": "c2c1ff8c6a16a05363cbc882e4673a2152666537370a9380a9c824b06b6e9191",
+      "include/fontconfig/fcprivate.h": "1453c2ce22f051b8f422bc81cd3bd23fdb205db9a2391a32a5302d10ee7d1b42",
+      "include/fontconfig/fontconfig.h": "ec733ef7a3d465d36780554d9dc9e1791214ef948779aae0d1175c1583ebd84a",
+      "lib/cmake/Fontconfig/FontconfigConfig.cmake": "22a25f66f55c889b4cdeda732dfe6af3e21953c14036c8d5244927d798cdd398",
+      "lib/cmake/Fontconfig/FontconfigConfigVersion.cmake": "cbe3d75068aa6c009f261dc538611457e53a5bf14e8aa0106e657182223d6f3e",
+      "lib/libfontconfig.a": "94764795d0fb575789081ad8efd0c9c62f8a7d1895ab2fa9981290354fddcf42",
+      "lib/pkgconfig/fontconfig.pc": "d56d69ab197329d60f07b49bfc131623755283442e23f82a3e129cf75d0e8a98"
+    }
+  },
+  "host_sanitizer_build": {
+    "status": "LINKED_NOT_EXECUTED",
+    "executed": false,
+    "host_reference": true,
+    "host_sanitizers": true,
+    "stage3_complete": false,
+    "source_manifest_sha256": "39d11ecc6f3f695ebf67832bfc6be7ff2c2b868eb24013dfb82b7259fb67c877",
+    "SDK_manifest_sha256": null,
+    "sources_sha256": {
+      "tools/build_native_fontconfig.py": "c31310bfc2c55f3d8a5b0f35551b876c096487f0520e92f317fb6d29fcb82670",
+      "tools/verify_native_fontconfig_sources.py": "2858ee244cd47f325f2c2367d3679bf0d8322737a5423fa9092d5f431816e15f",
+      "ports/fontconfig/memory-catalogue.patch": "4a600138b3e163878bba9ce9c88edbee26b89f1f93f54161da1ac02b528a1216",
+      "ports/fontconfig/generate_headers.py": "758918a178e227a459bc3912868c580f669c9e07bb6b6337e7a9adf2e01bc11f",
+      "ports/fontconfig/config.h": "bd380639dff136c430d8f7e10705d2a933eece927bfced71d29df46c857feed0",
+      "ports/fontconfig/CMakeLists.txt": "ed93a894ec2837ad3a743210dffff672b14f132b899e777c5232e7b02ad1c754",
+      "ports/fontconfig/fontconfig.pc.in": "57127e9ad03eecacff392a288c808d2c830c0a5c1ac994314bdf09088471b50c",
+      "ports/fontconfig/FontconfigConfig.cmake.in": "1893b7b69333fde286189a6dd497ca09d8762a5201bc6bbd0910937c775df597",
+      "tests/native_fontconfig/main.c": "dfb7def34878418d5a90ea4ea068befbdb4e79ba9c7f146f99750eba55ce699f",
+      "tests/native_fontconfig/CMakeLists.txt": "36cd4e6e06f1917a50d72d5c7594abe9dfdda008104711ba8ad220e2d64f05f8"
+    },
+    "dependency_files_sha256": {
+      "/workspace/chos-evidence/native-fontconfig-20261113/tools/usr/bin/gperf": "abe6a160086f7bc4f7706522a37faa1043398cce2d485afdcab72d105fb01147",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/ftconfig.h": "2f8c64d2eaaaff98966291b17fe1ac9c4f286143989c770112d294bee8ae8bda",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/ftheader.h": "0b099b85a787ef6a20774dad096bb74e6cbb89e244f198baad8b135709123d0b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/ftmodule.h": "f695657e4a8b02427296414d144d9dafc5b073538718d5e0c4290ba9d318c579",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/ftoption.h": "2115ceb051433d1596a63649923ace29441debd9f10de43c4c61259fc7b81384",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/ftstdlib.h": "de81744697b6f9f7fe3a49ca320f2a7ea8f2ae905bb96ff161b5b2d1eed25fe2",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/integer-types.h": "0aeaf74f638d1584ccae37f580076a7ac24ef89049749839c3c90dcdda148d5b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/mac-support.h": "be37d3886a1a1ab1bcf894259d6a50d90b5fc71e3284b12e818c57710a9c945d",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/config/public-macros.h": "7557630cb407f98fbc003300c507ae444b0f7449cab99d80c13f5c343710d06e",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/freetype.h": "7a343a0240598631b53adea94284d376979f42cf215e6ad7cfe932d96762497b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftadvanc.h": "6f0c22af9c16eb0459736db8c60e27269db6b774addd196a845e417c851d3813",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftbbox.h": "4389ec87328ba568415fe4919b9399ff38fa766956b0940e494fbccd1427a6da",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftbdf.h": "d394c0d427d75efbb04ee06d55e2793bfab969d6ca94dba9f743707b109adbcd",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftbitmap.h": "92b63e93b151d96fd985cfaba4ec60e47204bbc922f3bee82412ae2fc426fb03",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftbzip2.h": "be324bc70ad4b355d7a2ae78a540019db17146a140cdcc59676079afc174ca38",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftcache.h": "ba20c0391cc39373474ce3d57adb65559e3954d413d98c2100d77d40bf82bf07",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftchapters.h": "c7d1c2ca13903fb6d0b3b37850344d805280856fb87c7597087ce2352573f752",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftcid.h": "e71180811abd5f87bb9c5eb058904b32c037ed29f8666e8a9b3561936b5b6ecc",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftcolor.h": "217af290dc25ceba7b77ed62bf7710e17d6396d6a20438072ab3a0685f4b2137",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftdriver.h": "459e4688340c8fc66545768e360b7fa126a4939c8de33d729181ca23572cf695",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/fterrdef.h": "376e05cbda2fe270031ef19722c6f9d76b9c4c444ff9e0e9c97cf9e3a016111f",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/fterrors.h": "a7547172143ce6309f89492b47ab0e6e69c7fb7f7caa8c81635811fd42673050",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftfntfmt.h": "54f23d9c103f0c485e837ea1a9db5f0736372b7d781d1adafb8cff6aa950d4d1",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftgasp.h": "a1453a8faeba8845c7b35bcdbbfc43afcc51bfaea89470f813e344a5c9fb06af",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftglyph.h": "79a94788388fee750f7cb1deac0c2dfe23d6a6232f29eb9bc056ca4d5a74f137",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftgxval.h": "06bb3bd9450ac2534f738849df72de6e618313a61d4b4866bc0bdf44ecefdbcf",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftgzip.h": "75f54dfef82233d9a9a1f9d4b4560a258b052784aff9859137cc232f468805df",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftimage.h": "779afe61188e7b91dca89a3b9665b8db2d70e57b7bf1c2ec322c5a5fcc1c6816",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftincrem.h": "073a9dd3b7585989ee68540b3688a1e11bbd3498dd8210809b0869529861df05",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftlcdfil.h": "462073b97096be0c7e485d802fee6e6046f1aa36050c14f7771c31b99bab30fa",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftlist.h": "fea6f521193148308630725ae5de0ec736c135910704239967c541c8ab3e0cd1",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftlogging.h": "3c353c71c09de36f847cdc209f6e7d92dd92304b1d11c1d8d7300d439a24ef88",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftlzw.h": "fd8b72704427c0d8d4c6f2efdd30fdbfc55a7d1246a3c627dcb82661b324aae3",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftmac.h": "4203c770c57d3f09ea16e1dd6535da3a1bda62673cb9bedaacab90ac4b736bad",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftmm.h": "5d134d486b89d9a3dbaa54e581168be3868d04951c1ec3260542d852a14dddb1",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftmodapi.h": "1e526ff1f741cce96bf8d5e935bd9f1ba8db4afdd5c76f387ac54964b25d3fde",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftmoderr.h": "27a2a1aabbc9f2a99d77c65292272151f12626d10a37ad29571e1847984c4ad6",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftotval.h": "da5bfb9e509556bfc16ce899a161ea26555cc3ff019cdcc67e6b3af3723f6361",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftoutln.h": "db0585ea338debdb9b721adc5f6d138ec7f88df30ff44cf6fb3cac79a70982f8",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftparams.h": "4db8f53c9b62aa5adfd2f89877a96c522198e9a780402be7aafba9fdace5f485",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftpfr.h": "dd40f7a041f345c8ae12664f52d2def53ec5dd2a49e65aba2b95bdef5b63a1d0",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftrender.h": "9579d3d9ff09e98ee09a49c8588d97a910c8fe698fe465a3f33965921fea77ec",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftsizes.h": "2afecd7a4dabbf89e9f76d373829b4e8e70a5c593ecccb7646e190c47a2b398e",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftsnames.h": "621faad855dfd4cc5e9a90b5a4554b706767653c5c2d41acd1b03d2e118b52dd",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftstroke.h": "ba4ed8f81ac66e9e6a2cdf772b69da02a0085fc5576cd233e4da661c6fb1967c",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftsynth.h": "f75aa75f8cb754c37db6ac16e1c9648997e06d280d8b28490d502838e6c649ca",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftsystem.h": "9a41ef1877a9f5f7e5debbf0d701bd393e53e2ae36fb6c34faebf26b8cbc43f2",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/fttrigon.h": "924526c9b662973f64eb5b4f5034ae897684cb08b9cca7262aba097e49471ade",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/fttypes.h": "dcaa79e39c7495d8f622555bd64b2ea87d6ddcfb8c9bbe9f8c33befcdda4eb9b",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ftwinfnt.h": "a2d77ef372f2c874d61179687b71a2d034e1d51430266c46ec0854593d02b779",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/otsvg.h": "3f7b2484cf4980c5dfb568e8f57b687d3add3b7cc499054f46164ca6d2690e53",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/t1tables.h": "3bf63affe3fd88daa017ee7fcd894e37e961be9abdcd168b39a328ad3e6db3ba",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/ttnameid.h": "c7f9f5b9d7f90bb77f0b5e5fb643039f47ded753130b9c4521d6070fe7dcd7ce",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/tttables.h": "7fd1ce25de661e802dbff67ad5e9927bcdef1730527a5d453120586f13698280",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/freetype/tttags.h": "7b177ab5c05aa1ed60e23649745242886e2587f8c1a34f31dae5ea00ef4835e8",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/include/freetype2/ft2build.h": "1e8028d455a85db4dd19b2019a721d56409f802c2223e78ab5199c22f8b33397",
+      "/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix/lib/libfreetype.a": "8c8e4aafb8c7006d8030c65ddfafeb13ecaccd3b279075cc7ec3b04cae07ee5e",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/HTMLparser.h": "c4f81e8cbd194fbd4c121db47ff0eadf4b3efa9d0c780300787fb0e08372ffa4",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/HTMLtree.h": "d2280b971a031a5ed2f7f8ecff4906a9df6c3f35cb40c588eb05d60e24d8fdcb",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/SAX.h": "777fc2057fd2a39a6ca7648ee5f148014a65643e750cc5a2fe2e2fc3b4a0ff79",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/SAX2.h": "d3228dc9e18dec65660f7ff43eb5af2cb7a9e6dad00369f76f058300c0cb1b37",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/c14n.h": "c9adaf74b4d5c0f5e23e06deb9194e7d595142914a8c36f5e725010a37e6a7c6",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/catalog.h": "8418816149bed7463eb13fd6d260354a91f1819d2180685dc8d285181932b9c5",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/chvalid.h": "00acfc327dc00dfb2dd640ab4e1156effd8f5fb8311f0c20d2707440456dc7ce",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/debugXML.h": "1380bb85a7dccdbfebb1cc9ba9921873e6be11cbd4b0813824754feaa5aa5820",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/dict.h": "12302fd488f2b735c791f2b1d9fa5b2008dd5e40f94da12e56da0aebea6e1321",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/encoding.h": "0eabe928a57824d52b95daba1ee3e663f004d8622800f8c1f40177ea15a8a74c",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/entities.h": "ff61a6eedb81b52ad7e6bd5c005a705c871587c68314d94f7a3511f4afff8739",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/globals.h": "4e4a9866916b928b201d0ff4a544d90098c6b639da50ca25cc9c7ce395c26349",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/hash.h": "ee8ba2adce87d740581d6763e783828b622ea8da93a5e9ac4ff36436f607bc75",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/list.h": "ba1174b44be729cde0eb443180968def8a2879db54199af670e965d331648912",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/nanoftp.h": "b902e60279e35a4818cf1834a04e654a9cf51b5136f785e89179047304cc52ef",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/nanohttp.h": "8000d0196f6e6defd5e2468118cf3b534b15da7818b7db18167259ed857d4b7e",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/parser.h": "3062aaa97d435de0afc34630162c0b3c8a994e76854a92a0e3a217b6297545e2",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/parserInternals.h": "543da365c6c72699926ff11c0f4afa6c1990f028d7b8fcaaa30de2f284ae0718",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/pattern.h": "169dca568e076cba001c9a445b22fb73ffa64c9699fd785abcfaf31a8e22337a",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/relaxng.h": "7d46056b24c572f8a656637cb287fe462e880c7a1fbcd32d5ca7e618f838564c",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/schemasInternals.h": "e05a6496f4ca8e5017a94812b25bba7856110d7d85d91590ed50780ea6d98cdf",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/schematron.h": "a3d96d68d801f984b0eaab68d2b193b571ec3b27ba50bbc1c66d3f4dca187f0e",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/threads.h": "8cee9610d9e3ec2146af6a074a2c6161bd87629e55ab231e61c0fbd8686142d2",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/tree.h": "29bb46867633b5da9ac289f72f8667863a14b7105843f8fa2b16df21b26d0496",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/uri.h": "f761d9ac289b051ec7bbc73ae723468fa80f96461dc664fe5781bc009a92ac90",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/valid.h": "e51b4ca60f3f7921b3be0e78fe750f202b9d0a47fafc0750a806d665239f1fb9",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xinclude.h": "54df174ccb9f272aa5483b9c18c83153ca6bbea93e706453240ad09381fad037",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xlink.h": "6b0495de5f706d571995cde9e41ae6673d906a53899f7cae2061108ddad00d39",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlIO.h": "e623b00dcabbf5c559567fcea561cc97f03b9fb3c8642d9edcaf70ade988385d",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlautomata.h": "41eeba10a1dc5f727694618a5513ffef4b1dcb0c27169d91b264e54eedad7d08",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlerror.h": "ff6fb62996e5478f08ef99258c4f49b1a0830f93565ff3a92f47a316f792202f",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlexports.h": "36f6cc28976fed8b6c8587fd521f14ee1f4b96615f10e9b7c35c76ef2876e525",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlmemory.h": "b8a8addf9376aa9bee7d3f5b6f8b58d2af4c2c284921bd418da5b27b70fe1085",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlmodule.h": "ed0d48e89b3f1aac1618d4f74e87ee64bde0a8b4c7057fa56a03b56703af67cb",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlreader.h": "11fd34156675d65c73bfa83c69c8dda3d87a56553df92a5ab713bd95ab525c16",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlregexp.h": "7df116616ee4319f0654ce00b467bc165dbaf38ed318b1193d4a474a73ee1298",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlsave.h": "fb99635f075e4d1c2fe858b16ef0d8853839c5df971f5dec54dcb29b872ccbbe",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlschemas.h": "0e4eeabaa87ede8e7deb65e25078bfd0caa1ddfe5c7c9a98a043f2b870fa10fd",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlschemastypes.h": "9c9b26c8badbcbf12e580ad301bc261051a4b861a9cf5801b79585b218886622",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlstring.h": "479db08576ff1a61dee723ca0285893e19d806a23c1c287f75be5242f22e8aaa",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlunicode.h": "8a5b06d87968144cdb77908a4d6c3f8b04012a26f0cf64b186869d240a696f7e",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlversion.h": "c65309ac555fd6fb7e94223e406870959b1483dc302552998c9a892c2d890030",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xmlwriter.h": "9cf89ac9e8485869db835ed25643fe58a0dbb7ee30f9191d6c400ffd7c1405d9",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xpath.h": "5f6392d4a0fa7fe97407738baf692a99be31218cb786cc2225d28ea66c413f9c",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xpathInternals.h": "4daa466e29c75e91e70556911278542c65ac3168c7ce0287ccb566bf0ce58807",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/include/libxml2/libxml/xpointer.h": "f39e26a9380e0035c3f1c26f0a5ae2bc84ec7d1f2a172af809541c74eb1697b6",
+      "/workspace/chos-evidence/native-xml-20261112/host3/prefix/lib/libxml2.a": "63614bb5126b51d4a7373b8f8df277129c68db151170a0aa7609c3d7ba16530b"
+    },
+    "commands": [
+      [
+        "patch",
+        "--batch",
+        "--fuzz=0",
+        "--no-backup-if-mismatch",
+        "-p1",
+        "-i",
+        "/workspace/CHOS-Second-Variant/ports/fontconfig/memory-catalogue.patch"
+      ],
+      [
+        "python3",
+        "/workspace/CHOS-Second-Variant/ports/fontconfig/generate_headers.py",
+        "--source",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/source",
+        "--original-source",
+        "/workspace/CHOS-Second-Variant/third_party/fontconfig",
+        "--gperf",
+        "/workspace/chos-evidence/native-fontconfig-20261113/tools/usr/bin/gperf",
+        "--host-cc",
+        "clang"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-fontconfig-20261113/final-host4/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/ports/fontconfig",
+        "-B",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/fontconfig",
+        "-DFONTCONFIG_SOURCE=/workspace/chos-evidence/native-fontconfig-20261113/final-host4/source",
+        "-DFT_PREFIX=/workspace/chos-evidence/native-fonts-20261107/final-host-text/prefix",
+        "-DXML_PREFIX=/workspace/chos-evidence/native-xml-20261112/host3/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/fontconfig",
+        "-j4"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--install",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/fontconfig"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "-G",
+        "Ninja",
+        "-DCMAKE_MAKE_PROGRAM=/workspace/chos-tools/build-python/bin/ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_INSTALL_PREFIX=/workspace/chos-evidence/native-fontconfig-20261113/final-host4/prefix",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "-DCMAKE_C_FLAGS_RELEASE=-O1 -DNDEBUG",
+        "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined",
+        "-S",
+        "/workspace/CHOS-Second-Variant/tests/native_fontconfig",
+        "-B",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/application",
+        "-DFONTCONFIG_PREFIX=/workspace/chos-evidence/native-fontconfig-20261113/final-host4/prefix"
+      ],
+      [
+        "/workspace/chos-tools/build-python/cmake/data/bin/cmake",
+        "--build",
+        "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/application",
+        "-j4"
+      ]
+    ],
+    "limits": [
+      "Actual original Fontconfig matching, app-font files, patterns/charset/language/XML rules and real pthreads",
+      "Application explicitly installs memory catalogue before global FcInit succeeds",
+      "Default config loading, directory scans, serialized disk caches/watcher remain unsupported; not full filesystem Fontconfig",
+      "Regular fixture fonts only; actual bold/italic face catalogue selection remains unqualified",
+      "WebCore, browser, physical hardware and Stage 3 acceptance incomplete"
+    ],
+    "returncode": 0,
+    "seconds": 4.899236494999059,
+    "archive": {
+      "sha256": "971cdd077bc61ecf3595092dfc0e6ef5832164735e276b972aa02d18542df080",
+      "bytes": 3316542,
+      "members": 25
+    },
+    "application": {
+      "path": "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/application/native_fontconfig",
+      "sha256": "84015d65fa9a7301f35875a73127fb9da8ddc1dfebaaecdd77db1d01488cc20d",
+      "bytes": 40509280
+    },
+    "installed_files_sha256": {
+      "include/fontconfig/fcfreetype.h": "c2c1ff8c6a16a05363cbc882e4673a2152666537370a9380a9c824b06b6e9191",
+      "include/fontconfig/fcprivate.h": "1453c2ce22f051b8f422bc81cd3bd23fdb205db9a2391a32a5302d10ee7d1b42",
+      "include/fontconfig/fontconfig.h": "ec733ef7a3d465d36780554d9dc9e1791214ef948779aae0d1175c1583ebd84a",
+      "lib/cmake/Fontconfig/FontconfigConfig.cmake": "f7e084535bc53dd55f53ac3b6c2f05599da73d783df2f396cf205b2dcd9feddb",
+      "lib/cmake/Fontconfig/FontconfigConfigVersion.cmake": "cbe3d75068aa6c009f261dc538611457e53a5bf14e8aa0106e657182223d6f3e",
+      "lib/libfontconfig.a": "971cdd077bc61ecf3595092dfc0e6ef5832164735e276b972aa02d18542df080",
+      "lib/pkgconfig/fontconfig.pc": "e481f8e1656d69bf4c86aac4c84943e81eda10829f3c13c42ed5e2ee47dd4b8c"
+    }
+  },
+  "host_sanitizer_execution": {
+    "status": "PASS",
+    "exit_code": 0,
+    "command": [
+      "ASAN_OPTIONS=detect_leaks=1:abort_on_error=1",
+      "UBSAN_OPTIONS=halt_on_error=1",
+      "/workspace/chos-evidence/native-fontconfig-20261113/final-host4/application/native_fontconfig",
+      "/workspace/CHOS-Second-Variant/third_party/text-fixtures/fonts"
+    ],
+    "log_sha256": "75c0084077efe7a724213f7bd029e5e078bc9121f9ec3b1b1a59f6d5b97fc256"
+  },
+  "native_runs": {
+    "final-direct4": {
+      "result_sha256": "5185f85ac7a50a15229749510dd135962e58d6b0e90f292bd653010eee292ed0",
+      "serial_sha256": "f13159def49514935b44b858172b954ecdcd2b23a6f8892dff05ccb3b218db34",
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "355c2dc3b7efbd3421ed45db5dcc170804766187a3e8cb8b71979c40e5078949",
+      "harness_sha256": "f2e1799ebf6945a5a651ad70083e60e9a7a50b38b845e7cefe96b2d7bfd733a8",
+      "cold_free_pages": 110116,
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "seconds": 3.7998751800005266,
+          "cold_pages_restored": 110116,
+          "heap_before_main_return": [
+            {
+              "allocations": 6,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "seconds": 3.6417681869970693,
+          "cold_pages_restored": 110116,
+          "heap_before_main_return": [
+            {
+              "allocations": 6,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "seconds": 3.477060702000017,
+          "cold_pages_restored": 110116,
+          "heap_before_main_return": [
+            {
+              "allocations": 6,
+              "mapped_bytes": 65536
+            }
+          ]
+        }
+      ],
+      "checks": [
+        "Real file catalogue, family/alias/language/charset fallback, face reopen, rendering patterns and regular style fallback",
+        "Three real pthread workers, catalogue cleanup, normal exit and cold resource accounting"
+      ],
+      "limits": [
+        "Selected Fontconfig memory/app-font catalogue; WebCore/browser and physical hardware are not qualified",
+        "Automatic config/directory scans and serialized cache files unsupported; real bold/italic fixtures unavailable; Stage 3 incomplete",
+        "Runtime compiler TLS may remain allocated until CRT teardown after main returns; exact cold ownership required"
+      ]
+    },
+    "final-uefi4": {
+      "result_sha256": "9d9f5018c0544b7497fac37aa80ba693347d67e83523f7aac46a81efd1f31943",
+      "serial_sha256": "89d8fa421c9a7675a1edc3e7e4590c127c3f58e70b01d0761768c070597de3a2",
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "355c2dc3b7efbd3421ed45db5dcc170804766187a3e8cb8b71979c40e5078949",
+      "harness_sha256": "f2e1799ebf6945a5a651ad70083e60e9a7a50b38b845e7cefe96b2d7bfd733a8",
+      "cold_free_pages": 494486,
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "seconds": 3.8156200730009004,
+          "cold_pages_restored": 494486,
+          "heap_before_main_return": [
+            {
+              "allocations": 6,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "seconds": 3.9881334169986076,
+          "cold_pages_restored": 494486,
+          "heap_before_main_return": [
+            {
+              "allocations": 6,
+              "mapped_bytes": 65536
+            }
+          ]
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "seconds": 3.9424110330000985,
+          "cold_pages_restored": 494486,
+          "heap_before_main_return": [
+            {
+              "allocations": 6,
+              "mapped_bytes": 65536
+            }
+          ]
+        }
+      ],
+      "checks": [
+        "Real file catalogue, family/alias/language/charset fallback, face reopen, rendering patterns and regular style fallback",
+        "Three real pthread workers, catalogue cleanup, normal exit and cold resource accounting"
+      ],
+      "limits": [
+        "Selected Fontconfig memory/app-font catalogue; WebCore/browser and physical hardware are not qualified",
+        "Automatic config/directory scans and serialized cache files unsupported; real bold/italic fixtures unavailable; Stage 3 incomplete",
+        "Runtime compiler TLS may remain allocated until CRT teardown after main returns; exact cold ownership required"
+      ]
+    }
+  },
+  "retained_failures": {
+    "prototype_direct2": {
+      "status": "FAIL",
+      "reason": "Fixture requests256KiB workerstack while native contractmaximum128KiB; real catalogue/matching succeeded first",
+      "log_sha256": "1af59fd6773f8eb0069584f23a45948a4d0c503be493fdfb897622f049843d7e"
+    },
+    "unconfigured_retry": {
+      "status": "FAIL_REPRODUCED_TIMEOUT",
+      "exit_code": 124,
+      "reason": "Second original NULL-config reference path retried missing default loader forever; explicit profile now unlocks/returnsENOTSUP",
+      "source_sha256": "e621f218fa6772c1330d556695df6d24fc70194e3580d5b89afdd8ab532d8c1e",
+      "executable_sha256": "558685a3571284f8c609ad2a6a074496e527e9c99186cad7c6199cb8b3b575c3",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "xml_truncation": {
+      "profile": "original probe before complete-buffer libxml2 finalization fix",
+      "command": [
+        "/tmp/fontconfig-xml-review"
+      ],
+      "exit": 0,
+      "output_sha256": "d6a46f4b2d55318ede1e9b34f86af7c55b0e999da0d862855150f5a96ed561d5",
+      "executable_sha256": "a6d6430b505b5d3fca20542c8d782de9c3a5de0af1297743e9e9261ce285c83a",
+      "observed_truncated_xml_accepted": true,
+      "cases": {
+        "complete_element": "CASE 0 return 1",
+        "unclosed_root": "CASE 1 return 1",
+        "unclosed_alias": "CASE 2 return 1",
+        "partial_family": "CASE 3 return 1",
+        "mismatched_tags": "CASE 4 return 0"
+      },
+      "sanitizers": "ASan/UBSan/LeakSanitizer",
+      "note": "Negative correctness outcome preserved; exit 0 belongs to observation probe and does not mark truncated XML acceptance correct."
+    },
+    "header_generator_first_attempt": {
+      "status": "BUILD_FAILED",
+      "reason": "Original alias generator needs complete original source declarations before filtering omitted definitions; now receives explicit original-source path",
+      "log_sha256": "42c9bf591574eefa25e3d3ed762195a5acaacbb61d81726273781de4bd8469fe"
+    },
+    "optional_xml_test_oracle": {
+      "status": "FAIL",
+      "reason": "Fixture used complain=false where upstream optional-load contract returnsTrue on invalid input; required malformed inputs now use true; failure earlyreturn left test-ownedconfig causingLSan leak",
+      "host_log_sha256": "826884da5533eba5124c5392f2b36f142191d761748b80be471a90709db851cf",
+      "direct_result": {
+        "status": "FAIL",
+        "qualified": false,
+        "error": "exec /FC.ELF\n[SPAWNED] pid=1 path=/FC.ELF (running asynchronously)\nchos> Fontconfig error: \"memory\", line 1: Premature end of data in tag fontconfig line 1\n\n[FAIL] fontconfig line 46: bad&&!FcConfigParseAndLoadFromMemory(bad,(const FcChar8*)invalid[i],FcFalse) (errno=95)\n[FAIL] fontconfig line 56: !unconfigured()&&!config_errors() (errno=95)\n"
+      },
+      "uefi_result": {
+        "status": "FAIL",
+        "qualified": false,
+        "error": "exec /FC.ELF\n[SPAWNED] pid=1 path=/FC.ELF (running asynchronously)\nchos> Fontconfig error: \"memory\", line 1: Premature end of data in tag fontconfig line 1\n\n[FAIL] fontconfig line 46: bad&&!FcConfigParseAndLoadFromMemory(bad,(const FcChar8*)invalid[i],FcFalse) (errno=95)\n[FAIL] fontconfig line 56: !unconfigured()&&!config_errors() (errno=95)\n"
+      }
+    }
+  },
+  "limits": [
+    "Actual matching/configuration prerequisite,not full Fontconfig/FreeType/XML conformance or browser",
+    "No automatic POSIX configuration/directory scans, disk cache, watcher or serialized cache handles",
+    "Regular catalogue fonts only; actual bold/italic face selection unqualified",
+    "Six warm allocations/64KiB recorded before main return; exact cold resources restored after CRT/process reap",
+    "No production allocation-pressure/hostile-font security or physical Fusion/Pi5/laptop claim"
+  ],
+  "allocation_attribution_probe": {
+    "status": "PASS_ONE_DIRECT_LIFETIME",
+    "code": "Evidence-only qualified fixture copy adds xmlCleanupParser only after all Fontconfig/FreeType/worker consumers are released; repository fixture and qualified archive remain unchanged",
+    "source_sha256": "d83648f3915c396701b4f7ff04703fbba2e10e292d45229287734ca2b3e24a6a",
+    "application_sha256": "de5a6313902f26c672aed139ad09cb3a9e73185d75c650f1a256ffeab426de84",
+    "result": {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "de5a6313902f26c672aed139ad09cb3a9e73185d75c650f1a256ffeab426de84",
+      "harness_sha256": "f2e1799ebf6945a5a651ad70083e60e9a7a50b38b845e7cefe96b2d7bfd733a8",
+      "cold_free_pages": 110116,
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "seconds": 3.5872843530014507,
+          "cold_pages_restored": 110116,
+          "heap_before_main_return": [
+            {
+              "allocations": 2,
+              "mapped_bytes": 65536
+            }
+          ]
+        }
+      ],
+      "checks": [
+        "Real file catalogue, family/alias/language/charset fallback, face reopen, rendering patterns and regular style fallback",
+        "Three real pthread workers, catalogue cleanup, normal exit and cold resource accounting"
+      ],
+      "limits": [
+        "Selected Fontconfig memory/app-font catalogue; WebCore/browser and physical hardware are not qualified",
+        "Automatic config/directory scans and serialized cache files unsupported; real bold/italic fixtures unavailable; Stage 3 incomplete",
+        "Runtime compiler TLS may remain allocated until CRT teardown after main returns; exact cold ownership required"
+      ]
+    },
+    "serial_sha256": "55746b9c5cb86f6079efeba3c776adc8b0f5d003aa7a7ca86b717a700765e315",
+    "observations": {
+      "before_xml_cleanup": {
+        "allocations": 6,
+        "mapped_bytes": 65536
+      },
+      "after_xml_cleanup": {
+        "allocations": 2,
+        "mapped_bytes": 65536
+      }
+    },
+    "meaning": "Four retained allocations belong to libxml process/error state; remaining main-thread emulated TLS persists until native CRT teardown. Do not globally tear down XML while other consumers remain."
+  }
+}

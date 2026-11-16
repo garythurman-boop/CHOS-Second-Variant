@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.20)
+project(CHOSNativeStrings LANGUAGES C)
+add_executable(native_strings main.c)
+target_compile_options(native_strings PRIVATE -fno-builtin)
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "CHOS")
+    find_package(Threads REQUIRED)
+    target_link_libraries(native_strings PRIVATE Threads::Threads)
+endif()

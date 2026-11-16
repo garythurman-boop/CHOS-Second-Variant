@@ -1,0 +1,29 @@
+--- a/Source/WebCore/platform/SharedMemory.h
++++ b/Source/WebCore/platform/SharedMemory.h
+@@ -1,2 +1,3 @@
++/* CHOS modification (2026-11-16): genuine in-process owned backing, not IPC. */
+ /*
+  * Copyright (C) 2010-2024 Apple Inc. All rights reserved.
+@@ -32,4 +33,8 @@
+ #include <wtf/Platform.h>
+ #include <wtf/ThreadSafeRefCounted.h>
++
++#if OS(CHOS)
++#include "SharedMemoryCHOSBacking.h"
++#endif
+ 
+ #if USE(UNIX_DOMAIN_SOCKETS)
+@@ -69,4 +74,6 @@
+ #elif OS(WINDOWS)
+         Win32Handle;
++#elif OS(CHOS)
++        RefPtr<SharedMemoryCHOSBacking>;
+ #endif
+ 
+@@ -166,4 +173,6 @@
+ #elif OS(WINDOWS)
+     Win32Handle m_handle;
++#elif OS(CHOS)
++    RefPtr<SharedMemoryCHOSBacking> m_chosBacking;
+ #endif
+ };

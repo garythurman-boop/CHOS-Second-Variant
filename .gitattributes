@@ -42,3 +42,11 @@ third_party/mbedtls/** -whitespace
 
 # Signed source authentication receipts retain their exact original bytes.
 /ports/xml/authentication/** -whitespace
+
+# Keep original font/codec sources and authenticated receipts byte-identical.
+/third_party/fontconfig/** -whitespace
+/third_party/libwebp/** -whitespace
+/ports/fontconfig/authentication/** -whitespace
+/ports/webp/authentication/** -whitespace
+/ports/fontconfig/*.patch -whitespace
+/ports/webcore-page/*.patch -whitespace
