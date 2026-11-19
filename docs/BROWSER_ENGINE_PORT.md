@@ -1,5 +1,11 @@
 # Modern browser engine port decision
 
+The current platform checkpoint adds [real Cairo Fontconfig rendering](NATIVE_CAIRO_FONTCONFIG.md),
+[the actual PAL digest API](NATIVE_WEBCORE_CRYPTO.md), and a guarded
+[native desktop screen query](NATIVE_GUI_SCREEN.md). Selected direct/UEFI
+lifecycles and host sanitizer checks pass. Full WebCore configuration has reached
+actual compilation; complete page painting and the modern browser remain open.
+
 Current page-build prerequisites: [native LibXml2](NATIVE_XML.md),
 [SQLite memory core](NATIVE_SQLITE.md) and [zlib memory streams](NATIVE_ZLIB_STREAMS.md)
 now have actual native and sanitizer qualification. SQLite disk persistence and

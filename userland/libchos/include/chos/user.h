@@ -18,6 +18,7 @@
 #include "chos/net_dns6_api.h"
 #include "chos/gui_protocol.h"
 #include "chos/gui_surface.h"
+#include "chos/gui_screen.h"
 #include "chos/file_api.h"
 #include "chos/file_write_api.h"
 #include "chos/file_metadata_api.h"
@@ -250,6 +251,10 @@ static inline long chos_gui_submit(const chos_gui_message_t *message, size_t byt
 }
 static inline long chos_gui_surface_submit(const chos_gui_surface_message_t *message,size_t bytes) {
     return chos_syscall2((long)CHOS_SYS_GUI_SUBMIT,(long)(uintptr_t)message,(long)bytes);
+}
+/* Requires the GUI_SUBMIT permission. Exact-size, flags-zero, read-only query. */
+static inline long chos_gui_screen_info(chos_gui_screen_info_t *out) {
+    return chos_syscall3(CHOS_SYS_GUI_SCREEN_INFO,(long)(uintptr_t)out,sizeof(*out),0);
 }
 static inline long chos_gui_poll_event(chos_gui_message_t *event, size_t capacity) {
     return chos_syscall2((long)CHOS_SYS_GUI_POLL_EVENT, (long)(uintptr_t)event, (long)capacity);

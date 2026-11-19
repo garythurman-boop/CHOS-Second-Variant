@@ -1,0 +1,36 @@
+--- a/src/cairo-ft-font.c	2026-11-16
++++ b/src/cairo-ft-font.c	2026-11-16
+@@ -112,7 +112,14 @@
+ 
+ /* This is the max number of FT_face objects we keep open at once
+  */
++#ifdef __CHOS__
++/* The native file service has four process-owned descriptors. Keep two
++ * cached file-backed faces, leaving capacity for a readability probe and
++ * another application file. Original eviction closes real FT faces. */
++#define MAX_OPEN_FACES 2
++#else
+ #define MAX_OPEN_FACES 10
++#endif
+ 
+ /**
+  * SECTION:cairo-ft
+@@ -627,7 +634,18 @@
+     if (ret == FcResultOutOfMemory)
+ 	return _cairo_error (CAIRO_STATUS_NO_MEMORY);
+     if (ret == FcResultMatch) {
++#ifdef __CHOS__
++        /* CHOS provides real read-only FILE snapshots, not POSIX access().
++         * Check that the selected path can actually be opened and released;
++         * FreeType will independently open its own snapshot when needed. */
++        FILE *probe = fopen (filename, "rb");
++        cairo_bool_t readable = probe != NULL;
++        if (probe && fclose (probe) != 0)
++            readable = FALSE;
++        if (readable) {
++#else
+ 	if (access (filename, R_OK) == 0) {
++#endif
+ 	    /* If FC_INDEX is not set, we just use 0 */
+ 	    ret = FcPatternGetInteger (pattern, FC_INDEX, 0, &id);
+ 	    if (ret == FcResultOutOfMemory)

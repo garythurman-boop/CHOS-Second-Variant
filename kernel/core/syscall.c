@@ -832,6 +832,15 @@ static chos_irq_context_t *lower_sync_dispatch_inner(chos_irq_context_t *frame) 
                 frame->x[0] = sizeof(event);
                 return frame;
             }
+            case CHOS_SYS_GUI_SCREEN_INFO: {
+                chos_gui_screen_info_t status;
+                if(!process_pid_for_address_space(fault_space)){frame->x[0]=neg_errno(CHOS_ERRNO_ESRCH);return frame;}
+                if(frame->x[1]!=sizeof(status)||frame->x[2]){frame->x[0]=neg_errno(CHOS_ERRNO_EINVAL);return frame;}
+                if(!syscall_user_range_writable(fault_space,frame->x[0],sizeof(status))){frame->x[0]=neg_errno(CHOS_ERRNO_EFAULT);return frame;}
+                if(!chos_gui_get_screen_info(&status)){frame->x[0]=neg_errno(CHOS_ERRNO_EAGAIN);return frame;}
+                frame->x[0]=address_space_copy_to_user(fault_space,frame->x[0],&status,sizeof(status))?0u:neg_errno(CHOS_ERRNO_EFAULT);
+                return frame;
+            }
             case CHOS_SYS_MKDIR: {
                 char path[CHOS_ROMFS_PATH_CAPACITY], parent[CHOS_FILE_PATH_CAPACITY];
                 chos_chfs_entry_t existing;

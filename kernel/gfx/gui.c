@@ -161,6 +161,7 @@ static gui_app_client_t gui_app_clients[GUI_APP_MAX_CLIENTS];
 /* Fixed 24 MiB pixel arena. No user mappings, allocations or device pointers. */
 static gui_surface_store_t gui_app_surfaces[GUI_APP_MAX_CLIENTS];
 static chos_spinlock_t gui_surface_lock=CHOS_SPINLOCK_INITIALIZER;
+static chos_spinlock_t gui_display_lock=CHOS_SPINLOCK_INITIALIZER;
 static uint64_t gui_surface_next_id;
 static void gui_app_surface_drop(gui_app_client_t *client) {
     uint64_t irq=chos_spin_lock_irqsave(&gui_surface_lock);
@@ -1754,7 +1755,9 @@ static int gui_apply_display_mode(size_t mode_index) {
         gui_mark_dirty();
         return 0;
     }
+    uint64_t display_irq=chos_spin_lock_irqsave(&gui_display_lock);
     screen = updated_surface;
+    chos_spin_unlock_irqrestore(&gui_display_lock,display_irq);
     taskbar_tooltip_window_id = CHOS_WM_NO_WINDOW;
     taskbar_tooltip_fade_step = 0u;
     wallpaper_cache_valid = 0;
@@ -4918,8 +4921,10 @@ int chos_gui_init(const chos_surface_t *surface) {
     if (surface == NULL || !chos_surface_valid(surface) ||
         chos_display_mode_index((uint32_t)surface->width, (uint32_t)surface->height) < 0 ||
         surface->stride_pixels < surface->width) return 0;
+    uint64_t display_irq=chos_spin_lock_irqsave(&gui_display_lock);
     screen = *surface;
     gui_active = 1;
+    chos_spin_unlock_irqrestore(&gui_display_lock,display_irq);
     /* Prefer the VirtIO-GPU cursorq plane. If queue 1 is unavailable or the
      * host rejects cursor resources, the old software bitmap remains a fallback. */
     (void)virtio_gpu_cursor_init(chos_asset_cursor_pixels, chos_asset_cursor.width,
@@ -5667,6 +5672,24 @@ void chos_gui_pump(void) {
 }
 
 int chos_gui_ready(void) { return gui_active && virtio_gpu_ready(); }
+int chos_gui_get_screen_info(chos_gui_screen_info_t *out) {
+    if(!out)return 0;
+    uint64_t irq=chos_spin_lock_irqsave(&gui_display_lock);
+    if(!gui_active){chos_spin_unlock_irqrestore(&gui_display_lock,irq);return 0;}
+    unsigned scale=gui_scale_factor();
+    uint32_t width=(uint32_t)screen.width,height=(uint32_t)screen.height;
+    uint32_t taskbar=(uint32_t)TASKBAR_HEIGHT;
+    *out=(chos_gui_screen_info_t){
+        .size_bytes=sizeof(*out),.version=CHOS_GUI_SCREEN_VERSION,
+        .pixel_format=CHOS_GUI_SCREEN_XRGB8888,
+        .width=width,.height=height,
+        .available_width=width,.available_height=height>taskbar?height-taskbar:0,
+        .bits_per_pixel=32,.color_bits=24,
+        .scale_numerator=scale,.scale_denominator=1
+    };
+    chos_spin_unlock_irqrestore(&gui_display_lock,irq);
+    return 1;
+}
 const char *chos_gui_view_name(void) {
     gui_app_client_t *client;
     if (view >= VIEW_WELCOME && view < (int)GUI_VIEW_COUNT) return view_names[view];

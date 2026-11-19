@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/Mbed-TLS/mbedtls",
+  "commit": "068ff080b369adfac81509f9b57b2afabaf82dc5",
+  "tag": "mbedtls-3.6.7",
+  "file": "library/sha1.c",
+  "git_blob": "dfbe481f39ac4b52bf131c9c104813f259129510",
+  "sha256": "277b7499fe8315a46442c39c762e8768056114e3694215e4e2cadbd1ebfbce12",
+  "bytes": 14189,
+  "independent_https_url": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/068ff080b369adfac81509f9b57b2afabaf82dc5/library/sha1.c",
+  "independent_https_bytes_equal_pinned_Git_blob": true,
+  "release_tag_signed": false,
+  "tag_verification_returncode": 1,
+  "authentication_scope": "Exact existing commit pin, local Git blob and independently fetched official HTTPS bytes match. Release tag has no signature; no signed-release claim."
+}

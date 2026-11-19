@@ -1,0 +1,273 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_GUI_SCREEN_SERVICE",
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "syscall": 83,
+  "permission": "Existing GUI_SUBMIT11 capability, inherited/reducible; process-owned output",
+  "ABI": "64-byte version1 output; exact size, flags0; no framebuffer address",
+  "SDK_manifest_sha256": "68ab7a4141a41fec7d07f5b791933b135a7eab89fbf1621f79b8cdc5eb6f7410",
+  "sources_sha256": {
+    "include/chos/gui_screen.h": "d6b6489ab1253515f8a6422565ce58956e8396cb59c7230c31216c9995542af3",
+    "include/chos/gui.h": "586b8a02dc34393c5e41af8892d8ad3172554cc968c0f06d6c48b11a8af9329b",
+    "include/chos/syscall.h": "eb8b62cf37d516c5933cf3e22b4f7a2638594de017ff6239b65227d02d634e1c",
+    "include/chos/process_caps.h": "ea74867c0cc95a8873179862ff4346de80f83dcf158f99b5ebf8723e69560aba",
+    "userland/libchos/include/chos/user.h": "ff5b74da61991061a8d4eee38bc729b2320977d9048afe6a8d55ffdb6194148d",
+    "kernel/core/syscall.c": "fb72230a67f4f303d44d3600f5645fc021a984ae44c3ca03eb8af17581cd7c63",
+    "kernel/gfx/gui.c": "151c94cdc9bcbdd7bbbe5061e1b55343d1d975176900231c71d8fe7347b1566e",
+    "tests/test_gui.c": "4472c7f7f243c319f47cfb8a3965d819f81904a165f83fa0f4698044f651018a",
+    "tests/test_process_caps.c": "e8089ef8e4cbb0d1d03777a4f3d88de20beeff206497926b1652c32cadd69061",
+    "tests/test_user_abi.c": "74e85577cbd9b082794442944f76f486ddeca089508be0f4ce33206fdb604968",
+    "tests/native_gui_screen/main.c": "5a8785c1048d54f7703a1af8ba0b124d9b5f323228eee4cbba0c5bbdc9de7a9e",
+    "tests/native_gui_screen/CMakeLists.txt": "a96dc0240ea9c6eb245ce6e83a935bb6c910aef6da1fbab2162d6aa7bf6b2fed",
+    "tests/native_gui_screen/qemu.py": "f41a75812635a03576338fa3d9a376a59a2949166959b3f0a43e7860d3f6de93",
+    "tests/native_pause/main.cpp": "e06e992b6d124053e2770ef4a7e826ee6eff07133ca2dcd40da3fc8bad24889e",
+    "tools/build_native_pause.py": "58d8c534234236580eb4bc03eaae36d4261ca3c60185f724cc54d0c864b3a961"
+  },
+  "native_application": {
+    "path": "/workspace/chos-evidence/native-gui-screen-20261119/application1/native_gui_screen",
+    "sha256": "21667bc3d47b92abeac041e9a02684abfb3e791898371fa8bc4ff1f03e519f23"
+  },
+  "frozen_images_sha256": {
+    "chos.elf": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5",
+    "chos.iso": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+    "uefi-kernel.elf": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f"
+  },
+  "native_runs": {
+    "direct": {
+      "path": "/workspace/chos-evidence/native-gui-screen-20261119/direct1/result.json",
+      "sha256": "040e371877357b4a9b23c16326d53811834ec3e116bcb40d5c2fbd5244c7978f",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "21667bc3d47b92abeac041e9a02684abfb3e791898371fa8bc4ff1f03e519f23",
+        "cold_free_pages": 110684,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_free_pages_restored": 110684,
+            "screen_metadata": [
+              800,
+              600,
+              570,
+              1,
+              1,
+              32,
+              24
+            ],
+            "screenshot_size": [
+              800,
+              600
+            ]
+          },
+          {
+            "cycle": 1,
+            "pid": 3,
+            "cold_free_pages_restored": 110684,
+            "screen_metadata": [
+              800,
+              600,
+              570,
+              1,
+              1,
+              32,
+              24
+            ],
+            "screenshot_size": [
+              800,
+              600
+            ]
+          },
+          {
+            "cycle": 2,
+            "pid": 5,
+            "cold_free_pages_restored": 110684,
+            "screen_metadata": [
+              800,
+              600,
+              570,
+              1,
+              1,
+              32,
+              24
+            ],
+            "screenshot_size": [
+              800,
+              600
+            ]
+          }
+        ],
+        "checks": [
+          "Actual active framebuffer dimensions match independent QMP screenshot dimensions",
+          "Real work area, 32-bit XRGB/24 color bits and desktop scale; three workers query 192 times per process",
+          "Invalid size/flags/null/read-only/wrapping/cross-guard destinations refuse without partial output",
+          "A real child with GUI_SUBMIT permission removed receives EPERM with unchanged output",
+          "Three normal exits with zero user heap and exact cold process/frame/futex restoration"
+        ],
+        "limits": [
+          "Read-only single active desktop metadata; no physical DPI/HDR/multi-monitor claim",
+          "Kernel/API prerequisite, not WebCore page rendering or revised Stage 3 completion",
+          "QEMU direct and isolated UEFI evidence; new Fusion/Pi5/laptop execution remains unrun"
+        ]
+      }
+    },
+    "uefi": {
+      "path": "/workspace/chos-evidence/native-gui-screen-20261119/uefi1/result.json",
+      "sha256": "702cbb2435ae88ebf60a536686c7efe8e94a2c3be078c1f0e90aaa2bc314c45d",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "21667bc3d47b92abeac041e9a02684abfb3e791898371fa8bc4ff1f03e519f23",
+        "cold_free_pages": 493298,
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_free_pages_restored": 493298,
+            "screen_metadata": [
+              800,
+              600,
+              570,
+              1,
+              1,
+              32,
+              24
+            ],
+            "screenshot_size": [
+              800,
+              600
+            ]
+          },
+          {
+            "cycle": 1,
+            "pid": 3,
+            "cold_free_pages_restored": 493298,
+            "screen_metadata": [
+              800,
+              600,
+              570,
+              1,
+              1,
+              32,
+              24
+            ],
+            "screenshot_size": [
+              800,
+              600
+            ]
+          },
+          {
+            "cycle": 2,
+            "pid": 5,
+            "cold_free_pages_restored": 493298,
+            "screen_metadata": [
+              800,
+              600,
+              570,
+              1,
+              1,
+              32,
+              24
+            ],
+            "screenshot_size": [
+              800,
+              600
+            ]
+          }
+        ],
+        "checks": [
+          "Actual active framebuffer dimensions match independent QMP screenshot dimensions",
+          "Real work area, 32-bit XRGB/24 color bits and desktop scale; three workers query 192 times per process",
+          "Invalid size/flags/null/read-only/wrapping/cross-guard destinations refuse without partial output",
+          "A real child with GUI_SUBMIT permission removed receives EPERM with unchanged output",
+          "Three normal exits with zero user heap and exact cold process/frame/futex restoration"
+        ],
+        "limits": [
+          "Read-only single active desktop metadata; no physical DPI/HDR/multi-monitor claim",
+          "Kernel/API prerequisite, not WebCore page rendering or revised Stage 3 completion",
+          "QEMU direct and isolated UEFI evidence; new Fusion/Pi5/laptop execution remains unrun"
+        ]
+      }
+    }
+  },
+  "required_suites": {
+    "host": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log_sha256": "2dc7b4949dee48402d8f8e39a111a4943eddf18c714b5ab32e5420a7cce8f371"
+    },
+    "sanitize": {
+      "status": "PASS",
+      "exit_code": 0,
+      "log_sha256": "71e25864c3b3fa7c5d80dca68d451feea1e553b7323b82bd8afa6923a20da8b9"
+    }
+  },
+  "focused_host_sanitizers": {
+    "host": {
+      "path": "/workspace/chos-evidence/webcore-link-20261112/screen-info-host2.log",
+      "sha256": "96038863c3d9646275745105c6b29bc5838422f4b2586d7830d3ee137aa167f7",
+      "status": "PASS",
+      "checks": "800x600,actual1024x768modechange,1920x1080at2x,2560x1920at3x,failedmodeinitpreservesnapshot;ASAN/UBSAN/leak detection onfocusedGUIrun"
+    },
+    "sanitize": {
+      "path": "/workspace/chos-evidence/webcore-link-20261112/screen-info-sanitize2.log",
+      "sha256": "96038863c3d9646275745105c6b29bc5838422f4b2586d7830d3ee137aa167f7",
+      "status": "PASS",
+      "checks": "800x600,actual1024x768modechange,1920x1080at2x,2560x1920at3x,failedmodeinitpreservesnapshot;ASAN/UBSAN/leak detection onfocusedGUIrun"
+    }
+  },
+  "limits": [
+    "Single active software desktop, physical-pixel rectangles and desktop UI scale; no physical DPI/HDR/multi-monitor claim",
+    "No WebCore page execution or modern browser claim",
+    "New physical Fusion/Pi5/laptop execution not run"
+  ],
+  "pause_additive_header_compatibility": {
+    "sdk7": {
+      "status": "PASS",
+      "command": [
+        "clang++",
+        "--target=aarch64-none-elf",
+        "-D__CHOS__=1",
+        "-std=c++23",
+        "-fhosted",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-femulated-tls",
+        "-nostdinc++",
+        "-isystem",
+        "/workspace/chos-evidence/webcore-link-20261112/memory/sdk7/include/c++/v1",
+        "-isystem",
+        "/workspace/chos-evidence/webcore-link-20261112/memory/sdk7/include",
+        "-c",
+        "/workspace/chos-evidence/native-gui-screen-20261119/pause-api-forward-compatible.cpp",
+        "-o",
+        "/workspace/chos-evidence/native-gui-screen-20261119/pause-sdk7.o"
+      ],
+      "object_sha256": "0da3b4bae7a933b8a3b3f631fb6fcfc1d0a94a437d5d6eb547c9248dd40835aa"
+    },
+    "sdk8": {
+      "status": "PASS",
+      "command": [
+        "clang++",
+        "--target=aarch64-none-elf",
+        "-D__CHOS__=1",
+        "-std=c++23",
+        "-fhosted",
+        "-fno-exceptions",
+        "-fno-rtti",
+        "-femulated-tls",
+        "-nostdinc++",
+        "-isystem",
+        "/workspace/chos-evidence/webcore-link-20261112/memory/sdk8/include/c++/v1",
+        "-isystem",
+        "/workspace/chos-evidence/webcore-link-20261112/memory/sdk8/include",
+        "-c",
+        "/workspace/chos-evidence/native-gui-screen-20261119/pause-api-forward-compatible.cpp",
+        "-o",
+        "/workspace/chos-evidence/native-gui-screen-20261119/pause-sdk8.o"
+      ],
+      "object_sha256": "0da3b4bae7a933b8a3b3f631fb6fcfc1d0a94a437d5d6eb547c9248dd40835aa"
+    }
+  }
+}

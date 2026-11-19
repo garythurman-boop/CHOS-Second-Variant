@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "chos/gfx.h"
 #include "chos/gui_protocol.h"
+#include "chos/gui_screen.h"
 #include "chos/driver_report.h"
 
 int chos_gui_init(const chos_surface_t *surface);
@@ -34,6 +35,8 @@ void chos_gui_console_write(const char *bytes, size_t length);
 /* Read bytes queued for the active user-space Console session. Returns -1 for a non-owner. */
 int64_t chos_gui_console_session_read(uint32_t owner_pid, char *destination, size_t capacity);
 int chos_gui_ready(void);
+/* Kernel-owned output only; a single coherent snapshot, no framebuffer address. */
+int chos_gui_get_screen_info(chos_gui_screen_info_t *out);
 const char *chos_gui_view_name(void);
 /* EL0 GUI service. Messages have already been copied from the caller's address
  * space and are validated again here; each process may own one GUI window. */

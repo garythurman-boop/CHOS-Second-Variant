@@ -161,6 +161,7 @@
     "library/rsa_alt_helpers.c": "ab9e5af60e571f85e49fdd7ab9ca57f8cd3c6f9017ff326f45276aa9a596df3d",
     "library/rsa_alt_helpers.h": "ca0e1ff5c83c7c527ad9ff957ccefd99ea300206ef1140b6472bbbc6dd45e917",
     "library/rsa_internal.h": "aa043ede40150636726fef71c04d2bb104c87333743378defe8fde2df8409df3",
+    "library/sha1.c": "277b7499fe8315a46442c39c762e8768056114e3694215e4e2cadbd1ebfbce12",
     "library/sha256.c": "632672d0c954d8bc0e20fdc8370c9f1725f3ffc5fcdaacc14949e42a1b5424d7",
     "library/sha512.c": "d5f237a4f40660dd4fcd09ee995a67a2811a62f4e93348f837bc30e3a76693b7",
     "library/ssl_ciphersuites.c": "c1ea9c74805e037bc1f67eca7aecfcc4e9151bd5dfc944ecbc688c2b0c624ca7",

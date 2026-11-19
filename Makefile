@@ -1877,3 +1877,5 @@ test-native-fontconfig-sources:
 test-native-webp-sources:
 	python3 tools/verify_native_webp_sources.py
 test: test-native-fontconfig-sources test-native-webp-sources
+
+$(BUILD)/test-gui $(SAN_DIR)/test-gui $(BUILD)/test-process-caps $(SAN_DIR)/test-process-caps: include/chos/gui_screen.h

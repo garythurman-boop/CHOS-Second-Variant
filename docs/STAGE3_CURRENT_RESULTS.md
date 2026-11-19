@@ -1,5 +1,11 @@
 # Revised Stage 3 current evidence
 
+The current platform checkpoint adds [real Cairo Fontconfig rendering](NATIVE_CAIRO_FONTCONFIG.md),
+[the actual PAL digest API](NATIVE_WEBCORE_CRYPTO.md), and a guarded
+[native desktop screen query](NATIVE_GUI_SCREEN.md). Selected direct/UEFI
+lifecycles and host sanitizer checks pass. Full WebCore configuration has reached
+actual compilation; complete page painting and the modern browser remain open.
+
 The next page-build checkpoint qualifies [native Fontconfig catalogues](NATIVE_FONTCONFIG.md),
 [WebP decoding/demux/animation](NATIVE_WEBP.md), [native string search](NATIVE_LIBC_SPANS.md)
 and [original WebCore local buffer ownership](../ports/webcore-page/LOCAL_MEMORY.md).

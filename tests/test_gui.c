@@ -574,11 +574,30 @@ static unsigned mock_driver_report(unsigned page,char lines[CHOS_DRIVER_REPORT_R
     memset(lines,0,CHOS_DRIVER_REPORT_ROWS*(CHOS_DRIVER_REPORT_COLS+1));
     strcpy(lines[0],"Automatic hardware report");report_pages_seen|=1u<<page;return 3;
 }
+static void assert_screen_info(uint32_t width,uint32_t height,unsigned scale) {
+    chos_gui_screen_info_t info;
+    memset(&info,0xa5,sizeof(info));
+    assert(chos_gui_get_screen_info(&info));
+    assert(info.size_bytes==64 && info.version==CHOS_GUI_SCREEN_VERSION);
+    assert(info.pixel_format==CHOS_GUI_SCREEN_XRGB8888 && !info.reserved);
+    assert(!info.x && !info.y && info.width==width && info.height==height);
+    assert(!info.available_x && !info.available_y && info.available_width==width);
+    assert(info.available_height==height-30u*scale);
+    assert(info.bits_per_pixel==32 && info.color_bits==24);
+    assert(info.scale_numerator==scale && info.scale_denominator==1);
+}
+
 int main(void) {
     chos_surface_t surface = { pixels, 800u, 600u, 800u };
     size_t i;
     unsigned nonzero = 0u;
+    chos_gui_screen_info_t unavailable;
+    memset(&unavailable,0xa5,sizeof(unavailable));
+    chos_gui_screen_info_t preserved=unavailable;
+    assert(!chos_gui_get_screen_info(NULL));
+    assert(!chos_gui_get_screen_info(&unavailable) && !memcmp(&unavailable,&preserved,sizeof(unavailable)));
     assert(chos_gui_init(&surface));
+    assert_screen_info(800,600,1);
     assert(chos_gui_ready());
     assert(strcmp(chos_gui_view_name(), "Welcome") == 0);
     assert(presentations == 1u);
@@ -786,6 +805,7 @@ int main(void) {
     /* Settings is centered; convert base-logical coordinates to the physical screen. */
     click_at(365, 335); /* mode row 2: 1024x768 */
     assert(mock_screen_width == 1024u && mock_screen_height == 768u);
+    assert_screen_info(1024,768,1);
     assert(mock_display_mode_index == 2u);
     assert(mock_settings_size > 0u);
     /* Navigate to the last page and select the 2560x1920 4:3 mode. */
@@ -800,6 +820,7 @@ int main(void) {
     click_at(365 + (int32_t)(mock_screen_width - 800u) / 2 - 15,
              357 + (int32_t)(mock_screen_height - 600u) / 2 + 6);
     assert(mock_screen_width == 2560u && mock_screen_height == 1920u);
+    assert_screen_info(2560,1920,3);
     assert(mock_display_mode_index == 23u);
 
     /* Simulate a reboot: GPU initializes at recovery mode, GUI restores persisted mode. */
@@ -986,7 +1007,18 @@ int main(void) {
         mock_ticks+=100;chos_gui_pump();assert(!chos_gui_pop_event(94u,&e));
         chos_gui_process_exited(94u);chos_gui_process_exited(93u);
     }
-    puts("gui: desktop composition, taskbar hover-tooltip delay/fade, vertical start-menu gradient/branding, keyboard navigation, windowing, splash timing, persistent display modes, first-start audio readiness, bounded retries, power-dialog cancellation, and EL0 Console output ownership passed");
+    /* The screen service reports physical pixels plus actual 2x desktop scale. */
+    mock_settings_size=0;
+    mock_screen_width=1920;mock_screen_height=1080;
+    surface=(chos_surface_t){pixels,1920,1080,1920};
+    assert(chos_gui_init(&surface));
+    assert_screen_info(1920,1080,2);
+    chos_gui_screen_info_t before_bad,after_bad;
+    assert(chos_gui_get_screen_info(&before_bad));
+    surface.stride_pixels=1919;
+    assert(!chos_gui_init(&surface));
+    assert(chos_gui_get_screen_info(&after_bad) && !memcmp(&before_bad,&after_bad,sizeof(before_bad)));
+    puts("gui: desktop composition, live screen/work-area snapshots, taskbar hover-tooltip delay/fade, vertical start-menu gradient/branding, keyboard navigation, windowing, splash timing, persistent display modes, first-start audio readiness, bounded retries, power-dialog cancellation, and EL0 Console output ownership passed");
     return 0;
 }
 

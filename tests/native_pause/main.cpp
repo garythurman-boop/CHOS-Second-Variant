@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cerrno>
 #include <cstdlib>
-static_assert(CHOS_SYS_FUTEX_WAIT==61 && CHOS_SYSCALL_LIMIT==82);
+static_assert(CHOS_SYS_FUTEX_WAIT==61 && CHOS_SYS_THREAD_RESUME==82 && CHOS_SYSCALL_LIMIT>=CHOS_SYS_THREAD_RESUME);
 static bool fail(unsigned line){printf("[FAIL] native pause line %u\n",line);return false;}
 #define CHECK(v) do{if(!(v))return fail(__LINE__);}while(0)
 static std::atomic<unsigned> errors;

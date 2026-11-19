@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "original_headers": {
+    "Source/WebCore/PAL/pal/crypto/CryptoDigest.h": {
+      "sha256": "9fad8fba069e5266ce125c36ebc58fb797e004105d4e8e5496d0e127c9c83876",
+      "bytes": 2206,
+      "git_blob": "f5b21466810b15dc01a2bc8b7ee3598393b51705"
+    },
+    "Source/WebCore/PAL/pal/crypto/CryptoTypes.h": {
+      "sha256": "c58d659d45d847dea2d81a53987958d41e61d39877460b16ead5356553aa4d56",
+      "bytes": 2541,
+      "git_blob": "253832b155f20beb44f53fb270effb434f627a63"
+    },
+    "Source/WebCore/PAL/pal/ExportMacros.h": {
+      "sha256": "2966ecd389733b38febdded4c70267a41885a8d6e1a268fcecb0cc7920892aa6",
+      "bytes": 1829,
+      "git_blob": "da9b0b7489dc775114efd5ce5866aef1a2bd7781"
+    }
+  },
+  "scope": "Original PAL CryptoDigest API with real CHOS MbedTLS digest adapter; selected native component, not full WebCore or TLS/WebCrypto policy."
+}

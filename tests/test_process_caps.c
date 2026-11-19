@@ -4,6 +4,7 @@
 #include "chos/file_write_api.h"
 #include "chos/file_metadata_api.h"
 #include "chos/directory_api.h"
+#include "chos/gui_screen.h"
 int main(void){
  assert(chos_process_syscall_capability(CHOS_SYS_THREAD_SUSPEND)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_REAP));
  assert(chos_process_syscall_capability(CHOS_SYS_THREAD_RESUME)==CHOS_PROCESS_CAP(CHOS_SYS_THREAD_REAP));
@@ -24,7 +25,9 @@ int main(void){
  assert(chos_process_syscall_capability(64)==CHOS_PROCESS_CAP(CHOS_SYS_MAP_MEMORY));
  assert(chos_process_syscall_capability(65)==CHOS_PROCESS_CAP(CHOS_SYS_UNMAP_MEMORY));
  assert((int64_t)CHOS_PROCESS_CAP_ALL>0);
- assert(CHOS_SYS_SEEK==63&&CHOS_SYSCALL_LIMIT==82);
+ assert(CHOS_SYS_SEEK==63&&CHOS_SYSCALL_LIMIT==83);
+ assert(CHOS_SYS_GUI_SCREEN_INFO==83&&sizeof(chos_gui_screen_info_t)==64);
+ assert(chos_process_syscall_capability(CHOS_SYS_GUI_SCREEN_INFO)==CHOS_PROCESS_CAP(CHOS_SYS_GUI_SUBMIT));
  assert(chos_process_syscall_capability(CHOS_SYS_SEEK)==CHOS_PROCESS_CAP(CHOS_SYS_READ));
  assert(CHOS_PROCESS_CAP_SEEK==CHOS_PROCESS_CAP(CHOS_SYS_READ));
  assert(!chos_process_syscall_capability(0)&&!chos_process_syscall_capability(CHOS_SYSCALL_LIMIT+1u)&&!chos_process_syscall_capability(UINT32_MAX));

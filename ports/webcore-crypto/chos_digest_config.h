@@ -1,0 +1,44 @@
+/* CHOS digest-only MbedTLS profile, 2026-11-16. This is not the TLS profile.
+ * SHA-1 is available for required content/legacy digest operations only; no
+ * certificate-signature or transport policy is changed by this target. */
+#ifndef CHOS_DIGEST_CONFIG_H
+#define CHOS_DIGEST_CONFIG_H
+#define MBEDTLS_SHA1_C
+#define MBEDTLS_SHA224_C
+#define MBEDTLS_SHA256_C
+#define MBEDTLS_SHA384_C
+#define MBEDTLS_SHA512_C
+/* Private symbol namespace avoids collisions with the independently configured
+ * native TLS library. These names change linkage only, not algorithm bytes. */
+#define mbedtls_internal_sha1_process chos_pal_mbedtls_internal_sha1_process
+#define mbedtls_internal_sha256_process chos_pal_mbedtls_internal_sha256_process
+#define mbedtls_internal_sha512_process chos_pal_mbedtls_internal_sha512_process
+#define mbedtls_platform_zeroize chos_pal_mbedtls_platform_zeroize
+#define mbedtls_sha1 chos_pal_mbedtls_sha1
+#define mbedtls_sha1_clone chos_pal_mbedtls_sha1_clone
+#define mbedtls_sha1_finish chos_pal_mbedtls_sha1_finish
+#define mbedtls_sha1_free chos_pal_mbedtls_sha1_free
+#define mbedtls_sha1_init chos_pal_mbedtls_sha1_init
+#define mbedtls_sha1_self_test chos_pal_mbedtls_sha1_self_test
+#define mbedtls_sha1_starts chos_pal_mbedtls_sha1_starts
+#define mbedtls_sha1_update chos_pal_mbedtls_sha1_update
+#define mbedtls_sha224_self_test chos_pal_mbedtls_sha224_self_test
+#define mbedtls_sha256 chos_pal_mbedtls_sha256
+#define mbedtls_sha256_clone chos_pal_mbedtls_sha256_clone
+#define mbedtls_sha256_finish chos_pal_mbedtls_sha256_finish
+#define mbedtls_sha256_free chos_pal_mbedtls_sha256_free
+#define mbedtls_sha256_init chos_pal_mbedtls_sha256_init
+#define mbedtls_sha256_self_test chos_pal_mbedtls_sha256_self_test
+#define mbedtls_sha256_starts chos_pal_mbedtls_sha256_starts
+#define mbedtls_sha256_update chos_pal_mbedtls_sha256_update
+#define mbedtls_sha384_self_test chos_pal_mbedtls_sha384_self_test
+#define mbedtls_sha512 chos_pal_mbedtls_sha512
+#define mbedtls_sha512_clone chos_pal_mbedtls_sha512_clone
+#define mbedtls_sha512_finish chos_pal_mbedtls_sha512_finish
+#define mbedtls_sha512_free chos_pal_mbedtls_sha512_free
+#define mbedtls_sha512_init chos_pal_mbedtls_sha512_init
+#define mbedtls_sha512_self_test chos_pal_mbedtls_sha512_self_test
+#define mbedtls_sha512_starts chos_pal_mbedtls_sha512_starts
+#define mbedtls_sha512_update chos_pal_mbedtls_sha512_update
+#define mbedtls_zeroize_and_free chos_pal_mbedtls_zeroize_and_free
+#endif

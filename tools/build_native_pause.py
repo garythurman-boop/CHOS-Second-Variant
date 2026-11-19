@@ -11,7 +11,7 @@ commands=[[o.cmake,'-S',str(root/'tests/native_pause'),'-B',str(out/'cmake'),'-G
 code=0
 language_probes=[]
 probe=out/'language-probe.cpp'
-probe.write_text('#include <chos/user.h>\nstatic_assert(CHOS_SYSCALL_LIMIT==82);\nlong probe(uint32_t id,chos_thread_context_t* p){return chos_thread_suspend(id)+chos_thread_paused_context(id,p)+chos_thread_resume(id); }\n')
+probe.write_text('#include <chos/user.h>\nstatic_assert(CHOS_SYS_THREAD_RESUME==82 && CHOS_SYSCALL_LIMIT>=CHOS_SYS_THREAD_RESUME);\nlong probe(uint32_t id,chos_thread_context_t* p){return chos_thread_suspend(id)+chos_thread_paused_context(id,p)+chos_thread_resume(id); }\n')
 for mode in ['c++17','c++20','c++23']:
  cmd=['clang++','--target=aarch64-none-elf','--sysroot='+str(sdk),'-std='+mode,'-D__CHOS__=1','-fno-exceptions','-fno-rtti','-femulated-tls','-nostdinc++','-isystem',str(sdk/'include/c++/v1'),'-isystem',str(sdk/'include'),'-fsyntax-only','-Wall','-Wextra','-Werror',str(probe)]
  with (out/(mode+'.log')).open('wb') as log:r=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT)
