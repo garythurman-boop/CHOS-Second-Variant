@@ -1,0 +1,156 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_NATIVE_STDLIB_CONTAINERS",
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "source_manifest": "docs/dependencies/libcxx-containers.json",
+  "builds": {
+    "native2": {
+      "SDK_manifest_sha256": "287114bc40e68681233449f140f41ec943ee8be04b00361b8fca71ff4c26684b",
+      "application": {
+        "path": "/workspace/chos-evidence/native-stdlib-containers-20261120/native2/application/native_stdlib_containers",
+        "sha256": "4e3bdc21cac167c074da5b3b11847a2b305f003a5b1e8bc1171b758a410e7e53",
+        "bytes": 396544
+      },
+      "sources_sha256": {
+        "tools/build_native_stdlib_containers.py": "48c19f63e9098a329dbfb22d20e32288a898cfad139c190218603a5502538eaa",
+        "tools/verify_native_sdk.py": "aca63c2cecbf5386f13622c306f714f86fabc3f20fcc078fdefcd88759327ae6",
+        "tools/verify_libcxx.py": "13788d364d2f65c90ed7cb0c76449abf9f6382c48a9520a37eeb9141ec894f30",
+        "docs/dependencies/libcxx-native.json": "0279161d8ca69ec5cd046ba6e44b31c46e63afd4cfbca1867e38e646a123b52c",
+        "docs/dependencies/libcxx-containers.json": "e762c40f1ecf82a805795c205662c556dd318c4cc35f99f744806632434fb36d",
+        "tests/native_stdlib_containers/main.cpp": "cc7100f282c0ba0a64e27a453fe98eb434f529528cb490c1e69110755e1badb4",
+        "tests/native_stdlib_containers/CMakeLists.txt": "b0bea8d5e7c01501da8a4730b02197007e919f68a918c102a9603cf10256dc4c"
+      },
+      "build_report_sha256": "42c38a50c6d0ff03eb9420607bf1765b777f764b7a33f849270f623fe10d8324"
+    },
+    "host3": {
+      "SDK_manifest_sha256": "287114bc40e68681233449f140f41ec943ee8be04b00361b8fca71ff4c26684b",
+      "application": {
+        "path": "/workspace/chos-evidence/native-stdlib-containers-20261120/host3/native_stdlib_containers",
+        "sha256": "5f9a37e54b43318c1a472a1d9681ce39c0e49f0d92bcc8c520dcf33746711d40",
+        "bytes": 121488
+      },
+      "sources_sha256": {
+        "tools/build_native_stdlib_containers.py": "48c19f63e9098a329dbfb22d20e32288a898cfad139c190218603a5502538eaa",
+        "tools/verify_native_sdk.py": "aca63c2cecbf5386f13622c306f714f86fabc3f20fcc078fdefcd88759327ae6",
+        "tools/verify_libcxx.py": "13788d364d2f65c90ed7cb0c76449abf9f6382c48a9520a37eeb9141ec894f30",
+        "docs/dependencies/libcxx-native.json": "0279161d8ca69ec5cd046ba6e44b31c46e63afd4cfbca1867e38e646a123b52c",
+        "docs/dependencies/libcxx-containers.json": "e762c40f1ecf82a805795c205662c556dd318c4cc35f99f744806632434fb36d",
+        "tests/native_stdlib_containers/main.cpp": "cc7100f282c0ba0a64e27a453fe98eb434f529528cb490c1e69110755e1badb4",
+        "tests/native_stdlib_containers/CMakeLists.txt": "b0bea8d5e7c01501da8a4730b02197007e919f68a918c102a9603cf10256dc4c",
+        "userland/libcxx/string_instantiations.cpp": "b212315034caae3c42b946822f55a423579892da52533a274f6828276fc3ee93"
+      },
+      "build_report_sha256": "7cd739ffdde4a9e16bc3485703e04e792c6b4485ac98550f64bb46e2a79b3b1f",
+      "run_log_sha256": "d72d350229a3efcf46669977bdb42f5ccdb89f8636d26c02365c7fb44a1e1302",
+      "exit_status": 0
+    },
+    "host-sanitize3": {
+      "SDK_manifest_sha256": "287114bc40e68681233449f140f41ec943ee8be04b00361b8fca71ff4c26684b",
+      "application": {
+        "path": "/workspace/chos-evidence/native-stdlib-containers-20261120/host-sanitize3/native_stdlib_containers",
+        "sha256": "4ff538f0b04755fbe5b9f10da6ff3f5ba23c464aa7864f2db7f757915de405b4",
+        "bytes": 15404344
+      },
+      "sources_sha256": {
+        "tools/build_native_stdlib_containers.py": "48c19f63e9098a329dbfb22d20e32288a898cfad139c190218603a5502538eaa",
+        "tools/verify_native_sdk.py": "aca63c2cecbf5386f13622c306f714f86fabc3f20fcc078fdefcd88759327ae6",
+        "tools/verify_libcxx.py": "13788d364d2f65c90ed7cb0c76449abf9f6382c48a9520a37eeb9141ec894f30",
+        "docs/dependencies/libcxx-native.json": "0279161d8ca69ec5cd046ba6e44b31c46e63afd4cfbca1867e38e646a123b52c",
+        "docs/dependencies/libcxx-containers.json": "e762c40f1ecf82a805795c205662c556dd318c4cc35f99f744806632434fb36d",
+        "tests/native_stdlib_containers/main.cpp": "cc7100f282c0ba0a64e27a453fe98eb434f529528cb490c1e69110755e1badb4",
+        "tests/native_stdlib_containers/CMakeLists.txt": "b0bea8d5e7c01501da8a4730b02197007e919f68a918c102a9603cf10256dc4c",
+        "userland/libcxx/string_instantiations.cpp": "b212315034caae3c42b946822f55a423579892da52533a274f6828276fc3ee93"
+      },
+      "build_report_sha256": "51ce158349d477f1a810547d919d7c217f8aee0ee6db21428bda3a565c819bda",
+      "run_log_sha256": "d72d350229a3efcf46669977bdb42f5ccdb89f8636d26c02365c7fb44a1e1302",
+      "exit_status": 0
+    }
+  },
+  "native_runs": {
+    "direct": {
+      "result_sha256": "47d1251fb36c7ca0a149401a1c38f20daab4765f9dc00ed9cb0ec7df5b5015ff",
+      "result": {
+        "status": "PASS",
+        "mode": "direct",
+        "application_sha256": "4e3bdc21cac167c074da5b3b11847a2b305f003a5b1e8bc1171b758a410e7e53",
+        "harness_sha256": "3e409f8430fa97dae3dbdfcadfd59a233e1f83da80eec823291fbdf02ecb0ee7",
+        "cold_free_pages": 110684,
+        "boot_artifacts": {
+          "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+        },
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_pages_restored": 110684
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "cold_pages_restored": 110684
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "cold_pages_restored": 110684
+          }
+        ],
+        "checks": [
+          "Original LLVM libc++ bitset/stack compiled as actual C++23 native headers",
+          "Independent bit models for 0,1,63,64,65,129,257 bits; shifts,word boundaries,bitwise/proxy/string operations",
+          "Actual deque/vector stacks,copy/move/swap/LIFO/order,25296 matching constructors/destructors and zero live objects",
+          "Three actual pthread workers plus main; zero native heap and complete cold process/frame/futex restoration",
+          "Three normal process lifetimes"
+        ],
+        "limits": [
+          "Selected positive standard-container semantics; exceptions,full libc++ conformance,fuzzing and WebCore not qualified",
+          "QEMU only; new physical Fusion/Pi5/laptop execution not run; Stage 3 incomplete"
+        ]
+      }
+    },
+    "uefi": {
+      "result_sha256": "652444b496f73f1e229efd8d8983ed90c3af8a1f3c4f8e28ee0d6ffc34c77b60",
+      "result": {
+        "status": "PASS",
+        "mode": "uefi",
+        "application_sha256": "4e3bdc21cac167c074da5b3b11847a2b305f003a5b1e8bc1171b758a410e7e53",
+        "harness_sha256": "3e409f8430fa97dae3dbdfcadfd59a233e1f83da80eec823291fbdf02ecb0ee7",
+        "cold_free_pages": 493298,
+        "boot_artifacts": {
+          "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+          "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+          "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+          "kernel_symbols_match_iso": true
+        },
+        "runs": [
+          {
+            "cycle": 0,
+            "pid": 1,
+            "cold_pages_restored": 493298
+          },
+          {
+            "cycle": 1,
+            "pid": 2,
+            "cold_pages_restored": 493298
+          },
+          {
+            "cycle": 2,
+            "pid": 3,
+            "cold_pages_restored": 493298
+          }
+        ],
+        "checks": [
+          "Original LLVM libc++ bitset/stack compiled as actual C++23 native headers",
+          "Independent bit models for 0,1,63,64,65,129,257 bits; shifts,word boundaries,bitwise/proxy/string operations",
+          "Actual deque/vector stacks,copy/move/swap/LIFO/order,25296 matching constructors/destructors and zero live objects",
+          "Three actual pthread workers plus main; zero native heap and complete cold process/frame/futex restoration",
+          "Three normal process lifetimes"
+        ],
+        "limits": [
+          "Selected positive standard-container semantics; exceptions,full libc++ conformance,fuzzing and WebCore not qualified",
+          "QEMU only; new physical Fusion/Pi5/laptop execution not run; Stage 3 incomplete"
+        ]
+      }
+    }
+  }
+}

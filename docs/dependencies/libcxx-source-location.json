@@ -1,0 +1,28 @@
+{
+  "upstream_commit": "cd708029e0b2869e80abe31ddb175f7c35361f90",
+  "url": "https://raw.githubusercontent.com/llvm/llvm-project/cd708029e0b2869e80abe31ddb175f7c35361f90/libcxx/include/source_location",
+  "status": 200,
+  "sha256": "812d4f7afdc4b2ffc93a03d0fe4a070700dffa5ab8eaa30c54ae4466f8d18346",
+  "bytes": 2873,
+  "git_blob_sha1": "d16e3c46fce55e75faa0af566406236662119e90",
+  "authentication": "Existing pinned official release archive SHA256 plus byte-identical immutable-commit file over verified HTTPS; no release or commit signature verification claim",
+  "project": "LLVM libc++",
+  "version": "19.1.7",
+  "source_archive_sha256": "b736109650ffc750dbdc506483347b3713ded9d0300f48432b820ad66b6a9052",
+  "archive_member": "libcxx-19.1.7.src/include/source_location",
+  "source_original": true,
+  "additional_original_dependencies_imported": 0,
+  "active_original_files": [
+    "include/__config",
+    "include/__configuration/abi.h",
+    "include/__configuration/availability.h",
+    "include/__configuration/compiler.h",
+    "include/__configuration/language.h",
+    "include/__configuration/platform.h",
+    "include/cstdint",
+    "include/source_location",
+    "include/stdint.h",
+    "include/version"
+  ],
+  "native_probe_configuration_sha256": "4fa402fb7d90947d6f0add9dc0f74a2b0f1615727061243e5aee77971a9abd72"
+}

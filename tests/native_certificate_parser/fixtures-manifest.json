@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "purpose": "Public synthetic DER/metadata regression fixtures only;no private keys or production trust anchors",
+  "generator": "tests/native_certificate_parser/generate_cases.py",
+  "generated_keys_retained": false,
+  "root": "tests/native_certificate_parser/fixtures",
+  "files": {
+    "certificate-cases.h": "4352616009789a2a737110b38c0bcb335092aa1f02a2c1344dbd5682f9319755",
+    "country_fallback.der": "dcfd0e5f05c567c349c5a72f7a3741645e316473a4abd6c08e091d4837527733",
+    "ec384_utf8.der": "2e1592eac156a86cb98bb174220eccadd0ae942b4a3b284b5c48a2eba882155f",
+    "embedded_nul_subject.der": "e49d5cd44a11395cc55c7a6abf684308d42c80110f613b0ce7faa0804efea283",
+    "organization.der": "d43117a627fb7976e86ea6f8d6d84d1d99d7d845b1de67add4e3388438c966c5",
+    "rsa256.der": "574574e018e9604f5c505369f447506b57e9526b33352185239a380f546eb58d",
+    "rsa_sha1.der": "8cb94552f399e6b9e0cad5f5478a133e46ccb161f0addf044ac070b82cb81d0f",
+    "unsupported_ed25519.der": "5b7b4d76bb6c9435df5820ade06ee5e7754933e69ba7cdc2b994365f603705a8",
+    "vectors.json": "929aa591ff7aa0d958847debb8eee474ff1a3b1608e986e6b2aa06341726804e"
+  }
+}

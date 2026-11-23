@@ -1,0 +1,109 @@
+{
+  "generator": "cryptography X509 metadata plus actual OpenSSL SHA1-signed fixture",
+  "cases": [
+    {
+      "name": "rsa256",
+      "sha256": "574574e018e9604f5c505369f447506b57e9526b33352185239a380f546eb58d",
+      "bytes": 897,
+      "subject_utf8_hex": "6d657461646174612e63686f732e74657374",
+      "valid_from": 1582979696,
+      "valid_until": 2556241445,
+      "sha1": false,
+      "accepted_profile": true,
+      "sans": [
+        {
+          "bytes_hex": "6d657461646174612e63686f732e74657374",
+          "type": 2
+        },
+        {
+          "bytes_hex": "2a2e6578616d706c652e74657374",
+          "type": 2
+        },
+        {
+          "bytes_hex": "7f000001",
+          "type": 7
+        },
+        {
+          "bytes_hex": "20010db8000000000000000000000007",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "ec384_utf8",
+      "sha256": "2e1592eac156a86cb98bb174220eccadd0ae942b4a3b284b5c48a2eba882155f",
+      "bytes": 429,
+      "subject_utf8_hex": "436166c3a920cea9",
+      "valid_from": 1582979696,
+      "valid_until": 2556241445,
+      "sha1": false,
+      "accepted_profile": true,
+      "sans": [
+        {
+          "bytes_hex": "786e2d2d6361662d646d612e6578616d706c65",
+          "type": 2
+        },
+        {
+          "bytes_hex": "00000000000000000000000000000001",
+          "type": 7
+        }
+      ]
+    },
+    {
+      "name": "organization",
+      "sha256": "d43117a627fb7976e86ea6f8d6d84d1d99d7d845b1de67add4e3388438c966c5",
+      "bytes": 404,
+      "subject_utf8_hex": "43484f53204f7267",
+      "valid_from": 1582979696,
+      "valid_until": 2556241445,
+      "sha1": false,
+      "accepted_profile": true,
+      "sans": []
+    },
+    {
+      "name": "country_fallback",
+      "sha256": "dcfd0e5f05c567c349c5a72f7a3741645e316473a4abd6c08e091d4837527733",
+      "bytes": 702,
+      "subject_utf8_hex": "5553",
+      "valid_from": 1582979696,
+      "valid_until": 2556241445,
+      "sha1": false,
+      "accepted_profile": true,
+      "sans": []
+    },
+    {
+      "name": "embedded_nul_subject",
+      "sha256": "e49d5cd44a11395cc55c7a6abf684308d42c80110f613b0ce7faa0804efea283",
+      "bytes": 369,
+      "subject_utf8_hex": "410042",
+      "valid_from": 1582979696,
+      "valid_until": 2556241445,
+      "sha1": false,
+      "accepted_profile": true,
+      "sans": []
+    },
+    {
+      "name": "rsa_sha1",
+      "sha256": "8cb94552f399e6b9e0cad5f5478a133e46ccb161f0addf044ac070b82cb81d0f",
+      "bytes": 730,
+      "subject_utf8_hex": "6f6c642d7369676e61747572652e74657374",
+      "valid_from": 1795058082,
+      "valid_until": 1797650082,
+      "sha1": true,
+      "accepted_profile": true,
+      "sans": []
+    },
+    {
+      "name": "unsupported_ed25519",
+      "sha256": "5b7b4d76bb6c9435df5820ade06ee5e7754933e69ba7cdc2b994365f603705a8",
+      "bytes": 269,
+      "subject_utf8_hex": "756e737570706f727465642e74657374",
+      "valid_from": 1582979696,
+      "valid_until": 2556241445,
+      "sha1": false,
+      "accepted_profile": false,
+      "sans": []
+    }
+  ],
+  "private_keys_retained": false
+}

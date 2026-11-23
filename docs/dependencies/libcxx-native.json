@@ -891,7 +891,12 @@
     "include/queue": "cb0becd5b6ca6ba73490aadf1bd39e77adea0ce033394ae5a03fc1e0bb359be4",
     "include/deque": "dec89698671a05d4e5b1701088f14550a1877f14dabb3eef324e25a1e2a78d38",
     "include/__fwd/queue.h": "96b4ad2f98e6778dbb80f7602681c138fea87e1dbdabc9bfab2dad2f37ff75f9",
-    "include/__fwd/deque.h": "bb3d77740bfa0e1f01257c6b13ba04ae907207f17b53456bfbb32540f7f3d31e"
+    "include/__fwd/deque.h": "bb3d77740bfa0e1f01257c6b13ba04ae907207f17b53456bfbb32540f7f3d31e",
+    "include/__fwd/stack.h": "d9f18205e68d5cf0ad3929f95c885af7ff15309048e081354093a78ff34aba6b",
+    "include/__type_traits/is_char_like_type.h": "c07295ab7c85e28384e227a32ef97f08be128ab428617900a0c0c9c1c9a88ceb",
+    "include/bitset": "3daf1a3443717239d1df9983a7bf03b355192154b4bec3e91958a3023f21983f",
+    "include/source_location": "812d4f7afdc4b2ffc93a03d0fe4a070700dffa5ab8eaa30c54ae4466f8d18346",
+    "include/stack": "08a616c162b85657a1838bb07656943490c1ea2f8dc52e425a3e25df2e547025"
   },
   "scope": "Native static -O2 no-exceptions/no-RTTI allocation,containers,shared ownership,mutex/CV/once and bounded std::thread with ordered exit notification. Not full libc++,public futures,exceptions or engine runtime.",
   "native_header_imports": [
@@ -1701,6 +1706,39 @@
         "include/wctype.h"
       ],
       "policy": "real native preprocessing; original private and explicitly selected public headers only"
+    },
+    {
+      "target": "aarch64-none-elf",
+      "language": "c++23",
+      "configuration_sha256": "4fa402fb7d90947d6f0add9dc0f74a2b0f1615727061243e5aee77971a9abd72",
+      "selected_headers": [
+        "source_location"
+      ],
+      "active_original_files": [
+        "include/__config",
+        "include/__configuration/abi.h",
+        "include/__configuration/availability.h",
+        "include/__configuration/compiler.h",
+        "include/__configuration/language.h",
+        "include/__configuration/platform.h",
+        "include/cstdint",
+        "include/source_location",
+        "include/stdint.h",
+        "include/version"
+      ],
+      "policy": "Exact existing pinned release-archive member and immutable commit HTTPS bytes; genuine native C++23 preprocessing and constexpr compile; no header implementation changes or SDK mutation",
+      "release_archive_sha256": "b736109650ffc750dbdc506483347b3713ded9d0300f48432b820ad66b6a9052"
+    },
+    {
+      "component": "bitset and stack WebCore dependencies",
+      "source_archive_sha256": "b736109650ffc750dbdc506483347b3713ded9d0300f48432b820ad66b6a9052",
+      "files": [
+        "bitset",
+        "stack",
+        "__type_traits/is_char_like_type.h",
+        "__fwd/stack.h"
+      ],
+      "profile": "Original headers; native exception support unchanged; genuine target closure syntax probe passed"
     }
   ],
   "native_source_imports": [

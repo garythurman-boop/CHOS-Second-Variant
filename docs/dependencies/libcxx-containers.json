@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "project": "LLVM libc++",
+  "version": "19.1.7",
+  "upstream_commit": "cd708029e0b2869e80abe31ddb175f7c35361f90",
+  "source_archive_sha256": "b736109650ffc750dbdc506483347b3713ded9d0300f48432b820ad66b6a9052",
+  "authentication": "Existing pinned official HTTPS release archive; exact archive bytes and original header members verified, no release or commit signature claim",
+  "headers": {
+    "bitset": {
+      "sha256": "3daf1a3443717239d1df9983a7bf03b355192154b4bec3e91958a3023f21983f",
+      "git_blob_sha1": "6bd7bfe585f38a49397acb3bc94b23eca43efe2e",
+      "bytes": 39654,
+      "archive_member": "libcxx-19.1.7.src/include/bitset"
+    },
+    "stack": {
+      "sha256": "08a616c162b85657a1838bb07656943490c1ea2f8dc52e425a3e25df2e547025",
+      "git_blob_sha1": "90f8933cca3088a5c075587937a04c1d0c239c8b",
+      "bytes": 14142,
+      "archive_member": "libcxx-19.1.7.src/include/stack"
+    },
+    "__type_traits/is_char_like_type.h": {
+      "sha256": "c07295ab7c85e28384e227a32ef97f08be128ab428617900a0c0c9c1c9a88ceb",
+      "git_blob_sha1": "26205843047ca27ce93fc51afab77bd43b316fc0",
+      "bytes": 913,
+      "archive_member": "libcxx-19.1.7.src/include/__type_traits/is_char_like_type.h"
+    },
+    "__fwd/stack.h": {
+      "sha256": "d9f18205e68d5cf0ad3929f95c885af7ff15309048e081354093a78ff34aba6b",
+      "git_blob_sha1": "7dab6c1a4f4e2eaa3bb8ce0f0ca42813710b8862",
+      "bytes": 737,
+      "archive_member": "libcxx-19.1.7.src/include/__fwd/stack.h"
+    }
+  },
+  "native_probe": {
+    "status": "PASS",
+    "command": [
+      "clang++",
+      "--target=aarch64-none-elf",
+      "-D__CHOS__=1",
+      "-std=c++23",
+      "-fhosted",
+      "-fno-exceptions",
+      "-fno-rtti",
+      "-femulated-tls",
+      "-nostdinc++",
+      "-isystem",
+      "/workspace/chos-evidence/native-stdlib-containers-20261120/overlay",
+      "-isystem",
+      "/workspace/chos-evidence/webcore-link-20261112/memory/sdk9/include/c++/v1",
+      "-isystem",
+      "/workspace/chos-evidence/webcore-link-20261112/memory/sdk9/include",
+      "-fsyntax-only",
+      "/workspace/chos-evidence/native-stdlib-containers-20261120/probe.cpp"
+    ],
+    "returncode": 0
+  },
+  "stage3_complete": false
+}
