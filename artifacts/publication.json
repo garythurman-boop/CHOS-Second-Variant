@@ -7,7 +7,7 @@
   "schema": 1,
   "artifact_interval": 2,
   "iterations_since_artifacts": 0,
-  "last_counted_source_commit": "600498b03cb77ce9339b5971e76dab68cfee3e93",
+  "last_counted_source_commit": "ce1802c82cdf0bf1f1dc3ab8c5fc653e6788d793",
   "release_hold": {
     "active": false,
     "reason": "Superseded by user authorization for critical interim user-test binaries; Stage 3 completion remains gated",
@@ -16,5 +16,5 @@
   },
   "held_source_iterations": 30,
   "manual_milestones": true,
-  "milestone_source_iterations": 57
+  "milestone_source_iterations": 58
 }
