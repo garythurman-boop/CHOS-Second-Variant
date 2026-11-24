@@ -1558,8 +1558,10 @@ test: $(BUILD)/userland/futex_test.elf
 
 # Staged native headers, CRT and actual static runtime archives for external ports.
 NATIVE_SDK_ROOT ?= $(BUILD)/native-sdk
-native-sdk: $(BUILD)/userland/native_engine_abi.o $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(WIDE_ARCHIVE) $(STDIO_ARCHIVE) $(FORMAT_ARCHIVE) $(ICU_COMMON_ARCHIVE) $(ICU_BOOTSTRAP_DATA) $(ICU_I18N_ARCHIVE) $(ICU_FULL_DATA_ARCHIVE)
-	python3 tools/install_native_sdk.py --build $(BUILD) --out $(NATIVE_SDK_ROOT) $(foreach obj,$(LIBC_OBJECTS),--libc-object $(obj))
+# inet_ntop uses the SDK format archive. Legacy flat-object links omit optional SDK services.
+NATIVE_SDK_LIBC_OBJECTS := $(LIBC_OBJECTS) $(BUILD)/userland/libc/inet/inet_ntop.o
+native-sdk: $(BUILD)/userland/native_engine_abi.o $(BUILD)/userland/start.o $(NATIVE_STATIC_START) $(BUILD)/userland/native_abi.o $(NATIVE_SDK_LIBC_OBJECTS) $(LIBCPP_ARCHIVE) $(MUSL_MATH_ARCHIVE) $(MUSL_MATH_PUBLIC) $(QUAD_ARCHIVE) $(FLOAT_SCAN_ARCHIVE) $(COMPLEX_RT_ARCHIVE) $(WIDE_ARCHIVE) $(STDIO_ARCHIVE) $(FORMAT_ARCHIVE) $(ICU_COMMON_ARCHIVE) $(ICU_BOOTSTRAP_DATA) $(ICU_I18N_ARCHIVE) $(ICU_FULL_DATA_ARCHIVE)
+	python3 tools/install_native_sdk.py --build $(BUILD) --out $(NATIVE_SDK_ROOT) $(foreach obj,$(NATIVE_SDK_LIBC_OBJECTS),--libc-object $(obj))
 .PHONY: native-sdk
 
 test-native-sdk-installer:

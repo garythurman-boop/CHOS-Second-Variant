@@ -1,0 +1,19 @@
+{
+  "project": "musl",
+  "version": "1.2.5",
+  "commit": "0784374d561435f7c787a555aeab8ede699ed298",
+  "license": "third_party/musl/COPYRIGHT",
+  "adaptation": "Removed the sys/socket.h include. Address types and constants come from the native arpa/inet.h. The IPv4 formatting size check handles a negative snprintf result explicitly.",
+  "sources": {
+    "src/network/inet_pton.c": {
+      "upstream_sha256": "32a7094a7dc9eea10d067f5fcafbcf2651b86c459ff89cd3cd3f7b7f16e58bbe",
+      "target": "userland/libc/inet/inet_pton.c",
+      "target_sha256": "1d493a49cd34ec72e058e1afcf25f6f44aead75dd79eaafcf3829ea6a82b7cea"
+    },
+    "src/network/inet_ntop.c": {
+      "upstream_sha256": "f67c5afa4395699d32fe9f65e4d4fa7b94a7e5b63e7fcf08bb28b05234fab865",
+      "target": "userland/libc/inet/inet_ntop.c",
+      "target_sha256": "59815851e1e456fd16482644a9c77972b99bcca2c12cc286d620fd9ea34f8692"
+    }
+  }
+}

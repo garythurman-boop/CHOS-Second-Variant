@@ -11,6 +11,8 @@ p.add_argument('--out',type=pathlib.Path,required=True)
 p.add_argument('--native-sdk',type=pathlib.Path)
 p.add_argument('--font-build',type=pathlib.Path,required=True)
 p.add_argument('--fontconfig-build',type=pathlib.Path,help='Verified explicit-catalogue Fontconfig build; enables its real Cairo FT pattern backend')
+p.add_argument('--png-build', type=pathlib.Path, help='Verified libpng build for Cairo PNG streams')
+p.add_argument('--zlib-build', type=pathlib.Path, help='Verified full memory zlib build for libpng')
 p.add_argument('--host',action='store_true');p.add_argument('--sanitize',action='store_true')
 p.add_argument('--meson',default='meson');p.add_argument('--ninja',default='ninja')
 p.add_argument('--cmake',default='cmake')
@@ -41,6 +43,26 @@ sdk=o.native_sdk.resolve() if o.native_sdk else None
 if sdk:subprocess.run(['python3',str(root/'tools/verify_native_sdk.py'),str(sdk)],check=True)
 out=o.out.resolve();out.mkdir(parents=True,exist_ok=False);prefix=out/'prefix'
 dependency_prefixes=[prefix,font/'prefix']+([fc/'prefix',xml] if fc else [])
+png_dependencies = {}
+if bool(o.png_build) != bool(o.zlib_build):
+    p.error('--png-build and --zlib-build must be supplied together')
+if o.png_build:
+    for name, directory in [('png', o.png_build.resolve()), ('zlib', o.zlib_build.resolve())]:
+        metadata = json.loads((directory / 'build.json').read_text())
+        assert metadata['status'] == 'LINKED_NOT_EXECUTED'
+        assert metadata['host_reference'] == o.host and metadata['host_sanitizers'] == o.sanitize
+        assert metadata['source_manifest_sha256'] == sha(root / 'docs/dependencies/native-png.json')
+        for member, expected in metadata['installed_files_sha256'].items():
+            assert sha(directory / 'prefix' / member) == expected, member
+        png_dependencies[name] = sha(directory / 'build.json')
+        dependency_prefixes.append(directory / 'prefix')
+    # The upstream pkg-config file requests -lpng16, while the CHOS install
+    # exports libpng.a. Resolve that verified archive in this build's private pc.
+    pc = (o.png_build / 'prefix/lib/pkgconfig/libpng.pc').read_text()
+    assert pc.count('-lpng16') == 1
+    pc_dir = prefix / 'lib/pkgconfig'
+    pc_dir.mkdir(parents=True)
+    (pc_dir / 'libpng.pc').write_text(pc.replace('-lpng16', '-lpng'))
 env=os.environ.copy();env.update(PKG_CONFIG_PATH='',PKG_CONFIG_SYSROOT_DIR='',PKG_CONFIG_LIBDIR=':'.join(str(p/'lib/pkgconfig') for p in dependency_prefixes))
 meson=shutil.which(o.meson) or o.meson;ninja=shutil.which(o.ninja) or o.ninja
 commands=[];report={'status':'BUILDING','executed':False,'stage3_complete':False,'host_reference':o.host,'host_sanitizers':o.sanitize,'source_manifest_sha256':sha(root/'docs/dependencies/native-graphics.json'),'font_build_report_sha256':sha(font/'build.json'),'font_compilation_SDK_manifest_sha256':f['SDK_manifest_sha256'],'SDK_manifest_sha256':sha(sdk/'chos-sdk.json') if sdk else None,'commands':commands,'limits':['Software Cairo/pixman dependency,not WebCore/DOM/HTML/CSS or a modern browser','Image/recording/observer and explicit FreeType face backend;Fontconfig,PNG,PDF/PS/SVG output,display servers and GPU not supplied by this profile','Full upstream rendering corpus and production graphics/font isolation remain separate gates']}
@@ -49,6 +71,9 @@ if fc:
     report['fontconfig_build_report_sha256']=sha(fc/'build.json')
     report['fontconfig_dependency_files_sha256']=fc_report['dependency_files_sha256']
     report['limits'][1]='Image/recording/observer,FreeType face and real Fontconfig explicit-catalogue pattern backend;no default directory discovery/cache,PNG,PDF/PS/SVG output,display servers or GPU'
+if o.png_build:
+    report['png_dependency_report_sha256'] = png_dependencies
+    report['limits'][1] = 'Software Cairo including PNG image streams and FreeType; display servers and GPU remain unavailable'
 def run(name,args):
     commands.append(args);(out/'build.json').write_text(json.dumps(report,indent=2)+'\n')
     with (out/(name+'.log')).open('wb') as log:
@@ -78,11 +103,12 @@ report['port_patches_sha256']={p.name:sha(p) for p in patches}
 with (out/'cairo-patch.log').open('wb') as log:
     for patch in patches:
         subprocess.run(['patch','--batch','--fuzz=0','--no-backup-if-mismatch','-p1','-i',str(patch)],cwd=cairo_source,stdout=log,stderr=subprocess.STDOUT,check=True)
-run('cairo-setup',[*base,str(cairo),str(cairo_source),'-Dfreetype=enabled',*(['-Dfontconfig=enabled'] if fc else [])])
+run('cairo-setup',[*base,str(cairo),str(cairo_source),'-Dfreetype=enabled',*(['-Dpng=enabled'] if o.png_build else []),*(['-Dfontconfig=enabled'] if fc else [])])
 configuration=(cairo/'config.h').read_text()
 assert '#define CAIRO_HAS_REAL_PTHREAD 1' in configuration and '#define HAVE_C11_ATOMIC_PRIMITIVES 1' in configuration,'Real thread/atomic implementation required'
 assert 'CAIRO_NO_MUTEX' not in configuration
 features=(cairo/'src/cairo-features.h').read_text()
+if o.png_build:assert '#define CAIRO_HAS_PNG_FUNCTIONS 1' in features
 if fc:assert '#define CAIRO_HAS_FC_FONT 1' in features,'Real Fontconfig backend required'
 run('cairo-build',[ninja,'-C',str(cairo),'-j4']);run('cairo-install',[meson,'install','-C',str(cairo)])
 archives={}
@@ -91,16 +117,18 @@ for name in ['libcairo.a','libpixman-1.a']:
     if sdk:assert subprocess.check_output(['llvm-readelf','-h',str(path)],text=True).count('Machine:                           AArch64')==len(members)
     archives[name]={'bytes':path.stat().st_size,'sha256':sha(path),'members':len(members)}
 fixture='tests/native_cairo_fontconfig' if fc else 'tests/native_cairo'
+if o.png_build:fixture='tests/native_cairo_png'
 client_sources={n:sha(root/n) for n in [fixture+'/main.c',fixture+'/CMakeLists.txt']}
 cmake=shutil.which(o.cmake) or o.cmake
 application=out/'application'
 args=[cmake,'-S',str(root/fixture),'-B',str(application),'-G','Ninja','-DCMAKE_BUILD_TYPE=Release','-DCMAKE_MAKE_PROGRAM='+str(ninja),'-DGRAPHICS_PREFIX='+str(prefix),'-DFONT_PREFIX='+str(font/'prefix')]
+if o.png_build:args+=['-DPNG_PREFIX='+str(o.png_build.resolve()/'prefix'),'-DZLIB_PREFIX='+str(o.zlib_build.resolve()/'prefix')]
 if fc:args+=['-DFONTCONFIG_PREFIX='+str(fc/'prefix'),'-DXML_PREFIX='+str(xml)]
 if sdk:args+=['-DCMAKE_TOOLCHAIN_FILE='+str(root/'ports/native/chos-toolchain.cmake'),'-DCHOS_SDK_ROOT='+str(sdk),'-DCHOS_APPLICATION_PROFILE=engine']
 if o.sanitize:args+=['-DCMAKE_C_FLAGS=-fsanitize=address,undefined -fno-omit-frame-pointer','-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address,undefined']
 run('application-setup',args);run('application-build',[cmake,'--build',str(application),'-j4'])
 for name,wanted in client_sources.items():assert sha(root/name)==wanted,'Fixture source changed during build'
-elf=application/('native_cairo_fontconfig' if fc else 'native_cairo')
+elf=application/pathlib.Path(fixture).name
 if sdk:assert not subprocess.check_output(['llvm-nm','-u',str(elf)],text=True).strip(),'Unresolved target symbols'
 report.update(status='LINKED_NOT_EXECUTED',returncode=0,seconds=time.monotonic()-start,archives=archives,fixture_sources=client_sources,application={'path':str(elf),'sha256':sha(elf),'bytes':elf.stat().st_size},installed_files_sha256={str(p.relative_to(prefix)):sha(p) for p in sorted(prefix.rglob('*')) if p.is_file()})
 (out/'build.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({'status':report['status'],'archives':archives},indent=2))

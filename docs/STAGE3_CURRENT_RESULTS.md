@@ -1,5 +1,22 @@
 # Revised Stage 3 current evidence
 
+### Native address conversion, browser shuffle and PNG output
+
+WebCore can now use the CHOS SDK to parse and format IPv4 and IPv6 literals,
+convert network byte order, and shuffle user-agent brands using the pinned libc++
+default random engine. The address tests compared 4,096 round trips against the
+host socket library. Cairo's PNG stream fixture exercised callback failure and
+recovery and decoded each of 12 images to check all RGBA pixels. Both native
+fixtures passed three process lifetimes under each of direct and UEFI QEMU.
+The host and sanitizer regression suites passed. The new PNG profile retains
+Fontconfig support. [Validation results](validation/stage3-native-address-shuffle-png.json)
+
+The preceding checkpoint qualified certificate metadata and selected C++
+headers under both QEMU boot modes. Certificate trust policy and full WebCore
+page painting remain open. [Certificate tests](NATIVE_WEBCORE_CERTIFICATES.md)
+ · [Source locations](NATIVE_SOURCE_LOCATION.md) · [Containers](NATIVE_STDLIB_CONTAINERS.md)
+
+
 The current platform checkpoint adds [real Cairo Fontconfig rendering](NATIVE_CAIRO_FONTCONFIG.md),
 [the actual PAL digest API](NATIVE_WEBCORE_CRYPTO.md), and a guarded
 [native desktop screen query](NATIVE_GUI_SCREEN.md). Selected direct/UEFI

@@ -1,0 +1,212 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "component_tests": {
+    "address-shuffle": [
+      {
+        "result": {
+          "status": "PASS",
+          "mode": "direct",
+          "application_sha256": "50448496fe79216985d35d0c3af970c82b39a1f5359e21cf30b8fd12633611f9",
+          "harness_sha256": "905951d71e73b0f3fbb67c64a6b5c7907254f16a9afd146116b17d97f4502f39",
+          "cold_free_pages": 110684,
+          "boot_artifacts": {
+            "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+          },
+          "runs": [
+            {
+              "cycle": 0,
+              "pid": 1,
+              "cold_pages_restored": 110684
+            },
+            {
+              "cycle": 1,
+              "pid": 2,
+              "cold_pages_restored": 110684
+            },
+            {
+              "cycle": 2,
+              "pid": 3,
+              "cold_pages_restored": 110684
+            }
+          ],
+          "fixture": "address-shuffle",
+          "marker": "[ OK ] native WebCore IP address conversions and UA shuffle passed"
+        },
+        "result_sha256": "e04f68b89a1d841b44e573f7d3b256926051e7635adeba7828e156f68fb2a7b3"
+      },
+      {
+        "result": {
+          "status": "PASS",
+          "mode": "uefi",
+          "application_sha256": "50448496fe79216985d35d0c3af970c82b39a1f5359e21cf30b8fd12633611f9",
+          "harness_sha256": "905951d71e73b0f3fbb67c64a6b5c7907254f16a9afd146116b17d97f4502f39",
+          "cold_free_pages": 493298,
+          "boot_artifacts": {
+            "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+            "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+            "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+            "kernel_symbols_match_iso": true
+          },
+          "runs": [
+            {
+              "cycle": 0,
+              "pid": 1,
+              "cold_pages_restored": 493298
+            },
+            {
+              "cycle": 1,
+              "pid": 2,
+              "cold_pages_restored": 493298
+            },
+            {
+              "cycle": 2,
+              "pid": 3,
+              "cold_pages_restored": 493298
+            }
+          ],
+          "fixture": "address-shuffle",
+          "marker": "[ OK ] native WebCore IP address conversions and UA shuffle passed"
+        },
+        "result_sha256": "0a0b774c173bf09fd7de9d6b3ecb7f543befc13730a218920c5fbe980294dfaa"
+      }
+    ],
+    "cairo-png": [
+      {
+        "result": {
+          "status": "PASS",
+          "mode": "direct",
+          "application_sha256": "97eb39972a3830d4ded2cc507af306c5c3eeb8684eaeb15dcdff31f92ce260c5",
+          "harness_sha256": "905951d71e73b0f3fbb67c64a6b5c7907254f16a9afd146116b17d97f4502f39",
+          "cold_free_pages": 110684,
+          "boot_artifacts": {
+            "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+          },
+          "runs": [
+            {
+              "cycle": 0,
+              "pid": 1,
+              "cold_pages_restored": 110684
+            },
+            {
+              "cycle": 1,
+              "pid": 2,
+              "cold_pages_restored": 110684
+            },
+            {
+              "cycle": 2,
+              "pid": 3,
+              "cold_pages_restored": 110684
+            }
+          ],
+          "fixture": "cairo-png",
+          "marker": "[ OK ] Cairo PNG stream writes, callback failures and decoded pixels passed"
+        },
+        "result_sha256": "b98a84e5e1ae2de3a5f25485557abb3f743f5cd2b524c5eb33fed3f58b90644f"
+      },
+      {
+        "result": {
+          "status": "PASS",
+          "mode": "uefi",
+          "application_sha256": "97eb39972a3830d4ded2cc507af306c5c3eeb8684eaeb15dcdff31f92ce260c5",
+          "harness_sha256": "905951d71e73b0f3fbb67c64a6b5c7907254f16a9afd146116b17d97f4502f39",
+          "cold_free_pages": 493298,
+          "boot_artifacts": {
+            "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+            "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+            "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+            "kernel_symbols_match_iso": true
+          },
+          "runs": [
+            {
+              "cycle": 0,
+              "pid": 1,
+              "cold_pages_restored": 493298
+            },
+            {
+              "cycle": 1,
+              "pid": 2,
+              "cold_pages_restored": 493298
+            },
+            {
+              "cycle": 2,
+              "pid": 3,
+              "cold_pages_restored": 493298
+            }
+          ],
+          "fixture": "cairo-png",
+          "marker": "[ OK ] Cairo PNG stream writes, callback failures and decoded pixels passed"
+        },
+        "result_sha256": "5ff7ad7959984432fa0b2c54f729f43c8ee251d336b22a8ce24cfa8ccae2c272"
+      }
+    ]
+  },
+  "regressions": {
+    "host": {
+      "exit_code": 0,
+      "log_sha256": "afce66d97ab879234896deb3e3452f23c9ee32dc60eb37a366b67af83a2ef661"
+    },
+    "sanitizers": {
+      "exit_code": 0,
+      "log_sha256": "a41551c35c173f4f19f4e7b409852e54d263c0d660d3f0d73a6aff6dbbca9c3c"
+    }
+  },
+  "diagnostic_sdk_sha256": "cf48b99e4f0ac64872d56375437ce06adebd9cb8d685dbe964656345c49a8d52",
+  "graphics_builds": {
+    "host1": {
+      "application": {
+        "path": "/workspace/chos-evidence/cairo-png-20261123/host1/application/native_cairo_png",
+        "sha256": "b398779876dda6cb82edccd77f73787411914279e05cccdc6b410cf465ce304d",
+        "bytes": 72237664
+      },
+      "archives": {
+        "libcairo.a": {
+          "bytes": 25583024,
+          "sha256": "ae10439d171bad64de7540f25906912d8617deed205b3fc56c7b7be8b8c31083",
+          "members": 122
+        },
+        "libpixman-1.a": {
+          "bytes": 13937744,
+          "sha256": "bbcbf93a4197c80a497deefa51ba88049f944436a4743a23df8bdbf7c4b378ea",
+          "members": 31
+        }
+      },
+      "SDK_manifest_sha256": null,
+      "png_dependency_report_sha256": {
+        "png": "8134a4a86597b4e6d8dc696a2de224e086d6080a1aeb89d49fb63106397b90de",
+        "zlib": "70fc80362374d6789b797a6b7cf1d9760b900c1e9a425155669ed5f0123b86a2"
+      },
+      "fontconfig_build_report_sha256": "63e6b824428832bd5bd1c3d82302fe7bd075d986b7b7b1dbd5e30d19d3682e95",
+      "build_sha256": "ed99aa4633911d996a77a1d7c16417cef471890bd5cfdd804062c6b393769b1d"
+    },
+    "native1": {
+      "application": {
+        "path": "/workspace/chos-evidence/cairo-png-20261123/native1/application/native_cairo_png",
+        "sha256": "97eb39972a3830d4ded2cc507af306c5c3eeb8684eaeb15dcdff31f92ce260c5",
+        "bytes": 2625648
+      },
+      "archives": {
+        "libcairo.a": {
+          "bytes": 1986796,
+          "sha256": "f4e8196455e56f4d0465fe111b880d24525aaeadfc79c1c8284fda1a5a6074eb",
+          "members": 122
+        },
+        "libpixman-1.a": {
+          "bytes": 1023194,
+          "sha256": "d6a43703833555c88177bdf7ea2c63177ee756a0b53c130eebf661fe6f735547",
+          "members": 34
+        }
+      },
+      "SDK_manifest_sha256": "287114bc40e68681233449f140f41ec943ee8be04b00361b8fca71ff4c26684b",
+      "png_dependency_report_sha256": {
+        "png": "62878a89aecfeaed8d155b7fdf694737ed5a19c1749cad3a6e607a651690f511",
+        "zlib": "3923cf1bbc42872552eef19bd7268b7df171153d5f74be4dfa86dfe6f4526fa3"
+      },
+      "fontconfig_build_report_sha256": "75e7ef8c11227a5f9daf2c125c9e603dfbe4f3e6249d50be14d63e1aa904ad5d",
+      "build_sha256": "a72109c9aa8d0d7fbcfea3b946db223ee41bea96037abf1ce00ccad1c3286e04"
+    }
+  },
+  "cairo_host_sanitizer_log_sha256": "a16f608bd3996984dddd56bf6e37bb6f44558122ba1956e63a6bb63c3b5e37d1",
+  "known_failure": "Adding arpa/inet.h enabled the existing Mbed TLS IP-address verifier. Legacy native TLS initially failed to link inet_pton. Adding the parser to the common libc object list resolved the failure."
+}

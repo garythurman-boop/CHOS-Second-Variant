@@ -1,7 +1,8 @@
 # Freestanding CHOS-native allocation/string runtime, not a host libc link.
 LIBC_INCLUDES := -Iinclude -Iuserland/libc/include
 LIBC_SOURCES := userland/libc/pread.c userland/libc/strings.c userland/libc/calendar.c userland/libc/mman.c userland/libc/unistd.c userland/libc/platform.c userland/libc/ctype.c userland/libc/inttypes.c userland/libc/assert.c userland/libc/allocator.c userland/libc/stdlib.c userland/libc/string.c userland/libc/string_alloc.c userland/libc/prng.c userland/libc/time.c userland/libc/tls.c userland/libc/pthread_sync.c userland/libc/pthread.c userland/libc/emutls_adapter.c userland/libc/cxx_thread_atexit.c userland/libc/numeric.c userland/libc/unicode.c userland/libc/filename.c userland/libc/cxx_guard.c userland/libc/exit_registry.c userland/libc/exit.c
-LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h) include/chos/user_memory_limits.h include/chos/memory_api.h
+LIBC_SOURCES += userland/libc/inet.c userland/libc/inet/inet_pton.c
+LIBC_HEADERS := $(wildcard userland/libc/include/*.h userland/libc/include/chos/*.h userland/libc/include/sys/*.h userland/libc/include/netinet/*.h userland/libc/include/arpa/*.h) include/chos/user_memory_limits.h include/chos/memory_api.h
 CALENDAR_SOURCE_FILES := $(addprefix third_party/musl/src/time/,__tm_to_secs.c __secs_to_tm.c __year_to_secs.c __month_to_secs.c)
 CALENDAR_NATIVE_OBJECTS := $(patsubst third_party/musl/src/time/%.c,$(BUILD)/userland/libc/calendar/%.o,$(CALENDAR_SOURCE_FILES))
 CALENDAR_INCLUDES := -Iuserland/libc/calendar/include
@@ -318,3 +319,8 @@ test-stdlib-ext-sanitize: $(SAN_DIR)/test-stdlib-ext
 test: test-stdlib-ext
 test-sanitize: test-stdlib-ext-sanitize
 .PHONY: test-stdlib-ext test-stdlib-ext-sanitize
+
+.PHONY: test-inet-values
+test-inet-values:
+	python3 tests/test_inet_values.py
+test: test-inet-values
