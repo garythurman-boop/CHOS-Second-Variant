@@ -1,5 +1,15 @@
 # Revised Stage 3 current evidence
 
+### Full WebCore configuration and native resource values
+
+The page build now produces a runnable resource-value diagnostic using the full
+WebCore configuration. Three direct and three UEFI launches passed 39 groups
+per process, including certificate-record truncation, cross-thread copies,
+redirect privacy and public suffix handling. Each launch restored the guest's
+free-page count. The complete local HTML/CSS/JavaScript page still needs its
+platform methods linked and its pixel checks executed. [Build and reproduction](../ports/webcore-page/README.md)
+and [QEMU results](validation/stage3-webcore-page-values.json)
+
 ### Native key storage and public suffix rules
 
 RSA and EC key import/export passed independent byte and key-component checks.

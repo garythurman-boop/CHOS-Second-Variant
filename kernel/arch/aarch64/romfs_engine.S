@@ -4,5 +4,5 @@
 .global chos_romfs_engine_start
 .global chos_romfs_engine_end
 chos_romfs_engine_start:
-    .incbin "build/engine-test/native-engine.elf"
+    .incbin CHOS_ENGINE_ELF_PATH
 chos_romfs_engine_end:

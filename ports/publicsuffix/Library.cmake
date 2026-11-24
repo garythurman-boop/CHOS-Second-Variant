@@ -20,4 +20,4 @@ add_custom_command(OUTPUT "${_psl_output}/psl.c" "${_psl_output}/suffixes_dafsa.
 add_library(chos_publicsuffix STATIC "${_psl_output}/psl.c" "${_psl_source}/src/lookup_string_in_fixed_set.c")
 target_include_directories(chos_publicsuffix PUBLIC "${_psl_output}")
 target_compile_definitions(chos_publicsuffix PRIVATE BUILDING_PSL=1 ENABLE_BUILTIN=1 PSL_BUILTIN_ONLY=1 PACKAGE_VERSION="0.23.3")
-target_compile_options(chos_publicsuffix PRIVATE -ffunction-sections -fdata-sections)
+target_compile_options(chos_publicsuffix PRIVATE -UHAVE_CONFIG_H -ffunction-sections -fdata-sections)

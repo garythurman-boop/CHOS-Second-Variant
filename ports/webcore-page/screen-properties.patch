@@ -1,0 +1,17 @@
+--- a/Source/WebCore/platform/PlatformScreen.cpp
++++ b/Source/WebCore/platform/PlatformScreen.cpp
+@@ -26,7 +26,7 @@
+ #include "config.h"
+ #include "PlatformScreen.h"
+ 
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))
+ 
+ #include "ScreenProperties.h"
+ #include <wtf/Lock.h>
+@@ -126,4 +126,4 @@
+ 
+ } // namespace WebCore
+ 
+-#endif // PLATFORM(COCOA) || PLATFORM(GTK) || (PLATFORM(WPE) && ENABLE(WPE_PLATFORM))
++#endif // CHOS or existing native screen-property ports

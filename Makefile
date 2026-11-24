@@ -1737,21 +1737,22 @@ $(BUILD)/kernel/arch/aarch64/romfs_engine_empty.o: kernel/arch/aarch64/romfs_eng
 	$(CC) $(ASFLAGS) -c $< -o $@
 ENGINE_TEST_OBJECTS := $(filter-out $(BUILD)/kernel/arch/aarch64/romfs_engine_empty.o,$(OBJECTS))
 ENGINE_TEST_UEFI_OBJECTS := $(filter-out $(UEFI_KERNEL_BUILD)/kernel/arch/aarch64/romfs_engine_empty.o,$(UEFI_KERNEL_OBJECTS))
-$(BUILD)/engine-test/native-engine.elf:
+ENGINE_TEST_DIR ?= $(BUILD)/engine-test
+$(ENGINE_TEST_DIR)/native-engine.elf:
 	@echo 'Stage the real engine with tools/prepare_native_engine.py --application FILE' >&2
 	@false
-$(BUILD)/engine-test/romfs_engine.o: kernel/arch/aarch64/romfs_engine.S $(BUILD)/engine-test/native-engine.elf
+$(ENGINE_TEST_DIR)/romfs_engine.o: kernel/arch/aarch64/romfs_engine.S $(ENGINE_TEST_DIR)/native-engine.elf
 	@mkdir -p $(dir $@)
-	$(CC) $(ASFLAGS) -c $< -o $@
-$(BUILD)/engine-test/chos.elf: $(ENGINE_TEST_OBJECTS) $(BUILD)/engine-test/romfs_engine.o linker.ld
-	$(LD) $(LDFLAGS) -o $@ $(ENGINE_TEST_OBJECTS) $(BUILD)/engine-test/romfs_engine.o
-$(BUILD)/engine-test/uefi-kernel.elf: $(ENGINE_TEST_UEFI_OBJECTS) $(BUILD)/engine-test/romfs_engine.o linker.ld
-	$(LD) $(UEFI_KERNEL_LDFLAGS) -o $@ $(ENGINE_TEST_UEFI_OBJECTS) $(BUILD)/engine-test/romfs_engine.o
-$(BUILD)/engine-test/chos.iso: $(BUILD)/engine-test/uefi-kernel.elf $(BUILD)/uefi/BOOTAA64.EFI tools/mkuefi_iso.py
-	python3 tests/test_uefi_kernel.py $(BUILD)/engine-test/uefi-kernel.elf
-	python3 tools/mkuefi_iso.py --kernel $(BUILD)/engine-test/uefi-kernel.elf --efi $(BUILD)/uefi/BOOTAA64.EFI --esp-mib 64 --output $@
+	$(CC) $(ASFLAGS) '-DCHOS_ENGINE_ELF_PATH="$(abspath $(ENGINE_TEST_DIR)/native-engine.elf)"' -c $< -o $@
+$(ENGINE_TEST_DIR)/chos.elf: $(ENGINE_TEST_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o linker.ld
+	$(LD) $(LDFLAGS) -o $@ $(ENGINE_TEST_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o
+$(ENGINE_TEST_DIR)/uefi-kernel.elf: $(ENGINE_TEST_UEFI_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o linker.ld
+	$(LD) $(UEFI_KERNEL_LDFLAGS) -o $@ $(ENGINE_TEST_UEFI_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o
+$(ENGINE_TEST_DIR)/chos.iso: $(ENGINE_TEST_DIR)/uefi-kernel.elf $(BUILD)/uefi/BOOTAA64.EFI tools/mkuefi_iso.py
+	python3 tests/test_uefi_kernel.py $(ENGINE_TEST_DIR)/uefi-kernel.elf
+	python3 tools/mkuefi_iso.py --kernel $(ENGINE_TEST_DIR)/uefi-kernel.elf --efi $(BUILD)/uefi/BOOTAA64.EFI --esp-mib 64 --output $@
 .PHONY: engine-test-images
-engine-test-images: $(BUILD)/engine-test/chos.elf $(BUILD)/engine-test/chos.iso
+engine-test-images: $(ENGINE_TEST_DIR)/chos.elf $(ENGINE_TEST_DIR)/chos.iso
 
 $(BUILD)/kernel/mm/address_space.o $(UEFI_KERNEL_BUILD)/kernel/mm/address_space.o: kernel/mm/page_clear.h
 $(BUILD)/test-page-clear: tests/test_page_clear.c kernel/mm/page_clear.h

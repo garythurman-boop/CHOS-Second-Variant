@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "stage3_complete": false,
+  "derived_from": {
+    "Source/WebCore/platform/network/curl/ResourceRequest.h": {
+      "git_blob": "d6f770b201ce8d2befbed6550d5a360c61ef413d",
+      "sha256": "c6115a8f415715e3eff53bd1085cf1b0ce431cde361357250abb9aaf9c14173f"
+    },
+    "Source/WebCore/platform/network/curl/ResourceResponse.h": {
+      "git_blob": "b054c8fcec81e249da178db6712bad5f8953d56e",
+      "sha256": "27c016c4eba5b455d9eae0be18597f7fea142604f92254d3587f302fc363b2af"
+    },
+    "Source/WebCore/platform/network/curl/ResourceError.h": {
+      "git_blob": "ace8e48724354162cc202326ce1e8ea301e5d3db",
+      "sha256": "fa83121f1748e62c46aea5b6b8d0ab4f44a0a58f9f6c5dda99d9ecc2d031fe23"
+    },
+    "Source/WebCore/platform/network/curl/ResourceRequestCurl.cpp": {
+      "git_blob": "335893f23f76c3086fee3778d1f54ab3a632cb7c",
+      "sha256": "621c0be128afa5583a266060596f231618f16d2901da54d6caa9a8522f71dcc0"
+    },
+    "Source/WebCore/platform/network/curl/ResourceResponseCurl.cpp": {
+      "git_blob": "b354f4b3a2c549d012a324d1bba002656ac3e4fb",
+      "sha256": "3f8dd669bd122d5865af64b287772174b8cf099f5a1d85c975ac687b15d2bc28"
+    },
+    "Source/WebCore/platform/network/curl/ResourceErrorCurl.cpp": {
+      "git_blob": "58ed88ac89507470c94ade2ef6bfd87e3074940e",
+      "sha256": "da5e1652e6730c2a5ebf5da0d63ae173150ba4954aec893e8e7c26642e641e1c"
+    },
+    "Source/WebCore/platform/network/ResourceRequestBase.cpp": {
+      "git_blob": "e97d9f14885de22e1388b0db49eca892f6a0a1e2",
+      "sha256": "d8a9c335c3351163dae14be4820749aa94ad109dc1482996ebf87368e637bee8"
+    },
+    "Source/WebCore/platform/network/ResourceRequestBase.h": {
+      "git_blob": "19bc75508526b23003d64b7faf5de9d40306a5ba",
+      "sha256": "a1f296d02a17ec123242a80c89f8dfb9b45b3a71f97fff172bd8dde0feec7ada"
+    },
+    "Source/WebCore/platform/network/ResourceResponseBase.h": {
+      "git_blob": "d337fadbba6637f4c50b6574b776591e69792e4c",
+      "sha256": "f61a23af632fa1415bc7d1a129933a0dae368f5bf28ee20ac0dfe593c6ea491f"
+    },
+    "Source/WebCore/platform/network/FormData.cpp": {
+      "git_blob": "9f5b420da4fe7047831728dfe4263e6092c80b11",
+      "sha256": "3298ff05b8083f0ed228275ad87d66edf5f0a078dcf8f73a03bbc8dd7ecf54d3"
+    }
+  },
+  "scope": "Original source identity for the platform adapters and isolation patches"
+}

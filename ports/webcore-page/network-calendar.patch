@@ -1,0 +1,40 @@
+--- a/Source/WTF/wtf/ByteOrder.h
++++ b/Source/WTF/wtf/ByteOrder.h
+@@ -33,7 +33,7 @@
+ #include <bit>
+ #include <wtf/Platform.h>
+ 
+-#if OS(UNIX)
++#if OS(UNIX) || PLATFORM(CHOS)
+ #include <arpa/inet.h>
+ #endif
+ 
+--- a/Source/WebCore/platform/network/DNS.cpp
++++ b/Source/WebCore/platform/network/DNS.cpp
+@@ -38,7 +38,7 @@
+ #include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
+ #endif
+ 
+-#if OS(UNIX)
++#if OS(UNIX) || PLATFORM(CHOS)
+ #include <arpa/inet.h>
+ #endif
+ 
+--- a/Source/WebCore/dom/Document.cpp
++++ b/Source/WebCore/dom/Document.cpp
+@@ -7520,7 +7520,14 @@
+         dateTime = WallTime::now();
+ 
+     auto ctime = dateTime.value().secondsSinceEpoch().secondsAs<time_t>();
+-    auto localDateTime = std::localtime(&ctime);
++#if PLATFORM(CHOS)
++    struct tm storage;
++    auto* localDateTime = localtime_r(&ctime, &storage);
++#else
++    auto* localDateTime = std::localtime(&ctime);
++#endif
++    if (!localDateTime)
++        return emptyString();
+     return makeString(pad('0', 2, localDateTime->tm_mon + 1), '/',
+         pad('0', 2, localDateTime->tm_mday), '/',
+         pad('0', 4, 1900 + localDateTime->tm_year), ' ',

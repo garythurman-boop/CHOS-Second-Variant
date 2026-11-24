@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "development_version": "0.30.0",
+  "stage3_complete": false,
+  "upstream_commit": "32717fabcb9dcad9aa00a54ef1f23e41ee64e849",
+  "fresh_configure": {
+    "returncode": 0,
+    "upstream_WebCore_files_verified": 15977,
+    "published_source_files_verified": 9370,
+    "native_SDK_manifest_sha256": "cf48b99e4f0ac64872d56375437ce06adebd9cb8d685dbe964656345c49a8d52",
+    "engine_manifest_sha256": "c5f2aabcf448415a9567cb7f0d2d1ad11ace0c2ef44731f1c8ff0a810b1b4757",
+    "upstream_WebCore_inventory_sha256": "aadb93f32b7600067f63086428904b46326b41acac0b7619b66f8cbc3761d1ee",
+    "configure_log_sha256": "6f4a15420f0d2bd9b04e4b9f2f0b917cd9720ac20673e11feed28f339022f3f0"
+  },
+  "integrated_network_values": {
+    "compiled": true,
+    "linked": true,
+    "staged": {
+      "schema": 1,
+      "source_sha256": "c8a9f56b2cae6c02a7b3eb2724bc1b7b37316891608d6f2cabb447409db8ccf9",
+      "source_bytes": 35278112,
+      "staged_sha256": "ca2548a935a3253d9cc440c4c5310b8c231621be195da2a199600b07369173d2",
+      "staged_bytes": 34964352,
+      "original_policy": {
+        "accepted": true,
+        "resource_profile": 1,
+        "file_bytes": 35278112,
+        "virtual_bytes": 34959360,
+        "root_stack_pages": 256,
+        "segments": 3,
+        "executed": false
+      },
+      "staged_policy": {
+        "accepted": true,
+        "resource_profile": 1,
+        "file_bytes": 34964352,
+        "virtual_bytes": 34959360,
+        "root_stack_pages": 256,
+        "segments": 3,
+        "executed": false
+      },
+      "load_and_note_segments_identical": true,
+      "executed": false,
+      "limits": [
+        "Diagnostic ROMFS fixture only;normal images unchanged;no installer payload in diagnostic ISO",
+        "Successful staging is not VM/browser execution or Stage3 acceptance"
+      ]
+    },
+    "runs": [
+      {
+        "result": {
+          "status": "PASS",
+          "mode": "direct",
+          "application_sha256": "ca2548a935a3253d9cc440c4c5310b8c231621be195da2a199600b07369173d2",
+          "embedded_ROMFS": true,
+          "harness_sha256": "2f734e1aa1bd0b84a9bfe1cd3bd8475f58566c9c60b3af2c7f5c452ad1efda36",
+          "cold_free_pages": 102148,
+          "boot_artifacts": {
+            "kernel_sha256": "d96d0b23553c22efbebaac77ce5a0279aca4ff03abfd07b1a0e57f71f14f4265"
+          },
+          "runs": [
+            {
+              "cycle": 0,
+              "pid": 1,
+              "cold_pages_restored": 102148
+            },
+            {
+              "cycle": 1,
+              "pid": 2,
+              "cold_pages_restored": 102148
+            },
+            {
+              "cycle": 2,
+              "pid": 3,
+              "cold_pages_restored": 102148
+            }
+          ],
+          "checks": [
+            "Actual original WebCore Request/Response/Error/FormData and HTTP/origin value sources with CHOS owned values",
+            "Policy-preserving isolated copy, Base-typed self/reuse, independent body metadata, request/response/error serialization",
+            "Actual HTTP redirect credential/referrer handling, cache/filename metadata, privacy errors and three receiving pthreads",
+            "Three exit-zero native lifetimes, stable warm ownership and exact cold process/frame/futex cleanup"
+          ],
+          "limits": [
+            "Selected value types; no resource fetcher, WebCore page rendering or modern browser acceptance",
+            "QEMU only; new physical Fusion/Pi5/laptop execution not run; Stage 3 incomplete"
+          ]
+        },
+        "serial_sha256": "945f7a6a1d3b8c05dea18e54c9a6540698d27b9b947b19e6fa2d9917edf4b462"
+      },
+      {
+        "result": {
+          "status": "PASS",
+          "mode": "uefi",
+          "application_sha256": "ca2548a935a3253d9cc440c4c5310b8c231621be195da2a199600b07369173d2",
+          "embedded_ROMFS": true,
+          "harness_sha256": "2f734e1aa1bd0b84a9bfe1cd3bd8475f58566c9c60b3af2c7f5c452ad1efda36",
+          "cold_free_pages": 486514,
+          "boot_artifacts": {
+            "kernel_sha256": "0be3e061a8ac2ec4876e6bf4a471f1458331ef6a3bd7d0301026c30982a6d9fa",
+            "iso_sha256": "8ef6c9e60b44bb0a06bf52ade32891d5cc230bb0a3d2a79b4948b642ead7ff1c",
+            "iso_embedded_kernel_sha256": "0be3e061a8ac2ec4876e6bf4a471f1458331ef6a3bd7d0301026c30982a6d9fa",
+            "kernel_symbols_match_iso": true
+          },
+          "runs": [
+            {
+              "cycle": 0,
+              "pid": 1,
+              "cold_pages_restored": 486514
+            },
+            {
+              "cycle": 1,
+              "pid": 2,
+              "cold_pages_restored": 486514
+            },
+            {
+              "cycle": 2,
+              "pid": 3,
+              "cold_pages_restored": 486514
+            }
+          ],
+          "checks": [
+            "Actual original WebCore Request/Response/Error/FormData and HTTP/origin value sources with CHOS owned values",
+            "Policy-preserving isolated copy, Base-typed self/reuse, independent body metadata, request/response/error serialization",
+            "Actual HTTP redirect credential/referrer handling, cache/filename metadata, privacy errors and three receiving pthreads",
+            "Three exit-zero native lifetimes, stable warm ownership and exact cold process/frame/futex cleanup"
+          ],
+          "limits": [
+            "Selected value types; no resource fetcher, WebCore page rendering or modern browser acceptance",
+            "QEMU only; new physical Fusion/Pi5/laptop execution not run; Stage 3 incomplete"
+          ]
+        },
+        "serial_sha256": "4756c7bcb33d309a14b4a520e1838791d85866f6a74902d58501d2b1dc72758d"
+      }
+    ],
+    "completed_fixture_groups_per_process": 39,
+    "warm_allocations": 8,
+    "warm_mapped_bytes": 65536
+  },
+  "page": {
+    "linked": false,
+    "executed": false,
+    "baseline_link_unresolved_symbols": 49,
+    "baseline_link_log_sha256": "697cb8af4787bbf6dc130bb47b3658cca6565cbd543f9413ca31c356fc30796d",
+    "baseline_note": "Captured before adding native public suffix, certificate persistence, software scrollbars and the upstream manual-hyphenation profile. A new full link is needed."
+  }
+}

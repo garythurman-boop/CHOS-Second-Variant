@@ -1,0 +1,11 @@
+--- a/Source/WebCore/CMakeLists.txt
++++ b/Source/WebCore/CMakeLists.txt
+@@ -2264,5 +2264,7 @@
+ elseif (USE_LIBEPOXY)
+     list(APPEND WebCore_LIBRARIES Epoxy::Epoxy)
+-else ()
++# CHOS modification (2026-11-16): the explicit software-only port selects
++# no OpenGL/EGL sources and rejects GPU options in its platform configuration.
++elseif (NOT PORT STREQUAL "CHOS")
+     list(APPEND WebCore_LIBRARIES OpenGL::GLES)
+ 

@@ -25,6 +25,7 @@ public:
     int verificationError() const { return m_verificationError; }
     WEBCORE_EXPORT String verificationErrorDescription() const;
     const CertificateChain& certificateChain() const LIFETIME_BOUND { return m_certificateChain; }
+    std::optional<size_t> verifiedTrustAnchorIndex() const { return m_verifiedTrustAnchorIndex; }
     bool isEmpty() const { return m_certificateChain.isEmpty(); }
     WEBCORE_EXPORT bool containsNonRootSHA1SignedCertificate() const;
     WEBCORE_EXPORT std::optional<CertificateSummary> summary() const;

@@ -1,0 +1,10 @@
+# Actual generic PAL services and the independently qualified CHOS digest backend.
+list(APPEND PAL_SOURCES system/ClockGeneric.cpp system/Sound.cpp text/KillRing.cpp)
+if(NOT IS_DIRECTORY "${CHOS_PAL_DIGEST_DIR}")
+    message(FATAL_ERROR "CHOS_PAL_DIGEST_DIR must name the verified actual digest port")
+endif()
+if(NOT TARGET CHOS::PALDigest)
+    add_subdirectory("${CHOS_PAL_DIGEST_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/chos-pal-digest")
+endif()
+list(APPEND PAL_SOURCES "${CHOS_PAL_DIGEST_DIR}/CryptoDigestCHOS.cpp")
+list(APPEND PAL_LIBRARIES CHOS::PALDigest)

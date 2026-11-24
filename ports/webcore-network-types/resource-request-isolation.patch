@@ -1,0 +1,68 @@
+--- a/Source/WebCore/platform/network/ResourceRequestBase.cpp
++++ b/Source/WebCore/platform/network/ResourceRequestBase.cpp
+@@ -64,6 +64,13 @@
+ 
+ void ResourceRequestBase::setAsIsolatedCopy(const ResourceRequest& other)
+ {
++    // Read from a distinct value even when asked to isolate this same object.
++    // Otherwise replacing the destination can discard source policy/metadata.
++    if (this == &other) {
++        auto copy = other.isolatedCopy();
++        setAsIsolatedCopy(copy);
++        return;
++    }
+     setURL(other.url().isolatedCopy());
+     setCachePolicy(other.cachePolicy());
+     setTimeoutInterval(other.timeoutInterval());
+@@ -74,37 +81,32 @@
+     setInitiatorIdentifier(other.initiatorIdentifier().isolatedCopy());
+     setShouldBlockThirdPartyStorage(other.shouldBlockThirdPartyStorage());
+ 
+-    if (auto inspectorInitiatorNodeIdentifier = other.inspectorInitiatorNodeIdentifier())
+-        setInspectorInitiatorNodeIdentifier(*inspectorInitiatorNodeIdentifier);
+-
+-    if (!other.isSameSiteUnspecified())
+-        setIsSameSite(other.isSameSite());
++    m_inspectorInitiatorNodeIdentifier = other.inspectorInitiatorNodeIdentifier();
++    setSameSiteDisposition(other.sameSiteDisposition());
+     setIsTopSite(other.isTopSite());
+ 
+     updateResourceRequest();
+     m_requestData.m_httpHeaderFields = other.httpHeaderFields().isolatedCopy();
+ 
+-    size_t encodingCount = other.m_requestData.m_responseContentDispositionEncodingFallbackArray.size();
+-    if (encodingCount > 0) {
+-        String encoding1 = other.m_requestData.m_responseContentDispositionEncodingFallbackArray[0].isolatedCopy();
+-        String encoding2;
+-        String encoding3;
+-        if (encodingCount > 1) {
+-            encoding2 = other.m_requestData.m_responseContentDispositionEncodingFallbackArray[1].isolatedCopy();
+-            if (encodingCount > 2)
+-                encoding3 = other.m_requestData.m_responseContentDispositionEncodingFallbackArray[2].isolatedCopy();
+-        }
+-        ASSERT(encodingCount <= 3);
+-        setResponseContentDispositionEncodingFallbackArray(encoding1, encoding2, encoding3);
+-    }
+-    if (RefPtr httpBody = other.m_httpBody)
++    auto& encodings = m_requestData.m_responseContentDispositionEncodingFallbackArray;
++    const auto& sourceEncodings = other.m_requestData.m_responseContentDispositionEncodingFallbackArray;
++    encodings.clear();
++    encodings.reserveCapacity(sourceEncodings.size());
++    for (const auto& encoding : sourceEncodings)
++        encodings.append(encoding.isolatedCopy());
++    if (RefPtr httpBody = other.httpBody())
+         setHTTPBody(httpBody->isolatedCopy());
++    else
++        setHTTPBody(nullptr);
+     setAllowCookies(other.m_requestData.m_allowCookies);
+     setIsAppInitiated(other.isAppInitiated());
+     setPrivacyProxyFailClosedForUnreachableNonMainHosts(other.privacyProxyFailClosedForUnreachableNonMainHosts());
+     setUseAdvancedPrivacyProtections(other.useAdvancedPrivacyProtections());
+     setDidFilterLinkDecoration(other.didFilterLinkDecoration());
+     setIsPrivateTokenUsageByThirdPartyAllowed(other.isPrivateTokenUsageByThirdPartyAllowed());
++    setTargetAddressSpace(other.targetAddressSpace());
++    setWasSchemeOptimisticallyUpgraded(other.wasSchemeOptimisticallyUpgraded());
++    setHiddenFromInspector(other.hiddenFromInspector());
+ }
+ 
+ bool ResourceRequestBase::isEmpty() const

@@ -1,0 +1,11 @@
+--- a/Source/WebCore/platform/network/ResourceResponseBase.h
++++ b/Source/WebCore/platform/network/ResourceResponseBase.h
+@@ -271,7 +271,7 @@
+     short m_httpStatusCode { 0 };
+ 
+     bool m_isNull : 1 { true };
+-    unsigned m_initLevel : 3; // Controlled by ResourceResponse.
++    unsigned m_initLevel : 3 { Uninitialized }; // Controlled by ResourceResponse.
+     mutable UsedLegacyTLS m_usedLegacyTLS : bitWidthOfUsedLegacyTLS { UsedLegacyTLS::No };
+     mutable WasPrivateRelayed m_wasPrivateRelayed : bitWidthOfWasPrivateRelayed { WasPrivateRelayed::No };
+     String m_proxyName;

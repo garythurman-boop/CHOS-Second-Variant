@@ -1,0 +1,31 @@
+--- a/Source/WebCore/WebCorePrefix.h
++++ b/Source/WebCore/WebCorePrefix.h
+@@ -48,14 +48,18 @@
+ #endif // !OS(WINDOWS)
+ 
+ #include <sys/types.h>
++#if !PLATFORM(CHOS)
+ #include <fcntl.h>
++#endif
+ #if HAVE(REGEX_H)
+ #include <regex.h>
+ #endif
+ 
+ #include <setjmp.h>
+ 
++#if !PLATFORM(CHOS)
+ #include <signal.h>
++#endif
+ #include <stdarg.h>
+ #include <stddef.h>
+ #include <stdio.h>
+@@ -83,7 +87,9 @@
+ #if defined(__APPLE__)
+ #include <sys/param.h>
+ #endif
++#if !PLATFORM(CHOS)
+ #include <sys/stat.h>
++#endif
+ #if defined(__APPLE__)
+ #include <sys/time.h>
+ #include <sys/resource.h>

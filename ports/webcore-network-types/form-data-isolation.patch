@@ -1,0 +1,15 @@
+--- a/Source/WebCore/platform/network/FormData.cpp
++++ b/Source/WebCore/platform/network/FormData.cpp
+@@ -110,10 +110,10 @@
+ 
+ Ref<FormData> FormData::isolatedCopy() const
+ {
+-    // FIXME: isolatedCopy() does not copy m_identifier, m_boundary, or m_containsPasswordData.
+-    // Is all of that correct and intentional?
+     auto formData = create();
++    formData->m_identifier = m_identifier;
+     formData->m_alwaysStream = m_alwaysStream;
++    formData->m_boundary = m_boundary;
+     formData->m_elements = crossThreadCopy(m_elements);
+     return formData;
+ }
