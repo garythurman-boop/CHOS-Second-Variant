@@ -1,0 +1,171 @@
+--- a/Source/WebCore/platform/Pasteboard.h
++++ b/Source/WebCore/platform/Pasteboard.h
+@@ -102,7 +102,7 @@
+     HashMap<WebCore::FrameIdentifier, Ref<WebCore::LegacyWebArchive>> localFrameArchives;
+     Vector<WebCore::FrameIdentifier> remoteFrameIdentifiers;
+ #endif
+-#if PLATFORM(GTK) || PLATFORM(WPE) || PLATFORM(HAIKU)
++#if PLATFORM(CHOS) || PLATFORM(GTK) || PLATFORM(WPE) || PLATFORM(HAIKU)
+     String contentOrigin;
+     bool canSmartCopyOrDelete;
+     String text;
+@@ -119,7 +119,7 @@
+ #if PLATFORM(MAC)
+     String userVisibleForm;
+ #endif
+-#if PLATFORM(GTK) || PLATFORM(WPE) || PLATFORM(HAIKU)
++#if PLATFORM(CHOS) || PLATFORM(GTK) || PLATFORM(WPE) || PLATFORM(HAIKU)
+     String markup;
+ #endif
+ };
+@@ -156,7 +156,7 @@
+ public:
+     virtual ~PasteboardWebContentReader() = default;
+ 
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
+     virtual bool readFilePath(const String&, PresentationSize preferredPresentationSize = { }, const String& contentType = { }) = 0;
+     virtual bool readFilePaths(const Vector<String>&) = 0;
+     virtual bool readHTML(const String&) = 0;
+@@ -298,7 +298,7 @@
+     const PasteboardCustomData& readCustomData();
+ #endif
+ 
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
+     int64_t changeCount() const;
+ #else
+     int64_t changeCount() const { return 0; }
+--- a/Source/WebCore/editing/WebContentReader.h
++++ b/Source/WebCore/editing/WebContentReader.h
+@@ -63,7 +63,7 @@
+     WebContentReader(LocalFrame& frame, const SimpleRange& context, bool allowPlainText)
+         : FrameWebContentReader(frame)
+         , m_context(context)
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
+         , m_allowPlainText(allowPlainText)
+ #endif
+     {
+@@ -77,7 +77,7 @@
+     bool madeFragmentFromPlainText() const { return m_madeFragmentFromPlainText; }
+ 
+ private:
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
+     bool readFilePath(const String&, PresentationSize preferredPresentationSize = { }, const String& contentType = { }) override;
+     bool readFilePaths(const Vector<String>&) override;
+     bool readHTML(const String&) override;
+@@ -94,7 +94,7 @@
+ #endif
+ 
+     const SimpleRange m_context;
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
+     const bool m_allowPlainText;
+ #endif
+ 
+@@ -112,7 +112,7 @@
+     String takeMarkup() { return std::exchange(m_markup, { }); }
+ 
+ private:
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
+     bool readFilePath(const String&, PresentationSize = { }, const String& = { }) override { return false; }
+     bool readFilePaths(const Vector<String>&) override { return false; }
+     bool readHTML(const String&) override;
+--- a/Source/WebCore/editing/WebContentReader.cpp
++++ b/Source/WebCore/editing/WebContentReader.cpp
+@@ -52,7 +52,7 @@
+     return contentOrigin().isNull() ? MSOListQuirks::CheckIfNeeded : MSOListQuirks::Disabled;
+ }
+ 
+-#if PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(COCOA) || PLATFORM(GTK) || PLATFORM(WPE)
+ bool WebContentReader::readFilePaths(const Vector<String>& paths)
+ {
+     if (paths.isEmpty() || !frame().document())
+--- a/Source/WebCore/platform/StaticPasteboard.cpp
++++ b/Source/WebCore/platform/StaticPasteboard.cpp
+@@ -148,7 +148,7 @@
+ #if PLATFORM(COCOA)
+     markup = content.dataInHTMLFormat;
+     text = content.dataInStringFormat;
+-#elif PLATFORM(GTK) || USE(LIBWPE) || ENABLE(WPE_PLATFORM)
++#elif PLATFORM(CHOS) || PLATFORM(GTK) || USE(LIBWPE) || ENABLE(WPE_PLATFORM)
+     markup = content.markup;
+     text = content.text;
+ #else
+--- a/Source/WebCore/editing/glib/WebContentReaderGLib.cpp
++++ b/Source/WebCore/editing/glib/WebContentReaderGLib.cpp
+@@ -26,7 +26,7 @@
+ #include "config.h"
+ #include "WebContentReader.h"
+ 
+-#if PLATFORM(GTK) || PLATFORM(WPE)
++#if PLATFORM(CHOS) || PLATFORM(GTK) || PLATFORM(WPE)
+ #include "Blob.h"
+ #include "BlobURL.h"
+ #include "DOMURL.h"
+--- a/Source/WebCore/editing/glib/EditorGLib.cpp
++++ b/Source/WebCore/editing/glib/EditorGLib.cpp
+@@ -27,7 +27,7 @@
+ #include "config.h"
+ #include "Editor.h"
+ 
+-#if PLATFORM(GTK) || PLATFORM(WPE) || PLATFORM(HAIKU)
++#if PLATFORM(CHOS) || PLATFORM(GTK) || PLATFORM(WPE) || PLATFORM(HAIKU)
+ #include "CachedImage.h"
+ #include "ContainerNodeInlines.h"
+ #include "DocumentFragment.h"
+@@ -43,7 +43,9 @@
+ #include "RenderImage.h"
+ #include "SVGElementTypeHelpers.h"
+ #include "SVGImageElement.h"
++#if !PLATFORM(CHOS)
+ #include "SelectionData.h"
++#endif
+ #include "Settings.h"
+ #include "WebContentReader.h"
+ #include "XLinkNames.h"
+@@ -67,6 +69,7 @@
+         pasteAsFragment(fragment.releaseNonNull(), canSmartReplaceWithPasteboard(*pasteboard), chosePlainText, options.contains(PasteOption::IgnoreMailBlockquote) ? MailBlockquoteHandling::IgnoreBlockquote : MailBlockquoteHandling::RespectBlockquote);
+ }
+ 
++#if !PLATFORM(CHOS)
+ void Editor::platformCopyFont()
+ {
+ }
+@@ -74,6 +77,8 @@
+ void Editor::platformPasteFont()
+ {
+ }
++
++#endif
+ 
+ static String elementURL(Element& element)
+ {
+--- a/Source/WebCore/platform/PlatformKeyboardEvent.cpp
++++ b/Source/WebCore/platform/PlatformKeyboardEvent.cpp
+@@ -60,7 +60,7 @@
+     s_currentModifiers = modifiers;
+ }
+ 
+-#if PLATFORM(GTK) || USE(LIBWPE) || ENABLE(WPE_PLATFORM)
++#if PLATFORM(CHOS) || PLATFORM(GTK) || USE(LIBWPE) || ENABLE(WPE_PLATFORM)
+ OptionSet<PlatformEvent::Modifier> PlatformKeyboardEvent::currentStateOfModifierKeys()
+ {
+     if (s_currentModifiers)
+--- a/Source/WebCore/platform/StaticPasteboard.h
++++ b/Source/WebCore/platform/StaticPasteboard.h
+@@ -60,6 +60,10 @@
+     void read(PasteboardPlainText&, PlainTextURLReadingPolicy = PlainTextURLReadingPolicy::AllowURL, std::optional<size_t> = std::nullopt) final { }
+     void read(PasteboardWebContentReader&, WebContentReadingPolicy, std::optional<size_t> = std::nullopt) final { }
+ 
++#if PLATFORM(CHOS)
++    void read(PasteboardFileReader&, std::optional<size_t>) final;
++    void write(const PasteboardBuffer&) final;
++#endif
+     void write(const PasteboardURL&) final;
+     void write(const PasteboardImage&) final;
+     void write(const PasteboardWebContent&) final;

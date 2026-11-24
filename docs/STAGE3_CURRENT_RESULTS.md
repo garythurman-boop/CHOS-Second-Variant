@@ -1,5 +1,14 @@
 # Revised Stage 3 current evidence
 
+### Browser-process clipboard and keyboard modifier state
+
+Two WebCore pasteboard handles now share content and a change count. Origin
+filtering, private staging and reader reentry passed through three process
+lifetimes under each QEMU boot mode. The whole page still has 12 unresolved
+platform methods in the measured link, and its load span exceeds the 64 MiB
+executable limit. The link map identifies 32 MiB of embedded ICU data.
+[Clipboard results and reproduction](../tests/native_webcore_clipboard/README.md)
+
 ### Full WebCore configuration and native resource values
 
 The page build now produces a runnable resource-value diagnostic using the full

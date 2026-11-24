@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--out', type=pathlib.Path, required=True)
     parser.add_argument('--application', type=pathlib.Path, required=True)
     parser.add_argument('--image-root', type=pathlib.Path, required=True)
+    parser.add_argument('--fixture', choices=['network-values', 'clipboard'], default='network-values')
     parser.add_argument('--embedded', action='store_true', help='Application is the exact staged diagnostic ROMFS engine')
     parser.add_argument('--mode', choices=['direct', 'uefi'], default='direct')
     args = parser.parse_args()
@@ -47,7 +48,11 @@ def main():
         no_usb=False, usb_pci_bus=0, xhci_model='qemu-xhci', pci_virtio=True,
         net_model='e1000e', storage_error=False, nvme=False, no_rng=False,
         hub_depth=0, empty_usb=False, tablet=True)
-    marker = '[ OK ] actual WebCore request response error values passed; checks=39'
+    markers = {
+        'network-values': '[ OK ] actual WebCore request response error values passed; checks=39',
+        'clipboard': '[ OK ] native WebCore clipboard origin, reentry, buffers and modifiers passed',
+    }
+    marker = markers[args.fixture]
     failures = ('[FAIL]', '[FATAL]', '[USER FAULT]')
     guest = None
     runs = []
@@ -114,6 +119,12 @@ def main():
                 'Three exit-zero native lifetimes, stable warm ownership and exact cold process/frame/futex cleanup'],
             'limits': ['Selected value types; no resource fetcher, WebCore page rendering or modern browser acceptance',
                 'QEMU only; new physical Fusion/Pi5/laptop execution not run; Stage 3 incomplete']}
+        result['fixture'] = args.fixture
+        if args.fixture == 'clipboard':
+            result['checks'] = ['WebCore custom format origin filtering and private staging',
+                'Reader reentry with live replacement, indexed records and rich/plain fallback',
+                'Retained binary data, shared revision and modifier transitions',
+                'Three exit-zero lifetimes, stable warm heap and exact cold cleanup']
         (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     except Exception as error:
         (out / 'result.json').write_text(json.dumps({'status': 'FAIL', 'error': str(error), 'runs': runs}, indent=2) + '\n')
