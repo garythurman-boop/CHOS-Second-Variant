@@ -1,0 +1,60 @@
+--- a/psl.c
++++ b/psl.c
+@@ -30,7 +30,9 @@
+ #endif
+ 
+ #include <sys/types.h>
++#ifndef PSL_BUILTIN_ONLY
+ #include <sys/stat.h>
++#endif
+ 
+ #if defined(_WIN32) && (defined(WITH_LIBIDN2) || defined(WITH_LIBIDN))
+ # ifndef WIN32_LEAN_AND_MEAN
+@@ -1179,6 +1181,7 @@
+  *
+  * Since: 0.1
+  */
++#ifndef PSL_BUILTIN_ONLY
+ psl_ctx_t *psl_load_file(const char *fname)
+ {
+ 	FILE *fp;
+@@ -1364,6 +1367,8 @@
+  *
+  * Since: 0.1
+  */
++
++#endif
+ void psl_free(psl_ctx_t *psl)
+ {
+ 	if (psl && psl != &builtin_psl) {
+@@ -1530,6 +1535,7 @@
+  *
+  * Since: 0.10.0
+  */
++#ifndef PSL_BUILTIN_ONLY
+ int psl_builtin_outdated(void)
+ {
+ 	struct_stat st;
+@@ -1552,6 +1558,8 @@
+  *
+  * Since: 0.16
+  */
++
++#endif
+ const char *psl_dist_filename(void)
+ {
+ 	return _psl_dist_filename;
+@@ -2083,6 +2091,7 @@
+ }
+ 
+ /* if file is newer than the builtin data, insert it reverse sorted by mtime */
++#ifndef PSL_BUILTIN_ONLY
+ static int insert_file(const char *fname, const char **psl_fname, time_t *psl_mtime, int n)
+ {
+ 	struct_stat st;
+@@ -2148,3 +2157,5 @@
+ 	 * then return the builtin data. */
+ 	return psl ? psl : (psl_ctx_t *) psl_builtin();
+ }
++
++#endif

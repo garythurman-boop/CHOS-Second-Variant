@@ -1,0 +1,26 @@
+--- a/Source/WebCore/crypto/keys/CryptoKeyEC.h
++++ b/Source/WebCore/crypto/keys/CryptoKeyEC.h
+@@ -29,6 +29,10 @@
+ #include <WebCore/CryptoKeyPair.h>
+ 
+ #include <wtf/Platform.h>
++#if PLATFORM(CHOS)
++#include "PlatformCryptoKeyCHOS.h"
++#endif
++
+ #if OS(DARWIN) && !PLATFORM(GTK)
+ #include <WebCore/CommonCryptoUtilities.h>
+ 
+--- a/Source/WebCore/crypto/keys/CryptoKeyRSA.h
++++ b/Source/WebCore/crypto/keys/CryptoKeyRSA.h
+@@ -27,6 +27,10 @@
+ 
+ #include "CryptoKey.h"
+ #include <wtf/Function.h>
++
++#if PLATFORM(CHOS)
++#include "PlatformCryptoKeyCHOS.h"
++#endif
+ 
+ #if OS(DARWIN) && !PLATFORM(GTK)
+ #include "CommonCryptoUtilities.h"

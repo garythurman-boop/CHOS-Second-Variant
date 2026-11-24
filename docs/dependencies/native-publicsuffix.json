@@ -1,0 +1,23 @@
+{
+  "libpsl": {
+    "url": "https://github.com/rockdaboot/libpsl",
+    "version": "0.23.3",
+    "commit": "c486db8d221cbac55f87508d4da4db4497760997"
+  },
+  "rules": {
+    "url": "https://github.com/publicsuffix/list",
+    "commit": "faf981a207f390881e6c3bcc7b9a1d57b8db066f",
+    "commit_timestamp": 1795448958
+  },
+  "files": {
+    "third_party/libpsl/LICENSE": "e7c9f0d8498d28a360a7e8293ea70fd7bd952955b636938322c13d60a03b5a45",
+    "third_party/libpsl/src/LICENSE.chromium": "1d7f52747a9169751cdf2641a8299c0098e9ecdf9429296ffd55bdb14c9ed5b3",
+    "third_party/libpsl/src/psl.c": "b1c0fe26da82e50d693576ec68970a07d85064967b9aade4e41dbbf6c68d00cc",
+    "third_party/libpsl/src/lookup_string_in_fixed_set.c": "f7837e035486e6fc62fd897525f2f7abd8d8b50c4c696ba686205ebaace0bbc5",
+    "third_party/libpsl/src/psl-make-dafsa": "c598aeee7a0359fc3d67c0bdcd4345c315fc7dab7d5770ac0f57be65901c9617",
+    "third_party/libpsl/include/libpsl.h.in": "2f53a07f3a70e62ce95176c4c2b48f381a740e16c81c10d19ed34b611833a14b",
+    "third_party/publicsuffix/LICENSE": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172",
+    "third_party/publicsuffix/public_suffix_list.dat": "c83df04395f07a81145d0480e81a5e6793a39226597eec958e81759b192aa6b6",
+    "third_party/publicsuffix/tests/tests.txt": "61a3a502cf471d1a919d5e43c10e910023b0c4230e1db506f8e2ff0b47d2234e"
+  }
+}

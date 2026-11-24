@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "name": "MbedTLS auxiliary WebCore key writer",
+  "version": "3.6.7",
+  "upstream_commit": "068ff080b369adfac81509f9b57b2afabaf82dc5",
+  "upstream_repository": "https://github.com/Mbed-TLS/mbedtls",
+  "root": "third_party/mbedtls-webcore-keys",
+  "scope": "Original missing pkwrite.c and license only; existing shared source inventory/configurations remain unchanged",
+  "authentication": "Exact already-pinned commit and original Git blobs, independently byte-identical official immutable-commit HTTPS files; no signed-release claim",
+  "files": {
+    "library/pkwrite.c": "a9befea5ab74e3d9d7448f9790d7640b95fedf3c8386545bd7837962d26167c7",
+    "LICENSE": "9b405ef4c89342f5eae1dd828882f931747f71001cfba7d114801039b52ad09b"
+  },
+  "git_blobs": {
+    "library/pkwrite.c": "d264abfbd9a4bef56e4a31f4522194bf713d49c3",
+    "LICENSE": "776ac77eaf5a0da545f95ad7386b9954378fa8ae"
+  },
+  "official_https_comparison": [
+    {
+      "url": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/068ff080b369adfac81509f9b57b2afabaf82dc5/library/pkwrite.c",
+      "status": 200,
+      "sha256": "a9befea5ab74e3d9d7448f9790d7640b95fedf3c8386545bd7837962d26167c7",
+      "bytes": 20734
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/068ff080b369adfac81509f9b57b2afabaf82dc5/LICENSE",
+      "status": 200,
+      "sha256": "9b405ef4c89342f5eae1dd828882f931747f71001cfba7d114801039b52ad09b",
+      "bytes": 29852
+    }
+  ]
+}

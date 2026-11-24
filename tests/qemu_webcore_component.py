@@ -25,6 +25,7 @@ def main():
         'address-shuffle': '[ OK ] native WebCore IP address conversions and UA shuffle passed',
         'cairo-png': '[ OK ] Cairo PNG stream writes, callback failures and decoded pixels passed',
         'crypto-keys': '[ OK ] actual EC RSA key imports exports failures threads and cleanup passed',
+        'public-suffix': '[ OK ] public suffix rules and cookie-domain boundaries passed',
     }
     parser.add_argument('--fixture', choices=markers, required=True)
     args = parser.parse_args()

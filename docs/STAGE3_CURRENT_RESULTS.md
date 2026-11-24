@@ -1,5 +1,13 @@
 # Revised Stage 3 current evidence
 
+### Native key storage and public suffix rules
+
+RSA and EC key import/export passed independent byte and key-component checks.
+The public suffix library passed all 78 upstream registrable-domain tests and
+four additional cookie-domain and rule-category checks. Both fixtures passed
+under direct and UEFI QEMU. Browser-level WebCrypto, cookie handling and local
+page painting remain open. [Results and reproduction](NATIVE_WEBCORE_KEYS_AND_SUFFIXES.md)
+
 ### Native address conversion, browser shuffle and PNG output
 
 WebCore can now use the CHOS SDK to parse and format IPv4 and IPv6 literals,

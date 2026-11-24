@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "stage3_complete": false,
+  "development_version": "0.30.0",
+  "components": {
+    "crypto-keys": {
+      "qemu": [
+        {
+          "result": {
+            "status": "PASS",
+            "mode": "direct",
+            "application_sha256": "9029209c849217eeaad7a1be5b0908ef8037e58fb1ca7a685b9a02b7ce7ca29b",
+            "harness_sha256": "905951d71e73b0f3fbb67c64a6b5c7907254f16a9afd146116b17d97f4502f39",
+            "cold_free_pages": 110684,
+            "boot_artifacts": {
+              "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+            },
+            "runs": [
+              {
+                "cycle": 0,
+                "pid": 1,
+                "cold_pages_restored": 110684
+              },
+              {
+                "cycle": 1,
+                "pid": 2,
+                "cold_pages_restored": 110684
+              },
+              {
+                "cycle": 2,
+                "pid": 3,
+                "cold_pages_restored": 110684
+              }
+            ],
+            "fixture": "crypto-keys",
+            "marker": "[ OK ] actual EC RSA key imports exports failures threads and cleanup passed"
+          },
+          "serial_sha256": "13c035cde65edb0b8c0b791c92c31d7bee85e23ce35b234e7e5ef65a9aff4e3a"
+        },
+        {
+          "result": {
+            "status": "PASS",
+            "mode": "uefi",
+            "application_sha256": "9029209c849217eeaad7a1be5b0908ef8037e58fb1ca7a685b9a02b7ce7ca29b",
+            "harness_sha256": "905951d71e73b0f3fbb67c64a6b5c7907254f16a9afd146116b17d97f4502f39",
+            "cold_free_pages": 493298,
+            "boot_artifacts": {
+              "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+              "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+              "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+              "kernel_symbols_match_iso": true
+            },
+            "runs": [
+              {
+                "cycle": 0,
+                "pid": 1,
+                "cold_pages_restored": 493298
+              },
+              {
+                "cycle": 1,
+                "pid": 2,
+                "cold_pages_restored": 493298
+              },
+              {
+                "cycle": 2,
+                "pid": 3,
+                "cold_pages_restored": 493298
+              }
+            ],
+            "fixture": "crypto-keys",
+            "marker": "[ OK ] actual EC RSA key imports exports failures threads and cleanup passed"
+          },
+          "serial_sha256": "117dc6da2a4e6d14dec6774d5e5ff941f7f3706b9dc0e67abc347413c2daa1b2"
+        }
+      ],
+      "host": {
+        "compiler": "GCC",
+        "sanitizers": [
+          "address",
+          "undefined",
+          "leak"
+        ],
+        "successful_imports": 8,
+        "private_exports": 4,
+        "refused_cases": 54,
+        "allocation_trials": 25718,
+        "log_sha256": "ecf9ce840597bae87a8edf479129c100b22d329dd2f62d5aed6855d0dfb2d124",
+        "executable_sha256": "423496185acf2916b6568065e844f4820917f2ff72ad8fd007ba225f45443c4f"
+      },
+      "native_allocation_trials_per_run": 99,
+      "oracle_manifest_sha256": "a59f50bb349ce4aadd1ca1d8841991c349247358c745f8456bf1f5c88cf51540",
+      "input_manifest_sha256": "0bee3212729514307800665a3dd95d97124f3356ccde0b644817640a6409ba96"
+    },
+    "public-suffix": {
+      "qemu": [
+        {
+          "result": {
+            "status": "PASS",
+            "mode": "direct",
+            "application_sha256": "f14f4fcd9327f2f922ac7017d148fba8dbc6cd5803db2d48e37b8822e237bb73",
+            "harness_sha256": "a0a2fa6b3f0628851d7dc2982841935313045b18dbea278eaf0b2ae5e040cf8e",
+            "cold_free_pages": 110684,
+            "boot_artifacts": {
+              "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+            },
+            "runs": [
+              {
+                "cycle": 0,
+                "pid": 1,
+                "cold_pages_restored": 110684
+              },
+              {
+                "cycle": 1,
+                "pid": 2,
+                "cold_pages_restored": 110684
+              },
+              {
+                "cycle": 2,
+                "pid": 3,
+                "cold_pages_restored": 110684
+              }
+            ],
+            "fixture": "public-suffix",
+            "marker": "[ OK ] public suffix rules and cookie-domain boundaries passed"
+          },
+          "serial_sha256": "cbf9a040f829f5d1b8b1571d816643c7238e36541f011768a2a3fd65b74d92e0"
+        },
+        {
+          "result": {
+            "status": "PASS",
+            "mode": "uefi",
+            "application_sha256": "f14f4fcd9327f2f922ac7017d148fba8dbc6cd5803db2d48e37b8822e237bb73",
+            "harness_sha256": "a0a2fa6b3f0628851d7dc2982841935313045b18dbea278eaf0b2ae5e040cf8e",
+            "cold_free_pages": 493298,
+            "boot_artifacts": {
+              "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+              "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+              "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+              "kernel_symbols_match_iso": true
+            },
+            "runs": [
+              {
+                "cycle": 0,
+                "pid": 1,
+                "cold_pages_restored": 493298
+              },
+              {
+                "cycle": 1,
+                "pid": 2,
+                "cold_pages_restored": 493298
+              },
+              {
+                "cycle": 2,
+                "pid": 3,
+                "cold_pages_restored": 493298
+              }
+            ],
+            "fixture": "public-suffix",
+            "marker": "[ OK ] public suffix rules and cookie-domain boundaries passed"
+          },
+          "serial_sha256": "c6818b23982c328fbbb0df12ddcefd79365dc48df13aaf6d91a99f48f8e24f72"
+        }
+      ],
+      "host": {
+        "compiler": "GCC",
+        "sanitizers": [
+          "address",
+          "undefined",
+          "leak"
+        ],
+        "executable_sha256": "0d4c40897a513d7229b75ea9c6e904fde4f51f19067ee4397ac3084f19dae1f8"
+      },
+      "official_registrable_domain_cases": 78,
+      "private_icann_and_cookie_checks": 4,
+      "generated_rules_sha256": "0fa0d4274978a56d8036cc35ac43382ba0aafe53f92e31cb64a78cb27510ae45"
+    }
+  }
+}
