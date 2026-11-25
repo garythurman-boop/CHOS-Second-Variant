@@ -56,3 +56,11 @@ certificate metadata encoding and WebCore's public suffix API. Its diagnostic
 kernel embeds the ELF to accommodate the ICU data. Production browser
 navigation and the local page's geometry and pixel checks remain open.
 [Local page fixture](../../tests/native_webcore_page/README.md)
+
+For the local page, build the nine CHFS files from the verified ICU data. Place
+the resulting `ICU0.DAT` through `ICU8.DAT` in the guest's `/ICU` directory.
+The loader checks each file's size and SHA-256 before registering any with ICU.
+
+```sh
+python3 tools/prepare_webcore_icu_data.py --source build/icu-data --out "$icu_assets"
+```

@@ -1,0 +1,60 @@
+{
+  "source_sha256": "208a8392975e81a351fd9e3759f7a2c7a5659c97ef258c7a7435e2d9c31a61ce",
+  "resource_count": 4321,
+  "files": [
+    {
+      "name": "ICU0.DAT",
+      "bytes": 3728848,
+      "sha256": "20769253c926005ed31fd7821a4efd780733a6aca2a8a2875f72cbbdbc150581",
+      "entries": 461
+    },
+    {
+      "name": "ICU1.DAT",
+      "bytes": 3728784,
+      "sha256": "661c5284cfa9dd73db873addb9960577c3ee0288b98fbf5276015570b557bf3c",
+      "entries": 479
+    },
+    {
+      "name": "ICU2.DAT",
+      "bytes": 3728832,
+      "sha256": "38bb6b9c070b9d9b92e298001576c4e80194d2e530e9a069613fa4aa3778e212",
+      "entries": 482
+    },
+    {
+      "name": "ICU3.DAT",
+      "bytes": 3728864,
+      "sha256": "865cadf796383dbb4468eb069587b52ff4b9d02c41978fbd6cdf95a88d1f32f0",
+      "entries": 483
+    },
+    {
+      "name": "ICU4.DAT",
+      "bytes": 3728832,
+      "sha256": "726cd729ddf1c95cc6b37f01d59bab0f98752ad20af829c80e0ade7c7876cdb5",
+      "entries": 483
+    },
+    {
+      "name": "ICU5.DAT",
+      "bytes": 3728832,
+      "sha256": "082e697f6a42f901ac1275d7f848a42f7f2f5e5fa763056efd2b227586e338a3",
+      "entries": 483
+    },
+    {
+      "name": "ICU6.DAT",
+      "bytes": 3728864,
+      "sha256": "533f69075e4563090f6b5daa3440742820396cda903ae829c96ebb8806e0bdaa",
+      "entries": 484
+    },
+    {
+      "name": "ICU7.DAT",
+      "bytes": 3728768,
+      "sha256": "886f021ac709f31c8776cfb854ca30de88fca11b32e63ce45c8b0f384650a45c",
+      "entries": 483
+    },
+    {
+      "name": "ICU8.DAT",
+      "bytes": 3728768,
+      "sha256": "174a0d1b81ec847bc33e05d185cc98078cf6af8939187a44d576ddeae19e5cdd",
+      "entries": 483
+    }
+  ]
+}

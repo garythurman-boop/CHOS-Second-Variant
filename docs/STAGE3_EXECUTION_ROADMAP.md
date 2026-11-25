@@ -45,6 +45,7 @@ also passes complete/fragmented decoding and cleanup with the qualified engine
 allocator. Direct and UEFI tests compare every visible frame pixel. Broader codec,
 security and platform qualification remains open. Native XML, SQLite, zlib, WebP and explicit Fontconfig catalogue prerequisites
 now have selected execution evidence, as does original WebCore local buffer ownership.
-Next: finish the real CHOS WebCore/PAL generated configuration, font/graphics and
-digest backends, then reach local HTML/CSS/DOM painting. See [image execution](NATIVE_WEBCORE_IMAGES.md)
+The unified WebCore configuration now builds the component diagnostics. Finish
+session cookies, load deferral and software layer creation, then check local
+HTML/CSS layout and JavaScript-driven pixels in the guest. See [image execution](NATIVE_WEBCORE_IMAGES.md)
 and [the full port boundary](WEBCORE_PORT_BOUNDARY.md).

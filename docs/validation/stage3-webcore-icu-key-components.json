@@ -1,0 +1,264 @@
+{
+  "icu_version": "79.1",
+  "icu_resources": 4321,
+  "icu_packages": 9,
+  "sanitized_key_backend": [
+    "[KEY PROFILE] actual SPKI/PKCS8 ownership; TEST-ONLY keys; no signatures or key generation claimed",
+    "[KEY COMPONENTS] RSA public/private/CRT and EC raw/private coordinate oracles passed",
+    "[KEY CHECKS] keys=8 exports=4 refusals=54 allocation_trials=25717",
+    "[ OK ] actual EC RSA key imports exports failures threads and cleanup passed"
+  ],
+  "local_page_link": "Eight unresolved WebCore methods at this checkpoint. Local page has not run.",
+  "guest_runs": [
+    {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "9e4ce4ef74c16e1943a2e51efe8ebbf12e33c0f18034aab618efacfd072af8f5",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 110684,
+      "boot_artifacts": {
+        "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 110684
+        }
+      ],
+      "fixture": "icu-files",
+      "marker": "[ OK ] incomplete or altered ICU packages refused and released",
+      "icu_variant": "altered"
+    },
+    {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "9e4ce4ef74c16e1943a2e51efe8ebbf12e33c0f18034aab618efacfd072af8f5",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 110684,
+      "boot_artifacts": {
+        "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 110684
+        }
+      ],
+      "fixture": "icu-files",
+      "marker": "[ OK ] external ICU data normalization collation numbers breaks locales passed",
+      "icu_variant": "complete"
+    },
+    {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "9e4ce4ef74c16e1943a2e51efe8ebbf12e33c0f18034aab618efacfd072af8f5",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 110684,
+      "boot_artifacts": {
+        "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 110684
+        }
+      ],
+      "fixture": "icu-files",
+      "marker": "[ OK ] incomplete or altered ICU packages refused and released",
+      "icu_variant": "missing"
+    },
+    {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "9e4ce4ef74c16e1943a2e51efe8ebbf12e33c0f18034aab618efacfd072af8f5",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 493298,
+      "boot_artifacts": {
+        "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+        "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "kernel_symbols_match_iso": true
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 493298
+        }
+      ],
+      "fixture": "icu-files",
+      "marker": "[ OK ] incomplete or altered ICU packages refused and released",
+      "icu_variant": "altered"
+    },
+    {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "9e4ce4ef74c16e1943a2e51efe8ebbf12e33c0f18034aab618efacfd072af8f5",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 493298,
+      "boot_artifacts": {
+        "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+        "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "kernel_symbols_match_iso": true
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 493298
+        }
+      ],
+      "fixture": "icu-files",
+      "marker": "[ OK ] external ICU data normalization collation numbers breaks locales passed",
+      "icu_variant": "complete"
+    },
+    {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "9e4ce4ef74c16e1943a2e51efe8ebbf12e33c0f18034aab618efacfd072af8f5",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 493298,
+      "boot_artifacts": {
+        "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+        "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "kernel_symbols_match_iso": true
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 493298
+        }
+      ],
+      "fixture": "icu-files",
+      "marker": "[ OK ] incomplete or altered ICU packages refused and released",
+      "icu_variant": "missing"
+    },
+    {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "4058da93ff8e5ea7cf333b199b45723d861ac1fff90fc13fd92c6ba17fa9f94a",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 110684,
+      "boot_artifacts": {
+        "kernel_sha256": "625d441031fa16666fa757e26972e4b9535cc28359730d1f0c7e3189080c36f5"
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 110684
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 110684
+        }
+      ],
+      "fixture": "crypto-keys",
+      "marker": "[ OK ] actual EC RSA key imports exports failures threads and cleanup passed"
+    },
+    {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "4058da93ff8e5ea7cf333b199b45723d861ac1fff90fc13fd92c6ba17fa9f94a",
+      "harness_sha256": "ff8406678962bdae862b15eec4ece52415a9e197ebb06d016a48196bb2159944",
+      "cold_free_pages": 493298,
+      "boot_artifacts": {
+        "kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "iso_sha256": "a1afe068731503d1701a23e7dcfb362dad5c420b19d0468cb5007253232a5141",
+        "iso_embedded_kernel_sha256": "55f3de6bc00ed172afe7081059391c8d51a91c196b07dec494d2236f0ac65b2f",
+        "kernel_symbols_match_iso": true
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 493298
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 493298
+        }
+      ],
+      "fixture": "crypto-keys",
+      "marker": "[ OK ] actual EC RSA key imports exports failures threads and cleanup passed"
+    }
+  ]
+}

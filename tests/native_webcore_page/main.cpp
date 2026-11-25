@@ -1,6 +1,7 @@
 /* Local trusted-document diagnostic. Uses the original internal headless Page
  * workflow; it is not the browser or a network-loading implementation. */
 #include "config.h"
+#include "BrowserICUData.h"
 #include <WebCore/Color.h>
 #include <WebCore/Document.h>
 #include <WebCore/DocumentLoader.h>
@@ -158,6 +159,7 @@ static int page_case()
 
 int main()
 {
+    CHECK(!chos_browser_icu_init());
     CHECK(!fonts());
     ScriptController::initializeMainThread();
     WTF::RunLoop::initializeMain();

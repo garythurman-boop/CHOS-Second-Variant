@@ -67,7 +67,8 @@ if(NOT TARGET CHOS::CryptoKeys)
     include("${CHOS_WEBCORE_CRYPTO_KEYS_DIR}/Keys.cmake")
 endif()
 list(APPEND WebCore_LIBRARIES CHOS::CryptoKeys)
-list(APPEND WebCore_SOURCES "${CHOS_WEBCORE_CRYPTO_KEYS_DIR}/CryptoKeyDERCHOS.cpp")
+list(APPEND WebCore_SOURCES "${CHOS_WEBCORE_CRYPTO_KEYS_DIR}/CryptoKeyDERCHOS.cpp"
+    "${CHOS_WEBCORE_CRYPTO_KEYS_DIR}/CryptoAlgorithmRegistryCHOS.cpp")
 
 if(NOT IS_DIRECTORY "${CHOS_WEBCORE_PLATFORM_DIR}")
     message(FATAL_ERROR "Provide the actual CHOS software platform policy sources")
@@ -93,7 +94,12 @@ endif()
 # Static WebCore propagates bindings, DOM/rendering, and style object libraries
 # via its link interface. The diagnostic consumes that same interface.
 add_executable(CHOSLocalPage EXCLUDE_FROM_ALL "${WEBCORE_DIR}/platform/chos/LocalPageDiagnostic.cpp")
-target_link_libraries(CHOSLocalPage PRIVATE WebCore)
+add_subdirectory("${CHOS_WEBCORE_PLATFORM_DIR}/../icu/browser-data" "${CMAKE_CURRENT_BINARY_DIR}/chos-browser-icu")
+target_link_libraries(CHOSLocalPage PRIVATE WebCore chos_browser_icu_data)
+# ICU resolves individual resources from the verified packages registered at
+# startup. Its upstream bootstrap object supplies the required default symbol.
+target_link_options(CHOSLocalPage PRIVATE "-Wl,--icf=safe"
+    "-Wl,--whole-archive,${CHOS_SDK_ROOT}/lib/libicustubdata.a,--no-whole-archive")
 target_include_directories(CHOSLocalPage PRIVATE "$<TARGET_PROPERTY:WebCore,INCLUDE_DIRECTORIES>")
 target_compile_definitions(CHOSLocalPage PRIVATE "$<TARGET_PROPERTY:WebCore,COMPILE_DEFINITIONS>")
 target_link_options(CHOSLocalPage PRIVATE "-Wl,--strip-debug" "-Wl,-Map,${CMAKE_BINARY_DIR}/CHOSLocalPage.map")

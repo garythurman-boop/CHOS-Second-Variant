@@ -1,5 +1,16 @@
 # Revised Stage 3 current evidence
 
+### Browser ICU data and cryptographic key components
+
+The local-page target now loads all 4,321 ICU resources from nine verified CHFS
+files. This brings its measured load span below the 64 MiB executable limit.
+Under direct and UEFI QEMU, the native ICU fixture loaded complete data and
+refused missing and altered packages on each of three launches per case.
+RSA and EC key components passed independent oracle checks under both boots.
+The host key test completed 25,717 allocation-failure trials under sanitizers.
+The local page still needs eight platform methods and its first rendering test.
+[Guest results and key checks](validation/stage3-webcore-icu-key-components.json)
+
 ### Browser-process clipboard and keyboard modifier state
 
 Two WebCore pasteboard handles now share content and a change count. Origin

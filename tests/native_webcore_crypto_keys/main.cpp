@@ -145,6 +145,70 @@ static int sweep_rng(void *closure, unsigned char *output, size_t length)
     return 0;
 }
 
+static int key_components()
+{
+    for (const auto& spec : key_cases) {
+        if (spec.family == CHOS_KEY_RSA) {
+            auto number = [](KeyBytes input) -> chos_key_number { return { input.data, input.size }; };
+            chos_rsa_components values { };
+            values.n = number(spec.n);
+            values.e = number(spec.e);
+            Key publicKey(chos_key_from_rsa_numbers(&values, 0));
+            CHECK(publicKey && !export_check(spec, publicKey.get(), 0, false, nullptr));
+            values.d = number(spec.d);
+            CHECK(!chos_key_from_rsa_numbers(&values, 0));
+            Key recovered(chos_key_from_rsa_numbers(&values, 1));
+            CHECK(recovered);
+            uint8_t* der = nullptr;
+            size_t bytes = 0;
+            CHECK(!chos_webcore_key_export_spki(recovered.get(), &der, &bytes));
+            CHECK(bytes == spec.spki.size && !memcmp(der, spec.spki.data, bytes));
+            chos_webcore_key_free_bytes(der, bytes);
+            values.p = number(spec.p);
+            values.q = number(spec.q);
+            values.dp = number(spec.dp);
+            values.dq = number(spec.dq);
+            CHECK(!chos_key_from_rsa_numbers(&values, 1));
+            values.qi = number(spec.qi);
+            Key privateKey(chos_key_from_rsa_numbers(&values, 1));
+            CHECK(privateKey && !export_check(spec, privateKey.get(), 0, false, nullptr));
+            const KeyBytes expected[] = { spec.n, spec.e, spec.d, spec.p, spec.q, spec.dp, spec.dq, spec.qi };
+            uint8_t encoded[CHOS_RSA_MAX_WIDTH];
+            size_t count = 0;
+            for (unsigned field = CHOS_RSA_N; field <= CHOS_RSA_QI; ++field) {
+                CHECK(!chos_key_rsa_field(privateKey.get(), static_cast<chos_rsa_field>(field), encoded, &count));
+                CHECK(count == expected[field].size && !memcmp(encoded, expected[field].data, count));
+            }
+            CHECK(chos_key_rsa_field(publicKey.get(), CHOS_RSA_D, encoded, &count));
+            chos_key_clear_secret(encoded, sizeof(encoded));
+            const uint8_t one = 1;
+            values.qi = { &one, 1 };
+            CHECK(!chos_key_from_rsa_numbers(&values, 1));
+        } else {
+            auto point = spec.raw_public;
+            Key publicKey(chos_key_from_ec_point(spec.curve_bits, point.data, point.size, nullptr, 0, nullptr, nullptr));
+            CHECK(publicKey && !export_check(spec, publicKey.get(), 0, false, nullptr));
+            uint8_t raw[1 + 2 * CHOS_EC_MAX_WIDTH], scalar[CHOS_EC_MAX_WIDTH];
+            size_t width = 0;
+            CHECK(!chos_key_ec_fields(publicKey.get(), raw, nullptr, &width));
+            CHECK(width == spec.x.size && !memcmp(raw + 1, spec.x.data, width) && !memcmp(raw + 1 + width, spec.y.data, width));
+            CHECK(chos_key_ec_fields(publicKey.get(), raw, scalar, &width));
+            Key privateKey(chos_key_from_ec_point(spec.curve_bits, point.data, point.size, spec.d.data, spec.d.size, os_rng, nullptr));
+            CHECK(privateKey && !chos_key_ec_fields(privateKey.get(), raw, scalar, &width));
+            CHECK(width == spec.d.size && !memcmp(scalar, spec.d.data, width) && !memcmp(raw, point.data, point.size));
+            scalar[width - 1] ^= 1;
+            CHECK(!chos_key_from_ec_point(spec.curve_bits, point.data, point.size, scalar, width, os_rng, nullptr));
+            CHECK(!chos_key_from_ec_point(spec.curve_bits, point.data, point.size, spec.d.data, width, no_rng, nullptr));
+            CHECK(!chos_key_from_ec_point(spec.curve_bits, point.data, point.size - 1, nullptr, 0, nullptr, nullptr));
+            memset(raw + 1, 0, point.size - 1);
+            CHECK(!chos_key_from_ec_point(spec.curve_bits, raw, point.size, nullptr, 0, nullptr, nullptr));
+            chos_key_clear_secret(scalar, sizeof(scalar));
+        }
+    }
+    puts("[KEY COMPONENTS] RSA public/private/CRT and EC raw/private coordinate oracles passed");
+    return 0;
+}
+
 static int sweep_import(const CryptoKeyCase& spec,bool private_key) {
     SweepEntropy stream = {};
     stream.recording = true;
@@ -212,7 +276,7 @@ static int workers() {
 int main(int argc,char **argv) {
     puts("[KEY PROFILE] actual SPKI/PKCS8 ownership; TEST-ONLY keys; no signatures or key generation claimed");
     const char *dump=argc==2?argv[1]:nullptr;
-    CHECK(!cases(true,dump)&&!errors());
+    CHECK(!cases(true,dump)&&!errors()&&!key_components());
     CHECK(!sweep_import(key_cases[0],false)&&!sweep_import(key_cases[1],false)&&!sweep_import(key_cases[0],true));
 #ifndef __CHOS__
     // The complete P-256 private sweep has more than 25,000 allocation points.

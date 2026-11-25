@@ -192,12 +192,14 @@ def main():
             shutil.copyfile(source, target)
             report.setdefault('network_fixture_files_sha256', {})[name] = sha(source)
         external_sources = {}
-        for directory in ['ports/webcore-network-types', 'ports/webcore-platform', 'ports/webcore-crypto', 'ports/webcore-crypto-keys', 'ports/publicsuffix', 'tests/native_webcore_clipboard']:
+        for directory in ['ports/webcore-network-types', 'ports/webcore-platform', 'ports/webcore-crypto', 'ports/webcore-crypto-keys', 'ports/publicsuffix', 'tests/native_webcore_clipboard', 'ports/icu/browser-data']:
             for path in sorted((ROOT / directory).rglob('*')):
                 if path.is_file() and (path.suffix in ['.h', '.c', '.cpp', '.cmake', '.py', '.json', '.patch'] or path.name == 'CMakeLists.txt') and '__pycache__' not in path.parts:
                     assert not path.is_symlink() and path.resolve().is_relative_to(ROOT)
                     external_sources[str(path.relative_to(ROOT))] = sha(path)
         external_sources['docs/dependencies/native-publicsuffix.json'] = sha(ROOT / 'docs/dependencies/native-publicsuffix.json')
+        for name in ('docs/dependencies/icu-browser-packages.json', 'docs/dependencies/icu-generated-data.json'):
+            external_sources[name] = sha(ROOT / name)
         report['external_port_files_sha256'] = external_sources
         # Target roots only; host executable generators remain normal host tools.
         toolchain = out / 'chos-page-toolchain.cmake'

@@ -151,3 +151,170 @@ static int export_der(const chos_webcore_key *key,int private_key,uint8_t **out,
 }
 int chos_webcore_key_export_spki(const chos_webcore_key *key,uint8_t **out,size_t *bytes){return export_der(key,0,out,bytes);}
 int chos_webcore_key_export_pkcs8(const chos_webcore_key *key,uint8_t **out,size_t *bytes){return export_der(key,1,out,bytes);}
+
+static chos_webcore_key *allocate_key(mbedtls_pk_type_t type)
+{
+    chos_webcore_key *key = calloc(1, sizeof(*key));
+    if (!key)
+        return NULL;
+    mbedtls_pk_init(&key->context);
+    if (mbedtls_pk_setup(&key->context, mbedtls_pk_info_from_type(type))) {
+        chos_webcore_key_destroy(key);
+        return NULL;
+    }
+    return key;
+}
+
+void chos_key_clear_secret(void *buffer, size_t size)
+{
+    mbedtls_platform_zeroize(buffer, size);
+}
+
+static mbedtls_ecp_group_id named_group(unsigned curve)
+{
+    switch (curve) {
+    case CHOS_KEY_P256: return MBEDTLS_ECP_DP_SECP256R1;
+    case CHOS_KEY_P384: return MBEDTLS_ECP_DP_SECP384R1;
+    case CHOS_KEY_P521: return MBEDTLS_ECP_DP_SECP521R1;
+    default: return MBEDTLS_ECP_DP_NONE;
+    }
+}
+
+chos_webcore_key *chos_key_from_ec_point(unsigned curve, const uint8_t *bytes, size_t length,
+    const uint8_t *scalar, size_t scalar_bytes, chos_webcore_key_rng rng, void *rng_context)
+{
+    mbedtls_ecp_group_id group_id = named_group(curve);
+    size_t width = (curve + 7u) / 8u;
+    if (group_id == MBEDTLS_ECP_DP_NONE || !bytes || length != 1 + 2 * width || bytes[0] != 4
+        || (scalar ? scalar_bytes != width || !rng : scalar_bytes != 0))
+        return NULL;
+    chos_webcore_key *key = allocate_key(MBEDTLS_PK_ECKEY);
+    if (!key)
+        return NULL;
+    mbedtls_ecp_keypair *ec = mbedtls_pk_ec(key->context);
+    mbedtls_ecp_group group;
+    mbedtls_ecp_point point;
+    mbedtls_ecp_group_init(&group);
+    mbedtls_ecp_point_init(&point);
+    int rc = mbedtls_ecp_group_load(&group, group_id);
+    if (!rc)
+        rc = mbedtls_ecp_point_read_binary(&group, &point, bytes, length);
+    if (!rc)
+        rc = mbedtls_ecp_check_pubkey(&group, &point);
+    if (!rc && scalar)
+        rc = mbedtls_ecp_read_key(group_id, ec, scalar, scalar_bytes);
+    if (!rc)
+        rc = mbedtls_ecp_set_public_key(group_id, ec, &point);
+    if (!rc && scalar)
+        rc = mbedtls_pk_check_pair(&key->context, &key->context, rng, rng_context);
+    mbedtls_ecp_point_free(&point);
+    mbedtls_ecp_group_free(&group);
+    if (rc) {
+        chos_webcore_key_destroy(key);
+        return NULL;
+    }
+    key->info = (chos_webcore_key_info) { CHOS_KEY_EC, curve, curve, scalar != NULL };
+    return key;
+}
+
+int chos_key_ec_fields(const chos_webcore_key *key, uint8_t point[1 + 2 * CHOS_EC_MAX_WIDTH],
+    uint8_t *scalar, size_t *width)
+{
+    if (!key || key->info.family != CHOS_KEY_EC || !point || !width || (scalar && !key->info.is_private))
+        return CHOS_KEY_BAD_INPUT;
+    size_t size = (key->info.curve + 7u) / 8u;
+    size_t written = 0;
+    const mbedtls_ecp_keypair *ec = mbedtls_pk_ec(key->context);
+    if (mbedtls_ecp_write_public_key(ec, MBEDTLS_ECP_PF_UNCOMPRESSED, &written, point, 1 + 2 * size)
+        || written != 1 + 2 * size || point[0] != 4)
+        return CHOS_KEY_BAD_INPUT;
+    if (scalar && (mbedtls_ecp_write_key_ext(ec, &written, scalar, size) || written != size)) {
+        chos_key_clear_secret(scalar, size);
+        return CHOS_KEY_BAD_INPUT;
+    }
+    *width = size;
+    return 0;
+}
+
+static int valid_number(chos_key_number n)
+{
+    return n.size && n.size <= 1024 && n.data && n.data[0];
+}
+
+static int equal_number(const mbedtls_mpi *expected, chos_key_number number)
+{
+    mbedtls_mpi value;
+    mbedtls_mpi_init(&value);
+    int equal = !mbedtls_mpi_read_binary(&value, number.data, number.size) && !mbedtls_mpi_cmp_mpi(&value, expected);
+    mbedtls_mpi_free(&value);
+    return equal;
+}
+
+static int check_crt(const mbedtls_rsa_context *rsa, const chos_rsa_components *numbers)
+{
+    mbedtls_mpi dp, dq, qi;
+    mbedtls_mpi_init(&dp);
+    mbedtls_mpi_init(&dq);
+    mbedtls_mpi_init(&qi);
+    int valid = !mbedtls_rsa_export_crt(rsa, &dp, &dq, &qi)
+        && equal_number(&dp, numbers->dp) && equal_number(&dq, numbers->dq) && equal_number(&qi, numbers->qi);
+    mbedtls_mpi_free(&dp);
+    mbedtls_mpi_free(&dq);
+    mbedtls_mpi_free(&qi);
+    return valid;
+}
+
+chos_webcore_key *chos_key_from_rsa_numbers(const chos_rsa_components *numbers, int private_key)
+{
+    if (!numbers || !valid_number(numbers->n) || !valid_number(numbers->e))
+        return NULL;
+    int has_crt = numbers->p.size || numbers->q.size || numbers->dp.size || numbers->dq.size || numbers->qi.size;
+    if (private_key ? !valid_number(numbers->d) : numbers->d.size || has_crt)
+        return NULL;
+    if (has_crt && (!valid_number(numbers->p) || !valid_number(numbers->q) || !valid_number(numbers->dp)
+        || !valid_number(numbers->dq) || !valid_number(numbers->qi)))
+        return NULL;
+    chos_webcore_key *key = allocate_key(MBEDTLS_PK_RSA);
+    if (!key)
+        return NULL;
+    mbedtls_rsa_context *rsa = mbedtls_pk_rsa(key->context);
+    int rc = mbedtls_rsa_import_raw(rsa, numbers->n.data, numbers->n.size, numbers->p.data, numbers->p.size,
+        numbers->q.data, numbers->q.size, numbers->d.data, numbers->d.size, numbers->e.data, numbers->e.size);
+    if (!rc)
+        rc = mbedtls_rsa_complete(rsa);
+    if (!rc)
+        rc = private_key ? mbedtls_rsa_check_privkey(rsa) : mbedtls_rsa_check_pubkey(rsa);
+    size_t bits = mbedtls_pk_get_bitlen(&key->context);
+    if (rc || bits < 1024 || bits > 8192 || (has_crt && !check_crt(rsa, numbers))) {
+        chos_webcore_key_destroy(key);
+        return NULL;
+    }
+    key->info = (chos_webcore_key_info) { CHOS_KEY_RSA, CHOS_KEY_NO_CURVE, (unsigned)bits, !!private_key };
+    return key;
+}
+
+int chos_key_rsa_field(const chos_webcore_key *key, enum chos_rsa_field field, uint8_t out[CHOS_RSA_MAX_WIDTH], size_t *size)
+{
+    if (!key || !out || !size || key->info.family != CHOS_KEY_RSA || (unsigned)field > CHOS_RSA_QI
+        || (field > CHOS_RSA_E && !key->info.is_private))
+        return CHOS_KEY_BAD_INPUT;
+    mbedtls_mpi value;
+    mbedtls_mpi_init(&value);
+    const mbedtls_rsa_context *rsa = mbedtls_pk_rsa(key->context);
+    int rc;
+    if (field < CHOS_RSA_DP)
+        rc = mbedtls_rsa_export(rsa, field == CHOS_RSA_N ? &value : NULL, field == CHOS_RSA_P ? &value : NULL,
+            field == CHOS_RSA_Q ? &value : NULL, field == CHOS_RSA_D ? &value : NULL, field == CHOS_RSA_E ? &value : NULL);
+    else
+        rc = mbedtls_rsa_export_crt(rsa, field == CHOS_RSA_DP ? &value : NULL, field == CHOS_RSA_DQ ? &value : NULL,
+            field == CHOS_RSA_QI ? &value : NULL);
+    size_t length = mbedtls_mpi_size(&value);
+    if (!rc && length && length <= CHOS_RSA_MAX_WIDTH)
+        rc = mbedtls_mpi_write_binary(&value, out, length);
+    else
+        rc = CHOS_KEY_BAD_INPUT;
+    mbedtls_mpi_free(&value);
+    if (!rc)
+        *size = length;
+    return rc;
+}

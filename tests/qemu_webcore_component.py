@@ -15,6 +15,24 @@ sys.path.insert(0, str(ROOT / 'tests'))
 from qemu_platform import Guest, wait
 
 
+def stage_icu_packages(disk, directory, variant):
+    sys.path.insert(0, str(ROOT / 'tools'))
+    import mkchfs
+    receipt = json.loads((ROOT / 'docs/dependencies/icu-browser-packages.json').read_text())
+    raw = bytearray(disk.read_bytes())
+    mkchfs.mkdir(raw, '/ICU')
+    for index, entry in enumerate(receipt['files']):
+        data = (directory / entry['name']).read_bytes()
+        assert len(data) == entry['bytes'] and hashlib.sha256(data).hexdigest() == entry['sha256']
+        last = index == len(receipt['files']) - 1
+        if last and variant == 'missing':
+            continue
+        if last and variant == 'altered':
+            data = data[:-1] + bytes([data[-1] ^ 1])
+        mkchfs.put(raw, '/ICU/' + entry['name'], data)
+    disk.write_bytes(raw)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=pathlib.Path, required=True)
@@ -25,10 +43,15 @@ def main():
         'address-shuffle': '[ OK ] native WebCore IP address conversions and UA shuffle passed',
         'cairo-png': '[ OK ] Cairo PNG stream writes, callback failures and decoded pixels passed',
         'crypto-keys': '[ OK ] actual EC RSA key imports exports failures threads and cleanup passed',
+        'icu-files': '[ OK ] external ICU data normalization collation numbers breaks locales passed',
         'public-suffix': '[ OK ] public suffix rules and cookie-domain boundaries passed',
     }
     parser.add_argument('--fixture', choices=markers, required=True)
+    parser.add_argument('--icu-packages', type=pathlib.Path)
+    parser.add_argument('--icu-variant', choices=['complete', 'missing', 'altered'], default='complete')
     args = parser.parse_args()
+    if (args.fixture == 'icu-files') != bool(args.icu_packages) or (not args.icu_packages and args.icu_variant != 'complete'):
+        parser.error('The ICU fixture requires --icu-packages and owns --icu-variant')
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=False)
     application = out / 'application.elf'
@@ -38,8 +61,10 @@ def main():
     assert not subprocess.check_output(['llvm-nm', '-u', str(application)], text=True).strip()
     disk = out / 'disposable.img'
     mkchfs = ['python3', str(ROOT / 'tools/mkchfs.py')]
-    subprocess.run([*mkchfs, 'create', str(disk), '--size-mib', '16'], check=True)
+    subprocess.run([*mkchfs, 'create', str(disk), '--size-mib', '64' if args.icu_packages else '16'], check=True)
     subprocess.run([*mkchfs, 'put', str(disk), '/PROBE.ELF', str(application)], check=True)
+    if args.icu_packages:
+        stage_icu_packages(disk, args.icu_packages, args.icu_variant)
     images = args.image_root.resolve()
     options = argparse.Namespace(mode=args.mode, kernel=images / 'chos.elf',
         uefi_kernel=images / 'uefi-kernel.elf', iso=images / 'chos.iso',
@@ -50,7 +75,11 @@ def main():
         no_usb=False, usb_pci_bus=0, xhci_model='qemu-xhci', pci_virtio=True,
         net_model='e1000e', storage_error=False, nvme=False, no_rng=False,
         hub_depth=0, empty_usb=False, tablet=True)
+    command = 'exec /PROBE.ELF'
     marker = markers[args.fixture]
+    if args.icu_variant != 'complete':
+        command += ' refuse'
+        marker = '[ OK ] incomplete or altered ICU packages refused and released'
     failures = ('[FAIL]', '[FATAL]', '[USER FAULT]')
     guest = None
     runs = []
@@ -85,8 +114,8 @@ def main():
         baseline, _ = cold()
         for cycle in range(3):
             offset = len(guest.text())
-            guest.serial('exec /PROBE.ELF')
-            wait(lambda: marker in guest.text()[offset:] or any(item in guest.text()[offset:] for item in failures), 180 if args.fixture == 'crypto-keys' else 30, args.fixture)
+            guest.serial(command)
+            wait(lambda: marker in guest.text()[offset:] or any(item in guest.text()[offset:] for item in failures), 180 if args.fixture in ('crypto-keys', 'icu-files') else 30, args.fixture)
             text = guest.text()[offset:]
             assert text.count(marker) == 1 and not any(item in text for item in failures), text
             pages, section = cold()
@@ -99,6 +128,8 @@ def main():
             'harness_sha256': sha(pathlib.Path(__file__).resolve()), 'cold_free_pages': baseline,
             'boot_artifacts': json.loads((out / 'artifacts.json').read_text()), 'runs': runs,
             'fixture': args.fixture, 'marker': marker}
+        if args.icu_packages:
+            result['icu_variant'] = args.icu_variant
         (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     except Exception as error:
         (out / 'result.json').write_text(json.dumps({'status': 'FAIL', 'error': str(error), 'runs': runs}, indent=2) + '\n')
