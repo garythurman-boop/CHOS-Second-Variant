@@ -153,7 +153,7 @@ def main():
         # The earlier 95-file image subset cannot stand in for it.
         stage_webcore(wc)
         # Explicit, recorded changes apply only to a fresh verified source copy.
-        patches = [ROOT / 'ports/webcore-page' / name for name in ['shared-memory.patch', 'software-only.patch', 'native-prefix.patch', 'screen-properties.patch', 'accessibility-owned.patch', 'network-calendar.patch', 'dns-queue.patch', 'editor-clipboard.patch']]
+        patches = [ROOT / 'ports/webcore-page' / name for name in ['shared-memory.patch', 'software-only.patch', 'native-prefix.patch', 'screen-properties.patch', 'accessibility-owned.patch', 'network-calendar.patch', 'dns-queue.patch', 'editor-clipboard.patch', 'session-cookies.patch', 'local-resource.patch', 'structure-reservation.patch']]
         patches += [ROOT / 'ports/webcore-network-types' / name for name in
                     ['resource-request-isolation.patch', 'resource-response-initialization.patch', 'form-data-isolation.patch']]
         patches += [ROOT / 'ports/webcore-crypto-keys/key-types.patch']
@@ -192,7 +192,7 @@ def main():
             shutil.copyfile(source, target)
             report.setdefault('network_fixture_files_sha256', {})[name] = sha(source)
         external_sources = {}
-        for directory in ['ports/webcore-network-types', 'ports/webcore-platform', 'ports/webcore-crypto', 'ports/webcore-crypto-keys', 'ports/publicsuffix', 'tests/native_webcore_clipboard', 'ports/icu/browser-data']:
+        for directory in ['ports/webcore-network-types', 'ports/webcore-platform', 'ports/webcore-crypto', 'ports/webcore-crypto-keys', 'ports/publicsuffix', 'tests/native_webcore_clipboard', 'tests/native_webcore_cookies', 'tests/native_webcore_page', 'ports/icu/browser-data']:
             for path in sorted((ROOT / directory).rglob('*')):
                 if path.is_file() and (path.suffix in ['.h', '.c', '.cpp', '.cmake', '.py', '.json', '.patch'] or path.name == 'CMakeLists.txt') and '__pycache__' not in path.parts:
                     assert not path.is_symlink() and path.resolve().is_relative_to(ROOT)

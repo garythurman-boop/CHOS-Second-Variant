@@ -21,10 +21,13 @@ def main():
     parser.add_argument('--out', type=pathlib.Path, required=True)
     parser.add_argument('--application', type=pathlib.Path, required=True)
     parser.add_argument('--image-root', type=pathlib.Path, required=True)
-    parser.add_argument('--fixture', choices=['network-values', 'clipboard'], default='network-values')
+    parser.add_argument('--fixture', choices=['network-values', 'clipboard', 'cookies', 'local-page'], default='network-values')
     parser.add_argument('--embedded', action='store_true', help='Application is the exact staged diagnostic ROMFS engine')
     parser.add_argument('--mode', choices=['direct', 'uefi'], default='direct')
+    parser.add_argument('--icu-packages', type=pathlib.Path, help='Verified ICU package directory for the local page')
     args = parser.parse_args()
+    if (args.fixture == 'local-page') != bool(args.icu_packages) or (args.icu_packages and not args.embedded):
+        parser.error('The local page requires --embedded and --icu-packages')
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=False)
     application = out / 'application.elf'
@@ -34,7 +37,19 @@ def main():
     assert not subprocess.check_output(['llvm-nm', '-u', str(application)], text=True).strip()
     disk = out / 'disposable.img'
     mkchfs = ['python3', str(ROOT / 'tools/mkchfs.py')]
-    subprocess.run([*mkchfs, 'create', str(disk), '--size-mib', '16'], check=True)
+    subprocess.run([*mkchfs, 'create', str(disk), '--size-mib', '64' if args.icu_packages else '16'], check=True)
+    if args.icu_packages:
+        from qemu_webcore_component import stage_icu_packages
+        stage_icu_packages(disk, args.icu_packages, 'complete')
+        import mkchfs
+        raw = bytearray(disk.read_bytes())
+        mkchfs.mkdir(raw, '/FONTS')
+        catalogue = json.loads((ROOT / 'docs/dependencies/text-fixtures.json').read_text())
+        for font in catalogue['fonts']:
+            data = (ROOT / 'third_party/text-fixtures' / font['path']).read_bytes()
+            assert len(data) == font['bytes'] and hashlib.sha256(data).hexdigest() == font['sha256']
+            mkchfs.put(raw, font['guest_path'], data)
+        disk.write_bytes(raw)
     executable = '/BIN/JSCVM.ELF' if args.embedded else '/VALUES.ELF'
     if not args.embedded:
         subprocess.run([*mkchfs, 'put', str(disk), executable, str(application)], check=True)
@@ -50,6 +65,8 @@ def main():
         hub_depth=0, empty_usb=False, tablet=True)
     markers = {
         'network-values': '[ OK ] actual WebCore request response error values passed; checks=39',
+        'local-page': '[ OK ] local WebCore page diagnostic completed',
+        'cookies': '[ OK ] WebCore session cookie scope, policy, privileges and isolation passed',
         'clipboard': '[ OK ] native WebCore clipboard origin, reentry, buffers and modifiers passed',
     }
     marker = markers[args.fixture]
@@ -98,17 +115,39 @@ def main():
         for cycle in range(3):
             offset = len(guest.text())
             guest.serial('exec ' + executable)
-            wait(lambda: marker in guest.text()[offset:] or any(item in guest.text()[offset:] for item in failures), 30, 'native WebCore values')
+            next_status_check = time.monotonic() + 3
+
+            def finished():
+                nonlocal next_status_check
+                output = guest.text()[offset:]
+                if marker in output or any(item in output for item in failures):
+                    return True
+                if args.fixture == 'local-page' and '[PAGE]' in output and time.monotonic() >= next_status_check:
+                    next_status_check = time.monotonic() + 1
+                    if guest.symbol('engine_owner_slot') == 0xffffffff:
+                        return True
+                return False
+
+            wait(finished, 90 if args.icu_packages else 30, 'native WebCore guest execution')
             text = guest.text()[offset:]
             assert text.count(marker) == 1 and not any(item in text for item in failures), text
-            rows = re.findall(r'\[VALUES HEAP\] round=(\d+) allocations=(\d+) mapped=(\d+)', text)
-            assert len(rows) == 3 and [int(row[0]) for row in rows] == [0, 1, 2], text
-            assert len({row[1:] for row in rows}) == 1, rows
+            if args.fixture == 'local-page':
+                rows = re.findall(r'\[PAGE FRAME\] epoch=(\d+) glyph_pixels=(\d+) hash=([0-9a-f]{16})', text)
+                assert [int(row[0]) for row in rows] == [0, 1] and rows[0][2] != rows[1][2], text
+                assert min(int(row[1]) for row in rows) > 64
+                if runs:
+                    assert rows == runs[0]['frames'], rows
+            else:
+                rows = re.findall(r'\[VALUES HEAP\] round=(\d+) allocations=(\d+) mapped=(\d+)', text)
+                assert len(rows) == 3 and [int(row[0]) for row in rows] == [0, 1, 2], text
+                assert len({row[1:] for row in rows}) == 1, rows
             pages, section = cold()
             assert pages == baseline, (baseline, pages)
             pid = int(re.search(r'pid=(\d+) path=' + re.escape(executable), guest.text()[offset:])[1])
             assert re.search(r'\bpid=' + str(pid) + r'\b[^\r\n]*state=exited\b[^\r\n]*exit=0\b', section), section
             runs.append({'cycle': cycle, 'pid': pid, 'cold_pages_restored': pages})
+            if args.fixture == 'local-page':
+                runs[-1]['frames'] = rows
         assert sha(application) == application_sha
         result = {'status': 'PASS', 'mode': args.mode, 'application_sha256': application_sha, 'embedded_ROMFS': args.embedded,
             'harness_sha256': sha(pathlib.Path(__file__).resolve()), 'cold_free_pages': baseline,
@@ -125,8 +164,25 @@ def main():
                 'Reader reentry with live replacement, indexed records and rich/plain fallback',
                 'Retained binary data, shared revision and modifier transitions',
                 'Three exit-zero lifetimes, stable warm heap and exact cold cleanup']
+        if args.fixture == 'cookies':
+            result['checks'] = ['DOM and request visibility, host/domain/path matching and public suffix rejection',
+                'Secure, HttpOnly, SameSite, reserved prefixes, expiry and session isolation',
+                'Raw-cookie permission, three exit-zero lifetimes and exact warm/cold ownership']
+        if args.fixture == 'local-page':
+            result['checks'] = ['Embedded local HTML, CSS geometry and JavaScript DOM mutation',
+                'Two 512x256 Cairo frames with full geometry oracle and font coverage',
+                'Repeatable frame hashes and exact cold process cleanup across three launches']
+            result['limits'] = ['Offscreen local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open.']
         (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     except Exception as error:
+        if guest is not None:
+            try:
+                guest.serial('procinfo')
+                guest.serial('meminfo')
+                time.sleep(.3)
+                (out / 'registers.txt').write_text(guest.hmp('info registers'))
+            except (OSError, RuntimeError, AssertionError):
+                pass
         (out / 'result.json').write_text(json.dumps({'status': 'FAIL', 'error': str(error), 'runs': runs}, indent=2) + '\n')
         raise
     finally:

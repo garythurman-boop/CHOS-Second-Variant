@@ -1,5 +1,18 @@
 # Revised Stage 3 current evidence
 
+### Local HTML, CSS and JavaScript rendering
+
+The local-page diagnostic links the full WebCore target and boots on CHOS.
+In direct and UEFI QEMU, WebCore parsed the embedded HTML and CSS, checked the
+DOM rectangles, and painted 512 × 256 pixels. JavaScript then changed the text,
+position, transform and color. The second paint passed its geometry and glyph
+checks. The frame hashes were `782c4474c37c9190` and `7b723a20d34e99c6`.
+Cookie scope, script and request visibility, session isolation, software-layer
+invalidation, and deferred data URL delivery also passed guest checks.
+Desktop presentation of the full page, network navigation and target hardware
+qualification remain open. Each guest restored its free-page baseline after
+three launches. [Guest results](validation/stage3-local-page.json) and [reproduction](../tests/native_webcore_page/README.md)
+
 ### Browser ICU data and cryptographic key components
 
 The local-page target now loads all 4,321 ICU resources from nine verified CHFS

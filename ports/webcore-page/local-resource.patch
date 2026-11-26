@@ -1,0 +1,27 @@
+--- a/Source/WebCore/platform/network/ResourceHandleInternal.h
++++ b/Source/WebCore/platform/network/ResourceHandleInternal.h
+@@ -112,6 +112,11 @@
+     ResourceHandle::FailureType m_scheduledFailureType { ResourceHandle::NoFailure };
+     ContentEncodingSniffingPolicy m_contentEncodingSniffingPolicy;
+ 
++#if PLATFORM(CHOS)
++    Function<void()> m_localDelivery;
++    bool m_localDeliveryQueued { false };
++    bool m_localCancelled { false };
++#endif
+     bool m_defersLoading;
+     bool m_shouldContentSniff;
+     bool m_failsTAOCheck { false };
+--- a/Source/WebCore/platform/network/ResourceHandle.cpp
++++ b/Source/WebCore/platform/network/ResourceHandle.cpp
+@@ -114,6 +114,10 @@
+ void ResourceHandle::scheduleFailure(FailureType type)
+ {
+     d->m_scheduledFailureType = type;
++#if PLATFORM(CHOS)
++    if (d->m_defersLoading)
++        return;
++#endif
+     d->m_failureTimer.startOneShot(0_s);
+ }
+ 

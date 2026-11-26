@@ -21,6 +21,7 @@
 #include <JavaScriptCore/JSValue.h>
 #include <JavaScriptCore/SourceTaintedOrigin.h>
 #include <pal/SessionID.h>
+#include <wtf/MainThread.h>
 #include <wtf/RunLoop.h>
 #include <wtf/text/WTFString.h>
 #include <cairo.h>
@@ -119,15 +120,18 @@ static int fonts()
 
 static int page_case()
 {
+    puts("[PAGE] constructing page configuration");
     auto configuration=pageConfigurationWithEmptyClients(std::nullopt,PAL::SessionID::defaultSessionID());
     // This fixture supplies only its own trusted local document. The original
     // image-internal helper defaults to all sandbox restrictions, including JS.
     std::get<PageConfiguration::LocalMainFrameCreationParameters>(configuration.mainFrameCreationParameters).effectiveSandboxFlags={};
+    puts("[PAGE] creating Page");
     auto page=Page::create(WTF::move(configuration));
     page->settings().setScriptEnabled(true);
     page->settings().setAcceleratedCompositingEnabled(false);
     RefPtr frame=page->localMainFrame();CHECK(frame);
     frame->setView(LocalFrameView::create(*frame));
+    puts("[PAGE] initializing main frame");
     frame->init();
     RefPtr view=frame->view();CHECK(view);
     view->setCanHaveScrollbars(false);
@@ -137,11 +141,16 @@ static int page_case()
     RefPtr loader=frame->loader().activeDocumentLoader();CHECK(loader);
     auto& writer=loader->writer();
     writer.setMIMEType("text/html"_s);
+    puts("[PAGE] beginning document");
     CHECK(writer.begin(URL{"about:blank"_s}));
+    puts("[PAGE] parsing HTML");
     writer.insertDataSynchronously(String::fromUTF8(html));
+    puts("[PAGE] finishing parser");
     writer.end();
     RefPtr document=frame->document();CHECK(document);
+    puts("[PAGE] updating layout");
     document->updateLayoutIgnorePendingStylesheets();
+    puts("[PAGE] executing geometry script");
     auto before=frame->script().executeScriptIgnoringException(
         "(()=>{const r=document.getElementById('a').getBoundingClientRect();return document.title==='CHOS local page'&&r.x===17&&r.y===64&&r.width===71&&r.height===39})()"_s,
         JSC::SourceTaintedOrigin::Untainted);
@@ -157,12 +166,21 @@ static int page_case()
     return 0;
 }
 
+namespace WebCore { void installLocalPageStrategies(); }
+bool exerciseLocalPlatform();
+
 int main()
 {
+    puts("[PAGE] loading ICU");
     CHECK(!chos_browser_icu_init());
+    puts("[PAGE] loading fonts");
     CHECK(!fonts());
+    puts("[PAGE] initializing main thread");
+    WTF::initializeMainThread();
+    CHECK(exerciseLocalPlatform());
+    puts("[PAGE] starting JavaScriptCore");
     ScriptController::initializeMainThread();
-    WTF::RunLoop::initializeMain();
+    installLocalPageStrategies();
     CHECK(!page_case());
     puts("[ OK ] local WebCore page diagnostic completed");
     return 0;

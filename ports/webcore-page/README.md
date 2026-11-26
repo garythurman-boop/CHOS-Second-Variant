@@ -3,7 +3,7 @@
 This port builds WebCore, PAL, JavaScriptCore, WTF and bmalloc with one set of
 generated CHOS headers. The local-page diagnostic uses WebCore's real frame,
 HTML parser, CSS layout, JavaScript DOM bindings and Cairo paint path. The page
-executable still has unresolved platform methods. The smaller
+executable now links and launches in the guest. The smaller
 `CHOSNetworkValues` target builds and runs on CHOS with the same generated
 configuration. [Runtime results](../../docs/validation/stage3-webcore-page-values.json)
 

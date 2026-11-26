@@ -1,0 +1,6 @@
+add_executable(CHOSCookieValues EXCLUDE_FROM_ALL main.cpp)
+target_include_directories(CHOSCookieValues PRIVATE "$<TARGET_PROPERTY:WebCore,INCLUDE_DIRECTORIES>")
+target_compile_definitions(CHOSCookieValues PRIVATE "$<TARGET_PROPERTY:WebCore,COMPILE_DEFINITIONS>")
+target_link_libraries(CHOSCookieValues PRIVATE "$<TARGET_FILE:WebCore>" CHOSClipboardCore WTF PAL chos_publicsuffix ICU::uc ICU::i18n ICU::data)
+target_link_options(CHOSCookieValues PRIVATE "-Wl,--strip-debug" "-Wl,--error-limit=0")
+add_dependencies(CHOSCookieValues WebCore)

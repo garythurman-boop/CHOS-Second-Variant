@@ -1,0 +1,12 @@
+--- a/Source/WebCore/platform/network/NetworkStorageSession.h
++++ b/Source/WebCore/platform/network/NetworkStorageSession.h
+@@ -349,6 +349,9 @@
+     mutable UniqueRef<CookieJarDB> m_cookieDatabase;
+ #else
+     RefPtr<NetworkingContext> m_context;
++#if PLATFORM(CHOS)
++    std::unique_ptr<class SessionCookieStoreCHOS> m_cookieStore;
++#endif
+ #endif
+ 
+ #if HAVE(COOKIE_CHANGE_LISTENER_API)

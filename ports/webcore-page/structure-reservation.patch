@@ -1,0 +1,25 @@
+--- a/Source/JavaScriptCore/heap/StructureAlignedMemoryAllocator.cpp
++++ b/Source/JavaScriptCore/heap/StructureAlignedMemoryAllocator.cpp
+@@ -53,6 +53,9 @@
+ #endif
+ 
+ #include <wtf/OSAllocator.h>
++#if OS(CHOS)
++#include <chos/resource_profile.h>
++#endif
+ 
+ namespace JSC {
+ 
+@@ -261,7 +264,11 @@
+     static std::once_flag onceKey;
+     std::call_once(onceKey, [] {
+         size_t baseSize { 0 };
+-#if PLATFORM(PLAYSTATION) || OS(QNX)
++#if OS(CHOS)
++        // Start the upstream aligned-reservation fallback at the guest ABI's
++        // maximum. The ICU catalogue and fonts may already occupy this arena.
++        baseSize = CHOS_RESOURCE_ENGINE_RESERVE_MAX;
++#elif PLATFORM(PLAYSTATION) || OS(QNX)
+         baseSize = 128 * MB;
+ #elif (PLATFORM(IOS_FAMILY) && !CPU(ARM64E)) || PLATFORM(WATCHOS) || PLATFORM(APPLETV)
+         baseSize = 512 * MB;

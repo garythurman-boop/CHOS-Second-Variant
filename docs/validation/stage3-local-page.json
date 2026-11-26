@@ -1,0 +1,234 @@
+{
+  "page": [
+    {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "7f06feb4b66101df155d80ea0579f57a63d92046683f749f58c947347e8ce7e8",
+      "embedded_ROMFS": true,
+      "harness_sha256": "69046e31b1f65b9659cc1b04167aff5fb82b81c09a198d6e647217bc121e6f94",
+      "cold_free_pages": 95884,
+      "boot_artifacts": {
+        "kernel_sha256": "83291bfc9077659db76cb3c40f0f37026bef240a045323bceb129ca35557ba7e"
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 95884,
+          "frames": [
+            [
+              "0",
+              "1230",
+              "782c4474c37c9190"
+            ],
+            [
+              "1",
+              "1516",
+              "7b723a20d34e99c6"
+            ]
+          ]
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 95884,
+          "frames": [
+            [
+              "0",
+              "1230",
+              "782c4474c37c9190"
+            ],
+            [
+              "1",
+              "1516",
+              "7b723a20d34e99c6"
+            ]
+          ]
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 95884,
+          "frames": [
+            [
+              "0",
+              "1230",
+              "782c4474c37c9190"
+            ],
+            [
+              "1",
+              "1516",
+              "7b723a20d34e99c6"
+            ]
+          ]
+        }
+      ],
+      "checks": [
+        "Embedded local HTML, CSS geometry and JavaScript DOM mutation",
+        "Two 512x256 Cairo frames with full geometry oracle and font coverage",
+        "Repeatable frame hashes and exact cold process cleanup across three launches"
+      ],
+      "limits": [
+        "Offscreen local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open."
+      ],
+      "fixture": "local-page"
+    },
+    {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "7f06feb4b66101df155d80ea0579f57a63d92046683f749f58c947347e8ce7e8",
+      "embedded_ROMFS": true,
+      "harness_sha256": "69046e31b1f65b9659cc1b04167aff5fb82b81c09a198d6e647217bc121e6f94",
+      "cold_free_pages": 480254,
+      "boot_artifacts": {
+        "kernel_sha256": "1314a28a19bb86b0b995341806cd91ab6b0695e734c97754b6090d67cf8c41c6",
+        "iso_sha256": "876b646fb23df1aa778a6a672443339410cbb42fb25a8ca97400f8eb73ef138f",
+        "iso_embedded_kernel_sha256": "1314a28a19bb86b0b995341806cd91ab6b0695e734c97754b6090d67cf8c41c6",
+        "kernel_symbols_match_iso": true
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 480254,
+          "frames": [
+            [
+              "0",
+              "1230",
+              "782c4474c37c9190"
+            ],
+            [
+              "1",
+              "1516",
+              "7b723a20d34e99c6"
+            ]
+          ]
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 480254,
+          "frames": [
+            [
+              "0",
+              "1230",
+              "782c4474c37c9190"
+            ],
+            [
+              "1",
+              "1516",
+              "7b723a20d34e99c6"
+            ]
+          ]
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 480254,
+          "frames": [
+            [
+              "0",
+              "1230",
+              "782c4474c37c9190"
+            ],
+            [
+              "1",
+              "1516",
+              "7b723a20d34e99c6"
+            ]
+          ]
+        }
+      ],
+      "checks": [
+        "Embedded local HTML, CSS geometry and JavaScript DOM mutation",
+        "Two 512x256 Cairo frames with full geometry oracle and font coverage",
+        "Repeatable frame hashes and exact cold process cleanup across three launches"
+      ],
+      "limits": [
+        "Offscreen local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open."
+      ],
+      "fixture": "local-page"
+    }
+  ],
+  "cookies": [
+    {
+      "status": "PASS",
+      "mode": "direct",
+      "application_sha256": "0589d1d20a971fe22afe6675fed1a27dd9f9ebc8311b11eae42ea3bb21085779",
+      "embedded_ROMFS": true,
+      "harness_sha256": "bec04f99d0da8dcf01e3ecf60df0f92c37f9b03495b880f4ae440ac84f5c810f",
+      "cold_free_pages": 102152,
+      "boot_artifacts": {
+        "kernel_sha256": "738df03a5e685bc4443aa142fa40feb84e34a72bf1b83ebdc2bca6dd6056b70a"
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 102152
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 102152
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 102152
+        }
+      ],
+      "checks": [
+        "DOM and request visibility, host/domain/path matching and public suffix rejection",
+        "Secure, HttpOnly, SameSite, reserved prefixes, expiry and session isolation",
+        "Raw-cookie permission, three exit-zero lifetimes and exact warm/cold ownership"
+      ],
+      "limits": [
+        "Selected value types; no resource fetcher, WebCore page rendering or modern browser acceptance",
+        "QEMU only; new physical Fusion/Pi5/laptop execution not run; Stage 3 incomplete"
+      ],
+      "fixture": "cookies"
+    },
+    {
+      "status": "PASS",
+      "mode": "uefi",
+      "application_sha256": "0589d1d20a971fe22afe6675fed1a27dd9f9ebc8311b11eae42ea3bb21085779",
+      "embedded_ROMFS": true,
+      "harness_sha256": "bec04f99d0da8dcf01e3ecf60df0f92c37f9b03495b880f4ae440ac84f5c810f",
+      "cold_free_pages": 486522,
+      "boot_artifacts": {
+        "kernel_sha256": "110ead0b190d9e3b125e45deac2d6a9c50088bc80d6b123789e49f72ce66e0c0",
+        "iso_sha256": "32d0b206db707b72a0b30760a57d6a70d452e4e8b4374e133cd133b434de8ca1",
+        "iso_embedded_kernel_sha256": "110ead0b190d9e3b125e45deac2d6a9c50088bc80d6b123789e49f72ce66e0c0",
+        "kernel_symbols_match_iso": true
+      },
+      "runs": [
+        {
+          "cycle": 0,
+          "pid": 1,
+          "cold_pages_restored": 486522
+        },
+        {
+          "cycle": 1,
+          "pid": 2,
+          "cold_pages_restored": 486522
+        },
+        {
+          "cycle": 2,
+          "pid": 3,
+          "cold_pages_restored": 486522
+        }
+      ],
+      "checks": [
+        "DOM and request visibility, host/domain/path matching and public suffix rejection",
+        "Secure, HttpOnly, SameSite, reserved prefixes, expiry and session isolation",
+        "Raw-cookie permission, three exit-zero lifetimes and exact warm/cold ownership"
+      ],
+      "limits": [
+        "Selected value types; no resource fetcher, WebCore page rendering or modern browser acceptance",
+        "QEMU only; new physical Fusion/Pi5/laptop execution not run; Stage 3 incomplete"
+      ],
+      "fixture": "cookies"
+    }
+  ]
+}

@@ -1747,7 +1747,8 @@ $(ENGINE_TEST_DIR)/romfs_engine.o: kernel/arch/aarch64/romfs_engine.S $(ENGINE_T
 $(ENGINE_TEST_DIR)/chos.elf: $(ENGINE_TEST_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o linker.ld
 	$(LD) $(LDFLAGS) -o $@ $(ENGINE_TEST_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o
 $(ENGINE_TEST_DIR)/uefi-kernel.elf: $(ENGINE_TEST_UEFI_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o linker.ld
-	$(LD) $(UEFI_KERNEL_LDFLAGS) -o $@ $(ENGINE_TEST_UEFI_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o
+	# Keep loader symbols for QEMU diagnostics and omit host DWARF from boot media.
+	$(LD) $(UEFI_KERNEL_LDFLAGS) --strip-debug -o $@ $(ENGINE_TEST_UEFI_OBJECTS) $(ENGINE_TEST_DIR)/romfs_engine.o
 $(ENGINE_TEST_DIR)/chos.iso: $(ENGINE_TEST_DIR)/uefi-kernel.elf $(BUILD)/uefi/BOOTAA64.EFI tools/mkuefi_iso.py
 	python3 tests/test_uefi_kernel.py $(ENGINE_TEST_DIR)/uefi-kernel.elf
 	python3 tools/mkuefi_iso.py --kernel $(ENGINE_TEST_DIR)/uefi-kernel.elf --efi $(BUILD)/uefi/BOOTAA64.EFI --esp-mib 64 --output $@
