@@ -16,5 +16,10 @@
   },
   "held_source_iterations": 30,
   "manual_milestones": true,
-  "milestone_source_iterations": 61
+  "milestone_source_iterations": 61,
+  "latest_browser_diagnostic": {
+    "source_commit": "adb1acba5099aef5650c6682ecbe45cf9557307d",
+    "directory": "artifacts/adb1acb",
+    "qualification": "docs/validation/stage3-webcore-window.json"
+  }
 }

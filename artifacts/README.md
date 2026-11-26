@@ -1,5 +1,12 @@
 # Current CHOS build downloads
 
+**WebCore desktop preview for Fusion.** Download the diagnostic ISO and its
+companion asset disk, then follow the six-step window and keyboard test.
+[Downloads and Fusion checklist](adb1acb/README.md)
+
+## Installation media
+
+
 Tested source: `8cdb3fb2fb8217bbda8d9d3104be1ff11efe2694`.
 Publication tag: `build-8cdb3fb`.
 
