@@ -1,6 +1,7 @@
 /* Local trusted-document diagnostic. Uses the original internal headless Page
  * workflow; it is not the browser or a network-loading implementation. */
 #include "config.h"
+#include "PageWindow.h"
 #include "BrowserICUData.h"
 #include <WebCore/Color.h>
 #include <WebCore/Document.h>
@@ -118,7 +119,7 @@ static int fonts()
     return 0;
 }
 
-static int page_case()
+static int page_case(bool visible)
 {
     puts("[PAGE] constructing page configuration");
     auto configuration=pageConfigurationWithEmptyClients(std::nullopt,PAL::SessionID::defaultSessionID());
@@ -155,13 +156,28 @@ static int page_case()
         "(()=>{const r=document.getElementById('a').getBoundingClientRect();return document.title==='CHOS local page'&&r.x===17&&r.y===64&&r.width===71&&r.height===39})()"_s,
         JSC::SourceTaintedOrigin::Untainted);
     CHECK(before.isBoolean() && before.asBoolean());
+    PageWindow window;
+    CHECK(!visible || window.open());
     CHECK(!paint(*view,0));
+    if (visible) {
+        CHECK(window.present(webcore_page_pixels));
+        puts("[PAGE WINDOW] initial frame submitted");
+        int action = window.waitForKey(true);
+        CHECK(action >= 0);
+        if (!action)
+            return 0;
+    }
     auto changed=frame->script().executeScriptIgnoringException(
         "(()=>{const a=document.getElementById('a');a.style.left='121px';a.style.backgroundColor='#cc3366';document.getElementById('b').style.transform='translate(7px,-5px)';document.getElementById('message').textContent='JavaScript changed the DOM';const r=a.getBoundingClientRect();const b=document.getElementById('b').getBoundingClientRect();return r.x===121&&r.y===64&&b.x===247&&b.y===85&&document.getElementById('message').textContent==='JavaScript changed the DOM'})()"_s,
         JSC::SourceTaintedOrigin::Untainted);
     CHECK(changed.isBoolean() && changed.asBoolean());
     document->updateLayoutIgnorePendingStylesheets();
     CHECK(!paint(*view,1));
+    if (visible) {
+        CHECK(window.present(webcore_page_pixels));
+        puts("[PAGE WINDOW] changed frame submitted");
+        CHECK(window.waitForKey(false) == 0);
+    }
     puts("[ OK ] actual local HTML CSS layout JavaScript DOM mutation and paint passed");
     return 0;
 }
@@ -169,7 +185,7 @@ static int page_case()
 namespace WebCore { void installLocalPageStrategies(); }
 bool exerciseLocalPlatform();
 
-int main()
+int main(int argc, char** argv)
 {
     puts("[PAGE] loading ICU");
     CHECK(!chos_browser_icu_init());
@@ -181,7 +197,7 @@ int main()
     puts("[PAGE] starting JavaScriptCore");
     ScriptController::initializeMainThread();
     installLocalPageStrategies();
-    CHECK(!page_case());
+    CHECK(!page_case(argc == 2 && !std::strcmp(argv[1], "window")));
     puts("[ OK ] local WebCore page diagnostic completed");
     return 0;
 }

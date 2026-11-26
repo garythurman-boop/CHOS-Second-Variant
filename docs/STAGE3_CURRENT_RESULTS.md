@@ -1,5 +1,14 @@
 # Revised Stage 3 current evidence
 
+### WebCore desktop window
+
+The local page presents its initial and JavaScript-modified frames in an owned
+CHOS window. Direct and UEFI QEMU each completed three launches. The host
+checked all 131,072 displayed pixels per frame against the guest rendering
+hash, sent Space to advance, and sent Escape to close. Each launch returned
+all guest pages to its starting baseline. General DOM input, web navigation
+and Fusion hardware testing remain open. [QEMU evidence](validation/stage3-webcore-window.json) and [desktop fixture](../tests/native_webcore_page/README.md)
+
 ### Local HTML, CSS and JavaScript rendering
 
 The local-page diagnostic links the full WebCore target and boots on CHOS.

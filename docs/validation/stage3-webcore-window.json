@@ -1,0 +1,235 @@
+{
+  "direct1": {
+    "status": "PASS",
+    "mode": "direct",
+    "application_sha256": "416207f8c947dd5e38b7fddefa5bb7503be8ec11a660f73259a2ed974813689a",
+    "embedded_ROMFS": true,
+    "harness_sha256": "78a6c7c358e3b0b8213c84d467e754fc5bfe3d0baa789856a7417fd3a17ed15b",
+    "cold_free_pages": 95884,
+    "boot_artifacts": {
+      "kernel_sha256": "1b852a77287b62326e59e1c3029d02964eee0213c6d067b13222a968572d5668"
+    },
+    "runs": [
+      {
+        "cycle": 0,
+        "pid": 1,
+        "cold_pages_restored": 95884,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      },
+      {
+        "cycle": 1,
+        "pid": 2,
+        "cold_pages_restored": 95884,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      },
+      {
+        "cycle": 2,
+        "pid": 3,
+        "cold_pages_restored": 95884,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      }
+    ],
+    "checks": [
+      "Embedded local HTML, CSS geometry and JavaScript DOM mutation",
+      "Two 512x256 Cairo frames with full geometry oracle and font coverage",
+      "Repeatable frame hashes and exact cold process cleanup across three launches",
+      "Owned desktop window, two full screendump pixel hashes, physical Space and Escape"
+    ],
+    "limits": [
+      "Local local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open."
+    ],
+    "fixture": "local-page"
+  },
+  "uefi1": {
+    "status": "PASS",
+    "mode": "uefi",
+    "application_sha256": "416207f8c947dd5e38b7fddefa5bb7503be8ec11a660f73259a2ed974813689a",
+    "embedded_ROMFS": true,
+    "harness_sha256": "78a6c7c358e3b0b8213c84d467e754fc5bfe3d0baa789856a7417fd3a17ed15b",
+    "cold_free_pages": 480254,
+    "boot_artifacts": {
+      "kernel_sha256": "5f4514f3e4ddf195303efb54d105444d06bbca67ff3f762dfa2ed6ae35f7d60e",
+      "iso_sha256": "a4306ff002f0a82e6e9e72c0d31365a327ba5173aa5fe189e2d33c4d796f41b2",
+      "iso_embedded_kernel_sha256": "5f4514f3e4ddf195303efb54d105444d06bbca67ff3f762dfa2ed6ae35f7d60e",
+      "kernel_symbols_match_iso": true
+    },
+    "runs": [
+      {
+        "cycle": 0,
+        "pid": 1,
+        "cold_pages_restored": 480254,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      },
+      {
+        "cycle": 1,
+        "pid": 2,
+        "cold_pages_restored": 480254,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      },
+      {
+        "cycle": 2,
+        "pid": 3,
+        "cold_pages_restored": 480254,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      }
+    ],
+    "checks": [
+      "Embedded local HTML, CSS geometry and JavaScript DOM mutation",
+      "Two 512x256 Cairo frames with full geometry oracle and font coverage",
+      "Repeatable frame hashes and exact cold process cleanup across three launches",
+      "Owned desktop window, two full screendump pixel hashes, physical Space and Escape"
+    ],
+    "limits": [
+      "Local local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open."
+    ],
+    "fixture": "local-page"
+  },
+  "nvme4": {
+    "status": "PASS",
+    "mode": "uefi",
+    "application_sha256": "416207f8c947dd5e38b7fddefa5bb7503be8ec11a660f73259a2ed974813689a",
+    "embedded_ROMFS": true,
+    "harness_sha256": "2dcd5ecff885c8b953f0ccbd80d65d99164c8c29f1fd3aa9ee3b0d2985cb69c6",
+    "cold_free_pages": 480245,
+    "boot_artifacts": {
+      "kernel_sha256": "5f4514f3e4ddf195303efb54d105444d06bbca67ff3f762dfa2ed6ae35f7d60e",
+      "iso_sha256": "a4306ff002f0a82e6e9e72c0d31365a327ba5173aa5fe189e2d33c4d796f41b2",
+      "iso_embedded_kernel_sha256": "5f4514f3e4ddf195303efb54d105444d06bbca67ff3f762dfa2ed6ae35f7d60e",
+      "kernel_symbols_match_iso": true
+    },
+    "runs": [
+      {
+        "cycle": 0,
+        "pid": 1,
+        "cold_pages_restored": 480245,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      },
+      {
+        "cycle": 1,
+        "pid": 2,
+        "cold_pages_restored": 480245,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      },
+      {
+        "cycle": 2,
+        "pid": 3,
+        "cold_pages_restored": 480245,
+        "frames": [
+          [
+            "0",
+            "1230",
+            "782c4474c37c9190"
+          ],
+          [
+            "1",
+            "1516",
+            "7b723a20d34e99c6"
+          ]
+        ]
+      }
+    ],
+    "checks": [
+      "Embedded local HTML, CSS geometry and JavaScript DOM mutation",
+      "Two 512x256 Cairo frames with full geometry oracle and font coverage",
+      "Repeatable frame hashes and exact cold process cleanup across three launches",
+      "Owned desktop window, two full screendump pixel hashes, physical Space and Escape"
+    ],
+    "limits": [
+      "Local local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open."
+    ],
+    "fixture": "local-page",
+    "storage": "QEMU NVMe, VMDK snapshot, read-only detection through Diagnostics"
+  },
+  "prepared_assets": {
+    "CHOS-assets-flat.vmdk": "2df1bf6a4dc08e8a9e6670663fee7dddd38119ed1cb774e87e8e3b563cbfdb99",
+    "CHOS-assets.vmdk": "09f53517b8fff39e280e21a45040a6c7309b8bc5130759a14c4576cab81a7a0a"
+  }
+}

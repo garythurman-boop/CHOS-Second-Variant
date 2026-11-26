@@ -16,6 +16,21 @@ sys.path.insert(0, str(ROOT / 'tests'))
 from qemu_platform import Guest, wait
 
 
+def stage_page_assets(disk, directory):
+    from qemu_webcore_component import stage_icu_packages
+    stage_icu_packages(disk, directory, 'complete')
+    sys.path.insert(0, str(ROOT / 'tools'))
+    import mkchfs
+    raw = bytearray(disk.read_bytes())
+    mkchfs.mkdir(raw, '/FONTS')
+    catalogue = json.loads((ROOT / 'docs/dependencies/text-fixtures.json').read_text())
+    for font in catalogue['fonts']:
+        data = (ROOT / 'third_party/text-fixtures' / font['path']).read_bytes()
+        assert len(data) == font['bytes'] and hashlib.sha256(data).hexdigest() == font['sha256']
+        mkchfs.put(raw, font['guest_path'], data)
+    disk.write_bytes(raw)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=pathlib.Path, required=True)
@@ -25,7 +40,13 @@ def main():
     parser.add_argument('--embedded', action='store_true', help='Application is the exact staged diagnostic ROMFS engine')
     parser.add_argument('--mode', choices=['direct', 'uefi'], default='direct')
     parser.add_argument('--icu-packages', type=pathlib.Path, help='Verified ICU package directory for the local page')
+    parser.add_argument('--window', action='store_true', help='Present the local page and verify physical Space and Escape')
+    parser.add_argument('--fusion-disk', type=pathlib.Path, help='Test a disposable copy of the prepared page VMDK on UEFI NVMe')
     args = parser.parse_args()
+    if args.fusion_disk and (not args.window or args.mode != 'uefi'):
+        parser.error('--fusion-disk requires the UEFI window fixture')
+    if args.window and args.fixture != 'local-page':
+        parser.error('--window requires the local-page fixture')
     if (args.fixture == 'local-page') != bool(args.icu_packages) or (args.icu_packages and not args.embedded):
         parser.error('The local page requires --embedded and --icu-packages')
     out = args.out.resolve()
@@ -38,18 +59,12 @@ def main():
     disk = out / 'disposable.img'
     mkchfs = ['python3', str(ROOT / 'tools/mkchfs.py')]
     subprocess.run([*mkchfs, 'create', str(disk), '--size-mib', '64' if args.icu_packages else '16'], check=True)
-    if args.icu_packages:
-        from qemu_webcore_component import stage_icu_packages
-        stage_icu_packages(disk, args.icu_packages, 'complete')
-        import mkchfs
-        raw = bytearray(disk.read_bytes())
-        mkchfs.mkdir(raw, '/FONTS')
-        catalogue = json.loads((ROOT / 'docs/dependencies/text-fixtures.json').read_text())
-        for font in catalogue['fonts']:
-            data = (ROOT / 'third_party/text-fixtures' / font['path']).read_bytes()
-            assert len(data) == font['bytes'] and hashlib.sha256(data).hexdigest() == font['sha256']
-            mkchfs.put(raw, font['guest_path'], data)
-        disk.write_bytes(raw)
+    if args.fusion_disk:
+        disk = out / 'CHOS-assets.vmdk'
+        for name in ('CHOS-assets.vmdk', 'CHOS-assets-flat.vmdk'):
+            shutil.copyfile(args.fusion_disk / name, out / name)
+    elif args.icu_packages:
+        stage_page_assets(disk, args.icu_packages)
     executable = '/BIN/JSCVM.ELF' if args.embedded else '/VALUES.ELF'
     if not args.embedded:
         subprocess.run([*mkchfs, 'put', str(disk), executable, str(application)], check=True)
@@ -61,7 +76,7 @@ def main():
         rtc_base=None, trace=False,
         firmware=pathlib.Path('/workspace/chos-tools/root/usr/share/AAVMF/AAVMF_CODE.fd'),
         no_usb=False, usb_pci_bus=0, xhci_model='qemu-xhci', pci_virtio=True,
-        net_model='e1000e', storage_error=False, nvme=False, no_rng=False,
+        net_model='e1000e', storage_error=False, disk_format='vmdk' if args.fusion_disk else 'raw', nvme=bool(args.fusion_disk), no_rng=False,
         hub_depth=0, empty_usb=False, tablet=True)
     markers = {
         'network-values': '[ OK ] actual WebCore request response error values passed; checks=39',
@@ -111,10 +126,64 @@ def main():
         wait(lambda: guest.symbol('splash_active') == 0, 10, 'desktop splash')
         if args.mode == 'uefi':
             assert 'UEFI CPU isolation active' in guest.text()
+        if args.fusion_disk:
+            # ISO boots expose the explicit read-only NVMe discovery button.
+            guest.hmp('sendkey f1')
+            wait(lambda: guest.symbol('view') == 4, 5, 'Diagnostics window')
+            w = guest.window()
+            guest.screen('diagnostics', full=True)
+            width, height = map(int, (out / 'diagnostics.ppm').read_bytes().split(b'\n', 3)[1].split())
+            scale = 3 if width >= 2400 and height >= 1530 else 2 if width >= 1600 and height >= 1024 else 1
+            x, y = w['x'] + 420 * scale, w['y'] + 403 * scale
+            guest.qmp('input-send-event', events=[
+                {'type': 'abs', 'data': {'axis': 'x', 'value': round(x * 32767 / (width - 1))}},
+                {'type': 'abs', 'data': {'axis': 'y', 'value': round(y * 32767 / (height - 1))}}])
+            time.sleep(.15)
+            for down in (True, False):
+                guest.qmp('input-send-event', events=[{'type': 'btn', 'data': {'button': 'left', 'down': down}}])
+                time.sleep(.15)
+            wait(lambda: guest.symbol('fs_ready') == 1 and guest.symbol('native_storage_writable') == 0, 8, 'read-only NVMe asset mount')
         baseline, _ = cold()
         for cycle in range(3):
             offset = len(guest.text())
-            guest.serial('exec ' + executable)
+            guest.serial('exec ' + executable + (' window' if args.window else ''))
+            if args.window:
+                for epoch, phase, key in [(0, 'initial', 'spc'), (1, 'changed', 'esc')]:
+                    submitted = f'[PAGE WINDOW] {phase} frame submitted'
+                    wait(lambda: submitted in guest.text()[offset:] or any(f in guest.text()[offset:] for f in failures),
+                         90, submitted)
+                    assert submitted in guest.text()[offset:], guest.text()[offset:]
+                    frame = re.search(rf'\[PAGE FRAME\] epoch={epoch} glyph_pixels=\d+ hash=([0-9a-f]+)', guest.text()[offset:])
+                    assert frame
+                    expected = int(frame[1], 16)
+
+                    def visible():
+                        guest.qmp('stop')
+                        try:
+                            if guest.symbol('presented_generation') != guest.symbol('dirty_generation'):
+                                return False
+                            window = guest.window()
+                            name = f'page-{cycle}-{epoch}'
+                            pixels = guest.screen(name, full=True)
+                            header = (out / (name + '.ppm')).read_bytes().split(b'\n', 3)
+                            width, height = map(int, header[1].split())
+                            scale = 3 if width >= 2400 and height >= 1530 else 2 if width >= 1600 and height >= 1024 else 1
+                            left = window['x'] + 18 * scale
+                            top = window['y'] + 98 * scale
+                            if left < 0 or top < 0 or left + 512 * scale > width or top + 256 * scale > height:
+                                return False
+                            value = 14695981039346656037
+                            for y in range(256):
+                                start = ((top + y * scale) * width + left) * 3
+                                for x in range(start, start + 512 * scale * 3, 3 * scale):
+                                    for byte in (pixels[x+2], pixels[x+1], pixels[x], 255):
+                                        value = ((value ^ byte) * 1099511628211) & 0xffffffffffffffff
+                            return value == expected
+                        finally:
+                            guest.qmp('cont')
+                    wait(visible, 10, 'displayed WebCore pixels')
+                    guest.hmp('sendkey ' + key + ' 50')
+
             next_status_check = time.monotonic() + 3
 
             def finished():
@@ -172,7 +241,9 @@ def main():
             result['checks'] = ['Embedded local HTML, CSS geometry and JavaScript DOM mutation',
                 'Two 512x256 Cairo frames with full geometry oracle and font coverage',
                 'Repeatable frame hashes and exact cold process cleanup across three launches']
-            result['limits'] = ['Offscreen local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open.']
+            if args.window:
+                result['checks'].append('Owned desktop window, two full screendump pixel hashes, physical Space and Escape')
+            result['limits'] = ['Local local rendering in QEMU. Browser UI, secure network loading and hardware qualification remain open.']
         (out / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
     except Exception as error:
         if guest is not None:

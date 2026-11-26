@@ -97,6 +97,7 @@ add_executable(CHOSLocalPage EXCLUDE_FROM_ALL "${WEBCORE_DIR}/platform/chos/Loca
     "${CHOS_WEBCORE_PLATFORM_DIR}/../../tests/native_webcore_page/LocalPlatformTests.cpp"
     "${CHOS_WEBCORE_PLATFORM_DIR}/../../tests/native_webcore_page/LocalPageStrategies.cpp")
 add_subdirectory("${CHOS_WEBCORE_PLATFORM_DIR}/../icu/browser-data" "${CMAKE_CURRENT_BINARY_DIR}/chos-browser-icu")
+target_include_directories(CHOSLocalPage PRIVATE "${CHOS_WEBCORE_PLATFORM_DIR}/../../tests/native_webcore_page")
 target_link_libraries(CHOSLocalPage PRIVATE WebCore chos_browser_icu_data)
 # ICU resolves individual resources from the verified packages registered at
 # startup. Its upstream bootstrap object supplies the required default symbol.

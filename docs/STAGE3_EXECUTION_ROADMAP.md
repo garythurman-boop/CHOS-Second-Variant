@@ -45,7 +45,7 @@ also passes complete/fragmented decoding and cleanup with the qualified engine
 allocator. Direct and UEFI tests compare every visible frame pixel. Broader codec,
 security and platform qualification remains open. Native XML, SQLite, zlib, WebP and explicit Fontconfig catalogue prerequisites
 now have selected execution evidence, as does original WebCore local buffer ownership.
-The full WebCore target now renders a local page offscreen under direct and
-UEFI QEMU. Present those frames in an owned window, qualify input and teardown,
-then connect the secure resource loader. See [image execution](NATIVE_WEBCORE_IMAGES.md)
+The full WebCore target now renders a local page in an owned desktop window
+under direct and UEFI QEMU. Preview redraw, keyboard close and cleanup pass.
+Connect general DOM input and the secure resource loader. See [image execution](NATIVE_WEBCORE_IMAGES.md)
 and [the full port boundary](WEBCORE_PORT_BOUNDARY.md).

@@ -55,7 +55,8 @@ class Guest:
                 if args.storage_error:
                     config=out/'blkdebug.conf';config.write_text('[inject-error]\nevent = "write_aio"\nerrno = "5"\nimmediately = "on"\nonce = "off"\n')
                     disk_backend='blkdebug:'+str(config)+':'+str(disk)
-                cmd+=['-drive',f'if=none,file={disk_backend},format=raw,id=storage','-device',
+                disk_options = 'format=vmdk,snapshot=on' if getattr(args, 'disk_format', 'raw') == 'vmdk' else 'format=raw'
+                cmd+=['-drive',f'if=none,file={disk_backend},{disk_options},id=storage','-device',
                       'nvme,serial=CHOS-DISPOSABLE,drive=storage' if args.nvme else 'virtio-blk-pci,disable-legacy=on,drive=storage',
                       '-netdev',getattr(args,'netdev','user,id=net'),'-device',(getattr(args,'net_model','virtio')+',id=nic,netdev=net,romfile=' if getattr(args,'net_model','virtio') in ['vmxnet3','e1000e'] else 'virtio-net-pci,id=nic,disable-legacy=on,netdev=net')]
                 if not args.no_rng:cmd+=['-object','rng-random,filename=/dev/urandom,id=rng','-device','virtio-rng-pci,disable-legacy=on,rng=rng']
